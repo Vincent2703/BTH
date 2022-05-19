@@ -1,0 +1,5 @@
+.ui-state-active{
+	border: 1px solid #003eff;
+	background: #007fff;
+	color: white;
+}

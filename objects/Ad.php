@@ -1,0 +1,180 @@
+<?php
+
+class Ad {
+    
+        public function registerPluginStylesSingleAd() {
+            wp_register_style("leaflet", plugins_url("bth/includes/css/leaflet.min.css"));
+            wp_register_style("singleAd", plugins_url("bth/includes/css/singleAd.css"));
+            wp_enqueue_style("leaflet");
+            wp_enqueue_style("singleAd");
+        }
+
+        public function registerPluginScriptsSingleAd() {
+            wp_register_script("leaflet", plugins_url("bth/includes/js/leaflet.min.js"), array(), '1.7.1', true);
+            wp_register_script("singleAd", plugins_url("bth/includes/js/singleAd.js"), array(), '1.0', true);
+            wp_enqueue_script("leaflet");
+            wp_enqueue_script("singleAd");
+        }
+    
+        public function createAd() {
+        register_post_type("ad",
+            array(
+                "labels" => array(
+                    "name"                  => "Annonces",
+                    "singular_name"         => "Une annonce",
+                    "add_new"               => "Ajouter une annonce",
+                    "add_new_item"          => "Ajouter une annonce",
+                    "edit"                  => "Editer",
+                    "edit_item"             => "Editer une annonce",
+                    "new_item"              => "Nouvelle annonce",
+                    "view"                  => "Voir",
+                    "view_item"             => "Voir une annonce",
+                    "search_items"          => "Chercher des annonces",
+                    "not_found"             => "Aucune annonce trouvée",
+                    "not_found_in_trash"    => "Aucune annonce trouvée dans la corbeille",
+                    //"parent"              => "ads",
+                    "all_items"             => "Toutes les annonces",
+                    "featured_image"        => "Miniature de l'annonce",
+                    "set_featured_image"    => "Choisir une miniature",
+                    "remove_featured_image" => "Enlever la miniature",
+                    "use_featured_image"    => "Utiliser comme",
+               ),
+
+                "public" => true,
+                "menu_position" => 15,
+                "supports" => array("title", "editor", "thumbnail"),
+                "menu_icon" => "dashicons-admin-home",
+                "has_archive" => true
+           )
+       );
+        register_taxonomy("adTypeProperty", array("ad"), array(
+            "hierarchical"      => false, 
+            "description"       => "Créez un type de bien pour catégoriser vos annonces.", 
+            "label"             => "Types des biens immobiliers", 
+            "show_admin_column" => true, 
+            "show_in_menu"      => false,
+            "singular_label"    => "Type de bien", 
+            "rewrite"           => false,
+            "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
+       ));
+        
+        wp_insert_term("Appartement", "adTypeProperty");
+        wp_insert_term("Bâtiment", "adTypeProperty");
+        wp_insert_term("Boutique", "adTypeProperty");
+        wp_insert_term("Bureaux", "adTypeProperty");
+        wp_insert_term("Local", "adTypeProperty");
+        wp_insert_term("Maison/villa", "adTypeProperty");
+        wp_insert_term("Maison avec terrain", "adTypeProperty");
+        wp_insert_term("Parking/box", "adTypeProperty");
+        wp_insert_term("Terrain", "adTypeProperty");
+        
+        register_taxonomy("adTypeAd", array("ad"), array(
+            "hierarchical"      => false, 
+            "description"       => "Créez un type d'annonce pour catégoriser vos annonces.", 
+            "label"             => "Types des annonces immobilières", 
+            "show_admin_column" => true, 
+            "show_in_menu"      => false,
+            "singular_label"    => "Type d'annonce", 
+            "rewrite"           => false,
+            "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
+       ));
+        
+        wp_insert_term("Location", "adTypeAd");
+        wp_insert_term("Vente", "adTypeAd");
+        wp_insert_term("Vente de prestige", "adTypeAd");
+
+    }
+    
+    public function showPage() {
+    ?>
+
+    <div class="wrap">
+        <h2>BTH Accueil</h2>
+        <p>Bien le bonjour</p>
+        <?php settings_errors(); ?>
+    </div>
+    <?php }
+    
+  
+    function templatePostAd($path) {
+	if(get_post_type() == "ad") {
+            if(is_single()) {
+                $this->registerPluginScriptsSingleAd();
+                $this->registerPluginStylesSingleAd();
+                if($themeFile = locate_template(array('singleAd.php'))) {
+                    $path = $path;
+                }else{
+                    $path = plugin_dir_path(__DIR__)."templates/singleAd.php";
+                }
+            }
+	}
+	return $path;
+    }
+    
+    function taxonomyMetaBoxCB($post, $taxonomy) {
+        $taxonomyName = $taxonomy["args"]["taxonomy"];
+        $terms = get_terms($taxonomyName, array("hide_empty" => false));
+	//$post  = get_post();
+	$term = wp_get_object_terms($post->ID, $taxonomyName, array("orderby" => "term_id", "order" => "ASC"));
+	$name  = '';
+
+        if(!is_wp_error($term)) {
+            if(isset($term[0]) && isset($term[0]->name)) {
+                $name = $term[0]->name;
+            }
+        }
+
+        foreach ($terms as $term) {
+        ?>
+            <label title="<?php esc_attr_e($term->name); ?>">
+                <input type="radio" name="<?= $taxonomyName; ?>" value="<?php esc_attr_e($term->name); ?>" <?php checked($term->name, $name); ?>>
+                    <span><?php esc_html_e($term->name); ?></span>
+            </label><br>
+        <?php
+        }
+    }
+    
+function filterAdsByTaxonomies() {
+    global $typenow;
+    $postType = "ad"; 
+    $taxonomies = get_taxonomies(["object_type" => ["ad"]]);
+    foreach($taxonomies as $taxonomy) {
+        if($typenow == $postType) {
+            $selected      = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : "";
+            $taxonomyData = get_taxonomy($taxonomy);
+            wp_dropdown_categories(array(
+                    "show_option_all" => $taxonomyData->label,
+                    "taxonomy"        => $taxonomy,
+                    "name"            => $taxonomy,
+                    "orderby"         => "name",
+                    "selected"        => $selected,
+                    "show_count"      => true,
+                    "hide_empty"      => true,
+            ));
+        }
+    }
+}
+
+function convertIdToTermInQuery($query) {
+    global $typenow;
+    global $pagenow;
+    
+    $taxonomies = get_taxonomies(["object_type" => ["ad"]]);
+    
+    foreach($taxonomies as $taxonomy) {
+        if($pagenow == "edit.php" && $typenow == "ad" && isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
+            $taxQuery = array(
+                    "taxonomy" => $taxonomy,
+                    "terms"    => array( $_GET[$taxonomy] ),
+                    "field"    => "id",
+                    "operator" => "IN",
+            );
+            $query->tax_query->queries[] = $taxQuery; 
+            $query->query_vars["tax_query"] = $query->tax_query->queries;
+        }
+    }
+
+}
+    
+    
+}
