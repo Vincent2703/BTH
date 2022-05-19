@@ -8,10 +8,10 @@ class Options {
         <div class="wrap">
             <form method="post" action="options.php" enctype="multipart/form-data">
                 <?php
-                    if(isset($_GET["tab"])) { //Si on a sélectionné un onglet
+                    if(isset($_GET["tab"])) { //Si on a sÃ©lectionnÃ© un onglet
                         $option = "Options".ucfirst($_GET["tab"]); //On affiche la page correspondante
                     }else{
-                        $option = "OptionsImports"; //Page par défaut
+                        $option = "OptionsImports"; //Page par dÃ©faut
                     }
                     settings_fields(PLUGIN_RE_NAME.$option."Group");
                     do_settings_sections(PLUGIN_RE_NAME.$option."Page");
@@ -28,7 +28,7 @@ class Options {
                 if(isset($_GET["tab"])) { //S'il y a un $_GET tab
                     $tab = $_GET["tab"]; //On le prend
                 }else{
-                    $tab = "imports"; //Sinon par défaut
+                    $tab = "imports"; //Sinon par dÃ©faut
                 }
             }else{ //Sinon on est sur la page edit-tags
                 $tab = "tags";
@@ -39,9 +39,9 @@ class Options {
                 <a href="edit.php?post_type=ad&page=bthoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>">Imports</a>
                 <a href="edit.php?post_type=ad&page=bthoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>">Exports</a>
                 <!--<a href="edit.php?post_type=ad&page=bthoptions&tab=mapping" class="nav-tab <?/= $tab === "mapping" ? "nav-tab-active" : ''; ?>">Mapping</a>-->
-                <!--<a href="edit-tags.php?taxonomy=adTypeProperty&post_type=ad" class="nav-tab <?/= $tab === "tags" ? "nav-tab-active" : ''; ?>">Catégories</a>-->
+                <!--<a href="edit-tags.php?taxonomy=adTypeProperty&post_type=ad" class="nav-tab <?/= $tab === "tags" ? "nav-tab-active" : ''; ?>">CatÃ©gories</a>-->
                 <a href="edit.php?post_type=ad&page=bthoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>">Mail</a>
-                <a href="edit.php?post_type=ad&page=bthoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>">Barème des honoraires</a>                
+                <a href="edit.php?post_type=ad&page=bthoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>">BarÃ¨me des honoraires</a>                
             </h2>
         <?php   
         }
@@ -78,7 +78,7 @@ class Options {
             array($this, "optionsSanitizeEmail") // sanitizeCallback
         );
         
-        register_setting( //Enregistrement des options pour le barème des honoraires
+        register_setting( //Enregistrement des options pour le barÃ¨me des honoraires
             PLUGIN_RE_NAME."OptionsFeesGroup", // option_group
             PLUGIN_RE_NAME."OptionsFees", // option_name
             array($this, "optionsSanitizeFees") // sanitizeCallback
@@ -129,7 +129,7 @@ class Options {
         
         add_settings_field(
             "autoImport", // id
-            'Import automatique <abbr title="Les annonces stockées dans le répertoire d\'importation pourront être importées automatiquement sur ce site via un cron job"><sup>?</sup></abbr>', // title
+            'Import automatique <abbr title="Les annonces stockÃ©es dans le rÃ©pertoire d\'importation pourront Ãªtre importÃ©es automatiquement sur ce site via un cron job"><sup>?</sup></abbr>', // title
             array($this, "autoImportCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -137,7 +137,7 @@ class Options {
         
         add_settings_field(
             "dirImportPath", // id
-            'Répertoire d\'importation <abbr title="Chemin vers les fichiers à importer automatiquement"><sup>?</sup></abbr>', // title
+            'RÃ©pertoire d\'importation <abbr title="Chemin vers les fichiers Ã  importer automatiquement"><sup>?</sup></abbr>', // title
             array($this, "dirImportPathCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -145,7 +145,7 @@ class Options {
         
         add_settings_field(
             "saveCSVImport", // id
-            'Sauvegarde des importations <abbr title="Une copie du fichier contenant les annonces importées sera stockée sur le serveur"><sup>?</sup></abbr>', // title
+            'Sauvegarde des importations <abbr title="Une copie du fichier contenant les annonces importÃ©es sera stockÃ©e sur le serveur"><sup>?</sup></abbr>', // title
             array($this, "saveCSVImportCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -153,7 +153,7 @@ class Options {
         
         add_settings_field(
             "dirSavesPath", // id
-            'Répertoire de sauvegarde <abbr title="Chemin où sauvegarder les annonces importées"><sup>?</sup></abbr>', // title
+            'RÃ©pertoire de sauvegarde <abbr title="Chemin oÃ¹ sauvegarder les annonces importÃ©es"><sup>?</sup></abbr>', // title
             array($this, "dirSavesPathCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -161,7 +161,7 @@ class Options {
         
         add_settings_field(
             "maxSaves", // id
-            'Nombre de sauvegardes <abbr title="Nombre de copies des fichiers contenant les annonces importées à conserver"><sup>?</sup></abbr>', // title
+            'Nombre de sauvegardes <abbr title="Nombre de copies des fichiers contenant les annonces importÃ©es Ã  conserver"><sup>?</sup></abbr>', // title
             array($this, "maxSavesCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -169,7 +169,7 @@ class Options {
         
         add_settings_field(
             "maxDim", // id
-            'Taille des images <abbr title="Dimension maximale des images importées"><sup>?</sup></abbr>', // title
+            'Taille des images <abbr title="Dimension maximale des images importÃ©es"><sup>?</sup></abbr>', // title
             array($this, "maxDimCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -179,7 +179,7 @@ class Options {
                     
         add_settings_field(
             "dirExportPath", //id
-            'Répertoire d\'exportation <abbr title"Chemin où seront exportées localement les annonces"><sup>?</sup></abbr>', //title
+            'RÃ©pertoire d\'exportation <abbr title"Chemin oÃ¹ seront exportÃ©es localement les annonces"><sup>?</sup></abbr>', //title
             array($this, "dirExportPathCallback"), //callback
             PLUGIN_RE_NAME."OptionsExportsPage", //page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -187,7 +187,7 @@ class Options {
         
         /*add_settings_field(
             "autoExport", // id
-            'Export automatique <abbr title="Les annonces seront exportées automatiquement vers les sites partenaires - voir l\'onglet \'Exports\'"><sup>?</sup></abbr>', // title
+            'Export automatique <abbr title="Les annonces seront exportÃ©es automatiquement vers les sites partenaires - voir l\'onglet \'Exports\'"><sup>?</sup></abbr>', // title
             array($this, "autoExportCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -215,7 +215,7 @@ class Options {
 
         add_settings_field(
             "sendMail", // id
-            'Envoi mail si erreur <abbr title="Un mail sera envoyé à l\'adresse indiquée si le plugin détecte une erreur lors d\'une exportation ou d\'une importation"><sup>?</sup></abbr>', // title
+            'Envoi mail si erreur <abbr title="Un mail sera envoyÃ© Ã  l\'adresse indiquÃ©e si le plugin dÃ©tecte une erreur lors d\'une exportation ou d\'une importation"><sup>?</sup></abbr>', // title
             array($this, "sendMailCallback"), // callback
             PLUGIN_RE_NAME."OptionsEmailPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -223,17 +223,17 @@ class Options {
 
         add_settings_field(
             "email", // id
-            "Adresse mail à contacter en cas d'erreur", // title
+            "Adresse mail Ã  contacter en cas d'erreur", // title
             array($this, "emailCallback"), // callback
             PLUGIN_RE_NAME."OptionsEmailPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
-        /* Barème des honoaires*/
+        /* BarÃ¨me des honoaires*/
         
         add_settings_field(
             "feesUrl", // id
-            "Adresse URL vers le barème des honoraires", // title
+            "Adresse URL vers le barÃ¨me des honoraires", // title
             array($this, "feesUrlCallback"), // callback
             PLUGIN_RE_NAME."OptionsFeesPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -241,7 +241,7 @@ class Options {
         
         add_settings_field(
             "feesFile", // id
-            "Fichier avec le barème des honoraires", // title
+            "Fichier avec le barÃ¨me des honoraires", // title
             array($this, "feesFileCallback"), // callback
             PLUGIN_RE_NAME."OptionsFeesPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -350,7 +350,7 @@ class Options {
         if(isset($_GET["import"]) && is_admin()) {
             $this->import();
             if(SELF::$newAds > 0 || SELF::$updatedAds > 0) {
-                echo "Importation réussie : ".SELF::$newAds." annonce(s) créée(s) et ".SELF::$updatedAds." annonce(s) mise(s) à jour.";
+                echo "Importation rÃ©ussie : ".SELF::$newAds." annonce(s) crÃ©Ã©e(s) et ".SELF::$updatedAds." annonce(s) mise(s) Ã  jour.";
             }
             if(SELF::$errorAds !== 0) {
                 echo " Dont ".SELF::$errorAds." erreur(s). Consultez les logs pour en savoir plus.";
@@ -611,7 +611,7 @@ class Options {
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Numéro du champ (CSV)</th>
+                                <th>NumÃ©ro du champ (CSV)</th>
                                 <th>Nom de la valeur (<?= PLUGIN_RE_NAME;?>)</th>
                                 <th>Type du champ</th>
                                 <th>Section du champ</th>
@@ -677,7 +677,7 @@ class Options {
                                 }
                                 ?>
                             <tr class="table-separator">
-                                <td colspan="4">Champs personnalisés</td>
+                                <td colspan="4">Champs personnalisÃ©s</td>
                             </tr>
                         </tbody>
                     </table>
