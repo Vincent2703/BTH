@@ -185,18 +185,26 @@ class Options {
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
-        /*add_settings_field(
-            "autoExport", // id
-            'Export automatique <abbr title="Les annonces seront exportées automatiquement vers les sites partenaires - voir l\'onglet \'Exports\'"><sup>?</sup></abbr>', // title
-            array($this, "autoExportCallback"), // callback
+        add_settings_field(
+            "versionSeLoger", // id
+            'Version SeLoger <abbr title="Version et révision du format SeLoger utilisé"><sup>?</sup></abbr>', // title
+            array($this, "versionSeLogerCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
-        );*/
+        );
         
         add_settings_field(
             "idAgency", // id
             'Identifiant agence <abbr title="Identifiant pour utiliser le format SeLoger"><sup>?</sup></abbr>', // title
             array($this, "idAgencyCallback"), // callback
+            PLUGIN_RE_NAME."OptionsExportsPage", // page
+            PLUGIN_RE_NAME."optionsSection" // section
+        );
+        
+        add_settings_field(
+            "maxCSVColumn", // id
+            'Dernier rang du champ possible <abbr title="Ce nombre correspond au nombre de champs possible dans le format SeLoger +1"><sup>?</sup></abbr>', // title
+            array($this, "maxCSVColumnCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
         );
@@ -284,18 +292,20 @@ class Options {
         if(isset($input["dirExportPath"])) {
             $sanitaryValues["dirExportPath"] = sanitize_text_field($input["dirExportPath"]);
         }
-        if(isset($input["autoExport"])) {
-            $sanitaryValues["autoExport"] = $input["autoExport"];
+        if(isset($input["versionSeLoger"])) {
+            $sanitaryValues["autoExport"] = sanitize_text_field($input["autoExport"]);
         }
         if(isset($input["idAgency"])) {
             $sanitaryValues["idAgency"] = sanitize_text_field($input["idAgency"]);
+        }
+        if(isset($input["maxCSVColumn"])) {
+            $sanitaryValues["maxCSVColumn"] = sanitize_text_field($input["maxCSVColumn"]);
         }
         
         return $sanitaryValues;
     }
     
     public function optionsSanitizeMapping($input) {
-        //$sanitaryValues = array();
         if(isset($input["mappingFields"]) && is_string($input["mappingFields"]) && is_array(json_decode($input["mappingFields"], true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false) {
             $sanitaryValues = json_decode($input["mappingFields"], true);
         }      
@@ -376,13 +386,10 @@ class Options {
             "class" => "regular-text",
             "name" => PLUGIN_RE_NAME."OptionsExports[idAgency]",
             "id" => "idAgency",
+            "placeholder" => "monAgence",
             "value" => isset($this->optionsExports["idAgency"]) ? esc_attr($this->optionsExports["idAgency"]) : ''
         );
-        if(isset($this->optionsExports["autoExport"])) {
-            $args["required"] = "required";
-        }else{
-            $args["readonly"] = "readonly";
-        }
+
         echo "<input ";
         foreach($args as $key => $value) {
             if(!empty($value)) {
@@ -541,23 +548,43 @@ class Options {
         echo ">";
     }
     
-    public function autoExportCallback() {
+    public function versionSeLogerCallback() {
         $args = array(
-            "type" => "checkbox",
-            "name" => PLUGIN_RE_NAME."OptionsExports[autoExport]",
-            "id" => "autoExport",
-            "onchange" => "readOnlyFields(this,['idAgency']);"
+            "type" => "text",
+            "class" => "regular-text",
+            "name" => PLUGIN_RE_NAME."OptionsExports[versionSeLoger]",
+            "id" => "versionSeloger",
+            "pattern" => "\d+\.\d+-\d+",
+            "placeholder" => "4.08-007",
+            "value" => isset($this->optionsExports["versionSeLoger"]) ? esc_attr($this->optionsExports["versionSeLoger"]) : '',
+            "required" => "true"
         );
-        if(isset($this->optionsExports['autoExport'])) {
-            $args["checked"] = "checked";
-        }
+
         echo "<input ";
         foreach($args as $key => $value) {
             if(!empty($value)) {                
                 echo "$key=$value ";            
             }
         }
-        echo '><label for="autoExport"> Oui</label>';
+    }
+    
+    public function maxCSVColumnCallback() {
+        $args = array(
+            "type" => "number",
+            "class" => "regular-text",
+            "name" => PLUGIN_RE_NAME."OptionsExports[maxCSVColumn]",
+            "id" => "maxCSVColumn",
+            "placeholder" => 328,
+            "value" => isset($this->optionsExports["maxCSVColumn"]) ? esc_attr($this->optionsExports["maxCSVColumn"]) : '',
+            "required" => "true"
+        );
+
+        echo "<input ";
+        foreach($args as $key => $value) {
+            if(!empty($value)) {                
+                echo "$key=$value ";            
+            }
+        }
     }
 
     public function sendMailCallback() {
@@ -565,7 +592,7 @@ class Options {
             "type" => "checkbox",
             "name" => PLUGIN_RE_NAME."OptionsEmail[sendMail]",
             "id" => "sendMail",
-            "onchange" => "readOnlyFields(this);"
+            "onchange" => "readOnlyFields(this,['email']);"
         );
         if(isset($this->optionsEmail['sendMail'])) {
             $args["checked"] = "checked";

@@ -34,6 +34,7 @@ class Bth {
         add_action("init", array($this, "initObjects"));
 
 	register_activation_hook(__FILE__, array($this, 'activationPlugin')); //A l'activation du plugin...
+        //Ajouter à la désactivation
         
         add_action("admin_init", array($this, "initAdmin"));
         
@@ -55,7 +56,7 @@ class Bth {
         add_filter("template_include", array($this->Agency, "templatePostAgency"), 1);
         add_filter("template_include", array($this->Agent, "templatePostAgent"), 1);
 
-        
+        add_filter("the_title", array($this, "maxLengthTitle"));
         add_filter("enter_title_here", array($this, "changeTitle"));
         add_filter("pre_get_posts", array($this->Ad, "convertIdToTermInQuery"));
         
@@ -79,7 +80,7 @@ class Bth {
     }
 
     
-    public static function activationPlugin() { //A l'activation du plugin
+    public function activationPlugin() { //A l'activation du plugin
         //Enregistrer les valeurs par défaut
         $defaultValuesImports = array(
                 "autoImport" 		=> "on", 
@@ -93,7 +94,9 @@ class Bth {
         
         $defaultValuesExports = array(
                 "dirExportPath"     => "wp-content/plugins/".PLUGIN_RE_NAME."/export/",
-                "idAgency"          => "monAgence"
+                "versionSeLoger"    => "4.08-007",
+                "idAgency"          => "monAgence",
+                "maxCSVColumn"       => 328
         );
         update_option(PLUGIN_RE_NAME."OptionsExports", $defaultValuesExports); 
         
@@ -101,8 +104,7 @@ class Bth {
         $config = json_decode(fread($configFile, filesize(__DIR__."\config.json")), true);
         fclose($configFile);
         $defaultMapping = $config["DEFAULT_MAPPING"];
-        update_option(PLUGIN_RE_NAME."OptionsMapping", $defaultMapping); //Enregistrer le mapping par défaut des champs
-        
+        update_option(PLUGIN_RE_NAME."OptionsMapping", $defaultMapping); //Enregistrer le mapping par défaut des champs        
     }
     
     public function initObjects() {
@@ -213,6 +215,15 @@ class Bth {
             array($this->Options, "showPage"), //Function
             5 //Position
         );
+    }
+    
+    public function maxLengthTitle($title) {
+        $postType = get_current_screen()->post_type;
+        if($postType === "ad") {
+            $title = substr($title, 0, 64);
+        }
+        
+        return $title;
     }
     
     public function changeTitle($title) {

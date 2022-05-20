@@ -108,7 +108,7 @@ class EditAd {
                             $resultsArray = json_decode($resultsBody, true);
 
                             $coordinates = $resultsArray["features"][0]["geometry"]["coordinates"];
-                            update_post_meta($adId, "adDataMap", "$coordinates[1],$coordinates[0],$zoom,$radiusCircle");
+                            update_post_meta($adId, "adDataMap", array("lat" => $coordinates[1], "long" => $coordinates[0], "zoom" => $zoom, "circ" => $radiusCircle));
 
                             $PC = $resultsArray["features"][0]["properties"]["postcode"];
                             update_post_meta($adId, "adPC", $PC);
@@ -236,7 +236,7 @@ class EditAd {
                 </div>
                 <div class="text">
                     <label>Surface du terrain (m²)</label>
-                    <input type="number" name="landSurface" id="landSurfaceInput" placeholder="Ex : 90" value="<?= $landSurface; ?>" required>
+                    <input type="number" name="landSurface" id="landSurfaceInput" placeholder="Ex : 90" value="<?= $landSurface; ?>">
                 </div>
             </div>
             <div id="address">

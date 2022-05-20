@@ -9,7 +9,6 @@ class Import {
     private static $sendMail = false;
 
     public function showPage() {
-        SELF::addLog("éà");
         $optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");        
         $postType = get_current_screen()->post_type;
         $base = get_current_screen()->base;
@@ -22,17 +21,16 @@ class Import {
                 <h2>Importez les annonces</h2>
             <?php
             }
-             if($zipInDirPath) { ?>
+            if($zipInDirPath) { ?>
                 <a href="?startImport" class="button button-primary" style="margin-right: 10px;">Lancer une importation</a>
             <?php }else{ ?>
                 <form action="index.php" method="post" enctype="multipart/form-data">
-                    <input type="file" name="file" accept=".zip"><br />
-                <label class="switch">
-                    <input type="checkbox" id="publishAds" name="publishAds" checked>
-                    <span class="slider"></span>
-                </label>
-                <label for="publishAds">&#160;Publier directement les annonces</label><br />
-                    <input type="submit" name="submitImport" class="button button-primary" value="Importer les annonces">
+                    <input type="file" name="file" accept=".zip">
+                    <p>
+                        <input type="submit" name="submitImport" class="button button-primary" value="Importer les annonces">
+                        <input type="checkbox" id="publishAds" name="publishAds" checked>
+                        <label for="publishAds">Publier directement les annonces</label>                    
+                    </p>      
                 </form>
             <?php } ?>
         </div>
@@ -99,7 +97,7 @@ class Import {
         $dirSaves = scandir($dirSavesPath); //Scan le dossier des sauvegardes
         $saves = array();
         foreach($dirSaves as $elem) {
-            if((preg_match("/^[0-9]{2}-[0-9]{2}-[0-9]{4}_[0-9]{2}h[0-9]{2}m[0-9]{2}s_.{0,}\.zip/", $elem))) { //Si c'est un fichier de sauvegarde
+            if((preg_match("/^\d{2}-\d{2}-\d{4}_\d{2}h\d{2}m\d{2}s_.+\.zip/", $elem))) { //Si c'est un fichier de sauvegarde
                 array_push($saves, $elem); //On le met dans un tableau
             }
         }
