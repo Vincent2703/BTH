@@ -56,7 +56,7 @@ class Bth {
         add_filter("template_include", array($this->Agency, "templatePostAgency"), 1);
         add_filter("template_include", array($this->Agent, "templatePostAgent"), 1);
 
-        add_filter("the_title", array($this, "maxLengthTitle"));
+        //add_filter("the_title", array($this, "maxLengthTitle"));
         add_filter("enter_title_here", array($this, "changeTitle"));
         add_filter("pre_get_posts", array($this->Ad, "convertIdToTermInQuery"));
         
@@ -215,16 +215,7 @@ class Bth {
             array($this->Options, "showPage"), //Function
             5 //Position
         );
-    }
-    
-    public function maxLengthTitle($title) {
-        $postType = get_current_screen()->post_type;
-        if($postType === "ad") {
-            $title = substr($title, 0, 64);
-        }
-        
-        return $title;
-    }
+    }   
     
     public function changeTitle($title) {
         $postType = get_current_screen()->post_type;
