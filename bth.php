@@ -56,7 +56,6 @@ class Bth {
         add_filter("template_include", array($this->Agency, "templatePostAgency"), 1);
         add_filter("template_include", array($this->Agent, "templatePostAgent"), 1);
 
-        //add_filter("the_title", array($this, "maxLengthTitle"));
         add_filter("enter_title_here", array($this, "changeTitle"));
         add_filter("pre_get_posts", array($this->Ad, "convertIdToTermInQuery"));
         

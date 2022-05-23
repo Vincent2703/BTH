@@ -40,71 +40,79 @@ class Export {
             "post_status" => "publish"
         );
         if(isset($_POST["onlyAvailable"])) {
-            $args["meta_key"] = "adAvailable";
-            $args["meta_value"] = "on";
+            $args["tax_query"] = array(
+                array(
+                    "taxonomy" => "adAvailable",
+                    "term" => "name",
+                    "terms" => array("Disponible"),
+                    "operator" => "EXISTS"
+                )
+            );
         }
+
         $ads = get_posts($args);
-        $arrayAds = array();
-                
-        foreach($ads as $ad) {
-            $metas = array_map(function($n) {return $n[0];}, get_post_meta($ad->ID));                
-            $imagesIds = $metas["adImages"]; //On récupère les images
-            $images = array();
-            if(!is_null($imagesIds)) {
-                $ids = explode(';', $imagesIds); //Les IDs sont séparés par un ;
-                foreach ($ids as $id) {
-                    array_push($images, wp_get_attachment_image_url($id, "large")); //Pour chaque image on récupère leur URL
+               
+        $arrayAds = array();                
+
+        if(!empty($ads)) {
+            foreach($ads as $ad) {
+                $metas = array_map(function($n) {return $n[0];}, get_post_meta($ad->ID));         
+                $imagesIds = $metas["adImages"]; //On récupère les images
+                $images = array();
+                if(!is_null($imagesIds)) {
+                    $ids = explode(';', $imagesIds); //Les IDs sont séparés par un ;
+                    foreach ($ids as $id) {
+                        array_push($images, wp_get_attachment_image_url($id, "large")); //Pour chaque image on récupère leur URL
+                    }
+
+                    $sizeImgs = count($images);
+                    if($sizeImgs < 9) {
+                        $images += array_fill($sizeImgs, 9-$sizeImgs, ""); //S'il y a moins de 10 images, le champ sera laissé vide dans le CSV
+                    }
                 }
 
-                $sizeImgs = count($images);
-                if($sizeImgs < 9) {
-                    $images += array_fill($sizeImgs, 9-$sizeImgs, ""); //S'il y a moins de 10 images, le champ sera laissé vide dans le CSV
+                //Récupérer infos agent
+                if($metas["adShowAgent"] === "on" && isset($metas["adAgent"]) && $agent = get_post($metas["adAgent"])) {
+                    $agentEmail = get_post_meta($agent, "agentEmail", true);                 
+                }else{
+                    $agentEmail = "";
                 }
-            }
 
-            //Récupérer infos agent
-            if($metas["adShowAgent"] === "on") {
-                if($agent = get_post($metas["adAgent"])) {
-                    $agentEmail = get_post_meta($agent, "agentEmail", true);
+                $arrayAd = [
+                    1                                               => $optionsExports["idAgency"],
+                    SELF::getFieldIdByName($fields, "title")        => html_entity_decode(get_the_title($ad, ENT_COMPAT, "UTF-8")),
+                    SELF::getFieldIdByName($fields, "typeAd")       => get_the_terms($ad, "adTypeAd")[0]->name,
+                    SELF::getFieldIdByName($fields, "typeProperty") => get_the_terms($ad, "adTypeProperty")[0]->name,
+                    SELF::getFieldIdByName($fields, "description")  => html_entity_decode(get_the_content(null, null, $ad), ENT_COMPAT, "UTF-8"), 
+                    SELF::getFieldIdByName($fields, "latitude")     => unserialize($metas["adDataMap"])["lat"],
+                    SELF::getFieldIdByName($fields, "longitude")    => unserialize($metas["adDataMap"])["long"],
+                    SELF::getFieldIdByName($fields, "agentEmail")   => $agentEmail,
+                    SELF::getFieldIdByName($fields, "feesAgency")   => $optionsFees["feesUrl"],
+                    300 => "1" //Précision GPS (?)
+                ];
+
+                $arrayAd[SELF::getFieldIdByName($fields, "thumbnail")] = $images[0];
+                for($i=1; $i<=8; $i++) {
+                    $arrayAd[SELF::getFieldIdByName($fields, "picture".$i)] = $images[$i];
                 }
-            }else{
-                $agentEmail = "";
-            }
 
-            $arrayAd = [
-                1                                               => $optionsExports["idAgency"],
-                SELF::getFieldIdByName($fields, "title")        => html_entity_decode(get_the_title($ad, ENT_COMPAT, "UTF-8")),
-                SELF::getFieldIdByName($fields, "typeAd")       => get_the_terms($ad, "adTypeAd")[0]->name,
-                SELF::getFieldIdByName($fields, "typeProperty") => get_the_terms($ad, "adTypeProperty")[0]->name,
-                SELF::getFieldIdByName($fields, "description")  => html_entity_decode(get_the_content(null, null, $ad), ENT_COMPAT, "UTF-8"), 
-                SELF::getFieldIdByName($fields, "latitude")     => unserialize($metas["adDataMap"])["lat"],
-                SELF::getFieldIdByName($fields, "longitude")    => unserialize($metas["adDataMap"])["long"],
-                SELF::getFieldIdByName($fields, "agentEmail")   => $agentEmail,
-                SELF::getFieldIdByName($fields, "feesAgency")   => $optionsFees["feesUrl"],
-                300 => "1" //Précision GPS (?)
-            ];
+                //On peut peut-être fusionner les deux for suivants ? 
 
-            $arrayAd[SELF::getFieldIdByName($fields, "thumbnail")] = $images[0];
-            for($i=1; $i<=8; $i++) {
-                $arrayAd[SELF::getFieldIdByName($fields, "picture".$i)] = $images[$i];
-            }
-
-            //On peut peut-être fusionner les deux for suivants ? 
-
-            foreach($fields as $field) {
-                if(!array_key_exists($field["id"], $arrayAd)) {
-                    $arrayAd[$field["id"]] = $metas["ad".ucfirst($field["name"])];
+                foreach($fields as $field) {
+                    if(!array_key_exists($field["id"], $arrayAd)) {
+                        $arrayAd[$field["id"]] = $metas["ad".ucfirst($field["name"])];
+                    }
                 }
-            }
 
-            for($i=1; $i <= intval($optionsExports["maxCSVColumn"]); $i++) { //Ou au moins optimiser ça ?
-                if(!array_key_exists($i, $arrayAd)) {
-                    $arrayAd[$i] = "";
+                for($i=1; $i <= intval($optionsExports["maxCSVColumn"]); $i++) { //Ou au moins optimiser ça ?
+                    if(!array_key_exists($i, $arrayAd)) {
+                        $arrayAd[$i] = "";
+                    }
                 }
-            }
-            ksort($arrayAd);
+                ksort($arrayAd);
 
-            array_push($arrayAds, $arrayAd);
+                array_push($arrayAds, $arrayAd);
+            }
         }
         return $arrayAds;
     }

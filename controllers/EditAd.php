@@ -3,30 +3,21 @@
 class EditAd {
     public function addMetaBoxes() {
         add_meta_box( 
-            'adBasicsMetaBox', //ID HTML
+            "adBasicsMetaBox", //ID HTML
             "Renseignements basiques", //Display
-            array($this, 'displayAdBasicsMetaBox'), //Callback
-            'ad', //Custom type
-            'normal', //Location on the page
-            'high' //Priority
+            array($this, "displayAdBasicsMetaBox"), //Callback
+            "ad", //Custom type
+            "normal", //Location on the page
+            "high" //Priority
         );
-        
+             
         add_meta_box( 
-            'adStatusMetaBox', //ID HTML
-            "Statut de l'annonce", //Display
-            array($this, 'displayAdStatusMetaBox'), //Callback
-            'ad', //Custom type
-            'side', //Location on the page
-            'low' //Priority
-        );        
-        
-        add_meta_box( 
-            'adAdvancedMetaBox', //ID HTML
+            "adAdvancedMetaBox", //ID HTML
             "Renseignements complémentaires", //Display
-            array($this, 'displayAdAdvancedDateMetaBox'), //Callback
-            'ad', //Custom type
-            'advanced', //Location on the page
-            'high' //Priority
+            array($this, "displayAdAdvancedDateMetaBox"), //Callback
+            "ad", //Custom type
+            "advanced", //Location on the page
+            "high" //Priority
         );
     }
     
@@ -37,6 +28,7 @@ class EditAd {
             
             $this->saveTaxonomy($adId, "adTypeProperty");
             $this->saveTaxonomy($adId, "adTypeAd");
+            $this->saveTaxonomyAdAvailable($adId, "adAvailable");
             
             
             if(isset($_POST["refAgency"]) && ctype_space($_POST["refAgency"])) {
@@ -119,12 +111,7 @@ class EditAd {
             if(isset($_POST["showAgent"])) {
                 update_post_meta($adId, "adShowAgent", "OUI");
             }
-            
-            
-            if(isset($_POST["available"])) {
-                update_post_meta($adId, "adAvailable", "OUI");
-            }
-                    
+  
                        
             if(isset($_POST["labels"]) && ctype_space($_POST["labels"])) {
                 update_post_meta($adId, "adLabels", sanitize_text_field($_POST["labels"]));
@@ -165,6 +152,43 @@ class EditAd {
                 update_post_meta($adId, "adTerrace", "OUI");
             }
         }
+    }
+    
+        
+    function saveTaxonomy($postId, $taxonomyName) {
+        if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+            return;
+        }
+
+        if(!isset($_POST[$taxonomyName])) {
+            return;
+        }
+
+        $taxonomy = sanitize_text_field($_POST[$taxonomyName]);
+
+        if(!empty($taxonomy)) {
+
+            $term = get_term_by("name", $taxonomy, $taxonomyName);
+            if(!empty($term) && !is_wp_error($term)) {
+                wp_set_object_terms($postId, $term->term_id, $taxonomyName, false);
+            }
+        }
+    }
+    
+    function saveTaxonomyAdAvailable($postId) {
+        $taxonomyName = "adAvailable";
+        if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+            return;
+        }
+        
+        if(isset($_POST[$taxonomyName]) && $_POST[$taxonomyName] === "Disponible") {
+            $term = get_term_by("name", "Disponible", $taxonomyName);
+            wp_set_object_terms($postId, $term->term_id, $taxonomyName, false);
+        }else{
+            $term = get_term_by("name", "Indisponible", $taxonomyName);
+            wp_set_object_terms($postId, $term->term_id, $taxonomyName, false);
+        }
+        
     }
     
     public function displayAdBasicsMetaBox($ad) {
@@ -219,7 +243,7 @@ class EditAd {
                 </div>             
 
                 <div class="radio">
-                    <input type="radio" name="showMap" id="map1" value="no" <?=($showMap==="no")?"checked":NULL;?> required><label for="map1">Ne pas afficher l'adresse</label>
+                    <input type="radio" name="showMap" id="map1" value="no" <?=($showMap==="no")?"checked":NULL; //remplacer par la fonction wp checked()?> required><label for="map1">Ne pas afficher l'adresse</label>
                     <input type="radio" name="showMap" id="map2" value="onlyPC" <?=($showMap==="onlyPC"||!$showMap)?"checked":NULL;?> required><label for="map2">Afficher le code postal et la ville</label>
                     <input type="radio" name="showMap" id="map3" value="all" <?=($showMap==="all")?"checked":NULL;?> required><label for="map3">Afficher l'adresse complète</label>
                 </div>
@@ -282,51 +306,7 @@ class EditAd {
         </div>
         <?php
     }
-    
-    public function displayAdStatusMetaBox($ad) {
-        $available = esc_html(get_post_meta($ad->ID, "adAvailable", true));
-        ?>
-                    <input type="checkbox" name="available" <?=($available==="OUI")?"checked":NULL;?> value="on">
-                    <label>Le bien est disponible</label>
-                </td>
-            </tr>
-        </table>
-        <?php
-    }
-    
-    /*public function displayAdCatMetaBox($ad) {
-        $typeProperty = esc_html(get_post_meta($ad->ID, "adTypeProperty", true));
-        $typeAd = esc_html(get_post_meta($ad->ID, "adTypeAd", true));
-        ?>
-            <table>
-                <tr>
-                    <td>
-                        <select name="typeProperty">
-                            <option value="appartement" <?=($typeProperty==="appartement")?"selected":NULL;?>>Appartement</option>
-                            <option value="maison/villa" <?=($typeProperty==="maison/villa")?"selected":NULL;?>>Maison/Villa</option>
-                            <option value="maison avec terrain" <?=($typeProperty==="maison avec terrain")?"selected":NULL;?>>Maison avec terrain</option>
-                            <option value="bâtiment" <?=($typeProperty==="bâtiment")?"selected":NULL;?>>Bâtiment</option>
-                            <option value="boutique" <?=($typeProperty==="boutique")?"selected":NULL;?>>Boutique</option>
-                            <option value="bureaux" <?=($typeProperty==="bureaux")?"selected":NULL;?>>Bureaux</option>
-                            <option value="immeuble" <?=($typeProperty==="immeuble")?"selected":NULL;?>>immeuble</option>
-                            <option value="local" <?=($typeProperty==="local")?"selected":NULL;?>>Local</option>
-                            <option value="parking/box" <?=($typeProperty==="parking/box")?"selected":NULL;?>>Parking/Box</option>
-                            <option value="terrain" <?=($typeProperty==="terrain")?"selected":NULL;?>>Terrain</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr> <!--Etiquettes = catégories ?-->
-                    <td>
-                        <input type="radio" name="typeAd" id="cat1" value="aVendre" <?=($typeAd==="aVendre")?"checked":NULL;?> required><label for="cat1">A vendre<label>
-                        <input type="radio" name="typeAd" id="cat2" value="aLouer" <?=($typeAd==="aLouer")?"checked":NULL;?> required><label for="cat2">A louer</label>
-                        <input type="radio" name="typeAd" id="cat3" value="colocation" <?=($typeAd==="colocation")?"checked":NULL;?> required><label for="cat3">Colocation</label>
-                        <input type="radio" name="typeAd" id="cat4" value="airbnb" <?=($typeAd==="airbnb")?"checked":NULL;?> required><label for="cat4">Airbnb</label>
-                    </td>
-                </tr>
-            </table>
-        <?php
-     }*/
-    
+      
     public function displayAdAdvancedDateMetaBox($ad) {
         $showLabels = esc_html(get_post_meta($ad->ID, "adShowLabels", true));
         $beforePrice = esc_html(get_post_meta($ad->ID, "adBeforePrice", true));
@@ -427,25 +407,5 @@ class EditAd {
         <?php
     }
     
-    
-    function saveTaxonomy($postId, $taxonomyName) {
-        if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
-            return;
-        }
-
-        if(!isset($_POST[$taxonomyName])) {
-            return;
-        }
-
-        $taxonomy = sanitize_text_field($_POST[$taxonomyName]);
-
-        if(!empty($taxonomy)) {
-
-            $term = get_term_by("name", $taxonomy, $taxonomyName);
-            if(!empty($term) && !is_wp_error($term)) {
-                wp_set_object_terms($postId, $term->term_id, $taxonomyName, false);
-            }
-        }
-    }
 }
 ?>

@@ -37,6 +37,9 @@ class Import {
         <?php
         if(is_admin()) {
             if(isset($_POST["submitImport"])) {
+                if(!is_dir($dirPath)) {
+                    mkdir($dirPath);
+                }
                 $filePath = $dirPath.basename($_FILES["file"]["name"]);
                 $uploadOk = true;
                 $imageFileType = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
@@ -151,7 +154,7 @@ class Import {
             if(is_array($img) && !is_wp_error($img) && wp_remote_retrieve_response_code($img) === 200) { //si on a bien réussi à la récupérer
                 $imgOrigin = $img["body"];
                 list($widthP, $heightP/*, $type, $attr*/) = getimagesizefromstring($imgOrigin); //On va la redimensionner et la convertir. Selon les paramètres définis
-                $maxDim = $optionsImports[é]; //Parametrable
+                $maxDim = $optionsImports["maxDim"]; //Parametrable
                 if($widthP > $maxDim || $heightP > $maxDim) { //Si l'image est plus petit que $maxDim (px)
                     $ratio = $widthP/$heightP;
                     if($ratio > 1) {
@@ -381,8 +384,6 @@ class Import {
                             }
                         }
 
-                        SELF::checkError(update_post_meta($propertyWPId, "adAvailable", "on"), "$action impossible de la disponibilité de l'annonce ". $ad["uniqId"], true); //Le bien est disponible
-
                         //Pour récupérer l'agent
                         if($agent = get_posts(array(
                             "numberposts"   => 1,
@@ -390,8 +391,10 @@ class Import {
                             "meta_key"      => "agentEmail",
                             "meta_value"    => $ad["agentEmail"]
                         ))) {
-                             SELF::checkError(update_post_meta($propertyWPId, "adIdAgent", $agent[0]->ID), "$action impossible de l'identifiant agent pour l'annonce ". $ad["uniqId"], true);
+                            SELF::checkError(update_post_meta($propertyWPId, "adIdAgent", $agent[0]->ID), "$action impossible de l'identifiant agent pour l'annonce ". $ad["uniqId"], true);
                         }
+                        SELF::checkError(update_post_meta($propertyWPId, "adShowAgent", "on"), "$action impossible du statut d'affichage de l'agent pour l'annonce ". $ad["uniqId"], true); //A modifier selon un paramètre dans les options
+
                     
                         $location = get_post_meta($propertyWPId, "adAddress", true);
                         if(!$location || $location !== $ad["address"]) { //S'il n'y a pas déjà une adresse ou que l'ancienne adresse est différente de la nouvelle
@@ -476,6 +479,8 @@ class Import {
                         SELF::checkError(wp_set_post_terms($propertyWPId, $ad["typeProperty"], "adTypeProperty"), "$action du type de bien pour l'annonce ".$ad["uniqId"]);
                         
                         SELF::checkError(wp_set_post_terms($propertyWPId, $ad["typeAd"], "adTypeAd"), "$action du type de l'annonce ".$ad["uniqId"]);
+                        
+                        SELF::checkError(wp_set_post_terms($propertyWPId, "Disponible", "adAvailable"), "$action de la disponibilté du bien de l'annonce ".$ad["uniqId"]);
 
                         $fieldsToNotUpdate = ["title", "description", "typeAd", "typeProperty", "thumbnail", "picture1", "picture2", "picture3", "picture4", "picture5", "picture6", "picture7", "picture8", "agentEmail", "address", "typeHeating", "feesAgency"];
                         $checkMeta = true;

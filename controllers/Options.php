@@ -38,7 +38,7 @@ class Options {
             <h2 class="nav-tab-wrapper">
                 <a href="edit.php?post_type=ad&page=bthoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>">Imports</a>
                 <a href="edit.php?post_type=ad&page=bthoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>">Exports</a>
-                <!--<a href="edit.php?post_type=ad&page=bthoptions&tab=mapping" class="nav-tab <?/= $tab === "mapping" ? "nav-tab-active" : ''; ?>">Mapping</a>-->
+                <a href="edit.php?post_type=ad&page=bthoptions&tab=ads" class="nav-tab <?= $tab === "ads" ? "nav-tab-active" : ''; ?>">Affichage annonces</a>
                 <!--<a href="edit-tags.php?taxonomy=adTypeProperty&post_type=ad" class="nav-tab <?/= $tab === "tags" ? "nav-tab-active" : ''; ?>">Catégories</a>-->
                 <a href="edit.php?post_type=ad&page=bthoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>">Mail</a>
                 <a href="edit.php?post_type=ad&page=bthoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>">Barème des honoraires</a>                
@@ -51,6 +51,7 @@ class Options {
         $this->optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");
         $this->optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
         $this->optionsMapping = get_option(PLUGIN_RE_NAME."OptionsMapping");
+        $this->optionsAds = get_option(PLUGIN_RE_NAME."OptionsAds");
         $this->optionsEmail = get_option(PLUGIN_RE_NAME."OptionsEmail");
         $this->optionsFees = get_option(PLUGIN_RE_NAME."OptionsFees");
         
@@ -66,10 +67,10 @@ class Options {
             array($this, "optionsSanitizeExport") // sanitizeCallback
         );
         
-        register_setting( //Enregistrement du mapping des champs
-            PLUGIN_RE_NAME."OptionsMappingGroup", // option_group
-            PLUGIN_RE_NAME."OptionsMapping", // option_name
-            array($this, "optionsSanitizeMapping") // sanitizeCallback
+        register_setting( //Enregistrement des options pour l'affichage des champs
+            PLUGIN_RE_NAME."OptionsAdsGroup", // option_group
+            PLUGIN_RE_NAME."OptionsAds", // option_name
+            array($this, "optionsSanitizeAds") // sanitizeCallback
         );
                 
         register_setting( //Enregistrement des options mails
@@ -102,10 +103,10 @@ class Options {
         
         add_settings_section( //Section pour le mapping des champs
             PLUGIN_RE_NAME."optionsSection", // id
-            "Mapping", // title
+            "Annonces", // title
             //array($this, "infoExports"), // callback
             null,
-            PLUGIN_RE_NAME."OptionsMappingPage" // page
+            PLUGIN_RE_NAME."OptionsAdsPage" // page
         );     
         
         add_settings_section( //Section pour les diverses options
@@ -118,7 +119,7 @@ class Options {
         
         add_settings_section( //Section pour les diverses options
             PLUGIN_RE_NAME."optionsSection", // id
-            "Fees", // title
+            "Honoraires", // title
             //array($this, "infoDivers"), // callback
             null,
             PLUGIN_RE_NAME."OptionsFeesPage" // page
@@ -179,7 +180,7 @@ class Options {
                     
         add_settings_field(
             "dirExportPath", //id
-            'Répertoire d\'exportation <abbr title"Chemin où seront exportées localement les annonces"><sup>?</sup></abbr>', //title
+            'Répertoire d\'exportation <abbr title="Chemin où seront exportées localement les annonces"><sup>?</sup></abbr>', //title
             array($this, "dirExportPathCallback"), //callback
             PLUGIN_RE_NAME."OptionsExportsPage", //page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -209,14 +210,19 @@ class Options {
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
-        /* Mapping */
+        /* Ads */
         
         add_settings_field(
-            "mapping", // id
+            /*"mapping", // id
             null,
             array($this, "mappingCallback"), // callback
             PLUGIN_RE_NAME."OptionsMappingPage", // page
-            PLUGIN_RE_NAME."optionsSection" // section
+            PLUGIN_RE_NAME."optionsSection" // section*/
+            "displayAdsUnavailableAds",
+            'Afficher les annonces avec des biens indisponibles <abbr title="Un bien est indisponible quand il n\'est plus à la vente ou à la location"><sup>?</sup></abbr>',
+            array($this, "displayAdsUnavailableAdsCallback"),
+            PLUGIN_RE_NAME."OptionsAdsPage",
+            PLUGIN_RE_NAME."optionsSection"
         );
         
         /* Mail */
@@ -293,7 +299,7 @@ class Options {
             $sanitaryValues["dirExportPath"] = sanitize_text_field($input["dirExportPath"]);
         }
         if(isset($input["versionSeLoger"])) {
-            $sanitaryValues["autoExport"] = sanitize_text_field($input["autoExport"]);
+            $sanitaryValues["versionSeLoger"] = sanitize_text_field($input["versionSeLoger"]);
         }
         if(isset($input["idAgency"])) {
             $sanitaryValues["idAgency"] = sanitize_text_field($input["idAgency"]);
@@ -309,6 +315,16 @@ class Options {
         if(isset($input["mappingFields"]) && is_string($input["mappingFields"]) && is_array(json_decode($input["mappingFields"], true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false) {
             $sanitaryValues = json_decode($input["mappingFields"], true);
         }      
+        
+        return $sanitaryValues;
+    }
+    
+    public function optionsSanitizeAds($input) {
+        $sanitaryValues = array();
+        
+        if(isset($input["displayAdsUnavailable"])) {
+            $sanitaryValues["displayAdsUnavailable"] = $input["displayAdsUnavailable"];
+        }
         
         return $sanitaryValues;
     }
@@ -715,6 +731,24 @@ class Options {
         <?php
     }
     
+    public function displayAdsUnavailableAdsCallback() {
+        $args = array(
+            "type" => "checkbox",
+            "name" => PLUGIN_RE_NAME."OptionsAds[displayAdsUnavailable]",
+            "id" => "displayAdsUnavailable",
+        );
+        if(isset($this->optionsAds["displayAdsUnavailable"])) {
+            $args["checked"] = "checked";
+        }
+        echo "<input ";
+        foreach($args as $key => $value) {
+            if(!empty($value)) {                
+                echo "$key=$value ";            
+            }
+        }
+        echo '><label for="displayAdsUnavailable"> Oui</label>';
+    }
+    
     public function feesUrlCallback() {
         $args = array(
             "type" => "text",
@@ -723,7 +757,6 @@ class Options {
             "id" => "feesUrl",
             "placeholder" => $_SERVER["HTTP_HOST"]."/honoraires.pdf",
             "value" => isset($this->optionsFees["feesUrl"]) ? esc_attr($this->optionsFees["feesUrl"]) : '',
-            "required" => true
         );
 
         echo "<input ";

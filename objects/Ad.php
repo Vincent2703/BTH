@@ -82,6 +82,21 @@ class Ad {
         wp_insert_term("Location", "adTypeAd");
         wp_insert_term("Vente", "adTypeAd");
         wp_insert_term("Vente de prestige", "adTypeAd");
+        
+        register_taxonomy("adAvailable", array("ad"), array(
+            "hierarchical"      => false, 
+            "description"       => "Disponibilité de l'annonce.", 
+            "label"             => "Disponibilité de l'annonce", 
+            "show_admin_column" => true, 
+            "show_in_menu"      => false,
+            "singular_label"    => "Disponibilité de l'annonce", 
+            "rewrite"           => false,
+            "meta_box_cb"       => array($this, "taxonomyAdAvailableCheckboxCB"),
+            "default_term"      => "Disponible"
+       ));
+        
+        wp_insert_term("Disponible", "adAvailable");
+        wp_insert_term("Indisponible", "adAvailable");
 
     }
     
@@ -114,7 +129,6 @@ class Ad {
     function taxonomyMetaBoxCB($post, $taxonomy) {
         $taxonomyName = $taxonomy["args"]["taxonomy"];
         $terms = get_terms($taxonomyName, array("hide_empty" => false));
-	//$post  = get_post();
 	$term = wp_get_object_terms($post->ID, $taxonomyName, array("orderby" => "term_id", "order" => "ASC"));
 	$name  = '';
 
@@ -134,47 +148,67 @@ class Ad {
         }
     }
     
-function filterAdsByTaxonomies() {
-    global $typenow;
-    $postType = "ad"; 
-    $taxonomies = get_taxonomies(["object_type" => ["ad"]]);
-    foreach($taxonomies as $taxonomy) {
-        if($typenow == $postType) {
-            $selected      = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : "";
-            $taxonomyData = get_taxonomy($taxonomy);
-            wp_dropdown_categories(array(
-                    "show_option_all" => $taxonomyData->label,
-                    "taxonomy"        => $taxonomy,
-                    "name"            => $taxonomy,
-                    "orderby"         => "name",
-                    "selected"        => $selected,
-                    "show_count"      => true,
-                    "hide_empty"      => true,
-            ));
+    function taxonomyAdAvailableCheckboxCB($post/*, $taxonomy*/) {
+        $taxonomyName = "adAvailable";
+        $terms = get_terms($taxonomyName, array("hide_empty" => false));
+	$term = wp_get_object_terms($post->ID, $taxonomyName, array("orderby" => "term_id", "order" => "ASC"));
+	$name  = '';
+        if(!is_wp_error($term)) {
+            if(isset($term[0]) && isset($term[0]->name)) {
+                $name = $term[0]->name;
+            }
+        }
+
+        ?>
+        <label title="Le bien est disponible">
+            <input type="checkbox" name="<?= $taxonomyName; ?>" value="<?php esc_attr_e($terms[0]->name); ?>" <?php checked($terms[0]->name, $name); ?>>
+            <span>Le bien est disponible</span>
+        </label>
+        <?php
+    }
+    
+    function filterAdsByTaxonomies() {
+        global $typenow;
+        $postType = "ad"; 
+        $taxonomies = get_taxonomies(["object_type" => ["ad"]]);
+        foreach($taxonomies as $taxonomy) {
+            if($typenow == $postType) {
+                $selected      = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : "";
+                $taxonomyData = get_taxonomy($taxonomy);
+                wp_dropdown_categories(array(
+                        "show_option_all" => $taxonomyData->label,
+                        "taxonomy"        => $taxonomy,
+                        "name"            => $taxonomy,
+                        "orderby"         => "name",
+                        "selected"        => $selected,
+                        "show_count"      => true,
+                        "hide_empty"      => true,
+                        "hide_if_empty" => true
+                ));
+            }
         }
     }
-}
 
-function convertIdToTermInQuery($query) {
-    global $typenow;
-    global $pagenow;
-    
-    $taxonomies = get_taxonomies(["object_type" => ["ad"]]);
-    
-    foreach($taxonomies as $taxonomy) {
-        if($pagenow == "edit.php" && $typenow == "ad" && isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
-            $taxQuery = array(
-                    "taxonomy" => $taxonomy,
-                    "terms"    => array( $_GET[$taxonomy] ),
-                    "field"    => "id",
-                    "operator" => "IN",
-            );
-            $query->tax_query->queries[] = $taxQuery; 
-            $query->query_vars["tax_query"] = $query->tax_query->queries;
+    function convertIdToTermInQuery($query) {
+        global $typenow;
+        global $pagenow;
+
+        $taxonomies = get_taxonomies(["object_type" => ["ad"]]);
+
+        foreach($taxonomies as $taxonomy) {
+            if($pagenow == "edit.php" && $typenow == "ad" && isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
+                $taxQuery = array(
+                        "taxonomy" => $taxonomy,
+                        "terms"    => array( $_GET[$taxonomy] ),
+                        "field"    => "id",
+                        "operator" => "IN",
+                );
+                $query->tax_query->queries[] = $taxQuery; 
+                $query->query_vars["tax_query"] = $query->tax_query->queries;
+            }
         }
-    }
 
-}
+    }
     
     
 }
