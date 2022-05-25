@@ -51,6 +51,7 @@ class Bth {
         add_action("save_post_agency", array($this->EditAgency, "savePost"), 10, 2);
         
         add_action("restrict_manage_posts", array($this->Ad, "filterAdsByTaxonomies"));
+        add_action("restrict_manage_posts", array($this->Agent, "filterAgentByAgency"));
         
         add_filter("template_include", array($this->Ad, "templatePostAd"), 1);
         add_filter("template_include", array($this->Agency, "templatePostAgency"), 1);
@@ -149,7 +150,7 @@ class Bth {
         }
     }
     
-    public function registerPluginScriptsAdmin() {
+    public function registerPluginScriptsAdmin() { //Mettre dans une autre classe et créer des fonctions pour simplifier la gestion des ressources ?
         $postType = get_current_screen()->post_type;
         $base = get_current_screen()->base;
         
@@ -168,6 +169,10 @@ class Bth {
             }else if($postType === "agency") {
                 wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION);
                 wp_enqueue_script("autocompleteAddress");
+            }else if($postType === "agent") {
+                wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/reloadAgencies.js"), array('jquery'), PLUGIN_RE_VERSION);
+                wp_enqueue_script("reloadAgencies");
+                wp_add_inline_script("reloadAgencies", 'let pluginName="'.PLUGIN_RE_NAME.'";');
             }
         }else if($base === "ad_page_bthoptions") {
             wp_register_script("options", plugins_url(PLUGIN_RE_NAME."/includes/js/options.js"), array(), PLUGIN_RE_VERSION);
@@ -189,27 +194,27 @@ class Bth {
         );*/
         add_submenu_page(
             $parentSlug, //Parent slug
-            'Importez les annonces', //Page title
-            'Importez les annonces', //Menu title
-            'manage_options', //Capability
+            "Importez les annonces", //Page title
+            "Importez les annonces", //Menu title
+            "manage_options", //Capability
             "bthimport", //Menu slug
             array($this->Import, "showPage"), //Function
             3 //Position
         );
         add_submenu_page(
             $parentSlug, //Parent slug
-            'Exportez les annonces', //Page title
-            'Exportez les annonces', //Menu title
-            'manage_options', //Capability
+            "Exportez les annonces", //Page title
+            "Exportez les annonces", //Menu title
+            "manage_options", //Capability
             "bthexport", //Menu slug
             array($this->Export, "showPage"), //Function
             4 //Position
         );
         add_submenu_page(
             $parentSlug, //Parent slug
-            'Options', //Page title
-            'Options', //Menu title
-            'manage_options', //Capability
+            "Options", //Page title
+            "Options", //Menu title
+            "manage_options", //Capability
             "bthoptions", //Menu slug
             array($this->Options, "showPage"), //Function
             5 //Position
@@ -229,5 +234,3 @@ class Bth {
 	
 }
 new Bth;
-
-?>

@@ -105,7 +105,7 @@ class EditAd {
             if(isset($_POST["images"]) && ctype_space($_POST["images"])) {
                 update_post_meta($adId, "adImages", sanitize_text_field($_POST["images"]));
             }
-            if(isset($_POST["agent"]) && ctype_space($_POST["agent"])) {
+            if(isset($_POST["agent"]) && ctype_digit(strval($_POST["agent"]))) {
                 update_post_meta($adId, "adAgent", sanitize_text_field($_POST["agent"]));
             }
             if(isset($_POST["showAgent"])) {

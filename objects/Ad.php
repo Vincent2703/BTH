@@ -11,7 +11,7 @@ class Ad {
 
         public function registerPluginScriptsSingleAd() {
             wp_register_script("leaflet", plugins_url("bth/includes/js/leaflet.min.js"), array(), '1.7.1', true);
-            wp_register_script("singleAd", plugins_url("bth/includes/js/singleAd.js"), array(), '1.0', true);
+            wp_register_script("singleAd", plugins_url("bth/includes/js/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
             wp_enqueue_script("leaflet");
             wp_enqueue_script("singleAd");
         }
@@ -170,7 +170,7 @@ class Ad {
     function filterAdsByTaxonomies() {
         global $typenow;
         $postType = "ad"; 
-        $taxonomies = get_taxonomies(["object_type" => ["ad"]]);
+        $taxonomies = get_taxonomies(["object_type" => [$postType]]);
         foreach($taxonomies as $taxonomy) {
             if($typenow == $postType) {
                 $selected      = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : "";
@@ -183,7 +183,7 @@ class Ad {
                         "selected"        => $selected,
                         "show_count"      => true,
                         "hide_empty"      => true,
-                        "hide_if_empty" => true
+                        "hide_if_empty"   => true
                 ));
             }
         }

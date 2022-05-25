@@ -33,6 +33,16 @@ class Agent {
                 "has_archive" => false
             )
         );
+        register_taxonomy("agentAgency", array("agent"), array(
+            "hierarchical"      => false, 
+            "description"       => "L'agence à laquelle appartient l'agent.", 
+            "label"             => "Agence", 
+            "show_admin_column" => true, 
+            "show_in_menu"      => false,
+            "show_ui"           => false,
+            "singular_label"    => "Agence", 
+            "rewrite"           => false
+       ));
     }
     
     function templatePostAgent($path) {
@@ -48,5 +58,49 @@ class Agent {
             }
 	}
 	return $path;
+    }
+    
+    
+    function filterAgentByAgency() {
+        global $typenow;
+        $postType = "agent"; 
+        $taxonomies = get_taxonomies(["object_type" => [$postType]]);
+        foreach($taxonomies as $taxonomy) {
+            if($typenow == $postType) {
+                $selected      = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : "";
+                $taxonomyData = get_taxonomy($taxonomy);
+                wp_dropdown_categories(array(
+                        "show_option_all" => $taxonomyData->label,
+                        "taxonomy"        => $taxonomy,
+                        "name"            => $taxonomy,
+                        "orderby"         => "name",
+                        "selected"        => $selected,
+                        "show_count"      => true,
+                        "hide_empty"      => true,
+                        "hide_if_empty"   => true
+                ));
+            }
+        }
+    }
+
+    function convertIdToTermInQuery($query) {
+        global $typenow;
+        global $pagenow;
+
+        $taxonomies = get_taxonomies(["object_type" => ["agent"]]);
+
+        foreach($taxonomies as $taxonomy) {
+            if($pagenow == "edit.php" && $typenow == "agent" && isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
+                $taxQuery = array(
+                        "taxonomy" => $taxonomy,
+                        "terms"    => array( $_GET[$taxonomy] ),
+                        "field"    => "id",
+                        "operator" => "IN",
+                );
+                $query->tax_query->queries[] = $taxQuery; 
+                $query->query_vars["tax_query"] = $query->tax_query->queries;
+            }
+        }
+
     }
 }

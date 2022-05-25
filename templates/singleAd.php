@@ -15,7 +15,7 @@ get_header();
                 while(have_posts()) {
                     the_post(); //Stop the iterator on the post
                     
-                    get_the_post_thumbnail(); //Display the thumbnail
+                    //get_the_post_thumbnail(); //Display the thumbnail
                                        
                     the_title(); //The title
                     the_content(); //The description
@@ -40,13 +40,29 @@ get_header();
                     }
                     
                     
-                    if(!is_null($images)) {
+                    /*if(!is_null($images)) {
                         $ids = explode(';', $images);
                         foreach ($ids as $id) {
                             echo wp_get_attachment_image($id, "thumbnail");
                         }
-                    }
+                    }*/
+                    
+                    if(!is_null($images)) {
+                        $ids = explode(';', $images);
+                    ?>               
+                        <div id="slider">
+                            <span class="control_next">></span>
+                            <span class="control_prev"><</span>
+                            <ul>
+                            <?php foreach ($ids as $id) {
+                                echo "<li>".wp_get_attachment_image($id, array("500", "500"))."</li>";
+                            } ?>
+                            </ul>
+                        </div>  
+                        <div id="fullscreen" onclick="this.style.display='none';"></div>
 
+                    <?php
+                    }
                 } 
                 
                 ?>

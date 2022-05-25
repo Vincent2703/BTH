@@ -22,14 +22,18 @@ class editAgent {
     
     function savePost($agentId, $agent) {
         if($agent->post_type == "agent") {
-            if(isset($_POST["phone"]) && $_POST["phone"] !== '') {
+            if(isset($_POST["phone"]) && ctype_space($_POST["phone"])) {
                 update_post_meta($agentId, "agentPhone", sanitize_text_field($_POST["phone"]));
             }
-            if(isset($_POST["mobilePhone"]) && $_POST["mobilePhone"] !== '') {
+            if(isset($_POST["mobilePhone"]) && ctype_space($_POST["mobilePhone"])) {
                 update_post_meta($agentId, "agentMobilePhone", sanitize_text_field($_POST["mobilePhone"]));
             }
-            if(isset($_POST["email"]) && $_POST["email"] !== '') {
+            if(isset($_POST["email"]) && ctype_space($_POST["email"])) {
                 update_post_meta($agentId, "agentEmail", sanitize_text_field($_POST["email"]));
+            }
+            
+            if(isset($_POST["agency"]) && ctype_space($_POST["agency"])) {
+                wp_set_object_terms($agentId, $_POST["agency"], "agentAgency", false);
             }
         }       
     }
@@ -47,14 +51,15 @@ class editAgent {
     
     public function displayAgencyMetaBox($agent) {
         $allAgencies = get_posts(array("post_type" => "agency"));
-        $agencySaved = esc_html(get_post_meta($agent->ID, "agentAgency", true));
+        $agencySaved = get_the_terms($agent->ID, "agentAgency");
         ?>
-            <select name="agency">
+            <select name="agency" id="agencies" onclick="reloadAgencies();">
                 <?php
                     foreach($allAgencies as $agency) {
                         $nameAgency = get_the_title($agency);
+                        $idAgency = $agency->ID;
                         ?>
-                        <option value="<?= $nameAgency; ?>" <?=($nameAgency===$agencySaved)?"selected":NULL;?>><?= $nameAgency; ?></option>
+                        <option value="<?= $nameAgency; ?>" <?=(!is_wp_error($agencySaved) && $idAgency==$agencySaved[0]->term_id)?"selected":NULL;?>><?= $nameAgency; ?></option>
                         <?php
                     }
                 ?>

@@ -1,4 +1,5 @@
-function reloadAgents(/*savedAgent*/){
+function reloadAgents() {
+    agentSelected = parseInt(jQuery("#agents :selected").val());
     jQuery.ajax({
         url: "../wp-content/plugins/"+pluginName+"/includes/php/getAgents.php",
         type: "GET"                 
@@ -6,13 +7,13 @@ function reloadAgents(/*savedAgent*/){
         jQuery("#agents").empty();
         let json = JSON.parse(response);
         json.forEach(function(val) {
-            jQuery('<option/>')
+            jQuery("<option/>")
                 .val(val.ID)
                 .text(val.post_title)
                 .appendTo("#agents");
-            /*if(savedAgent === val.ID) {
-                jQuery('#agents option:last-child').attr('selected', 'selected');
-            }*/
+            if(agentSelected === val.ID) {
+                jQuery("#agents option:last-child").attr("selected", "selected");
+            }
         });
     });
 }
