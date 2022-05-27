@@ -26,52 +26,57 @@ class EditAd {
             
             $ad->post_title = substr(sanitize_text_field($ad->postTitle), 0, 64);
             
-            $this->saveTaxonomy($adId, "adTypeProperty");
-            $this->saveTaxonomy($adId, "adTypeAd");
-            $this->saveTaxonomyAdAvailable($adId, "adAvailable");
+            if(isset($_POST["adTypeProperty"]) && !ctype_space($_POST["adTypeProperty"])) {
+                $this->saveTaxonomy($adId, "adTypeProperty");
+            }
+            if(isset($_POST["adTypeAd"]) && !ctype_space($_POST["adTypeAd"])) {
+                $this->saveTaxonomy($adId, "adTypeAd");
+            }
+            if(isset($_POST["adAvailable"]) && $_POST["adAvailable"] === "Disponible") {
+                $this->saveTaxonomyAdAvailable($adId, "adAvailable");
+            }            
             
-            
-            if(isset($_POST["refAgency"]) && ctype_space($_POST["refAgency"])) {
+            if(isset($_POST["refAgency"]) && !ctype_space($_POST["refAgency"])) {
                 update_post_meta($adId, "adRefAgency", sanitize_text_field($_POST["refAgency"]));
             }
-            if(isset($_POST["price"]) && ctype_space($_POST["price"])) {
+            if(isset($_POST["price"]) && !ctype_space($_POST["price"])) {
                 update_post_meta($adId, "adPrice", sanitize_text_field($_POST["price"]));
             }
-            if(isset($_POST["fees"]) && ctype_space($_POST["fees"])) {
+            if(isset($_POST["fees"]) && !ctype_space($_POST["fees"])) {
                 update_post_meta($adId, "adFees", sanitize_text_field($_POST["fees"]));
             }
-            if(isset($_POST["showLabels"]) && ctype_space($_POST["showLabels"])) {
+            if(isset($_POST["showLabels"]) && !ctype_space($_POST["showLabels"])) {
                 update_post_meta($adId, "adShowLabels", "OUI");        
             }
-            if(isset($_POST["beforePrice"]) && ctype_space($_POST["beforePrice"])) {
+            if(isset($_POST["beforePrice"]) && !ctype_space($_POST["beforePrice"])) {
                 update_post_meta($adId, "adBeforePrice", sanitize_text_field($_POST["beforePrice"]));
             }
-            if(isset($_POST["afterPrice"]) && ctype_space($_POST["afterPrice"])) {
+            if(isset($_POST["afterPrice"]) && !ctype_space($_POST["afterPrice"])) {
                 update_post_meta($adId, "adAfterPrice", sanitize_text_field($_POST["afterPrice"]));
             }
-            if(isset($_POST["surface"]) && ctype_space($_POST["surface"])) {
+            if(isset($_POST["surface"]) && !ctype_space($_POST["surface"])) {
                 update_post_meta($adId, "adSurface", sanitize_text_field($_POST["surface"]));
             }
-            if(isset($_POST["landSurface"]) && ctype_space($_POST["landSurface"])) {
+            if(isset($_POST["landSurface"]) && !ctype_space($_POST["landSurface"])) {
                 update_post_meta($adId, "adTotalSurface", sanitize_text_field($_POST["landSurface"]));
             }
-            if(isset($_POST["nbRooms"]) && ctype_space($_POST["nbRooms"])) {
+            if(isset($_POST["nbRooms"]) && !ctype_space($_POST["nbRooms"])) {
                 update_post_meta($adId, "adNbRooms", sanitize_text_field($_POST["nbRooms"]));
             }
-            if(isset($_POST["nbBedrooms"]) && ctype_space($_POST["nbBedrooms"])) {
+            if(isset($_POST["nbBedrooms"]) && !ctype_space($_POST["nbBedrooms"])) {
                 update_post_meta($adId, "adNbBedrooms", sanitize_text_field($_POST["nbBedrooms"]));
             }
-            if(isset($_POST["nbBathrooms"]) && ctype_space($_POST["nbBathrooms"])) {
+            if(isset($_POST["nbBathrooms"]) && !ctype_space($_POST["nbBathrooms"])) {
                 update_post_meta($adId, "adNbBathrooms", sanitize_text_field($_POST["nbBathrooms"]));
             }
-            if(isset($_POST["nbWaterRooms"]) && ctype_space($_POST["nbWaterRooms"])) {
+            if(isset($_POST["nbWaterRooms"]) && !ctype_space($_POST["nbWaterRooms"])) {
                 update_post_meta($adId, "adNbWaterRooms", sanitize_text_field($_POST["nbWaterRooms"]));
             }
-            if(isset($_POST["nbWC"]) && ctype_space($_POST["nbWC"])) {
+            if(isset($_POST["nbWC"]) && !ctype_space($_POST["nbWC"])) {
                 update_post_meta($adId, "adNbWC", sanitize_text_field($_POST["nbWC"]));
             }            
             
-            if(isset($_POST["showMap"]) && ctype_space($_POST["showMap"])) {
+            if(isset($_POST["showMap"]) && !ctype_space($_POST["showMap"])) {
                 update_post_meta($adId, "adShowMap", sanitize_text_field($_POST["showMap"]));
                 if(isset($_POST["address"]) && $_POST["address"] !== '') {
                     update_post_meta($adId, "adAddress", sanitize_text_field($_POST["address"]));
@@ -102,7 +107,7 @@ class EditAd {
                     }
                 }
             }
-            if(isset($_POST["images"]) && ctype_space($_POST["images"])) {
+            if(isset($_POST["images"]) && !ctype_space($_POST["images"])) {
                 update_post_meta($adId, "adImages", sanitize_text_field($_POST["images"]));
             }
             if(isset($_POST["agent"]) && ctype_digit(strval($_POST["agent"]))) {
@@ -113,42 +118,42 @@ class EditAd {
             }
   
                        
-            if(isset($_POST["labels"]) && ctype_space($_POST["labels"])) {
+            if(isset($_POST["labels"]) && !ctype_space($_POST["labels"])) {
                 update_post_meta($adId, "adLabels", sanitize_text_field($_POST["labels"]));
             }
             
             
-            if(isset($_POST["floor"]) && ctype_space($_POST["floor"])) {
+            if(isset($_POST["floor"]) && !ctype_space($_POST["floor"])) {
                 update_post_meta($adId, "adFloor", sanitize_text_field($_POST["floor"]));
             }
-            if(isset($_POST["nbFloors"]) && ctype_space($_POST["nbFloors"])) {
+            if(isset($_POST["nbFloors"]) && !ctype_space($_POST["nbFloors"])) {
                 update_post_meta($adId, "adNbFloors", sanitize_text_field($_POST["nbFloors"]));
             }
-            if(isset($_POST["furnished"]) && ctype_space($_POST["furnished"])) {
+            if(isset($_POST["furnished"]) && !ctype_space($_POST["furnished"])) {
                 update_post_meta($adId, "adFurnished", "OUI");
             }
-            if(isset($_POST["year"]) && ctype_space($_POST["year"])) {
+            if(isset($_POST["year"]) && !ctype_space($_POST["year"])) {
                 update_post_meta($adId, "adYear", sanitize_text_field($_POST["year"]));
             }
-            if(isset($_POST["typeHeating"]) && ctype_space($_POST["typeHeating"])) {
+            if(isset($_POST["typeHeating"]) && !ctype_space($_POST["typeHeating"])) {
                 update_post_meta($adId, "adTypeHeating", sanitize_text_field($_POST["typeHeating"]));
             }
-            if(isset($_POST["typeKitchen"]) && ctype_space($_POST["typeKitchen"])) {
+            if(isset($_POST["typeKitchen"]) && !ctype_space($_POST["typeKitchen"])) {
                 update_post_meta($adId, "adTypeKitchen", sanitize_text_field($_POST["typeKitchen"]));
             }
-            if(isset($_POST["orientation"]) && ctype_space($_POST["orientation"])) {
+            if(isset($_POST["orientation"]) && !ctype_space($_POST["orientation"])) {
                 update_post_meta($adId, "adOrientation", sanitize_text_field($_POST["orientation"]));
             }
-            if(isset($_POST["nbBalconies"]) && ctype_space($_POST["nbBalconies"])) {
+            if(isset($_POST["nbBalconies"]) && !ctype_space($_POST["nbBalconies"])) {
                 update_post_meta($adId, "adNbBalconies", sanitize_text_field($_POST["nbBalconies"]));
             }
-            if(isset($_POST["elevator"]) && ctype_space($_POST["elevator"])) {
+            if(isset($_POST["elevator"]) && !ctype_space($_POST["elevator"])) {
                 update_post_meta($adId, "adElevator", "OUI");
             }
-            if(isset($_POST["cellar"]) && ctype_space($_POST["cellar"])) {
+            if(isset($_POST["cellar"]) && !ctype_space($_POST["cellar"])) {
                 update_post_meta($adId, "adCellar", "OUI");
             }
-            if(isset($_POST["terrace"]) && ctype_space($_POST["terrace"])) {
+            if(isset($_POST["terrace"]) && !ctype_space($_POST["terrace"])) {
                 update_post_meta($adId, "adTerrace", "OUI");
             }
         }
@@ -156,13 +161,9 @@ class EditAd {
     
         
     function saveTaxonomy($postId, $taxonomyName) {
-        if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+        /*if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
             return;
-        }
-
-        if(!isset($_POST[$taxonomyName])) {
-            return;
-        }
+        }*/
 
         $taxonomy = sanitize_text_field($_POST[$taxonomyName]);
 

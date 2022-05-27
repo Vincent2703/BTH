@@ -3,14 +3,14 @@
     width: 30em;
 }*/
 
-#slider {
+#miniSlider {
    position: relative;
    overflow: hidden;
    margin: 20px auto 0 auto;
    border-radius: 4px;
 }    
 
-#slider ul {
+#miniSlider ul {
    position: relative;
    margin: 0;
    padding: 0;
@@ -18,7 +18,7 @@
    list-style: none;
 }
 
-#slider ul li {
+#miniSlider ul li {
    position: relative;
    display: block;
    float: left;
@@ -31,13 +31,13 @@
    line-height: 300px;
 }
 
-#slider ul li img {
+#miniSlider ul li img {
     object-fit: cover;
     width:100%; 
     height :100%;
 }
 
-.control_prev, .control_next {
+.controlPrev, .controlNext {
    position: absolute;
    top: 40%;
    z-index: 999;
@@ -55,30 +55,66 @@
    user-select: none;
 }
 
-.control_prev:hover, .control_next:hover {
+.controlPrev:hover, .controlNext:hover {
    opacity: 1;
    -webkit-transition: all 0.2s ease;
 }
 
-.control_prev {
+.controlPrev {
    border-radius: 0 2px 2px 0;
 }
 
-.control_next {
+.controlNext {
    right: 0;
    border-radius: 2px 0 0 2px;
 }
 
-#fullscreen {
+#fullscreenSlider {
     display: none;
     position: absolute;
-    z-index: 9999;
+    z-index: 100000;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-size: contain;
-    background-repeat: no-repeat no-repeat;
-    background-position: center center;
     background-color: black;
 }
+
+#fullscreenSlider .displayFullscreen {
+    width: 100%;
+    height: 100%;
+    background-size: 80%;
+    background-repeat: no-repeat no-repeat;
+    background-position: center center;
+}
+
+#fullscreenSlider .controlClose {
+    font-size: 4rem;
+    color: white;
+    position: absolute;
+    right: 2%;
+    top: 2%;
+    cursor: pointer;
+    user-select: none;
+}
+
+#fullscreenSlider .controlNext, #fullscreenSlider .controlPrev {
+    background-color: rgba(128,128,128,0.5);
+    font-size: 4rem;
+}
+
+.pagingImg {
+    z-index: 999;
+    color: white;
+    position: absolute;
+    right: 2%;
+}
+
+#miniSlider .pagingImg {
+    bottom: 0%
+}
+
+#fullscreenSlider .pagingImg {
+    bottom: 10%;
+}
+

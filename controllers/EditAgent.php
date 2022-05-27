@@ -22,20 +22,36 @@ class editAgent {
     
     function savePost($agentId, $agent) {
         if($agent->post_type == "agent") {
-            if(isset($_POST["phone"]) && ctype_space($_POST["phone"])) {
+            if(isset($_POST["phone"]) && !ctype_space($_POST["phone"])) {
                 update_post_meta($agentId, "agentPhone", sanitize_text_field($_POST["phone"]));
             }
-            if(isset($_POST["mobilePhone"]) && ctype_space($_POST["mobilePhone"])) {
+            if(isset($_POST["mobilePhone"]) && !ctype_space($_POST["mobilePhone"])) {
                 update_post_meta($agentId, "agentMobilePhone", sanitize_text_field($_POST["mobilePhone"]));
             }
-            if(isset($_POST["email"]) && ctype_space($_POST["email"])) {
+            if(isset($_POST["email"]) && !ctype_space($_POST["email"])) {
                 update_post_meta($agentId, "agentEmail", sanitize_text_field($_POST["email"]));
             }
             
-            if(isset($_POST["agency"]) && ctype_space($_POST["agency"])) {
-                wp_set_object_terms($agentId, $_POST["agency"], "agentAgency", false);
+            if(isset($_POST["agency"]) && !ctype_space($_POST["agency"])) {
+                SELF::saveAgentAgency($agentId);
             }
         }       
+    }
+    
+    private static function saveAgentAgency($postId) {
+        /*if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+            return;
+        }*/
+
+        $taxonomy = sanitize_text_field($_POST["agency"]);
+
+        if(!empty($taxonomy)) {
+
+            $term = get_term_by("name", $taxonomy, "agentAgency");
+            if(!empty($term) && !is_wp_error($term)) {
+                wp_set_object_terms($postId, $term->term_id, "agentAgency", false);
+            }
+        }
     }
         
     public function displayAgentMetaBox($agent) {
@@ -51,7 +67,7 @@ class editAgent {
     
     public function displayAgencyMetaBox($agent) {
         $allAgencies = get_posts(array("post_type" => "agency"));
-        $agencySaved = get_the_terms($agent->ID, "agentAgency");
+        $agencySaved = get_the_terms($agent, "agentAgency");
         ?>
             <select name="agency" id="agencies" onclick="reloadAgencies();">
                 <?php

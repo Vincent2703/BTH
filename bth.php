@@ -58,7 +58,7 @@ class Bth {
         add_filter("template_include", array($this->Agent, "templatePostAgent"), 1);
 
         add_filter("enter_title_here", array($this, "changeTitle"));
-        add_filter("pre_get_posts", array($this->Ad, "convertIdToTermInQuery"));
+        add_filter("pre_get_posts", array($this, "convertIdToTermInQuery"));
         
         add_action("in_admin_header", array($this->Options, "tabsOption"));
         
@@ -230,6 +230,27 @@ class Bth {
         }
         
         return $title;
+    }
+    
+    function convertIdToTermInQuery($query) {
+        global $typenow;
+        global $pagenow;
+
+        $taxonomies = get_taxonomies(["object_type" => [$typenow]]);
+
+        foreach($taxonomies as $taxonomy) {
+            if($pagenow == "edit.php" && isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
+                $taxQuery = array(
+                        "taxonomy" => $taxonomy,
+                        "terms"    => array( $_GET[$taxonomy] ),
+                        "field"    => "id",
+                        "operator" => "IN",
+                );
+                $query->tax_query->queries[] = $taxQuery; 
+                $query->query_vars["tax_query"] = $query->tax_query->queries;
+            }
+        }
+
     }
 	
 }

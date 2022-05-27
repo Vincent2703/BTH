@@ -188,27 +188,6 @@ class Ad {
             }
         }
     }
-
-    function convertIdToTermInQuery($query) {
-        global $typenow;
-        global $pagenow;
-
-        $taxonomies = get_taxonomies(["object_type" => ["ad"]]);
-
-        foreach($taxonomies as $taxonomy) {
-            if($pagenow == "edit.php" && $typenow == "ad" && isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
-                $taxQuery = array(
-                        "taxonomy" => $taxonomy,
-                        "terms"    => array( $_GET[$taxonomy] ),
-                        "field"    => "id",
-                        "operator" => "IN",
-                );
-                $query->tax_query->queries[] = $taxQuery; 
-                $query->query_vars["tax_query"] = $query->tax_query->queries;
-            }
-        }
-
-    }
     
     
 }

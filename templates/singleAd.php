@@ -36,7 +36,7 @@ get_header();
                             $address = get_post_meta($id, "adAddress", true);
                         }
                         echo $address;
-                        echo'<div id="map" data-coord="'.get_post_meta($id, "adDataMap", true).'"></div>';
+                        echo'<div id="map" data-coord="'.print_r(get_post_meta($id, "adDataMap", true)).'"></div>';
                     }
                     
                     
@@ -49,18 +49,26 @@ get_header();
                     
                     if(!is_null($images)) {
                         $ids = explode(';', $images);
-                    ?>               
-                        <div id="slider">
-                            <span class="control_next">></span>
-                            <span class="control_prev"><</span>
+                    ?>
+                    <div class="sliders">
+                        <div id="miniSlider">
+                            <span class="controlNext">></span>
+                            <span class="controlPrev"><</span>
+                            <span class="pagingImg"></span>
                             <ul>
                             <?php foreach ($ids as $id) {
-                                echo "<li>".wp_get_attachment_image($id, array("500", "500"))."</li>";
+                                echo "<li>".wp_get_attachment_image($id, array(500, 500))."</li>";
                             } ?>
                             </ul>
                         </div>  
-                        <div id="fullscreen" onclick="this.style.display='none';"></div>
-
+                        <div id="fullscreenSlider">
+                            <div class="displayFullscreen"></div>
+                            <span class="controlClose">&times;</span>
+                            <span class="controlNext">></span>
+                            <span class="controlPrev"><</span>
+                            <span class="pagingImg"></span>
+                        </div>
+                    </div>
                     <?php
                     }
                 } 
