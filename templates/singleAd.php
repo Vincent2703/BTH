@@ -57,7 +57,7 @@ get_header();
                             <span class="pagingImg"></span>
                             <ul>
                             <?php foreach ($ids as $id) {
-                                echo "<li>".wp_get_attachment_image($id, array(500, 500))."</li>";
+                                echo "<li>".wp_get_attachment_image($id, "large")."</li>";
                             } ?>
                             </ul>
                         </div>  

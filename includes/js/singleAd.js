@@ -35,7 +35,7 @@ jQuery(document).ready(function ($) {
 	
     $("#miniSlider ul li:last-child").prependTo("#miniSlider ul");
     
-    $("#miniSlider .pagingImg").text("1/" + maxImg);
+    $(".pagingImg").text("1/" + maxImg);
 
     function moveSlide(direction) {
         if(direction === "left") {
@@ -47,7 +47,7 @@ jQuery(document).ready(function ($) {
             });
             
         if($("#fullscreenSlider").is(":visible")) {
-            var largeImage = $("#miniSlider ul li:first-child img").attr("srcset").split(", ").at(-1).replace(/ \d+w$/, '');
+            var largeImage = $("#miniSlider ul li:first-child img").attr("src")/*.attr("srcset").split(", ").find(e => e.includes("1024w")).replace(/ \d+w$/, '')*/;
             $("#fullscreenSlider .displayFullscreen").fadeOut("400", function() {
                 $("#fullscreenSlider .displayFullscreen").css("background-image", "url("+largeImage+")");
             })
@@ -62,7 +62,7 @@ jQuery(document).ready(function ($) {
             });
             
             if($("#fullscreenSlider").is(":visible")) {
-                var largeImage = $("#miniSlider ul li:nth-child(3) img").attr("srcset").split(", ").at(-1).replace(/ \d+w$/, '');
+                var largeImage = $("#miniSlider ul li:nth-child(3) img").attr("src");
                 $("#fullscreenSlider .displayFullscreen").fadeOut("400", function() {
                     $("#fullscreenSlider .displayFullscreen").css("background-image", "url("+largeImage+")");
                 })
@@ -115,7 +115,7 @@ jQuery(document).ready(function ($) {
     var imgs = $("#miniSlider ul li img");
     $(imgs).click(function() {
         autoplay = false;
-        var largeImage = $(this).attr("srcset").split(", ").at(-1).replace(/ \d+w$/, '');
+        var largeImage = $(this).attr("src");
         $("#fullscreenSlider .displayFullscreen").css("background-image", "url("+largeImage+")");
         $("#fullscreenSlider").show("slow"); //Remplacer par quelque chose qui permet de personnaliser l"effet
         $("body").css("overflow", "hidden");
