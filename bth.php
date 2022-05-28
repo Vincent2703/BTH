@@ -158,8 +158,8 @@ class Bth {
             if($postType === "ad") {
                 wp_enqueue_media();
                 wp_register_script("mediaButton", plugins_url(PLUGIN_RE_NAME."/includes/js/editAd.js"), array('jquery'), PLUGIN_RE_VERSION);
-                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION);
-                wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION);
+                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
 
                 wp_enqueue_script("mediaButton");
                 wp_enqueue_script("autocompleteAddress");
@@ -167,10 +167,10 @@ class Bth {
                 
                 wp_add_inline_script("reloadAgents", 'let pluginName="'.PLUGIN_RE_NAME.'";');
             }else if($postType === "agency") {
-                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION);
+                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("autocompleteAddress");
             }else if($postType === "agent") {
-                wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/reloadAgencies.js"), array('jquery'), PLUGIN_RE_VERSION);
+                wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/reloadAgencies.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("reloadAgencies");
                 wp_add_inline_script("reloadAgencies", 'let pluginName="'.PLUGIN_RE_NAME.'";');
             }

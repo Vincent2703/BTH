@@ -1,7 +1,83 @@
-/*#map { 
-    height: 30em; 
-    width: 30em;
-}*/
+/* Mise en page générale */
+
+.site-main {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.titleAd {
+    flex: 0 1 100%;
+    text-align: center;
+}
+
+.subtitleAd {
+    flex: 0 1 100%;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.titleAd h1 {
+    font-size: 32px;
+}
+
+.sliders {
+    flex: 0 1 100%;
+    margin-bottom: 3vh;
+}
+
+.more {
+    flex: 0 1 100%;
+    text-align: center;
+}
+
+.right, .left {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.right div, .left div {
+    flex-grow: 1;
+}
+
+.left {
+    flex: 1 0 75%;
+    padding-left: 3vw;
+    padding-right: 1vw;
+    border-right: 1px solid black;
+}
+
+.right {
+    flex: 1 0 25%;
+    padding-right: 3vw;
+    padding-left: 1vw;
+}
+
+.description {
+}
+
+.princ {
+}
+
+.comp {
+}
+
+.map {
+}
+
+.contact {
+}
+
+
+/* carte */
+#map { 
+    width: 100%;
+    height: 0; /*Pour utiliser la même valeur que width*/
+    padding-bottom: 100%;
+}
+
+/* slider photos */
 
 #miniSlider {
    position: relative;
@@ -33,8 +109,8 @@
 
 #miniSlider ul li img {
     object-fit: cover;
-    width:100%; 
-    height :100%;
+    width: 100%; 
+    height: 100%;
 }
 
 .controlPrev, .controlNext {
@@ -71,7 +147,7 @@
 
 #fullscreenSlider {
     display: none;
-    position: absolute;
+    position: fixed;
     z-index: 100000;
     top: 0;
     left: 0;
@@ -81,8 +157,8 @@
 }
 
 #fullscreenSlider .displayFullscreen {
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-size: 80%;
     background-repeat: no-repeat no-repeat;
     background-position: center center;

@@ -1,23 +1,24 @@
-/*let dataMap = document.getElementById("map").getAttribute("data-coord").split(",");
-let map = L.map("map").setView([dataMap[0], dataMap[1]], dataMap[2]);
-L.tileLayer("http://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png", {
-    attribution: "Données cartographiques : <a href="https://www.openstreetmap.fr/mentions-legales">OpenStreetMap.fr</a>"
-}).addTo(map);
-let circle = L.circle([dataMap[0], dataMap[1]], {
-    color: "red",
-    fillColor: "#f03",
-    fillOpacity: 0.5,
-    radius: dataMap[3]
-}).addTo(map);
-*/
-
 jQuery(document).ready(function ($) {
-    
-    let autoplay = true;
+    /* Map */
+    var dataMap = $("#map").data("coords").split(",");
+    let map = L.map("map").setView([dataMap[0], dataMap[1]], dataMap[2]);
+    L.tileLayer("http://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png", {
+        attribution: "Données cartographiques : <a href='https://www.openstreetmap.fr/mentions-legales'>OpenStreetMap.fr</a>"
+    }).addTo(map);
+    var circle = L.circle([dataMap[0], dataMap[1]], {
+        color: "red",
+        fillColor: "#f03",
+        fillOpacity: 0.5,
+        radius: dataMap[3]
+    }).addTo(map);
+
+
+    /* Slider */
+    var autoplay = true;
    
     setInterval(function () {
         if(autoplay) {
-            moveRight();
+            moveSlide("right");
         }
     }, 4000);
     
@@ -84,7 +85,7 @@ jQuery(document).ready(function ($) {
         autoplay = false;
     });
     
-    $("body").keypress(function() {
+    $("body").keyup(function() {
         $("#fullscreenSlider").hide("fast");
         $("body").css("overflow", '');
     });
@@ -117,8 +118,10 @@ jQuery(document).ready(function ($) {
         autoplay = false;
         var largeImage = $(this).attr("src");
         $("#fullscreenSlider .displayFullscreen").css("background-image", "url("+largeImage+")");
-        $("#fullscreenSlider").show("slow"); //Remplacer par quelque chose qui permet de personnaliser l"effet
-        $("body").css("overflow", "hidden");
+        $("#fullscreenSlider").show("slow"); //Remplacer par quelque chose qui permet de personnaliser l'effet
+        setTimeout(function() { //Pour éviter que la page soit redimensionnée avant que l'image s'affiche en plein écran. On peut peut-être trouver mieux ?
+            $("body").css("overflow", "hidden");
+        }, 600);
     });
     
 
