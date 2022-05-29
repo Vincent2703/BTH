@@ -236,9 +236,17 @@ class Options {
         );
 
         add_settings_field(
-            "email", // id
+            "emailError", // id
             "Adresse mail à contacter en cas d'erreur", // title
-            array($this, "emailCallback"), // callback
+            array($this, "emailErrorCallback"), // callback
+            PLUGIN_RE_NAME."OptionsEmailPage", // page
+            PLUGIN_RE_NAME."optionsSection" // section
+        );
+        
+            add_settings_field(
+            "emailAd", // id
+            'Adresse mail à contacter pour les annonces par défaut <abbr title="Adresse mail à contacter s\'il n\'est pas possible de contacter un agent ou une agence pour une annonce"><sup>?</sup></abbr>', // title
+            array($this, "emailAdCallback"), // callback
             PLUGIN_RE_NAME."OptionsEmailPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
         );
@@ -265,28 +273,32 @@ class Options {
     public function optionsSanitizeImport($input) {
         $sanitaryValues = array();
 
-        if(isset($input["dirSavesPath"])) {
+        if(isset($input["dirSavesPath"]) && !ctype_space($input["dirSavesPath"])) {
             $sanitaryValues["dirSavesPath"] = sanitize_text_field($input["dirSavesPath"]);
         }
         
-        if(isset($input["maxDim"])) {
+        if(isset($input["maxDim"]) && !ctype_space($input["maxDim"])) {
             $sanitaryValues["maxDim"] = $input["maxDim"];
         }
         
-        if(isset($input["dirImportPath"])) {
+        if(isset($input["dirImportPath"]) && !ctype_space($input["dirImportPath"])) {
             $sanitaryValues["dirImportPath"] = sanitize_text_field($input["dirImportPath"]);
         }
 
-        if(isset($input["maxSaves"])) {
+        if(isset($input["maxSaves"]) && !ctype_space($input["maxSaves"])) {
             $sanitaryValues["maxSaves"] = absint($input["maxSaves"]);
         }
         
         if(isset($input["autoImport"])) {
-            $sanitaryValues["autoImport"] = $input["autoImport"];
+            $sanitaryValues["autoImport"] = true;
+        }else{
+            $sanitaryValues["autoImport"] = false;
         }
         
         if(isset($input["saveCSVImport"])) {
-            $sanitaryValues["saveCSVImport"] = $input["saveCSVImport"];
+            $sanitaryValues["saveCSVImport"] = true;
+        }else{
+            $sanitaryValues["saveCSVImport"] = false;
         }
 
         return $sanitaryValues;
@@ -295,16 +307,16 @@ class Options {
     public function optionsSanitizeExport($input) {
         $sanitaryValues = array();
         
-        if(isset($input["dirExportPath"])) {
+        if(isset($input["dirExportPath"]) && !ctype_space($input["dirExportPath"])) {
             $sanitaryValues["dirExportPath"] = sanitize_text_field($input["dirExportPath"]);
         }
-        if(isset($input["versionSeLoger"])) {
+        if(isset($input["versionSeLoger"]) && !ctype_space($input["versionSeLoger"])) {
             $sanitaryValues["versionSeLoger"] = sanitize_text_field($input["versionSeLoger"]);
         }
-        if(isset($input["idAgency"])) {
+        if(isset($input["idAgency"]) && !ctype_space($input["idAgency"])) {
             $sanitaryValues["idAgency"] = sanitize_text_field($input["idAgency"]);
         }
-        if(isset($input["maxCSVColumn"])) {
+        if(isset($input["maxCSVColumn"]) && !ctype_space($input["maxCSVColumn"])) {
             $sanitaryValues["maxCSVColumn"] = sanitize_text_field($input["maxCSVColumn"]);
         }
         
@@ -323,7 +335,9 @@ class Options {
         $sanitaryValues = array();
         
         if(isset($input["displayAdsUnavailable"])) {
-            $sanitaryValues["displayAdsUnavailable"] = $input["displayAdsUnavailable"];
+            $sanitaryValues["displayAdsUnavailable"] = true;
+        }else{
+            $sanitaryValues["displayAdsUnavailable"] = false;
         }
         
         return $sanitaryValues;
@@ -333,11 +347,17 @@ class Options {
         $sanitaryValues = array();
         
         if(isset($input["sendMail"])) {
-            $sanitaryValues["sendMail"] = $input["sendMail"];
+            $sanitaryValues["sendMail"] = true;
+        }else{
+            $sanitaryValues["sendMail"] = false;
         }
 
-        if(isset($input["email"])) {
-            $sanitaryValues["email"] = sanitize_text_field($input["email"]);
+        if(isset($input["emailError"]) && is_email($input["emailError"])) {
+            $sanitaryValues["emailError"] = sanitize_text_field($input["emailError"]);
+        }
+        
+        if(isset($input["emailAd"]) && is_email($input["emailAd"])) {
+            $sanitaryValues["emailAd"] = sanitize_text_field($input["emailAd"]);
         }
         
         return $sanitaryValues;
@@ -351,16 +371,13 @@ class Options {
             $inputFile[$key] = $value["feesFile"]; 
         }
         
-        if(isset($input["feesUrl"])) {
+        if(isset($input["feesUrl"]) && !ctype_space($input["feesUrl"])) {
             $sanitaryValues["feesUrl"] = sanitize_url($input["feesUrl"], array("https", "http"));
         }
                 
         if(isset($inputFile)) {
             $upload = wp_handle_upload($inputFile, array("test_form" => false));
-            echo "ok1";
-            print_r($upload);
             if(isset($upload["url"]) && !empty($upload["url"])) {
-                echo "ok2";
                 $sanitaryValues["feesUrl"] = $upload["url"];
             }
         }
@@ -427,7 +444,7 @@ class Options {
             "placeholder" => "wp-content/plugins/".PLUGIN_RE_NAME."/saves/",
             "value" => isset($this->optionsImports["dirSavesPath"]) ? esc_attr($this->optionsImports["dirSavesPath"]) : ''
         );
-        if(isset($this->optionsImports['saveCSVImport'])) {
+        if($this->optionsImports["saveCSVImport"] === true) {
             $args["required"] = "required";
         }else{
             $args["readonly"] = "readonly";
@@ -464,7 +481,7 @@ class Options {
             "placeholder" => "wp-content/plugins/".PLUGIN_RE_NAME."/import/",
             "value" => isset($this->optionsImports["dirImportPath"]) ? esc_attr($this->optionsImports["dirImportPath"]) : ''
         );
-        if(isset($this->optionsImports['autoImport'])) {
+        if($this->optionsImports["autoImport"] === true) {
             $args["required"] = "required";
         }else{
             $args["readonly"] = "readonly";
@@ -487,7 +504,7 @@ class Options {
             "id" => "saveCSVImport",
             "onchange" => "readOnlyFields(this,['dirSavesPath','maxSaves']);",
         );
-        if(isset($this->optionsImports['saveCSVImport'])) {
+        if($this->optionsImports["saveCSVImport"] === true) {
             $args["checked"] = "checked";
         }
         echo "<input ";
@@ -508,7 +525,7 @@ class Options {
             "id" => "maxSaves",
             "value" => isset($this->optionsImports["maxSaves"]) ? absint($this->optionsImports["maxSaves"]) : ''
         );
-        if(isset($this->optionsImports['saveCSVImport'])) {
+        if($this->optionsImports["saveCSVImport"] === true) {
             $args["required"] = "required";
         }else{
             $args["readonly"] = "readonly";
@@ -529,7 +546,7 @@ class Options {
             "id" => "autoImport",
             "onchange" => "readOnlyFields(this,['dirImportPath']);",
         );
-        if(isset($this->optionsImports['autoImport'])) {
+        if($this->optionsImports["autoImport"] === true) {
             $args["checked"] = "checked";
         }
         echo "<input ";
@@ -608,9 +625,9 @@ class Options {
             "type" => "checkbox",
             "name" => PLUGIN_RE_NAME."OptionsEmail[sendMail]",
             "id" => "sendMail",
-            "onchange" => "readOnlyFields(this,['email']);"
+            "onchange" => "readOnlyFields(this,['emailError']);"
         );
-        if(isset($this->optionsEmail['sendMail'])) {
+        if($this->optionsEmail["sendMail"] === true) {
             $args["checked"] = "checked";
         }
         echo "<input ";
@@ -622,20 +639,38 @@ class Options {
         echo '><label for="sendMail"> Oui</label>';
     }
 
-    public function emailCallback() {
+    public function emailErrorCallback() {
         $args = array(
             "type" => "email",
             "class" => "regular-text",
-            "name" => PLUGIN_RE_NAME."OptionsEmail[email]",
-            "id" => "email",
+            "name" => PLUGIN_RE_NAME."OptionsEmail[emailError]",
+            "id" => "emailError",
             "placeholder" => "adresse@mail.com",
-            "value" => isset($this->optionsEmail["email"]) ? esc_attr($this->optionsEmail["email"]) : ''
+            "value" => isset($this->optionsEmail["emailError"]) ? esc_attr($this->optionsEmail["emailError"]) : ''
         );
-        if(isset($this->optionsEmail['sendMail'])) {
+        if($this->optionsEmail["sendMail"] === true) {
             $args["required"] = "required";
         }else{
             $args["readonly"] = "readonly";
         }
+        echo "<input ";
+        foreach($args as $key => $value) {
+            if(!empty($value)) {                
+                echo "$key=$value ";            
+            }
+        }
+        echo ">";
+    }
+    
+    public function emailAdCallback() {
+        $args = array(
+            "type" => "email",
+            "class" => "regular-text",
+            "name" => PLUGIN_RE_NAME."OptionsEmail[emailAd]",
+            "id" => "emailAd",
+            "placeholder" => "adresse@mail.com",
+            "value" => isset($this->optionsEmail["emailAd"]) ? esc_attr($this->optionsEmail["emailAd"]) : ''
+        );
         echo "<input ";
         foreach($args as $key => $value) {
             if(!empty($value)) {                
@@ -737,7 +772,7 @@ class Options {
             "name" => PLUGIN_RE_NAME."OptionsAds[displayAdsUnavailable]",
             "id" => "displayAdsUnavailable",
         );
-        if(isset($this->optionsAds["displayAdsUnavailable"])) {
+        if($this->optionsAds["displayAdsUnavailable"] === true) {
             $args["checked"] = "checked";
         }
         echo "<input ";

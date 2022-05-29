@@ -33,7 +33,9 @@ class EditAd {
                 $this->saveTaxonomy($adId, "adTypeAd");
             }
             if(isset($_POST["adAvailable"]) && $_POST["adAvailable"] === "Disponible") {
-                $this->saveTaxonomyAdAvailable($adId, "adAvailable");
+                $this->saveTaxonomyAdAvailable($adId, "Disponible");
+            }else{
+                $this->saveTaxonomyAdAvailable($adId, "Indisponible");
             }            
             
             if(isset($_POST["refAgency"]) && !ctype_space($_POST["refAgency"])) {
@@ -111,10 +113,12 @@ class EditAd {
                 update_post_meta($adId, "adImages", sanitize_text_field($_POST["images"]));
             }
             if(isset($_POST["agent"]) && ctype_digit(strval($_POST["agent"]))) {
-                update_post_meta($adId, "adAgent", sanitize_text_field($_POST["agent"]));
+                update_post_meta($adId, "adIdAgent", sanitize_text_field($_POST["agent"]));
             }
             if(isset($_POST["showAgent"])) {
                 update_post_meta($adId, "adShowAgent", "OUI");
+            }else{
+                update_post_meta($adId, "adShowAgent", "NON");
             }
   
                        
@@ -176,17 +180,13 @@ class EditAd {
         }
     }
     
-    function saveTaxonomyAdAvailable($postId) {
+    private static function saveTaxonomyAdAvailable($postId, $state) {
         $taxonomyName = "adAvailable";
         if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
             return;
         }
         
-        if(isset($_POST[$taxonomyName]) && $_POST[$taxonomyName] === "Disponible") {
-            $term = get_term_by("name", "Disponible", $taxonomyName);
-            wp_set_object_terms($postId, $term->term_id, $taxonomyName, false);
-        }else{
-            $term = get_term_by("name", "Indisponible", $taxonomyName);
+        if($term = get_term_by("name", $state, $taxonomyName)) {
             wp_set_object_terms($postId, $term->term_id, $taxonomyName, false);
         }
         

@@ -31,26 +31,28 @@
     text-align: center;
 }
 
-.right, .left {
+.contentRightAd, .contentLeftAd {
     display: flex;
     flex-direction: column;
     background-color: rgba(255, 255, 255, 0.7);
+    padding-top: 1vh;
+    padding-bottom: 1vh;
 }
 
-.right div, .left div {
+.contentRightAd div, .contentLeftAd div {
     flex-grow: 1;
 }
 
-.left {
+.contentLeftAd {
     flex: 1 0 75%;
-    padding-left: 3vw;
-    padding-right: 1vw;
+    padding-left: 6vw;
+    padding-right: 6vw;
     border-right: 1px solid black;
 }
 
-.right {
+.contentRightAd {
     flex: 1 0 25%;
-    padding-right: 3vw;
+    padding-right: 6vw;
     padding-left: 1vw;
 }
 
@@ -64,9 +66,41 @@
 }
 
 .map {
+    margin-bottom: 5vh;
 }
 
 .contact {
+}
+
+.headerContact {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5vh;
+}
+
+.formContactInput {
+    margin-bottom: 3vh !important;
+}
+
+.formContact {
+    
+}
+
+#formContactSubmit {
+    width: 100%;
+}
+
+.headerContactLeft {
+    display: flex;
+    justify-content: center;
+}
+
+.headerContactRight {
+}
+
+#thumbnailContact {
+    width: 70%;
+    border-radius: 50%;
 }
 
 

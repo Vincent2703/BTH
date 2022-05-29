@@ -4,15 +4,21 @@ class Ad {
     
         public function registerPluginStylesSingleAd() {
             wp_register_style("leaflet", plugins_url("bth/includes/css/leaflet.min.css"), array(), "1.8.0");
+            wp_register_style("leafletFullscreen", plugins_url("bth/includes/css/leafletFullscreen.min.css"), array(), "2.3.0");
             wp_register_style("singleAd", plugins_url("bth/includes/css/singleAd.css"));
+            wp_register_style("googleIcons", "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0");
             wp_enqueue_style("leaflet");
+            wp_enqueue_style("leafletFullscreen");
             wp_enqueue_style("singleAd");
+            wp_enqueue_style("googleIcons");
         }
 
         public function registerPluginScriptsSingleAd() {
             wp_register_script("leaflet", plugins_url("bth/includes/js/leaflet.min.js"), array(), "1.8.0", true);
+            wp_register_script("leafletFullscreen", plugins_url("bth/includes/js/leafletFullscreen.min.js"), array(), "2.3.0", true);
             wp_register_script("singleAd", plugins_url("bth/includes/js/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
             wp_enqueue_script("leaflet");
+            wp_enqueue_script("leafletFullscreen");
             wp_enqueue_script("singleAd");
         }
     

@@ -83,22 +83,28 @@ class Bth {
     public function activationPlugin() { //A l'activation du plugin
         //Enregistrer les valeurs par défaut
         $defaultValuesImports = array(
-                "autoImport" 		=> "on", 
-                "dirImportPath"         => "wp-content/plugins/".PLUGIN_RE_NAME."/import/",
-                "saveCSVImport"         => "on",
-                "dirSavesPath"          => "wp-content/plugins/".PLUGIN_RE_NAME."/saves/",
-                "maxSaves" 		=> 2,
-                "maxDim"		=> 1024,
+            "autoImport"        => true, 
+            "dirImportPath"     => "wp-content/plugins/".PLUGIN_RE_NAME."/import/",
+            "saveCSVImport"     => true,
+            "dirSavesPath"      => "wp-content/plugins/".PLUGIN_RE_NAME."/saves/",
+            "maxSaves"          => 2,
+            "maxDim"            => 1024,
         );
         update_option(PLUGIN_RE_NAME."OptionsImports", $defaultValuesImports); 
         
         $defaultValuesExports = array(
-                "dirExportPath"     => "wp-content/plugins/".PLUGIN_RE_NAME."/export/",
-                "versionSeLoger"    => "4.08-007",
-                "idAgency"          => "monAgence",
-                "maxCSVColumn"       => 328
+            "dirExportPath"     => "wp-content/plugins/".PLUGIN_RE_NAME."/export/",
+            "versionSeLoger"    => "4.08-007",
+            "idAgency"          => "monAgence",
+            "maxCSVColumn"      => 328
         );
         update_option(PLUGIN_RE_NAME."OptionsExports", $defaultValuesExports); 
+        
+        $defaultValuesEmail = array(
+            "emailError"    => wp_get_current_user()->user_email,
+            "emailAd"       => wp_get_current_user()->user_email
+        );
+        update_option(PLUGIN_RE_NAME."OptionsEmail", $defaultValuesEmail); 
         
         $configFile = fopen(__DIR__."\config.json", 'r');
         $config = json_decode(fread($configFile, filesize(__DIR__."\config.json")), true);
