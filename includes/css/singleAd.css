@@ -26,9 +26,14 @@
     margin-bottom: 3vh;
 }
 
-.more {
-    flex: 0 1 100%;
-    text-align: center;
+#moreTitle {
+    display: flex;    
+    justify-content: center;
+}
+
+.morePosts {
+    display: flex;    
+    justify-content: center;
 }
 
 .contentRightAd, .contentLeftAd {
@@ -59,10 +64,24 @@
 .description {
 }
 
-.princ {
+.mainFeatures {
+    
 }
 
-.comp {
+.mainFeatures ul, .complementaryFeatures ul {
+    list-style: none;
+    columns: 2;
+}
+
+.nameFeature {
+    font-weight: bold;
+}
+
+.valueFeature {
+    
+}
+
+.complementaryFeatures {
 }
 
 .map {
@@ -96,6 +115,17 @@
 }
 
 .headerContactRight {
+
+}
+
+#phoneContact {
+    display: flex;
+    align-items: center;
+}
+
+#phoneContact a {
+    margin-left: 0.3vw;
+    font-size: 15px;
 }
 
 #thumbnailContact {

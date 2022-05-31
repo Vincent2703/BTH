@@ -2,16 +2,16 @@
     while(have_posts()) {
         the_post();
        
-        $id = get_the_id();
+        $idPost = get_the_id();
         
-        if(wp_get_post_terms($id, "adAvailable")[0]->name === "Indisponible" && !get_option(PLUGIN_RE_NAME."OptionsAds")["displayAdsUnavailable"]) {
+        if(wp_get_post_terms($idPost, "adAvailable")[0]->name === "Indisponible" && !get_option(PLUGIN_RE_NAME."OptionsAds")["displayAdsUnavailable"]) {
             wp_redirect(get_home_url(), "302");
             exit();
         }
 
-        $price = get_post_meta($id, "adPrice", true);
-        $images = get_post_meta($id, "adImages", true);
-        $typeAd = get_the_terms($id, "adTypeAd")[0]->name;
+        $price = get_post_meta($idPost, "adPrice", true);
+        $images = get_post_meta($idPost, "adImages", true);
+        $typeAd = get_the_terms($idPost, "adTypeAd")[0]->name;
         $afterPrice = '€';
         if($typeAd === "Location") {
             $afterPrice .= "/mois";
@@ -21,19 +21,25 @@
             $imagesIds = explode(';', $images);
         }
 
-        $showMap = get_post_meta($id, "adShowMap", true);
+        $showMap = get_post_meta($idPost, "adShowMap", true);
         if($showMap !== "no" && $showMap) {
             if($showMap === "onlyPC") {
-                $address = get_post_meta($id, "adPC", true).", ".get_post_meta($id, "adCity", true);
+                $address = get_post_meta($idPost, "adPC", true).", ".get_post_meta($idPost, "adCity", true);
             }else if($showMap === "all"){
-                $address = get_post_meta($id, "adAddress", true);
+                $address = get_post_meta($idPost, "adAddress", true);
             }
-            $coords = get_post_meta($id, "adDataMap", true);
+            $coords = get_post_meta($idPost, "adDataMap", true);
         }
+        if(isset($coords) && !empty($coords) && is_array($coords)) {
+            $getCoords = true;
+        }else{
+            $getCoords = false;
+        }
+        $city = get_post_meta($idPost, "adCity", true);
 
-        if(!empty($idContact = get_post_meta($id, "adIdAgent", true))) {
+        if(!empty($idContact = get_post_meta($idPost, "adIdAgent", true))) {
             $getContact = true;
-            if(get_post_meta($id, "adShowAgent", true) === "OUI") {
+            if(get_post_meta($idPost, "adShowAgent", true) === "OUI") {
                 $emailToContact = get_post_meta($idContact, "agentEmail", true);
                 $phone = get_post_meta($idContact, "agentPhone", true);
                 $mobilePhone = get_post_meta($idContact, "agentMobilePhone", true);
@@ -50,7 +56,7 @@
         }
         
         if(isset($_POST["submit"])) {         
-            $adRef = get_post_meta($id, "adRefAgency", true);
+            $adRef = get_post_meta($idPost, "adRefAgency", true);
             $names = sanitize_text_field($_POST["names"]);
             $phone = sanitize_text_field($_POST["phone"]);
             $email = sanitize_email($_POST["email"]);
@@ -70,9 +76,36 @@
                 echo "Le mail n'a pas pu être envoyé.";
             }
         }
-
-
-
+        
+        $mapping = get_option(PLUGIN_RE_NAME."OptionsMapping");
+        $mainFeatures = array();
+        $complementaryFeatures = array();
+        foreach($mapping as $field) {
+            if($field["section"] === "mainFeatures") {
+                array_push($mainFeatures, $field);
+            }else if($field["section"] === "complementaryFeatures") {
+                array_push($complementaryFeatures, $field);
+            }
+        }
+        
+        $morePosts = get_posts(array(
+            "post_type" => "ad",
+            "exclude" => $idPost,
+            "meta_query" => array(
+                array(
+                    "key" => "adCity",
+                    "value" => $city
+                )
+            ),
+            "tax_query" => array(
+                array(
+                    "taxonomy" => "adTypeAd",
+                    "field" => "name",
+                    "terms" => $typeAd
+                )
+            )
+        ));
+        
         get_header();                 
 ?>
 
@@ -80,7 +113,7 @@
     <div id="primary" class="content-area">
         <main id="main" class="site-main">
             <span class="titleAd"><h1><?= the_title(); ?></h1></span>
-            <span class="subtitleAd"><?= "$address - $price$afterPrice"; ?></span>
+            <span class="subtitleAd"><?= "$city - $price$afterPrice"; ?></span>
             <div class="sliders">
                 <div id="miniSlider">
                     <span class="controlNext">></span>
@@ -105,15 +138,33 @@
                     <h4>Description</h4>
                     <?= the_content(); ?>
                 </div>
-                <div class="princ">
+                <div class="mainFeatures">
                     <h4>Caractéristiques principales</h4>
+                    <ul>
+                    <?php foreach($mainFeatures as $mainFeature) { ?>
+                        <li>
+                            <span class="nameFeature"><?= $mainFeature["name"] ;?></span>
+                            <span class="valueFeature"><?= get_post_meta($idPost, "ad".ucfirst($mainFeature["name"]), true); ?></span>
+                        </li>
+                    <?php } ?>
+                    </ul>
                 </div>
-                <div class="comp">
+                <div class="complementaryFeatures">
                     <h4>Caractéristiques complémentaires</h4>
+                    <ul>
+                    <?php foreach($complementaryFeatures as $complementaryFeatures) { ?>
+                        <li>
+                            <span class="nameFeature"><?= $complementaryFeatures["name"] ;?></span>
+                            <span class="valueFeature"><?= get_post_meta($idPost, "ad".ucfirst($complementaryFeatures["name"]), true); ?></span>
+                        </li>
+                    <?php } ?>
+                    </ul>
                 </div>
             </div>
             <div class="contentRightAd">
+                <?php if($getCoords) { ?>
                 <div id="map" class="map" data-coords="<?= implode(',', $coords); ?>"></div>
+                <?php } ?>
                 <div class="contact">
                     <div class="headerContact">
                         <?php if($getContact) { ?>
@@ -122,7 +173,12 @@
                         </div>
                         <div class="headerContactRight">
                             <span id="nameContact"><?= $nameContact; ?></span>
-                            <span id="phoneContact"><a href="tel:<?= $phone; ?>"><?= isset($phone)?$phone:'' ?></a></span>
+                            <div id="phoneContact">
+                                <span class="material-symbols-outlined">
+                                    call
+                                </span>
+                                <a href="tel:<?= $phone; ?>"><?= isset($phone)?$phone:'' ?></a>
+                            </div>
                             
                             <span id="mobilePhoneContact"><a href="tel:<?= $mobilePhone; ?>"><?= isset($mobilePhone)?$mobilePhone:'' ?></a></span>
                         </div>
@@ -140,7 +196,12 @@
                 </div>
             </div>
             <div class="more">
-              Autres annonces
+                <span id="moreTitle">Autres <?= lcfirst($typeAd); ?>s à <?= $city; ?></span>
+                <div class="morePosts">
+                <?php foreach($morePosts as $post) {
+                    echo '<a src="'.get_post_permalink($post).'">'.get_the_post_thumbnail($post, "thumbnail").get_the_title($post).'</a>';
+                } ?>
+                </div>
             </div>
     <?php 
     }           
