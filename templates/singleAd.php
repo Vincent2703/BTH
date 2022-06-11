@@ -8,9 +8,11 @@
             wp_redirect(get_home_url(), "302");
             exit();
         }
-
-        $price = get_post_meta($idPost, "adPrice", true);
-        $images = get_post_meta($idPost, "adImages", true);
+        
+        $metas = get_post_meta($idPost);
+        
+        $price = getMeta("adPrice");
+        $images = getMeta("adImages");
         $typeAd = get_the_terms($idPost, "adTypeAd")[0]->name;
         $afterPrice = '€';
         if($typeAd === "Location") {
@@ -21,25 +23,25 @@
             $imagesIds = explode(';', $images);
         }
 
-        $showMap = get_post_meta($idPost, "adShowMap", true);
+        $showMap = getMeta("adShowMap");
         if($showMap !== "no" && $showMap) {
             if($showMap === "onlyPC") {
-                $address = get_post_meta($idPost, "adPC", true).", ".get_post_meta($idPost, "adCity", true);
+                $address = getMeta("adPC").", ". getMeta("adCity");
             }else if($showMap === "all"){
-                $address = get_post_meta($idPost, "adAddress", true);
+                $address = getMeta("adAddress");
             }
-            $coords = get_post_meta($idPost, "adDataMap", true);
+            $coords = unserialize(getMeta("adDataMap"));
         }
         if(isset($coords) && !empty($coords) && is_array($coords)) {
             $getCoords = true;
         }else{
             $getCoords = false;
         }
-        $city = get_post_meta($idPost, "adCity", true);
+        $city = getMeta("adCity");
 
-        if(!empty($idContact = get_post_meta($idPost, "adIdAgent", true))) {
+        if(!empty($idContact = getMeta("adIdAgent"))) {
             $getContact = true;
-            if(get_post_meta($idPost, "adShowAgent", true) === "OUI") {
+            if(getMeta("adShowAgent") === "OUI") {
                 $emailToContact = get_post_meta($idContact, "agentEmail", true);
                 $phone = get_post_meta($idContact, "agentPhone", true);
                 $mobilePhone = get_post_meta($idContact, "agentMobilePhone", true);
@@ -56,7 +58,7 @@
         }
         
         if(isset($_POST["submit"])) {         
-            $adRef = get_post_meta($idPost, "adRefAgency", true);
+            $adRef = getMeta("adRefAgency");
             $names = sanitize_text_field($_POST["names"]);
             $phone = sanitize_text_field($_POST["phone"]);
             $email = sanitize_email($_POST["email"]);
@@ -80,7 +82,10 @@
         $mapping = get_option(PLUGIN_RE_NAME."OptionsMapping");
         $mainFeatures = array();
         $complementaryFeatures = array();
-        foreach($mapping as $field) {
+        foreach($mapping as $field) {           
+            $feature = array();
+            $feature["name"] = isset($field["FRName"]) ? $field["FRName"] : $field["name"];
+            
             if($field["section"] === "mainFeatures") {
                 array_push($mainFeatures, $field);
             }else if($field["section"] === "complementaryFeatures") {
@@ -105,7 +110,7 @@
                 )
             )
         ));
-        
+                
         get_header();                 
 ?>
 
@@ -141,23 +146,37 @@
                 <div class="mainFeatures">
                     <h4>Caractéristiques principales</h4>
                     <ul>
-                    <?php foreach($mainFeatures as $mainFeature) { ?>
+                    <?php foreach($mainFeatures as $mainFeature) { 
+                        $meta = getMeta("ad".ucfirst($mainFeature["name"]));
+                        if(isset($mainFeature["FRValuesReplace"])) {
+                            $value = $mainFeature["FRValuesReplace"][0][$meta];
+                        }else{
+                            $value = $meta;
+                        }
+                        if(!empty($value)) {?>
                         <li>
-                            <span class="nameFeature"><?= $mainFeature["name"] ;?></span>
-                            <span class="valueFeature"><?= get_post_meta($idPost, "ad".ucfirst($mainFeature["name"]), true); ?></span>
+                            <span class="nameFeature"><?= $mainFeature["FRName"] ;?></span>
+                            <span class="valueFeature"><?= $value ?></span>
                         </li>
-                    <?php } ?>
+                        <?php }} ?>
                     </ul>
                 </div>
                 <div class="complementaryFeatures">
                     <h4>Caractéristiques complémentaires</h4>
                     <ul>
-                    <?php foreach($complementaryFeatures as $complementaryFeatures) { ?>
+                    <?php foreach($complementaryFeatures as $complementaryFeature) { 
+                        $meta = getMeta("ad".ucfirst($complementaryFeature["name"]));
+                        if(isset($complementaryFeature["FRValuesReplace"])) {
+                            $value = $complementaryFeature["FRValuesReplace"][0][$meta];
+                        }else{
+                            $value = $meta;                         
+                        }
+                        if(!empty($value)) {?>
                         <li>
-                            <span class="nameFeature"><?= $complementaryFeatures["name"] ;?></span>
-                            <span class="valueFeature"><?= get_post_meta($idPost, "ad".ucfirst($complementaryFeatures["name"]), true); ?></span>
+                            <span class="nameFeature"><?= $complementaryFeature["FRName"] ;?></span>
+                            <span class="valueFeature"><?= $value; ?></span>
                         </li>
-                    <?php } ?>
+                        <?php }} ?>
                     </ul>
                 </div>
             </div>
@@ -199,7 +218,7 @@
                 <span id="moreTitle">Autres <?= lcfirst($typeAd); ?>s à <?= $city; ?></span>
                 <div class="morePosts">
                 <?php foreach($morePosts as $post) {
-                    echo '<a src="'.get_post_permalink($post).'">'.get_the_post_thumbnail($post, "thumbnail").get_the_title($post).'</a>';
+                    echo '<a href="'.get_post_permalink($post).'">'.get_the_post_thumbnail($post, "thumbnail").get_the_title($post).'</a>';
                 } ?>
                 </div>
             </div>
@@ -211,3 +230,8 @@
 
 <?php
 get_footer();
+
+function getMeta($metaName) {
+    global $metas;
+    return isset($metas[$metaName])?implode($metas[$metaName]):'';
+}

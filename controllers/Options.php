@@ -130,7 +130,7 @@ class Options {
         
         add_settings_field(
             "autoImport", // id
-            'Import automatique <abbr title="Les annonces stockées dans le répertoire d\'importation pourront être importées automatiquement sur ce site via un cron job"><sup>?</sup></abbr>', // title
+            'Import automatique <abbr title="Les annonces stockées dans le répertoire d\'importation POURRONT être importées automatiquement sur ce site via un cron job"><sup>?</sup></abbr>', // title
             array($this, "autoImportCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -172,6 +172,14 @@ class Options {
             "maxDim", // id
             'Taille des images <abbr title="Dimension maximale des images importées"><sup>?</sup></abbr>', // title
             array($this, "maxDimCallback"), // callback
+            PLUGIN_RE_NAME."OptionsImportsPage", // page
+            PLUGIN_RE_NAME."optionsSection" // section
+        );
+        
+        add_settings_field(
+            "adressPrecision", // id
+            'Affichage de l\'adresse <abbr title="Il est possible de faire apparaître l\'adresse complète ou seulement la commune/l\'arrondissement"><sup>?</sup></abbr>', // title
+            array($this, "addressPrecisionCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
         );
@@ -299,6 +307,10 @@ class Options {
             $sanitaryValues["saveCSVImport"] = true;
         }else{
             $sanitaryValues["saveCSVImport"] = false;
+        }
+        
+        if(isset($input["addressPrecision"]) && !ctype_space($input["addressPrecision"])) {
+            $sanitaryValues["addressPrecision"] = $input["addressPrecision"];
         }
 
         return $sanitaryValues;
@@ -444,7 +456,7 @@ class Options {
             "placeholder" => "wp-content/plugins/".PLUGIN_RE_NAME."/saves/",
             "value" => isset($this->optionsImports["dirSavesPath"]) ? esc_attr($this->optionsImports["dirSavesPath"]) : ''
         );
-        if($this->optionsImports["saveCSVImport"] === true) {
+        if(isset($this->optionsImports["saveCSVImport"]) && $this->optionsImports["saveCSVImport"] === true) {
             $args["required"] = "required";
         }else{
             $args["readonly"] = "readonly";
@@ -460,14 +472,23 @@ class Options {
     
     public function maxDimCallback() {
         ?> <select name="<?= PLUGIN_RE_NAME; ?>OptionsImports[maxDim]" id="maxDim">
-            <?php $selected = (isset($this->optionsImports['maxDim'] ) && $this->optionsImports['maxDim'] == '512') ? 'selected' : '' ; ?>
+            <?php $selected = (isset($this->optionsImports['maxDim']) && $this->optionsImports['maxDim'] == '512') ? 'selected' : '' ; ?>
             <option value="512" <?php echo $selected; ?>>512px</option>
-            <?php $selected = (isset($this->optionsImports['maxDim'] ) && $this->optionsImports['maxDim'] == '1024') ? 'selected' : '' ; ?>
+            <?php $selected = (isset($this->optionsImports['maxDim']) && $this->optionsImports['maxDim'] == '1024') ? 'selected' : '' ; ?>
             <option value="1024" <?php echo $selected; ?>>1024px</option>
-            <?php $selected = (isset($this->optionsImports['maxDim'] ) && $this->optionsImports['maxDim'] == '1536') ? 'selected' : '' ; ?>
+            <?php $selected = (isset($this->optionsImports['maxDim']) && $this->optionsImports['maxDim'] == '1536') ? 'selected' : '' ; ?>
             <option value="1536" <?php echo $selected; ?>>1536px</option>
-            <?php $selected = (isset($this->optionsImports['maxDim'] ) && $this->optionsImports['maxDim'] == '2048') ? 'selected' : '' ; ?>
+            <?php $selected = (isset($this->optionsImports['maxDim']) && $this->optionsImports['maxDim'] == '2048') ? 'selected' : '' ; ?>
             <option value="2048" <?php echo $selected; ?>>2048px</option>
+        </select> <?php
+    }
+    
+    public function addressPrecisionCallback() {
+        ?> <select name="<?= PLUGIN_RE_NAME; ?>OptionsImports[addressPrecision]" id="addressPrecision">
+            <?php $selected = (isset($this->optionsImports['addressPrecision']) && $this->optionsImports['addressPrecision'] == 'all') ? 'selected' : '' ; ?>
+            <option value="all" <?php echo $selected; ?>>Adresse complète</option>
+            <?php $selected = (isset($this->optionsImports['addressPrecision']) && $this->optionsImports['addressPrecision'] == 'onlyPC') ? 'selected' : '' ; ?>
+            <option value="onlyPC" <?php echo $selected; ?>>Commune</option>
         </select> <?php
     }
     
@@ -481,7 +502,7 @@ class Options {
             "placeholder" => "wp-content/plugins/".PLUGIN_RE_NAME."/import/",
             "value" => isset($this->optionsImports["dirImportPath"]) ? esc_attr($this->optionsImports["dirImportPath"]) : ''
         );
-        if($this->optionsImports["autoImport"] === true) {
+        if(isset($this->optionsImports["autoImport"]) && $this->optionsImports["autoImport"] === true) {
             $args["required"] = "required";
         }else{
             $args["readonly"] = "readonly";
@@ -504,7 +525,7 @@ class Options {
             "id" => "saveCSVImport",
             "onchange" => "readOnlyFields(this,['dirSavesPath','maxSaves']);",
         );
-        if($this->optionsImports["saveCSVImport"] === true) {
+        if(isset($this->optionsImports["saveCSVImport"]) && $this->optionsImports["saveCSVImport"] === true) {
             $args["checked"] = "checked";
         }
         echo "<input ";
@@ -525,7 +546,7 @@ class Options {
             "id" => "maxSaves",
             "value" => isset($this->optionsImports["maxSaves"]) ? absint($this->optionsImports["maxSaves"]) : ''
         );
-        if($this->optionsImports["saveCSVImport"] === true) {
+        if(isset($this->optionsImports["saveCSVImport"]) && $this->optionsImports["saveCSVImport"] === true) {
             $args["required"] = "required";
         }else{
             $args["readonly"] = "readonly";
@@ -546,7 +567,7 @@ class Options {
             "id" => "autoImport",
             "onchange" => "readOnlyFields(this,['dirImportPath']);",
         );
-        if($this->optionsImports["autoImport"] === true) {
+        if(isset($this->optionsImports["autoImport"]) && $this->optionsImports["autoImport"] === true) {
             $args["checked"] = "checked";
         }
         echo "<input ";
@@ -627,7 +648,7 @@ class Options {
             "id" => "sendMail",
             "onchange" => "readOnlyFields(this,['emailError']);"
         );
-        if($this->optionsEmail["sendMail"] === true) {
+        if(isset($this->optionsEmail["sendMail"]) && $this->optionsEmail["sendMail"] === true) {
             $args["checked"] = "checked";
         }
         echo "<input ";
@@ -648,7 +669,7 @@ class Options {
             "placeholder" => "adresse@mail.com",
             "value" => isset($this->optionsEmail["emailError"]) ? esc_attr($this->optionsEmail["emailError"]) : ''
         );
-        if($this->optionsEmail["sendMail"] === true) {
+        if(isset($this->optionsEmail["sendMail"]) && $this->optionsEmail["sendMail"] === true) {
             $args["required"] = "required";
         }else{
             $args["readonly"] = "readonly";
@@ -772,7 +793,7 @@ class Options {
             "name" => PLUGIN_RE_NAME."OptionsAds[displayAdsUnavailable]",
             "id" => "displayAdsUnavailable",
         );
-        if($this->optionsAds["displayAdsUnavailable"] === true) {
+        if(isset($this->optionsAds["displayAdsUnavailable"]) && $this->optionsAds["displayAdsUnavailable"] === true) {
             $args["checked"] = "checked";
         }
         echo "<input ";

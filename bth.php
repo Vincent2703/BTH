@@ -69,8 +69,8 @@ class Bth {
     }
     
     private static function defineGlobalConsts() {
-        $configFile = fopen(__DIR__."\config.json", 'r');
-        $config = json_decode(fread($configFile, filesize(__DIR__."\config.json")), true);
+        $configFile = fopen(__DIR__."/config.json", 'r');
+        $config = json_decode(fread($configFile, filesize(__DIR__."/config.json")), true);
         fclose($configFile);
         foreach($config as $key=>$value) {
             if(!is_array($value)) {
@@ -106,8 +106,8 @@ class Bth {
         );
         update_option(PLUGIN_RE_NAME."OptionsEmail", $defaultValuesEmail); 
         
-        $configFile = fopen(__DIR__."\config.json", 'r');
-        $config = json_decode(fread($configFile, filesize(__DIR__."\config.json")), true);
+        $configFile = fopen(__DIR__."/config.json", 'r');
+        $config = json_decode(fread($configFile, filesize(__DIR__."/config.json")), true);
         fclose($configFile);
         $defaultMapping = $config["DEFAULT_MAPPING"];
         update_option(PLUGIN_RE_NAME."OptionsMapping", $defaultMapping); //Enregistrer le mapping par défaut des champs        

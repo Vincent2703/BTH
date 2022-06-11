@@ -5,464 +5,428 @@
   {
     "id": 2,
     "name": "refAgency",
+    "FRName" : "Référence",
     "kindField": "text",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 3,
     "name": "typeAd",
     "kindField": "radio",
-    "section": "category",
-    "unchangeable": "true",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 4,
     "name": "typeProperty",
     "kindField": "select",
-    "section": "category",
-    "unchangeable": "true",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 5,
     "name": "postalCode",
+    "FRName": "Code postal",            
     "kindField": "number",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 6,
     "name": "city",
+    "FRName": "Ville",
     "kindField": "text",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 7,
     "name": "country",
+    "FRName": "Pays",            
     "kindField": "text",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 8,
     "name": "address",
+    "FRName": "Adresse",            
     "kindField": "text",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 11,
     "name": "price",
+    "FRName": "Prix",            
     "kindField": "number",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 16,
     "name": "surface",
+    "FRName": "Surface habitable",
     "kindField": "number",
     "section": "mainFeatures",
-    "unchangeable": "true",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 17,
     "name": "landSurface",
+    "FRName": "Surface du terrain",
     "kindField": "number",
     "section": "mainFeatures",
-    "unchangeable": "true",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 18,
     "name": "nbRooms",
+    "FRName": "Nombre de pièces",
     "kindField": "number",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 19,
     "name": "nbBedrooms",
+    "FRName": "Nombre de chambres",
     "kindField": "number",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 20,
     "name": "title",
+    "FRName": "",
     "kindField": "text",
-    "section": "title",
-    "unchangeable": "true",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 21,
     "name": "description",
+    "FRName": "",            
     "kindField": "text",
-    "section": "description",
-    "unchangeable": "true",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 23,
     "name": "fees",
+    "FRName": "Charges",            
     "kindField": "number",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 24,
     "name": "floor",
+    "FRName": "Etage",            
     "kindField": "number",
     "section": "complementaryFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 25,
     "name": "nbFloors",
+    "FRName": "Nombre d'étages",
     "kindField": "number",
     "section": "complementaryFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 26,
     "name": "furnished",
+    "FRName": "Meublé",
     "kindField": "checkbox",
     "section": "complementaryFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 27,
     "name": "yearBuilt",
+    "FRName": "Année de construction",            
     "kindField": "number",
     "section": "complementaryFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 29,
     "name": "nbBathrooms",
+    "FRName": "Nombre de salles de bain",            
     "kindField": "number",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 30,
     "name": "nbWaterRooms",
+    "FRName": "Nombre de pièces d'eau",            
     "kindField": "number",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 31,
     "name": "nbWC",
+    "FRName": "Nombre de toilettes",            
     "kindField": "number",
     "section": "mainFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 33,
     "name": "typeHeating",
+    "FRName": "Type de chauffage",       
+	"FRValuesReplace" : [{
+                "0":     "Inconnu",
+		"8704":  "Individuel gaz",
+		"4608":  "Collectif gaz",
+		"9216":  "Individuel fuel",
+		"5120":  "Collectif fuel",
+		"10240": "Individuel électrique",
+		"6144":  "Collectif électrique"
+	}],	
     "kindField": "select",
     "section": "complementaryFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 34,
     "name": "typeKitchen",
+    "FRName": "Type de cuisine",
+	"FRValuesReplace": [{
+                "0": "Inconnu",
+		"1": "Aucune",
+		"2": "Américaine",
+		"3": "Séparée",
+		"4": "Industrielle",
+		"5": "Coin cuisine",
+		"6": "Américaine équipée",
+		"7": "Séparée équipée",
+		"8": "Coin cuisine équipé",
+		"9": "Equipée"
+	}],
     "kindField": "select",
     "section": "complementaryFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 39,
     "name": "nbBalconies",
+    "FRName": "Nombre de balcons",
     "kindField": "number",
     "section": "complementaryFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 41,
     "name": "elevator",
+    "FRName": "Ascenseur",
     "kindField": "checkbox",
     "section": "complementaryFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 42,
     "name": "cellar",
+    "FRName": "Cave",            
     "kindField": "checkbox",
     "section": "complementaryFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 48,
     "name": "terrace",
+    "FRName": "Terrace",
     "kindField": "checkbox",
     "section": "complementaryFeatures",
-    "unchangeable": "false",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 85,
     "name": "thumbnail",
     "kindField": "picture",
-    "section": "?",
-    "unchangeable": "false",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 86,
     "name": "picture1",
     "kindField": "picture",
-    "section": "?",
-    "unchangeable": "false",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 87,
     "name": "picture2",
     "kindField": "picture",
-    "section": "?",
-    "unchangeable": "false",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 88,
     "name": "picture3",
     "kindField": "picture",
-    "section": "?",
-    "unchangeable": "false",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 89,
     "name": "picture4",
     "kindField": "picture",
-    "section": "?",
-    "unchangeable": "false",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 90,
     "name": "picture5",
     "kindField": "picture",
-    "section": "?",
-    "unchangeable": "false",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 91,
     "name": "picture6",
     "kindField": "picture",
-    "section": "?",
-    "unchangeable": "false",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 92,
     "name": "picture7",
     "kindField": "picture",
-    "section": "?",
-    "unchangeable": "false",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 93,
     "name": "picture8",
     "kindField": "picture",
-    "section": "?",
-    "unchangeable": "false",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 107,
     "name": "agentEmail",
     "kindField": "select",
-    "section": "?",
-    "unchangeable": "false",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "false",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 175,
     "name": "uniqId",
     "kindField": "text",
-    "section": "?",
-    "unchangeable": "true",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "true",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 298,
     "name": "latitude",
     "kindField": "text",
-    "section": "?",
-    "unchangeable": "true",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "true",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 299,
     "name": "longitude",
     "kindField": "text",
-    "section": "?",
-    "unchangeable": "true",
+    "section": "notDirectDisplay",
     "perso": "false",
     "hidden": "true",
-    "css": "",
-    "options": ""
+    "css": ""
   },
   {
     "id": 307,
     "name": "feesAgency",
+    "FRName": "Frais d'agence",
     "kindField": "text",
-    "section": "none",
-    "unchangeable": "true",
+    "section": "complementaryFeatures",
     "perso": "false",
     "hidden": "true",
-    "css": "",
-    "options": ""
+    "css": ""
   }
 ]
 }

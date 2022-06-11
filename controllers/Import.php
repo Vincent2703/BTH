@@ -38,6 +38,7 @@ class Import {
         if(is_admin()) {
             if(isset($_POST["submitImport"])) {
                 if(!is_dir($dirPath)) {
+                    echo $dirPath;
                     mkdir($dirPath);
                 }
                 $filePath = $dirPath.basename($_FILES["file"]["name"]);
@@ -404,12 +405,13 @@ class Import {
                                 $address = substr($address, 0, -1);
                             }
                             //Si on veut seulement la ville ou l'adresse complète A rajouter dans les options d'importation
-                            if(true) {
+                            if($optionsImports["addressPrecision"] === "all") {
                                 $query = $address." ".$ad["postalCode"]." ".$ad["city"];
+                                $url = "https://api-adresse.data.gouv.fr/search/?q=".$query."&limit=1"; 
                             }else{
                                 $query = $ad["postalCode"]." ".$ad["city"];
+                                $url = "https://api-adresse.data.gouv.fr/search/?q=".$query."&type=municipality&limit=1"; 
                             }
-                            $url = "https://api-adresse.data.gouv.fr/search/?q=".$query."&type=municipality&limit=1"; //obtient seulement la commune
                             $apiResponse = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                             
                             if(isset($apiResponse["features"][0])) { //Si on arrive à récupérer des infos à partir de l'adresse
