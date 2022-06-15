@@ -33,7 +33,7 @@ class Bth {
         
         add_action("init", array($this, "initObjects"));
 
-	register_activation_hook(__FILE__, array($this, 'activationPlugin')); //A l'activation du plugin...
+	register_activation_hook(__FILE__, array($this, "activationPlugin")); //A l'activation du plugin...
         //Ajouter à la désactivation
         
         add_action("admin_init", array($this, "initAdmin"));
@@ -60,7 +60,7 @@ class Bth {
         add_filter("enter_title_here", array($this, "changeTitle"));
         add_filter("pre_get_posts", array($this, "convertIdToTermInQuery"));
         
-        add_action("in_admin_header", array($this->Options, "tabsOption"));
+        add_action("all_admin_notices", array($this->Options, "tabsOption"));
         
         add_action("wp_ajax_nopriv_import", array($this->Import, "startImport")); //Cron
              
@@ -72,11 +72,10 @@ class Bth {
         $configFile = fopen(__DIR__."/config.json", 'r');
         $config = json_decode(fread($configFile, filesize(__DIR__."/config.json")), true);
         fclose($configFile);
-        foreach($config as $key=>$value) {
-            if(!is_array($value)) {
-                define($key, $value);
-            }
-        }
+        if(isset($config["PLUGIN_RE_NAME"]) && !empty($config["PLUGIN_RE_NAME"]) && isset($config["PLUGIN_RE_VERSION"]) && !empty($config["PLUGIN_RE_VERSION"])) {
+            define("PLUGIN_RE_NAME", $config["PLUGIN_RE_NAME"]);
+            define("PLUGIN_RE_VERSION", $config["PLUGIN_RE_VERSION"]);
+        }//else error
     }
 
     
@@ -89,6 +88,7 @@ class Bth {
             "dirSavesPath"      => "wp-content/plugins/".PLUGIN_RE_NAME."/saves/",
             "maxSaves"          => 2,
             "maxDim"            => 1024,
+            "addressPrecision"  => "onlyPC"
         );
         update_option(PLUGIN_RE_NAME."OptionsImports", $defaultValuesImports); 
         
@@ -130,26 +130,26 @@ class Bth {
         $postType = get_current_screen()->post_type;
         $base = get_current_screen()->base;
         if($postType === "ad" && $base === "post") {
-            wp_register_style("editAd", plugins_url("bth/includes/css/editAd.css"), array(), PLUGIN_RE_VERSION);
-            wp_register_style("autocompleteAddress", plugins_url("bth/includes/css/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("editAd", plugins_url(PLUGIN_RE_NAME."/includes/css/editAd.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
 
             wp_enqueue_style("editAd");
             wp_enqueue_style("autocompleteAddress");
         }else if($postType === "ad" && $base === "ad_page_bthoptions") {
-            wp_register_style("options", plugins_url("bth/includes/css/options.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("options", plugins_url(PLUGIN_RE_NAME."/includes/css/options.css"), array(), PLUGIN_RE_VERSION);
             
             wp_enqueue_style("options");
         }else if($postType === "ad" && $base === "edit-tags") {
-            wp_register_style("editTagsAd", plugins_url("bth/includes/css/editTagsAd.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("editTagsAd", plugins_url(PLUGIN_RE_NAME."/includes/css/editTagsAd.css"), array(), PLUGIN_RE_VERSION);
             
             wp_enqueue_style("editTagsAd");
         }else if($postType === "agent" && $base === "post") {
-            wp_register_style("editAgent", plugins_url("bth/includes/css/editAgent.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("editAgent", plugins_url(PLUGIN_RE_NAME."/includes/css/editAgent.css"), array(), PLUGIN_RE_VERSION);
             
             wp_enqueue_style("editAgent");
         }else if($postType === "agency" && $base === "post") {
-            wp_register_style("editAgency", plugins_url("bth/includes/css/editAgency.css"), array(), PLUGIN_RE_VERSION);
-            wp_register_style("autocompleteAddress", plugins_url("bth/includes/css/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("editAgency", plugins_url(PLUGIN_RE_NAME."/includes/css/editAgency.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
 
             wp_enqueue_style("editAgency");
             wp_enqueue_style("autocompleteAddress");

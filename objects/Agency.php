@@ -28,7 +28,7 @@ class Agency {
                 "public" => true,
                 "menu_position" => 16,
                 "supports" => array("title", "thumbnail"),
-                "taxonomies" => array(""),
+                //"taxonomies" => array(""),
                 "menu_icon" => "dashicons-admin-multisite",
                 "has_archive" => false
             )
@@ -40,10 +40,10 @@ class Agency {
             if(is_single()) {
                 //$this->registerPluginScriptsSingleAgency();
                 //$this->registerPluginStylesSingleAgency();
-                if($themeFile = locate_template(array('singleAgency.php'))) {
+                if($themeFile = locate_template(array('single_agency.php'))) {
                     $path = $path;
                 }else{
-                    $path = plugin_dir_path(__DIR__)."templates/singleAgency.php";
+                    $path = plugin_dir_path(__DIR__)."templates/single_agency.php";
                 }
             }
 	}

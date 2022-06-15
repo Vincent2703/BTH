@@ -28,7 +28,7 @@ class Agent {
                 "public" => true,
                 "menu_position" => 16,
                 "supports" => array("title", "thumbnail"),
-                "taxonomies" => array(""),
+                //"taxonomies" => array(""),
                 "menu_icon" => "dashicons-businessperson",
                 "has_archive" => false
             )
@@ -50,10 +50,10 @@ class Agent {
             if(is_single()) {
                 $this->registerPluginScriptsSingleAd();
                 $this->registerPluginStylesSingleAd();
-                if($themeFile = locate_template(array('singleAgent.php'))) {
+                if($themeFile = locate_template(array('single_agent.php'))) {
                     $path = $path;
                 }else{
-                    $path = plugin_dir_path(__DIR__)."templates/singleAgent.php";
+                    $path = plugin_dir_path(__DIR__)."templates/single_agent.php";
                 }
             }
 	}

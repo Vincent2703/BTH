@@ -26,14 +26,37 @@
     margin-bottom: 3vh;
 }
 
-#moreTitle {
-    display: flex;    
+.more {
+    display: flex;
+    flex-wrap: wrap;
     justify-content: center;
 }
 
-.morePosts {
+#moreTitle {
+}
+
+.morePostsPanel {
     display: flex;    
+    gap: 15px;
+
+}
+
+.morePosts {
+    display: flex;
     justify-content: center;
+    flex-wrap: wrap;
+}
+
+.moreAd {
+    display: flex;
+    flex-direction: column;
+}
+
+.moreThumbnailAd {
+}
+
+.moreTitleAd {
+    font-size: 10px;
 }
 
 .contentRightAd, .contentLeftAd {

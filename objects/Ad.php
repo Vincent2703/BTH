@@ -3,9 +3,9 @@
 class Ad {
     
         public function registerPluginStylesSingleAd() {
-            wp_register_style("leaflet", plugins_url("bth/includes/css/leaflet.min.css"), array(), "1.8.0");
-            wp_register_style("leafletFullscreen", plugins_url("bth/includes/css/leafletFullscreen.min.css"), array(), "2.3.0");
-            wp_register_style("singleAd", plugins_url("bth/includes/css/singleAd.css"));
+            wp_register_style("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/css/leaflet.min.css"), array(), "1.8.0");
+            wp_register_style("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/css/leafletFullscreen.min.css"), array(), "2.3.0");
+            wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/singleAd.css"));
             wp_register_style("googleIcons", "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0");
             wp_enqueue_style("leaflet");
             wp_enqueue_style("leafletFullscreen");
@@ -14,9 +14,9 @@ class Ad {
         }
 
         public function registerPluginScriptsSingleAd() {
-            wp_register_script("leaflet", plugins_url("bth/includes/js/leaflet.min.js"), array(), "1.8.0", true);
-            wp_register_script("leafletFullscreen", plugins_url("bth/includes/js/leafletFullscreen.min.js"), array(), "2.3.0", true);
-            wp_register_script("singleAd", plugins_url("bth/includes/js/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+            wp_register_script("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/js/leaflet.min.js"), array(), "1.8.0", true);
+            wp_register_script("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/js/leafletFullscreen.min.js"), array(), "2.3.0", true);
+            wp_register_script("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/js/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
             wp_enqueue_script("leaflet");
             wp_enqueue_script("leafletFullscreen");
             wp_enqueue_script("singleAd");
@@ -122,10 +122,10 @@ class Ad {
             if(is_single()) {
                 $this->registerPluginScriptsSingleAd();
                 $this->registerPluginStylesSingleAd();
-                if($themeFile = locate_template(array('singleAd.php'))) {
+                if($themeFile = locate_template(array("single_ad.php"))) {
                     $path = $path;
                 }else{
-                    $path = plugin_dir_path(__DIR__)."templates/singleAd.php";
+                    $path = plugin_dir_path(__DIR__)."templates/single_ad.php";
                 }
             }
 	}

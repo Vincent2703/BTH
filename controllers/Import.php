@@ -408,19 +408,25 @@ class Import {
                             if($optionsImports["addressPrecision"] === "all") {
                                 $query = $address." ".$ad["postalCode"]." ".$ad["city"];
                                 $url = "https://api-adresse.data.gouv.fr/search/?q=".$query."&limit=1"; 
+                                $zoom = 18;
+                                $circ = 10;
                             }else{
                                 $query = $ad["postalCode"]." ".$ad["city"];
                                 $url = "https://api-adresse.data.gouv.fr/search/?q=".$query."&type=municipality&limit=1"; 
+                                $zoom = 14;
+                                $circ = 50; //Dépend de la taille de la commune
                             }
                             $apiResponse = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                             
                             if(isset($apiResponse["features"][0])) { //Si on arrive à récupérer des infos à partir de l'adresse
                                 $coordGPS = $apiResponse["features"][0]["geometry"]["coordinates"];
-                                SELF::checkError(update_post_meta($propertyWPId, "adDataMap", array("lat"=>$coordGPS[1], "long"=>$coordGPS[0], "zoom"=>14, "circ"=>50)), "$action impossible des coordonnées GPS pour l'annonce ".$ad["uniqId"]);
+                                SELF::checkError(update_post_meta($propertyWPId, "adDataMap", array("lat"=>$coordGPS[1], "long"=>$coordGPS[0], "zoom"=>$zoom, "circ"=>$circ)), "$action impossible des coordonnées GPS pour l'annonce ".$ad["uniqId"]);
                             }else{
                                 update_post_meta($propertyWPId, "adDataMap", '');
                             }
                             SELF::checkError(update_post_meta($propertyWPId, "adAddress", $query), "$action impossible de l'adresse pour l'annonce ". $ad["uniqId"]);
+                            SELF::checkError(update_post_meta($propertyWPId, "adShowMap", $optionsImports["addressPrecision"]), "$action impossible de la visibilité de l'adresse pour l'annonce ".$ad["uniqId"]);                        
+
                         }
                         
                         switch($ad["typeHeating"]) { //Rajouter collectif ou non
