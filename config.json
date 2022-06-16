@@ -401,6 +401,24 @@
     "css": ""
   },
   {
+    "id": 176,
+    "name": "DPE",
+    "kindField": "number",
+    "section": "complementaryFeatures",
+    "perso": "false",
+    "hidden": "false",
+    "css": ""
+  },
+  {
+    "id": 178,
+    "name": "GES",
+    "kindField": "number",
+    "section": "complementaryFeatures",
+    "perso": "false",
+    "hidden": "false",
+    "css": ""
+  },
+  {
     "id": 298,
     "name": "latitude",
     "kindField": "text",

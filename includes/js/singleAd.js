@@ -131,5 +131,27 @@ jQuery(document).ready(function ($) {
         }, 600);
     });
     
+    /* More posts */
+    $(".prevMorePosts, .nextMorePosts").click(function(e) {
+        var target = $(e.target);
+        var parent = target.parent();
+        if(target.attr("class") === "prevMorePosts") {
+            parent.hide();
+            if(parent.prev().index() !== -1) {
+                parent.prev().show();
+            }else{
+                parent.parent().find(".morePostsPanel:last").show();
+               
+            }
+        }else if(target.attr("class")=== "nextMorePosts") {
+            parent.hide();
+            if(parent.next().index() !== -1) {
+                parent.next().show();
+            }else{
+                parent.parent().find(".morePostsPanel:first").show();
+            }
+        }
+    });
+    
 
 });    

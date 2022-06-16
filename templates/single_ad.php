@@ -103,6 +103,9 @@
                     array(
                         "key" => "adCity",
                         "value" => $city
+                    ),
+                    array(
+                        "key" => "_thumbnail_id"
                     )
                 ),
                 "tax_query" => array(
@@ -126,7 +129,7 @@
         <div id="primary" class="content-area">
             <main id="main" class="site-main">
                 <span class="titleAd"><h1><?= the_title(); ?></h1></span>
-                <span class="subtitleAd"><?= "$city - $price$afterPrice"; ?></span>
+                <span class="subtitleAd"><?= ucfirst($city)." - $price$afterPrice"; ?></span>
                 <div class="sliders">
                     <div id="miniSlider">
                         <span class="controlNext">></span>
@@ -181,8 +184,8 @@
                             }
                             if(!empty($value)) {?>
                             <li>
-                                <span class="nameFeature"><?= $complementaryFeature["FRName"] ;?></span>
-                                <span class="valueFeature"><?= $value; ?></span>
+                                <span id="<?= $complementaryFeature["name"]; ?>Name" class="nameFeature"><?= isset($complementaryFeature["FRName"])?$complementaryFeature["FRName"]:'' ;?></span>
+                                <span id="<?= $complementaryFeature["name"]; ?>Value" class="valueFeature"><?= $value; ?></span>
                             </li>
                             <?php }} ?>
                         </ul>
@@ -223,15 +226,16 @@
                     </div>
                 </div>
                 <div class="more">
-                    <span id="moreTitle">Autres <?= lcfirst($typeAd); ?>s à <?= $city; ?></span>
-                    <div class="morePosts">            
+                    <span id="moreTitle">Autres <?= lcfirst($typeAd); ?>s à <?= ucfirst($city); ?></span><br />
+                    <div class="morePosts">
                         <?php 
                             $nbPosts = count($morePosts);
                             $adByPanel = 5;
                             $nbPanels = ceil($nbPosts/$adByPanel);
                             for($i=0; $i<$nbPanels; $i++) { ?>
-                                <div class="morePostsPanel">
-                                    <?php for($y=0; $y<=$adByPanel; $y++) {
+                                <div class="morePostsPanel" <?= $i>0 ? 'style="display: none;"':'';?>>
+                                    <span class="prevMorePosts" ><</span>
+                                    <?php for($y=0; $y<$adByPanel; $y++) {
                                         $currentNbPost = $i*5+$y;
                                         if(isset($morePosts[$currentNbPost]) && get_the_post_thumbnail_url($morePosts[$currentNbPost]) !== false) { 
                                             $morePost = $morePosts[$currentNbPost];?>
@@ -239,14 +243,14 @@
                                                 <div class="moreThumbnailAd">
                                                     <?= '<a href="'.get_post_permalink($morePost).'">'.get_the_post_thumbnail($morePost, "thumbnail").'</a>' ;?>
                                                 </div>
-                                                <!--<span class="moreTitleAd"><?//= '<a href="'.get_post_permalink($morePost).'">'.get_the_title($morePost).'</a>' ;?></span>-->
+                                                <span class="moreTitleAd"><?= '<a href="'.get_post_permalink($morePost).'">'.get_the_title($morePost).'</a>' ;?></span>
                                             </div>
                                         <?php }
                                     } ?>
+                                    <span class="nextMorePosts" >></span>
                                 </div>
                             <?php }
                         ?>
-
                     </div>
                 </div>
         <?php 

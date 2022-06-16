@@ -160,6 +160,12 @@ class EditAd {
             if(isset($_POST["terrace"]) && !ctype_space($_POST["terrace"])) {
                 update_post_meta($adId, "adTerrace", "OUI");
             }
+            if(isset($_POST["DPE"]) && !ctype_space($_POST["DPE"])) {
+                update_post_meta($adId, "adDPE", sanitize_text_field(intval($_POST["DPE"])));
+            }
+            if(isset($_POST["GES"]) && !ctype_space($_POST["GES"])) {
+                update_post_meta($adId, "adGES", sanitize_text_field(intval($_POST["GES"])));
+            }
         }
     }
     
@@ -323,6 +329,8 @@ class EditAd {
         $elevator = esc_html(get_post_meta($ad->ID, "adElevator", true));
         $cellar = esc_html(get_post_meta($ad->ID, "adCellar", true));
         $terrace = esc_html(get_post_meta($ad->ID, "adTerrace", true));
+        $DPE = intval(get_post_meta($ad->ID, "adDPE", true));
+        $GES = intval(get_post_meta($ad->ID, "adGES", true));
         ?>
                     <div id="labelsActivation">
                 <label class="switch">
@@ -404,6 +412,13 @@ class EditAd {
                 <span class="slider"></span>
             </label>   
             <label for="terrace">Terrasse</label>
+            
+            <div class="text">
+                <label>DPE en kWhEP/m²/an</label>
+                <input type="number" id="DPE" name="DPE" value="<?= $DPE; ?>">
+                <label>GES en kg éqCO2/m²/an</label>
+                <input type="number" id="GES" name="GES" value="<?= $GES; ?>">
+            </div>
 
         <?php
     }

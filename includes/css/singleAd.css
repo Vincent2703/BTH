@@ -28,11 +28,16 @@
 
 .more {
     display: flex;
+    width: 100%;
+    flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
+    margin-bottom: 10px;
 }
 
 #moreTitle {
+    display: flex;
+    justify-content: center;
 }
 
 .morePostsPanel {
@@ -50,6 +55,15 @@
 .moreAd {
     display: flex;
     flex-direction: column;
+    width: 150px;
+    user-select: none;
+}
+
+.prevMorePosts, .nextMorePosts {
+    font-size: 20px;
+    align-self: center;
+    cursor: pointer;
+    user-select: none;
 }
 
 .moreThumbnailAd {
