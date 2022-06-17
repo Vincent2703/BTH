@@ -1,16 +1,14 @@
-/* FlexBox - adBasics*/
-.adBasics {
-}
+/* FlexBox - adBasicsMetaBox*/
 
-.adBasics div {
+#adBasicsMetaBox .inside div, #adComplementariesMetaBox .inside div{
     display: flex;
 }
 
-.adBasics>div {
+#adBasicsMetaBox .inside>div, #adComplementariesMetaBox .inside>div{
     border-bottom: rgba(0, 0, 0, 0.1) dashed 1px;
 }
 
-.adBasics label {
+#adBasicsMetaBox .inside label, #adComplementariesMetaBox .inside label {
     font-weight: 500;
     cursor: default;
 }
@@ -29,12 +27,17 @@
 }
 
 .radio, .select {
+    margin: 10px 10px 30px 10px;
     display: inline-flex;
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 0;
     flex-wrap: wrap;
     align-items: center;
+}
+
+.checkbox {
+    margin: 10px 10px 30px 10px;
 }
 
 .radio label {
@@ -67,6 +70,7 @@
 
 .switch, .switch+label {
     align-self: baseline;
+    margin-left: 5px;
 }
 
 .switch input { 

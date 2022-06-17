@@ -403,6 +403,7 @@
   {
     "id": 176,
     "name": "DPE",
+    "FRName": "DPE (kWhEP/m²/an)",
     "kindField": "number",
     "section": "complementaryFeatures",
     "perso": "false",
@@ -412,6 +413,7 @@
   {
     "id": 178,
     "name": "GES",
+    "FRName": "GES en kg éqCO2/m²/an",
     "kindField": "number",
     "section": "complementaryFeatures",
     "perso": "false",
