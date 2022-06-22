@@ -421,9 +421,12 @@ class Import {
                             if(isset($apiResponse["features"][0])) { //Si on arrive à récupérer des infos à partir de l'adresse
                                 $coordGPS = $apiResponse["features"][0]["geometry"]["coordinates"];
                                 SELF::checkError(update_post_meta($propertyWPId, "adDataMap", array("lat"=>$coordGPS[1], "long"=>$coordGPS[0], "zoom"=>$zoom, "circ"=>$circ)), "$action impossible des coordonnées GPS pour l'annonce ".$ad["uniqId"]);
+                                $city = $apiResponse["features"][0]["properties"]["name"];                    
                             }else{
                                 update_post_meta($propertyWPId, "adDataMap", '');
+                                $city = $ad["city"];
                             }
+                            SELF::checkError(update_post_meta($propertyWPId, "adCity", $city), "$action impossible de la ville pour l'annonce ". $ad["uniqId"]);
                             SELF::checkError(update_post_meta($propertyWPId, "adAddress", $query), "$action impossible de l'adresse pour l'annonce ". $ad["uniqId"]);
                             SELF::checkError(update_post_meta($propertyWPId, "adShowMap", $optionsImports["addressPrecision"]), "$action impossible de la visibilité de l'adresse pour l'annonce ".$ad["uniqId"]);                        
 
@@ -490,7 +493,7 @@ class Import {
                         
                         SELF::checkError(wp_set_post_terms($propertyWPId, "Disponible", "adAvailable"), "$action de la disponibilté du bien de l'annonce ".$ad["uniqId"]);
 
-                        $fieldsToNotUpdate = ["title", "description", "typeAd", "typeProperty", "thumbnail", "picture1", "picture2", "picture3", "picture4", "picture5", "picture6", "picture7", "picture8", "agentEmail", "address", "typeHeating", "feesAgency"];
+                        $fieldsToNotUpdate = ["title", "description", "typeAd", "typeProperty", "city", "thumbnail", "picture1", "picture2", "picture3", "picture4", "picture5", "picture6", "picture7", "picture8", "agentEmail", "address", "typeHeating", "feesAgency"];
                         $checkMeta = true;
                         foreach($fields as $field) {
                             if(!in_array($field["name"], $fieldsToNotUpdate)) { //On vérifie que le champ a bien besoin d'être enregistré

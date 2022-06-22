@@ -124,11 +124,15 @@ class Ad {
             if(is_single()) {
                 $this->registerPluginScriptsSingleAd();
                 $this->registerPluginStylesSingleAd();
-                if($themeFile = locate_template(array("single_ad.php"))) {
+                if($themeFile = locate_template(array("single-ad.php"))) {
                     $path = $path;
                 }else{
-                    $path = plugin_dir_path(__DIR__)."templates/single_ad.php";
+                    $path = plugin_dir_path(__DIR__)."templates/single-ad.php";
                 }
+            }else if(is_post_type_archive("ad")) {
+                wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/archiveAd.css"), array(), PLUGIN_RE_VERSION);
+                wp_enqueue_style("archiveAd");
+                $path = plugin_dir_path(__DIR__)."templates/archive-ad.php";
             }
 	}
 	return $path;

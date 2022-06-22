@@ -225,6 +225,7 @@
                         </form>
                     </div>
                 </div>
+                <?php if(!empty($morePosts)) { ?>
                 <div class="more">
                     <span id="moreTitle">Autres <?= lcfirst($typeAd); ?>s à <?= ucfirst($city); ?></span><br />
                     <div class="morePosts">
@@ -254,6 +255,7 @@
                     </div>
                 </div>
         <?php 
+            }
         }       
     }    
     ?>

@@ -26,6 +26,7 @@ jQuery(document).ready(function ($) {
     setInterval(function () {
         if(autoplay) {
             moveSlide("right");
+            pagingUpdate("right");
         }
     }, 4000);
     

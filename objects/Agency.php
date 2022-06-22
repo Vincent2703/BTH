@@ -40,10 +40,10 @@ class Agency {
             if(is_single()) {
                 //$this->registerPluginScriptsSingleAgency();
                 //$this->registerPluginStylesSingleAgency();
-                if($themeFile = locate_template(array('single_agency.php'))) {
+                if($themeFile = locate_template(array('single-agency.php'))) {
                     $path = $path;
                 }else{
-                    $path = plugin_dir_path(__DIR__)."templates/single_agency.php";
+                    $path = plugin_dir_path(__DIR__)."templates/single-agency.php";
                 }
             }
 	}
