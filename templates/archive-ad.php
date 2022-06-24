@@ -3,7 +3,7 @@
             <main id="main" class="site-main">
             <?php if(have_posts()) { //Rajouter une limite de posts?>
                 <header class="archive-header has-text-align-center">
-                    <h1 class="archive-title">Liste des <span class="color-accent">annonces</span></h1>
+                    <h1 class="archive-title">Liste des <span class="color-accent">Annonces</span></h1>
                 </header>
                 <?php
                 while(have_posts()) {

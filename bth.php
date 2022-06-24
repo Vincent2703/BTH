@@ -51,7 +51,14 @@ class Bth {
         add_action("save_post_agency", array($this->EditAgency, "savePost"), 10, 2);
         
         add_action("restrict_manage_posts", array($this->Ad, "filterAdsByTaxonomies"));
-        add_action("restrict_manage_posts", array($this->Agent, "filterAgentByAgency"));
+        
+        add_action("restrict_manage_posts", array($this->Agent, "agentFilterByAgency"));
+
+        add_action("init", array($this->Agent, "publicQueryAgentPostParent"));
+        add_filter("manage_agent_posts_columns", array($this->Agent, "customAgentSortableColumns"));
+        add_action("manage_agent_posts_custom_column" , array($this->Agent, "selectCustomAgentColumn"), 10, 2 );
+        add_filter("manage_edit-agent_sortable_columns", array($this->Agent, "customAgentColumn"));
+        
         
         add_filter("template_include", array($this->Ad, "templatePostAd"), 1);
         add_filter("template_include", array($this->Agency, "templatePostAgency"), 1);
@@ -67,6 +74,7 @@ class Bth {
         
         SELF::defineGlobalConsts();
     }
+    
     
     private static function defineGlobalConsts() {
         $configFile = fopen(__DIR__."/config.json", 'r');

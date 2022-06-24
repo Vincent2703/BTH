@@ -22,7 +22,7 @@ class editAgency {
             }
             if(isset($_POST["address"]) && $_POST["address"] !== '') {
                 update_post_meta($agencyId, "agencyAddress", sanitize_text_field($_POST["address"]));
-            }
+            }         
         }    
     }
         

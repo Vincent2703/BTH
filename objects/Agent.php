@@ -33,23 +33,11 @@ class Agent {
                 "has_archive" => false
             )
         );
-        register_taxonomy("agentAgency", array("agent"), array(
-            "hierarchical"      => false, 
-            "description"       => "L'agence à laquelle appartient l'agent.", 
-            "label"             => "Agence", 
-            "show_admin_column" => true, 
-            "show_in_menu"      => false,
-            "show_ui"           => false,
-            "singular_label"    => "Agence", 
-            "rewrite"           => false
-       ));
     }
     
-    function templatePostAgent($path) {
+    public function templatePostAgent($path) {
 	if(get_post_type() == "agent") {
             if(is_single()) {
-                $this->registerPluginScriptsSingleAd();
-                $this->registerPluginStylesSingleAd();
                 if($themeFile = locate_template(array('single-agent.php'))) {
                     $path = $path;
                 }else{
@@ -60,47 +48,60 @@ class Agent {
 	return $path;
     }
     
-    
-    function filterAgentByAgency() {
-        global $typenow;
-        $postType = "agent"; 
-        $taxonomies = get_taxonomies(["object_type" => [$postType]]);
-        foreach($taxonomies as $taxonomy) {
-            if($typenow == $postType) {
-                $selected      = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : "";
-                $taxonomyData = get_taxonomy($taxonomy);
-                wp_dropdown_categories(array(
-                        "show_option_all" => $taxonomyData->label,
-                        "taxonomy"        => $taxonomy,
-                        "name"            => $taxonomy,
-                        "orderby"         => "name",
-                        "selected"        => $selected,
-                        "show_count"      => true,
-                        "hide_empty"      => true,
-                        "hide_if_empty"   => true
-                ));
-            }
-        }
-    }
-
-    function convertIdToTermInQuery($query) {
-        global $typenow;
+        
+    public function publicQueryAgentPostParent() {
         global $pagenow;
+        $postType = $_GET["post_type"];
+        var_dump($postType);
+        if (is_admin() && $pagenow == "edit.php" && $postType === "agent") {
+            $GLOBALS["wp"]->add_query_var("post_parent");
+        }
+    }
 
-        $taxonomies = get_taxonomies(["object_type" => ["agent"]]);
+    public function agentFilterByAgency() {
+        global $wpdb;
+        if (isset($_GET["post_type"]) && $_GET["post_type"] === "agent") {
+            $sql = "SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'agency' AND post_parent = 0 AND post_status = 'publish' ORDER BY post_title";
+            $parent_pages = $wpdb->get_results($sql, OBJECT_K);
+            $select = '
+                <select name="post_parent">
+                    <option value="">Agences</option>';
+                    $current = isset($_GET['post_parent']) ? $_GET['post_parent'] : '';
+                    foreach ($parent_pages as $page) {
+                        $select .= sprintf('<option value="%s"%s>%s</option>', $page->ID, $page->ID == $current ? ' selected="selected"' : '', $page->post_title);
+                    }
+            $select .= '
+                </select>';
+            echo $select;
+        } else {
+            return;
+       }
+    }
+    
+    
+    public function customAgentColumn($columns) {
+        $columns["agency"] = "agency";
+        return $columns;
+    }
+    
+    
+    public function customAgentSortableColumns($columns) {
+        unset($columns["date"]);
 
-        foreach($taxonomies as $taxonomy) {
-            if($pagenow == "edit.php" && $typenow == "agent" && isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
-                $taxQuery = array(
-                        "taxonomy" => $taxonomy,
-                        "terms"    => array( $_GET[$taxonomy] ),
-                        "field"    => "id",
-                        "operator" => "IN",
-                );
-                $query->tax_query->queries[] = $taxQuery; 
-                $query->query_vars["tax_query"] = $query->tax_query->queries;
+        $columns["agency"] = "Agence";
+
+        return $columns;
+    }
+
+    public function selectCustomAgentColumn($column, $postID) {
+        if($column === "agency") {
+            if(!empty($parent = get_post_parent($postID))) {
+                echo "<a href='edit.php?post_type=agent&post_parent=".$parent->ID."'>".get_the_title($parent)."</a>";
+            } else {
+               echo "Pas d'agence attribuée";
             }
         }
-
     }
+    
+    
 }

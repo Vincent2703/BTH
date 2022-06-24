@@ -33,27 +33,21 @@ class editAgent {
             }
             
             if(isset($_POST["agency"]) && !ctype_space($_POST["agency"])) {
-                SELF::saveAgentAgency($agentId);
+                //wp_update_post(array("ID" => $agentId, "post_parent" => sanitize_text_field($_POST["agency"])));
+                //$agent->post_parent = sanitize_text_field($_POST["agency"]);
+                remove_action( 'save_post_agent', array($this, 'savePost') );
+
+                wp_update_post( array(
+                    'ID' => $agentId,
+                    'post_parent' => sanitize_text_field($_POST["agency"])
+                ) );
+                
             }
+            
+            
         }       
     }
     
-    private static function saveAgentAgency($postId) {
-        /*if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
-            return;
-        }*/
-
-        $taxonomy = sanitize_text_field($_POST["agency"]);
-
-        if(!empty($taxonomy)) {
-
-            $term = get_term_by("name", $taxonomy, "agentAgency");
-            if(!empty($term) && !is_wp_error($term)) {
-                wp_set_object_terms($postId, $term->term_id, "agentAgency", false);
-            }
-        }
-    }
-        
     public function displayAgentMetaBox($agent) {
         $phone = esc_html(get_post_meta($agent->ID, "agentPhone", true));
         $mobilePhone = esc_html(get_post_meta($agent->ID, "agentMobilePhone", true));
@@ -67,7 +61,6 @@ class editAgent {
     
     public function displayAgencyMetaBox($agent) {
         $allAgencies = get_posts(array("post_type" => "agency"));
-        $agencySaved = get_the_terms($agent, "agentAgency");
         ?>
             <select name="agency" id="agencies" onclick="reloadAgencies();">
                 <?php
@@ -75,7 +68,7 @@ class editAgent {
                         $nameAgency = get_the_title($agency);
                         $idAgency = $agency->ID;
                         ?>
-                        <option value="<?= $nameAgency; ?>" <?=(!is_wp_error($agencySaved) && $idAgency==$agencySaved[0]->term_id)?"selected":NULL;?>><?= $nameAgency; ?></option>
+                        <option value="<?= $idAgency; ?>" <?=(isset($agent->post_parent) && $idAgency==$agent->post_parent)?"selected":NULL;?>><?= $nameAgency; ?></option>
                         <?php
                     }
                 ?>
