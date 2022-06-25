@@ -17,7 +17,6 @@ class Agency {
                     "search_items"          => "Chercher des agences",
                     "not_found"             => "Aucune agence trouvée",
                     "not_found_in_trash"    => "Aucune agence trouvée dans la corbeille",
-                    //"parent"                => "ads",
                     "all_items"             => "Toutes les agences",
                     "featured_image"        => "Photo de l'agence",
                     "set_featured_image"    => "Choisir une photo",
@@ -26,9 +25,8 @@ class Agency {
                 ),
 
                 "public" => true,
-                "menu_position" => 16,
+                "menu_position" => 17,
                 "supports" => array("title", "thumbnail"),
-                //"taxonomies" => array(""),
                 "menu_icon" => "dashicons-admin-multisite",
                 "has_archive" => false
             )
@@ -38,12 +36,10 @@ class Agency {
     function templatePostAgency($path) {
 	if(get_post_type() == "agency") {
             if(is_single()) {
-                //$this->registerPluginScriptsSingleAgency();
-                //$this->registerPluginStylesSingleAgency();
-                if($themeFile = locate_template(array('single-agency.php'))) {
-                    $path = $path;
-                }else{
-                    $path = plugin_dir_path(__DIR__)."templates/single-agency.php";
+                if(!locate_template(array("single-agency.php"))) {
+                    $path = plugin_dir_path(__DIR__)."templates/singles/single-agency.php";
+                    wp_register_style("singleAgency", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/singles/singleAgency.css"), array(), PLUGIN_RE_VERSION);
+                    wp_enqueue_style("singleAgency");
                 }
             }
 	}

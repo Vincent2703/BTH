@@ -34,13 +34,12 @@ jQuery(document).ready(function ($) {
     var slideCount = $("#miniSlider ul li").length;
     var slideWidth = $("#miniSlider ul li").width();
     var slideHeight = $("#miniSlider ul li").height();
-    var miniSliderUlWidth = slideCount * slideWidth;
     var currentImg = 1;
     var maxImg = $("#miniSlider ul li").length;
 
-    $("#miniSlider").css({ width: slideWidth, height: slideHeight });
+    $("#miniSlider").css({ maxWidth: slideWidth, height: slideHeight });
 
-    $("#miniSlider ul").css({ width: miniSliderUlWidth, marginLeft: - slideWidth });
+    $("#miniSlider ul").css({ width: "100vw" });
 	
     $("#miniSlider ul li:last-child").prependTo("#miniSlider ul");
     

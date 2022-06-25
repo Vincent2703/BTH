@@ -17,7 +17,6 @@ class Agent {
                     "search_items"          => "Chercher des agents",
                     "not_found"             => "Aucun agent trouvé",
                     "not_found_in_trash"    => "Aucun agent trouvé dans la corbeille",
-                    //"parent"                => "ads",
                     "all_items"             => "Tous les agents",
                     "featured_image"        => "Avatar de l'agent",
                     "set_featured_image"    => "Choisir un avatar",
@@ -28,7 +27,6 @@ class Agent {
                 "public" => true,
                 "menu_position" => 16,
                 "supports" => array("title", "thumbnail"),
-                //"taxonomies" => array(""),
                 "menu_icon" => "dashicons-businessperson",
                 "has_archive" => false
             )
@@ -38,10 +36,10 @@ class Agent {
     public function templatePostAgent($path) {
 	if(get_post_type() == "agent") {
             if(is_single()) {
-                if($themeFile = locate_template(array('single-agent.php'))) {
-                    $path = $path;
-                }else{
-                    $path = plugin_dir_path(__DIR__)."templates/single-agent.php";
+                if(!locate_template(array("single-agent.php"))) {
+                    $path = plugin_dir_path(__DIR__)."templates/singles/single-agent.php";
+                    wp_register_style("singleAgent", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/singles/singleAgent.css"), array(), PLUGIN_RE_VERSION);
+                    wp_enqueue_style("singleAgent");
                 }
             }
 	}
@@ -51,9 +49,8 @@ class Agent {
         
     public function publicQueryAgentPostParent() {
         global $pagenow;
-        $postType = $_GET["post_type"];
-        var_dump($postType);
-        if (is_admin() && $pagenow == "edit.php" && $postType === "agent") {
+        global $typenow;
+        if(is_admin() && $pagenow == "edit.php" && $typenow === "agent") {
             $GLOBALS["wp"]->add_query_var("post_parent");
         }
     }

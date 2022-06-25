@@ -54,7 +54,7 @@ class Bth {
         
         add_action("restrict_manage_posts", array($this->Agent, "agentFilterByAgency"));
 
-        add_action("init", array($this->Agent, "publicQueryAgentPostParent"));
+        add_action("admin_init", array($this->Agent, "publicQueryAgentPostParent"));
         add_filter("manage_agent_posts_columns", array($this->Agent, "customAgentSortableColumns"));
         add_action("manage_agent_posts_custom_column" , array($this->Agent, "selectCustomAgentColumn"), 10, 2 );
         add_filter("manage_edit-agent_sortable_columns", array($this->Agent, "customAgentColumn"));
@@ -138,26 +138,26 @@ class Bth {
         $postType = get_current_screen()->post_type;
         $base = get_current_screen()->base;
         if($postType === "ad" && $base === "post") {
-            wp_register_style("editAd", plugins_url(PLUGIN_RE_NAME."/includes/css/editAd.css"), array(), PLUGIN_RE_VERSION);
-            wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("editAd", plugins_url(PLUGIN_RE_NAME."/includes/css/edits/editAd.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
 
             wp_enqueue_style("editAd");
             wp_enqueue_style("autocompleteAddress");
         }else if($postType === "ad" && $base === "ad_page_bthoptions") {
-            wp_register_style("options", plugins_url(PLUGIN_RE_NAME."/includes/css/options.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("options", plugins_url(PLUGIN_RE_NAME."/includes/css/others/options.css"), array(), PLUGIN_RE_VERSION);
             
             wp_enqueue_style("options");
         }else if($postType === "ad" && $base === "edit-tags") {
-            wp_register_style("editTagsAd", plugins_url(PLUGIN_RE_NAME."/includes/css/editTagsAd.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("editTagsAd", plugins_url(PLUGIN_RE_NAME."/includes/css/edits/editTagsAd.css"), array(), PLUGIN_RE_VERSION);
             
             wp_enqueue_style("editTagsAd");
         }else if($postType === "agent" && $base === "post") {
-            wp_register_style("editAgent", plugins_url(PLUGIN_RE_NAME."/includes/css/editAgent.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("editAgent", plugins_url(PLUGIN_RE_NAME."/includes/css/edits/editAgent.css"), array(), PLUGIN_RE_VERSION);
             
             wp_enqueue_style("editAgent");
         }else if($postType === "agency" && $base === "post") {
-            wp_register_style("editAgency", plugins_url(PLUGIN_RE_NAME."/includes/css/editAgency.css"), array(), PLUGIN_RE_VERSION);
-            wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("editAgency", plugins_url(PLUGIN_RE_NAME."/includes/css/edits/editAgency.css"), array(), PLUGIN_RE_VERSION);
+            wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
 
             wp_enqueue_style("editAgency");
             wp_enqueue_style("autocompleteAddress");
@@ -171,9 +171,9 @@ class Bth {
         if($base === "post") {
             if($postType === "ad") {
                 wp_enqueue_media();
-                wp_register_script("mediaButton", plugins_url(PLUGIN_RE_NAME."/includes/js/editAd.js"), array('jquery'), PLUGIN_RE_VERSION);
-                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
-                wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                wp_register_script("mediaButton", plugins_url(PLUGIN_RE_NAME."/includes/js/edits/editAd.js"), array('jquery'), PLUGIN_RE_VERSION);
+                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
 
                 wp_enqueue_script("mediaButton");
                 wp_enqueue_script("autocompleteAddress");
@@ -181,15 +181,15 @@ class Bth {
                 
                 wp_add_inline_script("reloadAgents", 'let pluginName="'.PLUGIN_RE_NAME.'";');
             }else if($postType === "agency") {
-                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("autocompleteAddress");
             }else if($postType === "agent") {
-                wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/reloadAgencies.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgencies.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("reloadAgencies");
                 wp_add_inline_script("reloadAgencies", 'let pluginName="'.PLUGIN_RE_NAME.'";');
             }
         }else if($base === "ad_page_bthoptions") {
-            wp_register_script("options", plugins_url(PLUGIN_RE_NAME."/includes/js/options.js"), array(), PLUGIN_RE_VERSION);
+            wp_register_script("options", plugins_url(PLUGIN_RE_NAME."/includes/js/others/options.js"), array(), PLUGIN_RE_VERSION);
 
             wp_enqueue_script("options");
         }      

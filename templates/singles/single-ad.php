@@ -11,7 +11,7 @@
                 exit();
             }
 
-            $metas = get_post_custom($idPost);
+            $metas = get_post_custom();
            
 
             $price = getMeta("adPrice");

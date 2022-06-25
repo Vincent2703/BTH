@@ -3,9 +3,9 @@
 class Ad {
     
         public function registerPluginStylesSingleAd() {
-            wp_register_style("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/css/leaflet.min.css"), array(), "1.8.0");
-            wp_register_style("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/css/leafletFullscreen.min.css"), array(), "2.3.0");
-            wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/singleAd.css"));
+            wp_register_style("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leaflet.min.css"), array(), "1.8.0");
+            wp_register_style("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leafletFullscreen.min.css"), array(), "2.3.0");
+            wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/singles/singleAd.css"));
             wp_register_style("googleIcons", "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0");
             wp_enqueue_style("leaflet");
             wp_enqueue_style("leafletFullscreen");
@@ -14,10 +14,10 @@ class Ad {
         }
 
         public function registerPluginScriptsSingleAd() {
-            wp_register_script("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/js/leaflet.min.js"), array(), "1.8.0", true);
-            wp_register_script("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/js/leafletFullscreen.min.js"), array(), "2.3.0", true);
-            wp_register_script("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/js/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
-            wp_register_script("dpeges", plugins_url(PLUGIN_RE_NAME."/includes/js/dpeges.js"), array(), PLUGIN_RE_VERSION, true);
+            wp_register_script("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leaflet.min.js"), array(), "1.8.0", true);
+            wp_register_script("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leafletFullscreen.min.js"), array(), "2.3.0", true);
+            wp_register_script("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/singles/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+            wp_register_script("dpeges", plugins_url(PLUGIN_RE_NAME."/includes/js/others/dpeges.js"), array(), PLUGIN_RE_VERSION, true);
             wp_enqueue_script("leaflet");
             wp_enqueue_script("leafletFullscreen");
             wp_enqueue_script("singleAd");
@@ -40,7 +40,6 @@ class Ad {
                     "search_items"          => "Chercher des annonces",
                     "not_found"             => "Aucune annonce trouvée",
                     "not_found_in_trash"    => "Aucune annonce trouvée dans la corbeille",
-                    //"parent"              => "ads",
                     "all_items"             => "Toutes les annonces",
                     "featured_image"        => "Miniature de l'annonce",
                     "set_featured_image"    => "Choisir une miniature",
@@ -53,8 +52,8 @@ class Ad {
                 "supports" => array("title", "editor", "thumbnail"),
                 "menu_icon" => "dashicons-admin-home",
                 "has_archive" => true
-           )
-       );
+            )
+        );
         register_taxonomy("adTypeProperty", array("ad"), array(
             "hierarchical"      => false, 
             "description"       => "Créez un type de bien pour catégoriser vos annonces.", 
@@ -64,7 +63,7 @@ class Ad {
             "singular_label"    => "Type de bien", 
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
-       ));
+        ));
         
         wp_insert_term("Appartement", "adTypeProperty");
         wp_insert_term("Bâtiment", "adTypeProperty");
@@ -85,7 +84,7 @@ class Ad {
             "singular_label"    => "Type d'annonce", 
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
-       ));
+        ));
         
         wp_insert_term("Location", "adTypeAd");
         wp_insert_term("Vente", "adTypeAd");
@@ -101,7 +100,7 @@ class Ad {
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyAdAvailableCheckboxCB"),
             "default_term"      => "Disponible"
-       ));
+        ));
         
         wp_insert_term("Disponible", "adAvailable");
         wp_insert_term("Indisponible", "adAvailable");
@@ -122,17 +121,17 @@ class Ad {
     function templatePostAd($path) {
 	if(get_post_type() == "ad") {
             if(is_single()) {
-                $this->registerPluginScriptsSingleAd();
-                $this->registerPluginStylesSingleAd();
-                if($themeFile = locate_template(array("single-ad.php"))) {
-                    $path = $path;
-                }else{
-                    $path = plugin_dir_path(__DIR__)."templates/single-ad.php";
+                if(!locate_template(array("single-ad.php"))) {
+                    $path = plugin_dir_path(__DIR__)."templates/singles/single-ad.php";
+                    $this->registerPluginScriptsSingleAd();
+                    $this->registerPluginStylesSingleAd();
                 }
-            }else if(is_post_type_archive("ad")) {
-                wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/archiveAd.css"), array(), PLUGIN_RE_VERSION);
-                wp_enqueue_style("archiveAd");
-                $path = plugin_dir_path(__DIR__)."templates/archive-ad.php";
+            }else if(is_post_type_archive("ad")) { 
+                if(!locate_template(array("archive-ad.php"))) {
+                    $path = plugin_dir_path(__DIR__)."templates/archives/archive-ad.php";
+                    wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
+                    wp_enqueue_style("archiveAd");
+                }
             }
 	}
 	return $path;
