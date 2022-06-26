@@ -66,15 +66,32 @@ class Bth {
 
         add_filter("enter_title_here", array($this, "changeTitle"));
         add_filter("pre_get_posts", array($this, "convertIdToTermInQuery"));
+        add_filter("pre_get_posts", array($this->Ad, "searchAds"));
         
         add_action("all_admin_notices", array($this->Options, "tabsOption"));
         
         add_action("wp_ajax_nopriv_import", array($this->Import, "startImport")); //Cron
-             
         
+        add_action("widgets_init", array($this, "removeSearchWidget"));
+                
         SELF::defineGlobalConsts();
     }
     
+    
+    public function removeSearchWidget() {
+	unregister_widget("WP_Widget_Search");
+        register_sidebar(
+        array (
+            'name' => __( 'Content Top', 'your-theme-domain' ),
+            'id' => 'before_content-side-bar',
+            'description' => __( 'Content Top Sidebar for Posts', 'your-theme-domain' ),
+            'before_widget' => '<div class="content_top_sidebar">',
+            'after_widget' => '</div>',
+            'before_title' => '<h3 class="widget-title">',
+            'after_title' => '</h3>',
+        )
+    );
+    }   
     
     private static function defineGlobalConsts() {
         $configFile = fopen(__DIR__."/config.json", 'r');
@@ -246,22 +263,25 @@ class Bth {
         return $title;
     }
     
-    function convertIdToTermInQuery($query) {
+    public function convertIdToTermInQuery($query) {
+        global $pagenow;            
         global $typenow;
-        global $pagenow;
 
-        $taxonomies = get_taxonomies(["object_type" => [$typenow]]);
+        if(is_admin() && $pagenow == "edit.php") {
 
-        foreach($taxonomies as $taxonomy) {
-            if($pagenow == "edit.php" && isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
-                $taxQuery = array(
-                        "taxonomy" => $taxonomy,
-                        "terms"    => array( $_GET[$taxonomy] ),
-                        "field"    => "id",
-                        "operator" => "IN",
-                );
-                $query->tax_query->queries[] = $taxQuery; 
-                $query->query_vars["tax_query"] = $query->tax_query->queries;
+            $taxonomies = get_taxonomies(["object_type" => [$typenow]]);
+
+            foreach($taxonomies as $taxonomy) {
+                if(isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
+                    $taxQuery = array(
+                            "taxonomy" => $taxonomy,
+                            "terms"    => array($_GET[$taxonomy]),
+                            "field"    => "id",
+                            "operator" => "IN",
+                    );
+                    $query->tax_query->queries[] = $taxQuery; 
+                    $query->query_vars["tax_query"] = $query->tax_query->queries;
+                }
             }
         }
 

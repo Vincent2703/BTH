@@ -2,6 +2,9 @@
     if(have_posts()) {
         get_header();                 
         while(have_posts()) { //?
+   if ( is_active_sidebar( 'before_content-side-bar' ) ) {
+      dynamic_sidebar( 'before_content-side-bar' );
+   }
             the_post();
 
             $idPost = get_the_id();
@@ -20,7 +23,7 @@
             $afterPrice = '€';
             if($typeAd === "Location") {
                 $afterPrice .= "/mois";
-            }                  
+            }
 
             if(!is_null($images)) {
                 $imagesIds = explode(';', $images);

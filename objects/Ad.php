@@ -118,7 +118,7 @@ class Ad {
     <?php }
     
   
-    function templatePostAd($path) {
+    public function templatePostAd($path) {
 	if(get_post_type() == "ad") {
             if(is_single()) {
                 if(!locate_template(array("single-ad.php"))) {
@@ -132,12 +132,16 @@ class Ad {
                     wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
                     wp_enqueue_style("archiveAd");
                 }
+            }else if(is_search()) {
+                if(!locate_template(array("archive-search-ad.php"))) {
+                    $path = plugin_dir_path(__DIR__)."templates/searches/archive-search-ad.php";
+                }
             }
 	}
 	return $path;
     }
     
-    function taxonomyMetaBoxCB($post, $taxonomy) {
+    public function taxonomyMetaBoxCB($post, $taxonomy) {
         $taxonomyName = $taxonomy["args"]["taxonomy"];
         $terms = get_terms($taxonomyName, array("hide_empty" => false));
 	$term = wp_get_object_terms($post->ID, $taxonomyName, array("orderby" => "term_id", "order" => "ASC"));
@@ -159,7 +163,7 @@ class Ad {
         }
     }
     
-    function taxonomyAdAvailableCheckboxCB($post/*, $taxonomy*/) {
+    public function taxonomyAdAvailableCheckboxCB($post/*, $taxonomy*/) {
         $taxonomyName = "adAvailable";
         $terms = get_terms($taxonomyName, array("hide_empty" => false));
 	$term = wp_get_object_terms($post->ID, $taxonomyName, array("orderby" => "term_id", "order" => "ASC"));
@@ -178,7 +182,7 @@ class Ad {
         <?php
     }
     
-    function filterAdsByTaxonomies() {
+    public function filterAdsByTaxonomies() {
         global $typenow;
         $postType = "ad"; 
         $taxonomies = get_taxonomies(["object_type" => [$postType]]);
@@ -197,6 +201,65 @@ class Ad {
                         "hide_if_empty"   => true
                 ));
             }
+        }
+    }
+    
+    public function searchAds($query) {
+        if(!is_admin() && $query->is_search && $_GET["post_type"] === "ad") {        
+            $query->set("post_type", "ad");
+            
+            $terms = array();
+            $metas = array();
+            
+            if(isset($_GET["typeAd"])) {
+                array_push($terms,
+                    array(
+                        "taxonomy" => "adTypeAd",
+                        "field" => "slug",
+                        "terms" => sanitize_text_field($_GET["typeAd"])
+                    )
+                );            
+            }
+            if(isset($_GET["typeProperty"])) {
+                array_push($terms,
+                    array(
+                        "taxonomy" => "adTypeProperty",
+                        "field" => "slug",
+                        "terms" => sanitize_text_field($_GET["typeProperty"])
+                    )
+                );
+            }
+            if(isset($_GET["minSurface"]) && isset($_GET["maxSurface"])) {
+                array_push($metas,
+                    array(
+                        "key" => "adSurface",
+                        "value" => array(intval($_GET["minSurface"]), intval($_GET["maxSurface"])),
+                        "compare" => "BETWEEN"
+                    )
+                );
+            }         
+            if(isset($_GET["minPrice"]) && isset($_GET["maxPrice"])) {
+                array_push($metas,
+                    array(
+                        "key" => "adPrice",
+                        "value" => array(intval($_GET["minPrice"]), intval($_GET["maxPrice"])),
+                        "compare" => "BETWEEN"
+                    )
+                );
+            } 
+            if(isset($_GET["city"])) {
+                array_push($metas,
+                    array(
+                        "key" => "adCity",
+                        "value" => sanitize_text_field($_GET["city"]),
+                        "compare" => "LIKE"
+                    )
+                );
+            } 
+                           
+            $query->set("tax_query", array($terms));
+            $query->set("meta_query", array($metas));
+            
         }
     }
     
