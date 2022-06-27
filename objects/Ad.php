@@ -247,12 +247,28 @@ class Ad {
                     )
                 );
             } 
-            if(isset($_GET["city"])) {
+            if(isset($_GET["city"]) && isset($_GET["radius"])) {
+                $city = sanitize_text_field($_GET["city"]);
+                $radius = intval($_GET["radius"]);
+                $url = "https://api-adresse.data.gouv.fr/search/?q=".$city."&type=municipality&limit=1"; 
+                $apiResponse = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
+                $coordsGPS = $apiResponse["features"][0]["geometry"]["coordinates"];
+                $minLat = $coordsGPS[1]-$radius/111;
+                $maxLat = $coordsGPS[1]+$radius/111;
+                $minLong = $coordsGPS[0]-$radius/76;
+                $maxLong = $coordsGPS[0]+$radius/76;
                 array_push($metas,
                     array(
-                        "key" => "adCity",
-                        "value" => sanitize_text_field($_GET["city"]),
-                        "compare" => "LIKE"
+                        "key" => "adLatitude",
+                        "value" => array($minLat, $maxLat),
+                        "compare" => "BETWEEN"
+                    )
+                );
+                array_push($metas,
+                    array(
+                        "key" => "adLongitude",
+                        "value" => array($minLong, $maxLong),
+                        "compare" => "BETWEEN"
                     )
                 );
             } 
@@ -262,6 +278,48 @@ class Ad {
             
         }
     }
+    
+    public function insertAdSearchBar() { 
+        $adTypesAd = get_terms(array(
+            "taxonomy" => "adTypeAd",
+            "hide_empty" => true,
+        ));
+        $adTypesProperty = get_terms(array(
+            "taxonomy" => "adTypeProperty",
+            "hide_empty" => true,
+        ));
+        ?>
+        <form role="search" action="" method="get" id="AdSearchBar">
+            <input type="hidden" name="s">
+            <input type="hidden" name="post_type" value="ad">
+
+            <select name="typeAd">
+                <?php
+                foreach($adTypesAd as $adTypeAd) { ?>
+                    <option value="<?= $adTypeAd->slug; ?>" <?= isset($_GET["typeAd"]) && $_GET["typeAd"] === $adTypeAd->slug?"selected":''; ?>><?= $adTypeAd->name; ?></option>                 
+                <?php }
+                ?>
+            </select>
+            <select name="typeProperty">
+                <?php
+                foreach($adTypesProperty as $adTypeProperty) { ?>
+                    <option value="<?= $adTypeProperty->slug; ?>" <?= isset($_GET["typeProperty"]) && $_GET["typeProperty"] === $adTypeProperty->slug?"selected":''; ?>><?= $adTypeProperty->name; ?></option>                 
+                <?php }
+                ?>
+            </select>
+            
+            <input type="number" name="minSurface" value="<?= isset($_GET["minSurface"])?intval($_GET["minSurface"]):'0'; ?>">
+            <input type="number" name="maxSurface" value="<?= isset($_GET["maxSurface"])?intval($_GET["maxSurface"]):'0'; ?>">
+            
+            <input type="number" name="minPrice" value="<?= isset($_GET["minPrice"])?intval($_GET["minPrice"]):'0'; ?>">
+            <input type="number" name="maxPrice" value="<?= isset($_GET["maxPrice"])?intval($_GET["maxPrice"]):'0'; ?>">
+            
+            <input type="text" name="city" <?= isset($_GET["city"])?'value="'.sanitize_text_field($_GET["city"]).'"':''; ?>>
+            <input type="number" name="radius" value="<?= isset($_GET["radius"])?intval($_GET["radius"]):'10'; ?>">
+            
+            <input type="submit" value="Rechercher">
+        </form>
+    <?php }
     
     
 }

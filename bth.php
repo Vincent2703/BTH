@@ -73,24 +73,14 @@ class Bth {
         add_action("wp_ajax_nopriv_import", array($this->Import, "startImport")); //Cron
         
         add_action("widgets_init", array($this, "removeSearchWidget"));
+        
+        add_filter("loop_start", array($this->Ad, "insertAdSearchBar"));
                 
         SELF::defineGlobalConsts();
     }
     
-    
     public function removeSearchWidget() {
 	unregister_widget("WP_Widget_Search");
-        register_sidebar(
-        array (
-            'name' => __( 'Content Top', 'your-theme-domain' ),
-            'id' => 'before_content-side-bar',
-            'description' => __( 'Content Top Sidebar for Posts', 'your-theme-domain' ),
-            'before_widget' => '<div class="content_top_sidebar">',
-            'after_widget' => '</div>',
-            'before_title' => '<h3 class="widget-title">',
-            'after_title' => '</h3>',
-        )
-    );
     }   
     
     private static function defineGlobalConsts() {

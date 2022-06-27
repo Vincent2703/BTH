@@ -90,6 +90,8 @@ class EditAd {
 
                             $coordinates = $resultsArray["features"][0]["geometry"]["coordinates"];
                             update_post_meta($adId, "adDataMap", array("lat" => $coordinates[1], "long" => $coordinates[0], "zoom" => $zoom, "circ" => $radiusCircle));
+                            update_post_meta($adId, "adLatitude", $coordinates[1]);
+                            update_post_meta($adId, "adLongitude", $coordinates[0]);
 
                             $PC = $resultsArray["features"][0]["properties"]["postcode"];
                             update_post_meta($adId, "adPC", $PC);

@@ -143,7 +143,7 @@ class Import {
 
             $propertyImagesArray = explode(";", $propertyImages);
             foreach($propertyImagesArray as $propertyImage) { //On vérifie qu'on a pas déjà l'image
-                if(get_post($propertyImage)->post_content === $imgURL) { //Remplacer par quelque chose qui compare vraiment les images ?
+                if(get_post($propertyImage) !== null && get_post($propertyImage)->post_content === $imgURL) { //Remplacer par quelque chose qui compare vraiment les images ?
                     $alreadyThisImage = true;
                     break;
                 }
@@ -419,8 +419,10 @@ class Import {
                             $apiResponse = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                             
                             if(isset($apiResponse["features"][0])) { //Si on arrive à récupérer des infos à partir de l'adresse
-                                $coordGPS = $apiResponse["features"][0]["geometry"]["coordinates"];
-                                SELF::checkError(update_post_meta($propertyWPId, "adDataMap", array("lat"=>$coordGPS[1], "long"=>$coordGPS[0], "zoom"=>$zoom, "circ"=>$circ)), "$action impossible des coordonnées GPS pour l'annonce ".$ad["uniqId"]);
+                                $coordsGPS = $apiResponse["features"][0]["geometry"]["coordinates"];
+                                SELF::checkError(update_post_meta($propertyWPId, "adDataMap", array("lat"=>$coordsGPS[1], "long"=>$coordsGPS[0], "zoom"=>$zoom, "circ"=>$circ)), "$action impossible des coordonnées GPS pour l'annonce ".$ad["uniqId"]);
+                                SELF::checkError(update_post_meta($propertyWPId, "adLatitude", $coordsGPS[1]), "$action de la latitude pour l'annonce ".$ad["uniqId"]);
+                                SELF::checkError(update_post_meta($propertyWPId, "adLongitude", $coordsGPS[0]), "$action impossible de la longitude pour l'annonce ".$ad["uniqId"]);                                
                                 $city = $apiResponse["features"][0]["properties"]["name"];                    
                             }else{
                                 update_post_meta($propertyWPId, "adDataMap", '');
