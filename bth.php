@@ -46,7 +46,7 @@ class Bth {
         add_action("wp_dashboard_setup", array($this->Import, "widgetImport"));
         add_action("wp_dashboard_setup", array($this->Export, "widgetExport"));
         
-        add_action("save_post_ad", array($this->EditAd, "savePost"), 10, 2);
+        add_action("save_post_re-ad", array($this->EditAd, "savePost"), 10, 2);
         add_action("save_post_agent", array($this->EditAgent, "savePost"), 10, 2);
         add_action("save_post_agency", array($this->EditAgency, "savePost"), 10, 2);
         
@@ -74,7 +74,7 @@ class Bth {
         
         add_action("widgets_init", array($this, "removeSearchWidget"));
         
-        add_filter("loop_start", array($this->Ad, "insertAdSearchBar"));
+        add_filter("wp_enqueue_scripts", array($this, "updateHeader"));
                 
         SELF::defineGlobalConsts();
     }
@@ -82,6 +82,19 @@ class Bth {
     public function removeSearchWidget() {
 	unregister_widget("WP_Widget_Search");
     }   
+    
+    public function updateHeader() {
+        global $post_type;
+        global $pagenow;
+        if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {
+            wp_register_script("addSearchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/searchBars/addSearchBarAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+            wp_enqueue_script("addSearchBarAd");
+            wp_add_inline_script("addSearchBarAd", 'let pluginName="'.PLUGIN_RE_NAME.'";');
+            
+            wp_register_style("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
+            wp_enqueue_style("searchBarAd");
+        }
+    }
     
     private static function defineGlobalConsts() {
         $configFile = fopen(__DIR__."/config.json", 'r');
@@ -144,17 +157,17 @@ class Bth {
     public function registerPluginStylesAdmin() {
         $postType = get_current_screen()->post_type;
         $base = get_current_screen()->base;
-        if($postType === "ad" && $base === "post") {
+        if($postType === "re-ad" && $base === "post") {
             wp_register_style("editAd", plugins_url(PLUGIN_RE_NAME."/includes/css/edits/editAd.css"), array(), PLUGIN_RE_VERSION);
             wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
 
             wp_enqueue_style("editAd");
             wp_enqueue_style("autocompleteAddress");
-        }else if($postType === "ad" && $base === "ad_page_bthoptions") {
+        }else if($postType === "re-ad" && $base === "ad_page_bthoptions") {
             wp_register_style("options", plugins_url(PLUGIN_RE_NAME."/includes/css/others/options.css"), array(), PLUGIN_RE_VERSION);
             
             wp_enqueue_style("options");
-        }else if($postType === "ad" && $base === "edit-tags") {
+        }else if($postType === "re-ad" && $base === "edit-tags") {
             wp_register_style("editTagsAd", plugins_url(PLUGIN_RE_NAME."/includes/css/edits/editTagsAd.css"), array(), PLUGIN_RE_VERSION);
             
             wp_enqueue_style("editTagsAd");
@@ -176,7 +189,7 @@ class Bth {
         $base = get_current_screen()->base;
         
         if($base === "post") {
-            if($postType === "ad") {
+            if($postType === "re-ad") {
                 wp_enqueue_media();
                 wp_register_script("mediaButton", plugins_url(PLUGIN_RE_NAME."/includes/js/edits/editAd.js"), array('jquery'), PLUGIN_RE_VERSION);
                 wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);

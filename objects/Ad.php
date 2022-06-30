@@ -25,7 +25,7 @@ class Ad {
         }
     
         public function createAd() {
-        register_post_type("ad",
+        register_post_type("re-ad",
             array(
                 "labels" => array(
                     "name"                  => "Annonces",
@@ -54,7 +54,7 @@ class Ad {
                 "has_archive" => true
             )
         );
-        register_taxonomy("adTypeProperty", array("ad"), array(
+        register_taxonomy("adTypeProperty", array("re-ad"), array(
             "hierarchical"      => false, 
             "description"       => "Créez un type de bien pour catégoriser vos annonces.", 
             "label"             => "Types des biens immobiliers", 
@@ -75,7 +75,7 @@ class Ad {
         wp_insert_term("Parking/box", "adTypeProperty");
         wp_insert_term("Terrain", "adTypeProperty");
         
-        register_taxonomy("adTypeAd", array("ad"), array(
+        register_taxonomy("adTypeAd", array("re-ad"), array(
             "hierarchical"      => false, 
             "description"       => "Créez un type d'annonce pour catégoriser vos annonces.", 
             "label"             => "Types des annonces immobilières", 
@@ -90,7 +90,7 @@ class Ad {
         wp_insert_term("Vente", "adTypeAd");
         wp_insert_term("Vente de prestige", "adTypeAd");
         
-        register_taxonomy("adAvailable", array("ad"), array(
+        register_taxonomy("adAvailable", array("re-ad"), array(
             "hierarchical"      => false, 
             "description"       => "Disponibilité de l'annonce.", 
             "label"             => "Disponibilité de l'annonce", 
@@ -119,22 +119,18 @@ class Ad {
     
   
     public function templatePostAd($path) {
-	if(get_post_type() == "ad") {
+	if(get_post_type() == "re-ad") {
             if(is_single()) {
                 if(!locate_template(array("single-ad.php"))) {
-                    $path = plugin_dir_path(__DIR__)."templates/singles/single-ad.php";
+                    $path = plugin_dir_path(__DIR__)."templates/singles/single-re-ad.php";
                     $this->registerPluginScriptsSingleAd();
                     $this->registerPluginStylesSingleAd();
                 }
-            }else if(is_post_type_archive("ad")) { 
-                if(!locate_template(array("archive-ad.php"))) {
-                    $path = plugin_dir_path(__DIR__)."templates/archives/archive-ad.php";
+            }else if(is_post_type_archive("re-ad")) { 
+                if(!locate_template(array("archive-re-ad.php"))) {
+                    $path = plugin_dir_path(__DIR__)."templates/archives/archive-re-ad.php";
                     wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
                     wp_enqueue_style("archiveAd");
-                }
-            }else if(is_search()) {
-                if(!locate_template(array("archive-search-ad.php"))) {
-                    $path = plugin_dir_path(__DIR__)."templates/searches/archive-search-ad.php";
                 }
             }
 	}
@@ -184,7 +180,7 @@ class Ad {
     
     public function filterAdsByTaxonomies() {
         global $typenow;
-        $postType = "ad"; 
+        $postType = "re-ad"; 
         $taxonomies = get_taxonomies(["object_type" => [$postType]]);
         foreach($taxonomies as $taxonomy) {
             if($typenow == $postType) {
@@ -205,13 +201,13 @@ class Ad {
     }
     
     public function searchAds($query) {
-        if(!is_admin() && $query->is_search && $_GET["post_type"] === "ad") {        
-            $query->set("post_type", "ad");
+        if(!is_admin() && $query->is_search && isset($_GET["post_type"]) && $_GET["post_type"] === "re-ad") {        
+            $query->set("post_type", "re-ad");
             
             $terms = array();
             $metas = array();
             
-            if(isset($_GET["typeAd"])) {
+            if(isset($_GET["typeAd"]) && !ctype_space($_GET["typeAd"])) {
                 array_push($terms,
                     array(
                         "taxonomy" => "adTypeAd",
@@ -220,7 +216,7 @@ class Ad {
                     )
                 );            
             }
-            if(isset($_GET["typeProperty"])) {
+            if(isset($_GET["typeProperty"]) && !ctype_space($_GET["typeProperty"])) {
                 array_push($terms,
                     array(
                         "taxonomy" => "adTypeProperty",
@@ -229,97 +225,61 @@ class Ad {
                     )
                 );
             }
-            if(isset($_GET["minSurface"]) && isset($_GET["maxSurface"])) {
+            if(isset($_GET["minSurface"]) && isset($_GET["maxSurface"]) && !ctype_space($_GET["minSurface"]) && !ctype_space($_GET["maxSurface"])) {
                 array_push($metas,
                     array(
                         "key" => "adSurface",
                         "value" => array(intval($_GET["minSurface"]), intval($_GET["maxSurface"])),
-                        "compare" => "BETWEEN"
+                        "compare" => "BETWEEN",
+                        "type" => "DECIMAL"
                     )
                 );
             }         
-            if(isset($_GET["minPrice"]) && isset($_GET["maxPrice"])) {
+            if(isset($_GET["minPrice"]) && isset($_GET["maxPrice"]) && !ctype_space($_GET["minPrice"]) && !ctype_space($_GET["maxPrice"])) {
                 array_push($metas,
                     array(
                         "key" => "adPrice",
                         "value" => array(intval($_GET["minPrice"]), intval($_GET["maxPrice"])),
-                        "compare" => "BETWEEN"
+                        "compare" => "BETWEEN",
+                        "type" => "DECIMAL"
                     )
                 );
             } 
-            if(isset($_GET["city"]) && isset($_GET["radius"])) {
+            if(isset($_GET["city"]) && isset($_GET["radius"]) && !ctype_space($_GET["city"]) && !ctype_space($_GET["radius"])) {
                 $city = sanitize_text_field($_GET["city"]);
                 $radius = intval($_GET["radius"]);
                 $url = "https://api-adresse.data.gouv.fr/search/?q=".$city."&type=municipality&limit=1"; 
                 $apiResponse = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                $coordsGPS = $apiResponse["features"][0]["geometry"]["coordinates"];
-                $minLat = $coordsGPS[1]-$radius/111;
-                $maxLat = $coordsGPS[1]+$radius/111;
-                $minLong = $coordsGPS[0]-$radius/76;
-                $maxLong = $coordsGPS[0]+$radius/76;
-                array_push($metas,
-                    array(
-                        "key" => "adLatitude",
-                        "value" => array($minLat, $maxLat),
-                        "compare" => "BETWEEN"
-                    )
-                );
-                array_push($metas,
-                    array(
-                        "key" => "adLongitude",
-                        "value" => array($minLong, $maxLong),
-                        "compare" => "BETWEEN"
-                    )
-                );
-            } 
+                if(isset($apiResponse["features"])) {
+                    $coordsGPS = $apiResponse["features"][0]["geometry"]["coordinates"];
+                    $minLat = $coordsGPS[1]-$radius/111;
+                    $maxLat = $coordsGPS[1]+$radius/111;
+                    $minLong = $coordsGPS[0]-$radius/76;
+                    $maxLong = $coordsGPS[0]+$radius/76;
+                    array_push($metas,
+                        array(
+                            "key" => "adLatitude",
+                            "value" => array($minLat, $maxLat),
+                            "compare" => "BETWEEN"
+                        )
+                    );
+                    array_push($metas,
+                        array(
+                            "key" => "adLongitude",
+                            "value" => array($minLong, $maxLong),
+                            "compare" => "BETWEEN"
+                        )
+                    );
+                } 
+            }
                            
-            $query->set("tax_query", array($terms));
-            $query->set("meta_query", array($metas));
-            
+            if(!empty($terms)) {
+                $query->set("tax_query", array($terms));
+            }
+            if(!empty($metas)) {
+                $query->set("meta_query", array($metas));
+            }
         }
     }
-    
-    public function insertAdSearchBar() { 
-        $adTypesAd = get_terms(array(
-            "taxonomy" => "adTypeAd",
-            "hide_empty" => true,
-        ));
-        $adTypesProperty = get_terms(array(
-            "taxonomy" => "adTypeProperty",
-            "hide_empty" => true,
-        ));
-        ?>
-        <form role="search" action="" method="get" id="AdSearchBar">
-            <input type="hidden" name="s">
-            <input type="hidden" name="post_type" value="ad">
-
-            <select name="typeAd">
-                <?php
-                foreach($adTypesAd as $adTypeAd) { ?>
-                    <option value="<?= $adTypeAd->slug; ?>" <?= isset($_GET["typeAd"]) && $_GET["typeAd"] === $adTypeAd->slug?"selected":''; ?>><?= $adTypeAd->name; ?></option>                 
-                <?php }
-                ?>
-            </select>
-            <select name="typeProperty">
-                <?php
-                foreach($adTypesProperty as $adTypeProperty) { ?>
-                    <option value="<?= $adTypeProperty->slug; ?>" <?= isset($_GET["typeProperty"]) && $_GET["typeProperty"] === $adTypeProperty->slug?"selected":''; ?>><?= $adTypeProperty->name; ?></option>                 
-                <?php }
-                ?>
-            </select>
-            
-            <input type="number" name="minSurface" value="<?= isset($_GET["minSurface"])?intval($_GET["minSurface"]):'0'; ?>">
-            <input type="number" name="maxSurface" value="<?= isset($_GET["maxSurface"])?intval($_GET["maxSurface"]):'0'; ?>">
-            
-            <input type="number" name="minPrice" value="<?= isset($_GET["minPrice"])?intval($_GET["minPrice"]):'0'; ?>">
-            <input type="number" name="maxPrice" value="<?= isset($_GET["maxPrice"])?intval($_GET["maxPrice"]):'0'; ?>">
-            
-            <input type="text" name="city" <?= isset($_GET["city"])?'value="'.sanitize_text_field($_GET["city"]).'"':''; ?>>
-            <input type="number" name="radius" value="<?= isset($_GET["radius"])?intval($_GET["radius"]):'10'; ?>">
-            
-            <input type="submit" value="Rechercher">
-        </form>
-    <?php }
-    
     
 }

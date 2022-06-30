@@ -6,7 +6,7 @@ class EditAd {
             "adBasicsMetaBox", //ID HTML
             "Renseignements basiques", //Display
             array($this, "displayAdBasicsMetaBox"), //Callback
-            "ad", //Custom type
+            "re-ad", //Custom type
             "normal", //Location on the page
             "high" //Priority
         );
@@ -15,14 +15,14 @@ class EditAd {
             "adComplementariesMetaBox", //ID HTML
             "Renseignements complémentaires", //Display
             array($this, "displayAdComplementariesMetaBox"), //Callback
-            "ad", //Custom type
+            "re-ad", //Custom type
             "advanced", //Location on the page
             "high" //Priority
         );
     }
     
     function savePost($adId, $ad) {
-        if($ad->post_type == "ad") {
+        if($ad->post_type == "re-ad") {
             
             $ad->post_title = substr(sanitize_text_field($ad->postTitle), 0, 64);
             

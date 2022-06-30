@@ -1,0 +1,23 @@
+.searchBar form .formOneLine {
+    display: flex;
+    justify-content: center;
+}
+
+.searchBar form .formOneLine label {
+    display: block;
+}
+
+.searchBar form .formOneLine .cellInput {
+    float: left;
+}
+
+.searchBar form .formOneLine .cellInput input {
+    width: 50%;
+    font-size: 14px;
+    padding: 0.5rem 0.2rem;
+}
+
+.searchBar form input[type=submit] {
+    display: flex;
+    margin: auto;
+}

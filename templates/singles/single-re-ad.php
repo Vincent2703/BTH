@@ -100,7 +100,7 @@
             }
 
             $morePosts = get_posts(array(
-                "post_type" => "ad",
+                "post_type" => "re-ad",
                 "numberposts" => 15,
                 "exclude" => $idPost,
                 "meta_query" => array(

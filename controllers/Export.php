@@ -7,7 +7,7 @@ class Export {
         $base = get_current_screen()->base;
         ?>
         <div class="wrap">
-            <?php if($postType==="ad" && $base="bthexport") { ?>
+            <?php if($postType==="re-ad" && $base="bthexport") { ?>
                 <h2>Exportez les annonces</h2>
             <?php } ?>
                 <form action="" method="post">
@@ -36,7 +36,7 @@ class Export {
 
         $args = array(
             "numberposts" => -1,
-            "post_type" => "ad",
+            "post_type" => "re-ad",
             "post_status" => "publish"
         );
         if(isset($_POST["onlyAvailable"])) {

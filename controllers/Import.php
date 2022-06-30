@@ -17,7 +17,7 @@ class Import {
         $zipInDirPath = !empty(glob($dirPath.'*.{zip}', GLOB_BRACE));
         ?>
         <div class="wrap">
-            <?php if($postType==="ad" && $base="bthimport") { ?>
+            <?php if($postType==="re-ad" && $base="bthimport") { ?>
                 <h2>Importez les annonces</h2>
             <?php
             }
@@ -330,7 +330,7 @@ class Import {
                     //On cherche s'il n'y a pas déjà une annonce avec le même ID
                     $args = array(
                         "numberposts" 	=> 1,
-                        "post_type" 	=> "ad",
+                        "post_type" 	=> "re-ad",
                         "meta_query" 	=> array(
                             array(
                                 "key"       => "adUniqId",
@@ -365,7 +365,7 @@ class Import {
                             "post_title" 	=> $ad["title"],
                             "post_author" 	=> 1,
                             "post_content" 	=> $ad["description"],
-                            "post_type" 	=> "ad",
+                            "post_type" 	=> "re-ad",
                         );
                         if($publish) {//Si l'utilisateur a décidé publier directement les annonces
                             $post["post_status"] = "publish";
