@@ -38,14 +38,25 @@ $(document).ready(function(){
     input.keyup(function(){
         if($(this).val() !== '') {
             var getValue = encodeURIComponent($(this).val());
+            if(input.attr("name") === "address") {
+                var url = "https://api-adresse.data.gouv.fr/search/?q="+getValue+"&limit=5";
+                var minLength = 5;
+            }else if(input.attr("name") === "city") {
+                var url = "https://api-adresse.data.gouv.fr/search/?q="+getValue+"&type=municipality&limit=5";
+                var minLength = 3;
+            }
             $.ajax({
                 cache: false,
-                url: "https://api-adresse.data.gouv.fr/search/?q="+getValue+"&limit=5",
+                url: url,
                 dataType: "json",
                 success: function(data){
                     let labels = [];
                     data.features.forEach(feature => {
-                        labels.push(feature.properties.label);
+                        var valueLabel = feature.properties.label;
+                        if(input.attr("name") === "city") {
+                            valueLabel += ' '+feature.properties.postcode;
+                        }
+                        labels.push(valueLabel);
                     });
                     
                     input.autocomplete({
@@ -56,7 +67,7 @@ $(document).ready(function(){
                                 return matcher.test(value) || matcher.test(normalize(value));
                             }));
                         },
-                        minLength: 5,
+                        minLength: minLength,
                         mustMatch: false
                     });
                 }

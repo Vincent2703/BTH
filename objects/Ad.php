@@ -207,7 +207,7 @@ class Ad {
             $terms = array();
             $metas = array();
             
-            if(isset($_GET["typeAd"]) && !ctype_space($_GET["typeAd"])) {
+            if(isset($_GET["typeAd"]) && !empty($_GET["typeAd"])) {
                 array_push($terms,
                     array(
                         "taxonomy" => "adTypeAd",
@@ -216,7 +216,7 @@ class Ad {
                     )
                 );            
             }
-            if(isset($_GET["typeProperty"]) && !ctype_space($_GET["typeProperty"])) {
+            if(isset($_GET["typeProperty"]) && !empty($_GET["typeProperty"])) {
                 array_push($terms,
                     array(
                         "taxonomy" => "adTypeProperty",
@@ -225,7 +225,7 @@ class Ad {
                     )
                 );
             }
-            if(isset($_GET["minSurface"]) && isset($_GET["maxSurface"]) && !ctype_space($_GET["minSurface"]) && !ctype_space($_GET["maxSurface"])) {
+            if(isset($_GET["minSurface"]) && isset($_GET["maxSurface"]) && is_numeric($_GET["minSurface"]) && is_numeric($_GET["maxSurface"])) {
                 array_push($metas,
                     array(
                         "key" => "adSurface",
@@ -235,7 +235,7 @@ class Ad {
                     )
                 );
             }         
-            if(isset($_GET["minPrice"]) && isset($_GET["maxPrice"]) && !ctype_space($_GET["minPrice"]) && !ctype_space($_GET["maxPrice"])) {
+            if(isset($_GET["minPrice"]) && isset($_GET["maxPrice"]) && is_numeric($_GET["minPrice"]) && is_numeric($_GET["maxPrice"])) {
                 array_push($metas,
                     array(
                         "key" => "adPrice",
@@ -245,7 +245,7 @@ class Ad {
                     )
                 );
             } 
-            if(isset($_GET["city"]) && isset($_GET["radius"]) && !ctype_space($_GET["city"]) && !ctype_space($_GET["radius"])) {
+            if(isset($_GET["city"]) && isset($_GET["radius"]) && !empty($_GET["city"]) && !empty($_GET["radius"])) {
                 $city = sanitize_text_field($_GET["city"]);
                 $radius = intval($_GET["radius"]);
                 $url = "https://api-adresse.data.gouv.fr/search/?q=".$city."&type=municipality&limit=1"; 

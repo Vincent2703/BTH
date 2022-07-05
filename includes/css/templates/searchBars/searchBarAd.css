@@ -1,23 +1,46 @@
-.searchBar form .formOneLine {
-    display: flex;
-    justify-content: center;
+.searchBar .compSearchBarInputs {
+    margin-top: 20px;
 }
 
-.searchBar form .formOneLine label {
+.searchBar .formOneLine #minSurface, .searchBar .formOneLine #maxSurface {
+    width: 30%;
+}
+
+.searchBar .formOneLine #minPrice, .searchBar .formOneLine #maxPrice {
+    width: 45%;
+}
+
+.searchBar .formOneLine>div {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.searchBar .formOneLine>div label {
     display: block;
 }
 
-.searchBar form .formOneLine .cellInput {
+.searchBar .formOneLine>div .searchBarInput {
     float: left;
 }
 
-.searchBar form .formOneLine .cellInput input {
-    width: 50%;
+.searchBar .formOneLine>div .searchBarInput input {
     font-size: 14px;
     padding: 0.5rem 0.2rem;
+}
+
+.searchBar .formOneLine #radius {
+    width: 4em;
+}
+
+.searchBar .formOneLine #filters {
+    font-size: 14px;
+    border-radius: 12px;
+    padding: 0.5em;
+    align-self: flex-end;
 }
 
 .searchBar form input[type=submit] {
     display: flex;
     margin: auto;
+    margin-top: 25px;
 }

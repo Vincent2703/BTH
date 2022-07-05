@@ -7,7 +7,8 @@ Author: Vincent Bourdon
 License:  GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
-require_once('bth.php'); //Pour installer le plugin depuis l'interface
+
+require_once("bth.php"); //Pour installer le plugin depuis l'interface
 
 class Bth {
     public function __construct() {
@@ -87,12 +88,15 @@ class Bth {
         global $post_type;
         global $pagenow;
         if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {
-            wp_register_script("addSearchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/searchBars/addSearchBarAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+            wp_enqueue_script("jquery-ui-autocomplete");
+            wp_register_script("addSearchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/searchBars/addSearchBarAd.js"), array("jquery"), PLUGIN_RE_VERSION, false);
             wp_enqueue_script("addSearchBarAd");
             wp_add_inline_script("addSearchBarAd", 'let pluginName="'.PLUGIN_RE_NAME.'";');
             
             wp_register_style("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
             wp_enqueue_style("searchBarAd");
+            wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
+            wp_enqueue_style("autocompleteAddress");
         }
     }
     
@@ -216,7 +220,7 @@ class Bth {
     }
       
     public function completeMenu() {
-        $parentSlug = "edit.php?post_type=ad";
+        $parentSlug = "edit.php?post_type=re-ad";
         /*add_submenu_page(
             $parentSlug, //Parent slug
             'Accueil', //Page title

@@ -1,5 +1,4 @@
 <?php
-
 class EditAd {
     public function addMetaBoxes() {
         add_meta_box( 
