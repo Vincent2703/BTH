@@ -223,7 +223,7 @@
                             <label for="names">Nom et prénom</label><input type="text" name="names" class="formContactInput" required>
                             <label for="phone">Téléphone</label><input type="tel" name="phone" class="formContactInput" required>
                             <label for="email">Adresse mail</label><input type="text" name="email" class="formContactInput" required>
-                            <label for="message">Message</label><textarea name="message" class="formContactInput" required></textarea>
+                            <label for="message">Message</label><textarea name="message" class="formContactInput" cols="22" required></textarea>
                             <input type="submit" name="submit" id="formContactSubmit" value="Envoyer">
                         </form>
                     </div>

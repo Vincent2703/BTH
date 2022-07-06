@@ -23,8 +23,8 @@ class Options {
     
     public function tabsOption() { 
         $base = get_current_screen()->base;
-        if($base === "edit-tags" || $base === "ad_page_bthoptions") { 
-            if($base === "ad_page_bthoptions") { //Si on est sur la page des options custom
+        if($base === "edit-tags" || $base === "re-ad_page_bthoptions") { 
+            if($base === "re-ad_page_bthoptions") { //Si on est sur la page des options custom
                 if(isset($_GET["tab"])) { //S'il y a un $_GET tab
                     $tab = $_GET["tab"]; //On le prend
                 }else{
@@ -36,12 +36,13 @@ class Options {
             <h2><?= PLUGIN_RE_NAME; ?></h2>
             <p>Interface de configuration - <?= PLUGIN_RE_NAME; ?></p>
             <h2 class="nav-tab-wrapper">
-                <a href="edit.php?post_type=ad&page=bthoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>">Imports</a>
-                <a href="edit.php?post_type=ad&page=bthoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>">Exports</a>
-                <a href="edit.php?post_type=ad&page=bthoptions&tab=ads" class="nav-tab <?= $tab === "ads" ? "nav-tab-active" : ''; ?>">Affichage annonces</a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>">Imports</a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>">Exports</a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=ads" class="nav-tab <?= $tab === "ads" ? "nav-tab-active" : ''; ?>">Affichage annonces</a>
                 <!--<a href="edit-tags.php?taxonomy=adTypeProperty&post_type=ad" class="nav-tab <?/= $tab === "tags" ? "nav-tab-active" : ''; ?>">Catégories</a>-->
-                <a href="edit.php?post_type=ad&page=bthoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>">Mail</a>
-                <a href="edit.php?post_type=ad&page=bthoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>">Barème des honoraires</a>                
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>">Mail</a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>">Barème des honoraires</a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=style" class="nav-tab <?= $tab === "style" ? "nav-tab-active" : ''; ?>">Style</a>                                
             </h2>
         <?php   
         }
@@ -54,6 +55,7 @@ class Options {
         $this->optionsAds = get_option(PLUGIN_RE_NAME."OptionsAds");
         $this->optionsEmail = get_option(PLUGIN_RE_NAME."OptionsEmail");
         $this->optionsFees = get_option(PLUGIN_RE_NAME."OptionsFees");
+        $this->optionsFees = get_option(PLUGIN_RE_NAME."OptionsStyle");
         
         register_setting( //Enregistrement des options pour les importations
             PLUGIN_RE_NAME."OptionsImportsGroup", // option_group
@@ -84,6 +86,13 @@ class Options {
             PLUGIN_RE_NAME."OptionsFees", // option_name
             array($this, "optionsSanitizeFees") // sanitizeCallback
         );
+        
+        register_setting( //Enregistrement des options pour le style
+            PLUGIN_RE_NAME."OptionsStyleGroup", // option_group
+            PLUGIN_RE_NAME."OptionsStyle", // option_name
+            array($this, "optionsSanitizeStyle") // sanitizeCallback
+        );
+        
         
         add_settings_section( //Section pour les imports
             PLUGIN_RE_NAME."optionsSection", // id
@@ -123,6 +132,14 @@ class Options {
             //array($this, "infoDivers"), // callback
             null,
             PLUGIN_RE_NAME."OptionsFeesPage" // page
+        );
+        
+        add_settings_section( //Section pour les diverses options
+            PLUGIN_RE_NAME."optionsSection", // id
+            "Style", // title
+            //array($this, "infoDivers"), // callback
+            null,
+            PLUGIN_RE_NAME."OptionsStylePage" // page
         );
         
         

@@ -20,9 +20,9 @@
                         <h3 class="entry-title has-text-align-center"><a href="<?= get_post_permalink($idPost); ?>"><?php the_title(); ?></a></h3>
                         <span class="dateAd">Annonce postée le <?= get_the_date(); ?></span>
                     </div>
-                    <figure class="featured-media">
+                    <div class="thumbnailAd">
                         <a href="<?= get_post_permalink($idPost); ?>"><?= get_the_post_thumbnail($idPost, array(800, 800)); ?></a>
-                    </figure>
+                    </div>
                     <table class="inShort">
                         <thead>
                             <tr>
