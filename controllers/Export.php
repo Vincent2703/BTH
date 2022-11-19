@@ -100,7 +100,12 @@ class Export {
 
                 foreach($fields as $field) {
                     if(!array_key_exists($field["id"], $arrayAd)) {
-                        $arrayAd[$field["id"]] = $metas["ad".ucfirst($field["name"])];
+                        $metaName = "ad".ucfirst($field["name"]);
+                        if(array_key_exists($metaName, $metas)) {
+                            $arrayAd[$field["id"]] = $metas[$metaName];
+                        }else{
+                            echo "Absence du meta-term \"$metaName\" pour l'annonce \"".get_the_title($ad).'"<br />';
+                        }
                     }
                 }
 

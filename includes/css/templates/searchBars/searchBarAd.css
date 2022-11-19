@@ -8,34 +8,34 @@
     margin-top: 20px;
 }
 
-.searchBar .formOneLine #minSurface, .searchBar .formOneLine #maxSurface {
+.searchBar .searchForm #minSurface, .searchBar .searchForm #maxSurface {
     width: 30%;
 }
 
-.searchBar .formOneLine #minPrice, .searchBar .formOneLine #maxPrice {
+.searchBar .searchForm #minPrice, .searchBar .searchForm #maxPrice {
     width: 45%;
 }
 
-.searchBar .formOneLine>div {
+.searchBar .searchForm>div {
     display: flex;
     justify-content: space-evenly;
 }
 
-.searchBar .formOneLine>div .searchBarInput label {
+.searchBar .searchForm>div .searchBarInput label {
     display: block;
     font-weight: 600;
 }
 
-.searchBar .formOneLine>div .searchBarInput input, .searchBar .formOneLine>div .searchBarInput select {
+.searchBar .searchForm>div .searchBarInput input, .searchBar .searchForm>div .searchBarInput select {
     font-size: 16px;
     padding: 0.5rem 0.5rem;
 }
 
-.searchBar .formOneLine #radius {
+.searchBar .searchForm #radius {
     width: 4em;
 }
 
-.searchBar .formOneLine #filters {
+.searchBar .searchForm #filters {
     font-size: 14px;
     border-radius: 12px;
     padding: 0.5em;
@@ -46,4 +46,22 @@
     display: flex;
     margin: auto;
     margin-top: 25px;
+}
+/*
+.ui-menu-item {
+    list-style: none !important;
+}
+
+ul {
+    background-color: white;
+}*/
+
+@media only screen and (max-width : 768px) {
+    .mainSearchBarInputs {
+        flex-direction: column;
+    }
+    
+    #addressInput {
+        width: 50%;
+    }
 }

@@ -44,9 +44,12 @@ var DPEGES = function(diag, domID) {
             
     
 
-    //document.getElementById(domID).textContent = '';
     document.getElementById(domID).appendChild(smallDiag);
 };
 
-DPEGES("DPE", "DPEValue");
-DPEGES("GES", "GESValue");
+if(document.body.contains(document.getElementById("DPEValue"))) {
+    DPEGES("DPE", "DPEValue");
+}
+if(document.body.contains(document.getElementById("GESValue"))) {
+    DPEGES("GES", "GESValue");
+}

@@ -52,7 +52,7 @@
                     $phone = get_post_meta($idContact, "agentPhone", true);
                     $mobilePhone = get_post_meta($idContact, "agentMobilePhone", true);
                 }else{
-                    $idContact = get_the_terms($idContact, "agentAgency")[0]->name;
+                    $idContact = wp_get_post_parent_id($idContact);
                     $emailToContact = get_post_meta($idContact, "agencyEmail", true);
                     $phone = get_post_meta($idContact, "agencyPhone", true);
                 }
@@ -129,7 +129,7 @@
     ?>
 
 
-        <div id="primary" class="content-area">
+        <div id="primary" class="content-area bth">
             <main id="main" class="site-main">
                 <span class="titleAd"><h1><?= the_title(); ?></h1></span>
                 <span class="subtitleAd"><?= ucfirst($city)." - $price$afterPrice"; ?></span>
@@ -195,8 +195,11 @@
                     </div>
                 </div>
                 <div class="contentRightAd">
-                    <?php if($getCoords) { ?>
-                    <div id="map" class="map" data-coords="<?= implode(',', $coords); ?>"></div>
+                    <?php if($getCoords) {  
+                        if($showMap == "onlyPC") { ?>
+                            <span id="addressApprox">L'emplacement du bien est approximatif.</span>
+                        <?php } ?>
+                        <div id="map" class="map" data-coords="<?= implode(',', $coords); ?>"></div>
                     <?php } ?>
                     <div class="contact">
                         <div class="headerContact">

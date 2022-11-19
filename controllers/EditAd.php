@@ -41,46 +41,46 @@ class EditAd {
                 update_post_meta($adId, "adRefAgency", sanitize_text_field($_POST["refAgency"]));
             }
             if(isset($_POST["price"]) && !ctype_space($_POST["price"])) {
-                update_post_meta($adId, "adPrice", sanitize_text_field($_POST["price"]));
+                update_post_meta($adId, "adPrice", sanitize_text_field(intval($_POST["price"])));
             }
             if(isset($_POST["fees"]) && !ctype_space($_POST["fees"])) {
-                update_post_meta($adId, "adFees", sanitize_text_field($_POST["fees"]));
+                update_post_meta($adId, "adFees", sanitize_text_field(intval($_POST["fees"])));
             }        
             if(isset($_POST["surface"]) && !ctype_space($_POST["surface"])) {
-                update_post_meta($adId, "adSurface", sanitize_text_field($_POST["surface"]));
+                update_post_meta($adId, "adSurface", sanitize_text_field(intval($_POST["surface"])));
             }
             if(isset($_POST["landSurface"]) && !ctype_space($_POST["landSurface"])) {
-                update_post_meta($adId, "adTotalSurface", sanitize_text_field($_POST["landSurface"]));
+                update_post_meta($adId, "adTotalSurface", sanitize_text_field(intval($_POST["landSurface"])));
             }
             if(isset($_POST["nbRooms"]) && !ctype_space($_POST["nbRooms"])) {
-                update_post_meta($adId, "adNbRooms", sanitize_text_field($_POST["nbRooms"]));
+                update_post_meta($adId, "adNbRooms", sanitize_text_field(intval($_POST["nbRooms"])));
             }
             if(isset($_POST["nbBedrooms"]) && !ctype_space($_POST["nbBedrooms"])) {
-                update_post_meta($adId, "adNbBedrooms", sanitize_text_field($_POST["nbBedrooms"]));
+                update_post_meta($adId, "adNbBedrooms", sanitize_text_field(intval($_POST["nbBedrooms"])));
             }
             if(isset($_POST["nbBathrooms"]) && !ctype_space($_POST["nbBathrooms"])) {
-                update_post_meta($adId, "adNbBathrooms", sanitize_text_field($_POST["nbBathrooms"]));
+                update_post_meta($adId, "adNbBathrooms", sanitize_text_field(intval($_POST["nbBathrooms"])));
             }
             if(isset($_POST["nbWaterRooms"]) && !ctype_space($_POST["nbWaterRooms"])) {
-                update_post_meta($adId, "adNbWaterRooms", sanitize_text_field($_POST["nbWaterRooms"]));
+                update_post_meta($adId, "adNbWaterRooms", sanitize_text_field(intval($_POST["nbWaterRooms"])));
             }
             if(isset($_POST["nbWC"]) && !ctype_space($_POST["nbWC"])) {
-                update_post_meta($adId, "adNbWC", sanitize_text_field($_POST["nbWC"]));
+                update_post_meta($adId, "adNbWC", sanitize_text_field(intval($_POST["nbWC"])));
             }            
             
             if(isset($_POST["showMap"]) && !ctype_space($_POST["showMap"])) {
                 update_post_meta($adId, "adShowMap", sanitize_text_field($_POST["showMap"]));
-                if(isset($_POST["address"]) && $_POST["address"] !== '') {
+                if(isset($_POST["address"]) && !ctype_space($_POST["address"])) {
                     update_post_meta($adId, "adAddress", sanitize_text_field($_POST["address"]));
                     if($_POST["showMap"] !== "no") {
                         $query = urlencode(addslashes(htmlentities(sanitize_text_field($_POST["address"]))));
                         if($_POST["showMap"] === "all") {
-                            $zoom = 18;
+                            $zoom = 16;
                             $radiusCircle = 10;
                             $resultsResponse = wp_remote_get("https://api-adresse.data.gouv.fr/search/?q=".$query."&limit=1");
                         }else if($_POST["showMap"] === "onlyPC") {
                             $zoom = 14;
-                            $radiusCircle = 50;
+                            $radiusCircle = 0;
                             $resultsResponse = wp_remote_get("https://api-adresse.data.gouv.fr/search/?q=".$query."&type=municipality&limit=1");
                         }
                         if(wp_remote_retrieve_response_code($resultsResponse) === 200) {
@@ -104,8 +104,8 @@ class EditAd {
             if(isset($_POST["images"]) && !ctype_space($_POST["images"])) {
                 update_post_meta($adId, "adImages", sanitize_text_field($_POST["images"]));
             }
-            if(isset($_POST["agent"]) && ctype_digit(strval($_POST["agent"]))) {
-                update_post_meta($adId, "adIdAgent", sanitize_text_field($_POST["agent"]));
+            if(isset($_POST["agent"]) && !ctype_space($_POST["agent"])) {
+                update_post_meta($adId, "adIdAgent", sanitize_text_field(intval($_POST["agent"])));
             }
             if(isset($_POST["showAgent"])) {
                 update_post_meta($adId, "adShowAgent", "OUI");
@@ -120,37 +120,45 @@ class EditAd {
             
             
             if(isset($_POST["floor"]) && !ctype_space($_POST["floor"])) {
-                update_post_meta($adId, "adFloor", sanitize_text_field($_POST["floor"]));
+                update_post_meta($adId, "adFloor", sanitize_text_field(intval($_POST["floor"])));
             }
             if(isset($_POST["nbFloors"]) && !ctype_space($_POST["nbFloors"])) {
-                update_post_meta($adId, "adNbFloors", sanitize_text_field($_POST["nbFloors"]));
+                update_post_meta($adId, "adNbFloors", sanitize_text_field(intval($_POST["nbFloors"])));
             }
             if(isset($_POST["furnished"]) && !ctype_space($_POST["furnished"])) {
                 update_post_meta($adId, "adFurnished", "OUI");
+            }else{
+                update_post_meta($adId, "adFurnished", "NON");
             }
             if(isset($_POST["year"]) && !ctype_space($_POST["year"])) {
-                update_post_meta($adId, "adYear", sanitize_text_field($_POST["year"]));
+                update_post_meta($adId, "adYear", sanitize_text_field(intval($_POST["year"])));
             }
             if(isset($_POST["typeHeating"]) && !ctype_space($_POST["typeHeating"])) {
-                update_post_meta($adId, "adTypeHeating", sanitize_text_field($_POST["typeHeating"]));
+                update_post_meta($adId, "adTypeHeating", sanitize_text_field(intval($_POST["typeHeating"])));
             }
             if(isset($_POST["typeKitchen"]) && !ctype_space($_POST["typeKitchen"])) {
-                update_post_meta($adId, "adTypeKitchen", sanitize_text_field($_POST["typeKitchen"]));
+                update_post_meta($adId, "adTypeKitchen", sanitize_text_field(intval($_POST["typeKitchen"])));
             }
-            if(isset($_POST["orientation"]) && !ctype_space($_POST["orientation"])) {
+            /*if(isset($_POST["orientation"]) && !ctype_space($_POST["orientation"])) {
                 update_post_meta($adId, "adOrientation", sanitize_text_field($_POST["orientation"]));
-            }
+            }*/
             if(isset($_POST["nbBalconies"]) && !ctype_space($_POST["nbBalconies"])) {
-                update_post_meta($adId, "adNbBalconies", sanitize_text_field($_POST["nbBalconies"]));
+                update_post_meta($adId, "adNbBalconies", sanitize_text_field(intval($_POST["nbBalconies"])));
             }
             if(isset($_POST["elevator"]) && !ctype_space($_POST["elevator"])) {
                 update_post_meta($adId, "adElevator", "OUI");
+            }else{
+                update_post_meta($adId, "adElevator", "NON");
             }
             if(isset($_POST["cellar"]) && !ctype_space($_POST["cellar"])) {
                 update_post_meta($adId, "adCellar", "OUI");
+            }else{
+                update_post_meta($adId, "adCellar", "NON");                
             }
             if(isset($_POST["terrace"]) && !ctype_space($_POST["terrace"])) {
                 update_post_meta($adId, "adTerrace", "OUI");
+            }else{
+                update_post_meta($adId, "adTerrace", "NON");                
             }
             if(isset($_POST["DPE"]) && !ctype_space($_POST["DPE"])) {
                 update_post_meta($adId, "adDPE", sanitize_text_field(intval($_POST["DPE"])));

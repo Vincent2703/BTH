@@ -1,33 +1,33 @@
 /* Mise en page générale */
 
-.site-main {
+.bth .site-main {
     display: flex;
     flex-flow: row wrap;
 }
 
-.titleAd {
+.bth .titleAd {
     flex: 0 1 100%;
     text-align: center;
 }
 
-.subtitleAd {
+.bth .subtitleAd {
     flex: 0 1 100%;
     text-align: center;
     font-size: 16px;
     font-weight: bold;
 }
 
-.titleAd h1 {
+.bth .titleAd h1 {
     font-size: 32px;
 }
 
-.sliders {
+.bth .sliders {
     flex: 0 1 100%;
     margin-bottom: 3vh;
     object-fit: contain;
 }
 
-.more {
+.bth .more {
     display: flex;
     width: 100%;
     flex-direction: column;
@@ -36,45 +36,45 @@
     margin-bottom: 10px;
 }
 
-#moreTitle {
+.bth #moreTitle {
     display: flex;
     justify-content: center;
 }
 
-.morePostsPanel {
+.bth .morePostsPanel {
     display: flex;    
     gap: 15px;
 
 }
 
-.morePosts {
+.bth .morePosts {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
 }
 
-.moreAd {
+.bth .moreAd {
     display: flex;
     flex-direction: column;
     width: 150px;
     user-select: none;
 }
 
-.prevMorePosts, .nextMorePosts {
+.bth .prevMorePosts, .bth .nextMorePosts {
     font-size: 20px;
     align-self: center;
     cursor: pointer;
     user-select: none;
 }
 
-.moreThumbnailAd {
+.bth .moreThumbnailAd {
 }
 
-.moreTitleAd {
+.bth .moreTitleAd {
     font-size: 10px;
 }
 
-.contentRightAd, .contentLeftAd {
+.bth .contentRightAd, .bth .contentLeftAd {
     display: flex;
     flex-direction: column;
     background-color: rgba(255, 255, 255, 0.7);
@@ -82,113 +82,126 @@
     padding-bottom: 1vh;
 }
 
-.contentRightAd div, .contentLeftAd div {
+.bth .contentRightAd div, .bth .contentLeftAd div {
     flex-grow: 1;
 }
 
-.contentLeftAd {
+.bth .contentLeftAd {
     flex: 1 0 75%;
     padding-left: 6vw;
     padding-right: 6vw;
     border-right: 1px solid black;
 }
 
-.contentRightAd {
+.bth .contentRightAd {
     flex: 1 0 25%;
     padding-right: 6vw;
     padding-left: 1vw;
 }
 
-.description h4 {
+.bth .description h4 {
     margin-top: 0;
 }
 
-.mainFeatures {
+.bth .mainFeatures {
     
 }
 
-.mainFeatures ul, .complementaryFeatures ul {
+.bth .mainFeatures ul, .bth .complementaryFeatures ul {
     list-style: none;
     columns: 2;
 }
 @media only screen and (max-width : 768px) {
-    .mainFeatures ul, .complementaryFeatures ul {
+    .bth .mainFeatures ul, .bth .complementaryFeatures ul {
         columns: 1;
     }
     
-    .mainFeatures ul li, .complementaryFeatures ul li {
+    .bth .mainFeatures ul li, .bth .complementaryFeatures ul li {
         margin-bottom: 15px;
     }
     
-    #map { /*Pas trouvé mieux*/
+    .bth #map { 
+        margin-left: 10px; /*Pas trouvé mieux*/
+    }
+    
+    .bth .contact {
         margin-left: 10px;
     }
 }
 
-.nameFeature {
+.bth .nameFeature {
     font-weight: bold;
 }
 
-.valueFeature {
+.bth .valueFeature {
 }
 
-.complementaryFeatures {
+.bth .complementaryFeatures {
 }
 
-.map {
+.bth #DPEValueSmall, .bth #GESValueSmall {
+    margin-top: 5px;
+}
+
+.bth .map {
     margin-bottom: 5vh;
 }
 
-.contact {
+.bth #addressApprox {
+    font-style: italic;
+    font-size: 10px;
 }
 
-.headerContact {
+.bth .contact {
+}
+
+.bth .headerContact {
     display: flex;
     align-items: center;
     margin-bottom: 5vh;
 }
 
-.formContact label {
+.bth .formContact label {
     display: block;
 }
 
-.formContactInput {
+.bth .formContactInput {
     margin-bottom: 3vh !important;
 }
 
-#formContactSubmit {
+.bth #formContactSubmit {
     display: block;
     width: auto;
     margin: auto;
 }
 
-.headerContactLeft {
+.bth .headerContactLeft {
     display: flex;
     justify-content: center;
 }
 
-.headerContactRight {
+.bth .headerContactRight {
 
 }
 
-#phoneContact {
+.bth #phoneContact {
     display: flex;
     align-items: center;
 }
 
-#phoneContact a {
+.bth #phoneContact a {
     margin-left: 0.3vw;
     font-size: 15px;
 }
 
-#thumbnailContact {
+.bth #thumbnailContact {
     width: 70%;
     border-radius: 50%;
 }
 
 
 /* carte */
-#map { 
+.bth #map { 
     width: 100%;
     height: 0; /*Pour utiliser la même valeur que width*/
     padding-bottom: 100%;
@@ -196,14 +209,14 @@
 
 /* slider photos */
 
-#miniSlider {
+.bth #miniSlider {
    position: relative;
    overflow: hidden;
    margin: 20px auto 0 auto;
    border-radius: 4px;
 }    
 
-#miniSlider ul {
+.bth #miniSlider ul {
    position: relative;
    margin: 0;
    padding: 0;
@@ -211,7 +224,7 @@
    list-style: none;
 }
 
-#miniSlider ul li {
+.bth #miniSlider ul li {
    position: relative;
    display: block;
    float: left;
@@ -224,13 +237,13 @@
    line-height: 300px;
 }
 
-#miniSlider ul li img {
+.bth #miniSlider ul li img {
     object-fit: cover;
     width: 100%; 
     height: 100%;
 }
 
-.controlPrev, .controlNext {
+.bth .controlPrev, .bth .controlNext {
    position: absolute;
    top: 40%;
    z-index: 999;
@@ -248,21 +261,21 @@
    user-select: none;
 }
 
-.controlPrev:hover, .controlNext:hover {
+.bth .controlPrev:hover, .bth .controlNext:hover {
    opacity: 1;
    -webkit-transition: all 0.2s ease;
 }
 
-.controlPrev {
+.bth .controlPrev {
    border-radius: 0 2px 2px 0;
 }
 
-.controlNext {
+.bth .controlNext {
    right: 0;
    border-radius: 2px 0 0 2px;
 }
 
-#fullscreenSlider {
+.bth #fullscreenSlider {
     display: none;
     position: fixed;
     z-index: 100000;
@@ -273,7 +286,7 @@
     background-color: black;
 }
 
-#fullscreenSlider .displayFullscreen {
+.bth #fullscreenSlider .displayFullscreen {
     width: 100vw;
     height: 100vh;
     /*background-size: 80%;*/
@@ -281,7 +294,7 @@
     background-position: center center;
 }
 
-#fullscreenSlider .controlClose {
+.bth #fullscreenSlider .controlClose {
     font-size: 4rem;
     color: white;
     position: absolute;
@@ -291,12 +304,12 @@
     user-select: none;
 }
 
-#fullscreenSlider .controlNext, #fullscreenSlider .controlPrev {
+.bth #fullscreenSlider .controlNext, .bth #fullscreenSlider .controlPrev {
     background-color: rgba(128,128,128,0.5);
     font-size: 4rem;
 }
 
-.pagingImg {
+.bth .pagingImg {
     z-index: 999;
     font-weight: 200;
     color: white;
@@ -305,11 +318,11 @@
     user-select: none;
 }
 
-#miniSlider .pagingImg {
+.bth #miniSlider .pagingImg {
     bottom: 0%
 }
 
-#fullscreenSlider .pagingImg {
+.bth #fullscreenSlider .pagingImg {
     bottom: 10%;
 }
 

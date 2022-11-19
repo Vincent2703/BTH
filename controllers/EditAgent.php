@@ -28,18 +28,18 @@ class editAgent {
             if(isset($_POST["mobilePhone"]) && !ctype_space($_POST["mobilePhone"])) {
                 update_post_meta($agentId, "agentMobilePhone", sanitize_text_field($_POST["mobilePhone"]));
             }
-            if(isset($_POST["email"]) && !ctype_space($_POST["email"])) {
+            if(isset($_POST["email"]) && is_email($_POST["email"])) {
                 update_post_meta($agentId, "agentEmail", sanitize_text_field($_POST["email"]));
             }
             
-            if(isset($_POST["agency"]) && !ctype_space($_POST["agency"])) {
+            if(isset($_POST["agency"]) && is_int($_POST["agency"])) {
                 //wp_update_post(array("ID" => $agentId, "post_parent" => sanitize_text_field($_POST["agency"])));
                 //$agent->post_parent = sanitize_text_field($_POST["agency"]);
-                remove_action( 'save_post_agent', array($this, 'savePost') );
+                remove_action("save_post_agent", array($this, "savePost"));
 
                 wp_update_post( array(
-                    'ID' => $agentId,
-                    'post_parent' => sanitize_text_field($_POST["agency"])
+                    "ID" => $agentId,
+                    "post_parent" => sanitize_text_field($_POST["agency"])
                 ) );
                 
             }

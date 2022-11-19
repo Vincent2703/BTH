@@ -1,5 +1,5 @@
 <?php
-    require(implode("/", (explode("/", __DIR__, -5)))."/wp-load.php");
+    require_once(preg_replace( '/wp-content(?!.*wp-content).*/', '', __DIR__ )."wp-load.php");
     $adTypesAd = get_terms(array(
         "taxonomy" => "adTypeAd",
         "hide_empty" => true,
@@ -14,7 +14,7 @@
         <input type="hidden" name="s">
         <input type="hidden" name="post_type" value="re-ad">
 
-        <div class="formOneLine">
+        <div class="searchForm">
             <div class="mainSearchBarInputs">
                 <div class="searchBarInput">
                     <label for="typeAd">Type d'annonce</label>
@@ -40,7 +40,7 @@
                 
                 <div class="searchBarInput">
                     <label for="addressInput">Ville</label>
-                    <input type="text" name="city" id="addressInput" autocomplete="off" size="15" placeholder="Ex : Paris" <?= isset($_GET["city"]) && !empty($_GET["city"])?'value="'.sanitize_text_field($_GET["city"]).'"':''; ?>>
+                    <input type="text" name="city" id="addressInput" class="ui-autocomplete-input" autocomplete="off" size="15" placeholder="Ex : Paris" <?= isset($_GET["city"]) && !empty($_GET["city"])?'value="'.sanitize_text_field($_GET["city"]).'"':''; ?>>
                 </div>
 
                 <div class="searchBarInput">
