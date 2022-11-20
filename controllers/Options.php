@@ -42,7 +42,8 @@ class Options {
                 <!--<a href="edit-tags.php?taxonomy=adTypeProperty&post_type=ad" class="nav-tab <?/= $tab === "tags" ? "nav-tab-active" : ''; ?>">Catégories</a>-->
                 <a href="edit.php?post_type=re-ad&page=bthoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>">Mail</a>
                 <a href="edit.php?post_type=re-ad&page=bthoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>">Barème des honoraires</a>
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=style" class="nav-tab <?= $tab === "style" ? "nav-tab-active" : ''; ?>">Style</a>                                
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=style" class="nav-tab <?= $tab === "style" ? "nav-tab-active" : ''; ?>">Style</a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=apis" class="nav-tab <?= $tab === "apis" ? "nav-tab-active" : ''; ?>">APIs</a>                                
             </h2>
         <?php   
         }
@@ -55,7 +56,8 @@ class Options {
         $this->optionsAds = get_option(PLUGIN_RE_NAME."OptionsAds");
         $this->optionsEmail = get_option(PLUGIN_RE_NAME."OptionsEmail");
         $this->optionsFees = get_option(PLUGIN_RE_NAME."OptionsFees");
-        $this->optionsFees = get_option(PLUGIN_RE_NAME."OptionsStyle");
+        $this->optionsStyle = get_option(PLUGIN_RE_NAME."OptionsStyle");
+        $this->optionsApis = get_option(PLUGIN_RE_NAME."OptionsApis");
         
         register_setting( //Enregistrement des options pour les importations
             PLUGIN_RE_NAME."OptionsImportsGroup", // option_group
@@ -91,6 +93,12 @@ class Options {
             PLUGIN_RE_NAME."OptionsStyleGroup", // option_group
             PLUGIN_RE_NAME."OptionsStyle", // option_name
             array($this, "optionsSanitizeStyle") // sanitizeCallback
+        );
+        
+        register_setting( //Enregistrement des options pour le style
+            PLUGIN_RE_NAME."OptionsApisGroup", // option_group
+            PLUGIN_RE_NAME."OptionsApis", // option_name
+            array($this, "optionsSanitizeApis") // sanitizeCallback
         );
         
         
@@ -140,6 +148,13 @@ class Options {
             //array($this, "infoDivers"), // callback
             null,
             PLUGIN_RE_NAME."OptionsStylePage" // page
+        );
+        
+        add_settings_section( //Section pour les diverses options
+            PLUGIN_RE_NAME."optionsSection", // id
+            "APIs", // title
+            null,
+            PLUGIN_RE_NAME."OptionsApisPage" // page
         );
         
         
@@ -268,7 +283,7 @@ class Options {
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
-            add_settings_field(
+        add_settings_field(
             "emailAd", // id
             'Adresse mail à contacter pour les annonces par défaut <abbr title="Adresse mail à contacter s\'il n\'est pas possible de contacter un agent ou une agence pour une annonce"><sup>?</sup></abbr>', // title
             array($this, "emailAdCallback"), // callback
@@ -293,6 +308,35 @@ class Options {
             PLUGIN_RE_NAME."OptionsFeesPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
         );
+        
+        /* Style */
+        
+        /* APIs */
+        
+        add_settings_field(
+            "apiUsed", // id
+            "API à utiliser", // title
+            array($this, "apiUsedCallback"), // callback
+            PLUGIN_RE_NAME."OptionsApisPage", // page
+            PLUGIN_RE_NAME."optionsSection" // section
+        );
+        
+        add_settings_field(
+            "apiKeyGoogle", // id
+            "Clé API Google", // title
+            array($this, "apiKeyGoogleCallback"), // callback
+            PLUGIN_RE_NAME."OptionsApisPage", // page
+            PLUGIN_RE_NAME."optionsSection" // section
+        );
+        
+        add_settings_field(
+            "apiLimitCountry", // id
+            "Limiter les recherches à un pays", // title
+            array($this, "apiLimitCountryCallback"), // callback
+            PLUGIN_RE_NAME."OptionsApisPage", // page
+            PLUGIN_RE_NAME."optionsSection" // section
+        );
+        
     }
 
     public function optionsSanitizeImport($input) {
@@ -409,6 +453,24 @@ class Options {
             if(isset($upload["url"]) && !empty($upload["url"])) {
                 $sanitaryValues["feesUrl"] = $upload["url"];
             }
+        }
+        
+        return $sanitaryValues;
+    }
+    
+    public function optionsSanitizeApis($input) {
+        $sanitaryValues = array();
+        
+        if(isset($input["apiUsed"]) && in_array($input["apiUsed"], array("govFr", "google"))) {
+            $sanitaryValues["apiUsed"] = $input["apiUsed"];
+        }
+        
+        if(isset($input["apiKeyGoogle"]) && !ctype_space($input["apiKeyGoogle"])) {
+            $sanitaryValues["apiKeyGoogle"] = sanitize_text_field($input["apiKeyGoogle"]);
+        }
+        
+        if(isset($input["apiLimitCountry"]) && !ctype_space($input["apiLimitCountry"])) {
+            $sanitaryValues["apiLimitCountry"] = sanitize_text_field($input["apiLimitCountry"]);
         }
         
         return $sanitaryValues;
@@ -844,5 +906,51 @@ class Options {
     public function feesFileCallback() {
         $name = PLUGIN_RE_NAME."OptionsFees[feesFile]";
         echo "<input type='file' name='$name' accept='.pdf, image/*'>";
+    }
+    
+    public function apiUsedCallback() {         
+        $name = PLUGIN_RE_NAME."OptionsApis[apiUsed]";
+        ?>
+            <input type="radio" name="<?=$name;?>" id="govFr" value="govFr" <?= isset($this->optionsApis["apiUsed"]) && $this->optionsApis["apiUsed"] == 'govFr' ? "checked" : '';?>><label for="govFr">Api adresse.data.gouv.fr&nbsp;</label><br />
+            <input type="radio" name="<?=$name;?>" value="google" id="google" <?= isset($this->optionsApis["apiUsed"]) && $this->optionsApis["apiUsed"] == 'google' ? "checked" : '';?>><label for="google">Api Google&nbsp;</label>
+        <?php
+    }
+    
+    public function apiKeyGoogleCallback() {
+        $args = array(
+            "type" => "text",
+            "class" => "regular-text",
+            "name" => PLUGIN_RE_NAME."OptionsApis[apiKeyGoogle]",
+            "id" => "apiKeyGoogle",
+            "placeholder" => "123",
+            "value" => isset($this->optionsApis["apiKeyGoogle"]) ? esc_attr($this->optionsApis["apiKeyGoogle"]) : '',
+        );
+
+        echo "<input ";
+        foreach($args as $key => $value) {
+            if(!empty($value)) {                
+                echo "$key=$value ";            
+            }
+        }
+        echo ">";   
+    }
+    
+    public function apiLimitCountryCallback() {
+        $args = array(
+            "type" => "text",
+            "class" => "regular-text",
+            "name" => PLUGIN_RE_NAME."OptionsApis[apiLimitCountry]",
+            "id" => "apiLimitCountry",
+            "placeholder" => "fr",
+            "value" => isset($this->optionsApis["apiLimitCountry"]) ? esc_attr($this->optionsApis["apiLimitCountry"]) : '',
+        );
+
+        echo "<input ";
+        foreach($args as $key => $value) {
+            if(!empty($value)) {                
+                echo "$key=$value ";            
+            }
+        }
+        echo ">";   
     }
 }

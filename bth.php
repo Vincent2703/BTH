@@ -91,7 +91,7 @@ class Bth {
             wp_enqueue_script("jquery-ui-autocomplete");
             wp_register_script("addSearchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/searchBars/addSearchBarAd.js"), array("jquery"), PLUGIN_RE_VERSION, false);
             wp_enqueue_script("addSearchBarAd");
-            wp_add_inline_script("addSearchBarAd", 'let pluginName="'.PLUGIN_RE_NAME.'";');
+            wp_add_inline_script("addSearchBarAd", 'let pluginName="'.PLUGIN_RE_NAME.'";var URLGetAddressDataFile="'.plugins_url(PLUGIN_RE_NAME."/includes/php/getAddressData.php").'";');
             
             wp_register_style("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
             wp_enqueue_style("searchBarAd");
@@ -203,14 +203,16 @@ class Bth {
                 wp_enqueue_script("autocompleteAddress");
                 wp_enqueue_script("reloadAgents");
                 
-                wp_add_inline_script("reloadAgents", 'let pluginName="'.PLUGIN_RE_NAME.'";');
+                wp_add_inline_script("autocompleteAddress", 'var URLGetAddressDataFile="'.plugins_url(PLUGIN_RE_NAME."/includes/php/getAddressData.php").'";');
+                wp_add_inline_script("reloadAgents", 'var pluginName="'.PLUGIN_RE_NAME.'";');
             }else if($postType === "agency") {
                 wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("autocompleteAddress");
+                wp_add_inline_script("autocompleteAddress", 'var URLGetAddressDataFile="'.plugins_url(PLUGIN_RE_NAME."/includes/php/getAddressData.php").'";');
             }else if($postType === "agent") {
                 wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgencies.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("reloadAgencies");
-                wp_add_inline_script("reloadAgencies", 'let pluginName="'.PLUGIN_RE_NAME.'";');
+                wp_add_inline_script("reloadAgencies", 'var pluginName="'.PLUGIN_RE_NAME.'";');
             }
         }else if($base === "ad_page_bthoptions") {
             wp_register_script("options", plugins_url(PLUGIN_RE_NAME."/includes/js/others/options.js"), array(), PLUGIN_RE_VERSION);
