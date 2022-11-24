@@ -29,17 +29,16 @@ class Export {
         wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetExport", "Exporter les annonces", array($this, "showPage"));
     }
 
-    private static function getPreparedAds() {
-        $optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
+    private static function getArrayAds() {
+        //$optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
         $optionsFees = get_option(PLUGIN_RE_NAME."OptionsFees");
-        $fields = get_option(PLUGIN_RE_NAME."OptionsMapping");
 
         $args = array(
             "numberposts" => -1,
             "post_type" => "re-ad",
             "post_status" => "publish"
         );
-        if(isset($_POST["onlyAvailable"])) {
+        if(isset($_POST["onlyAvailable"])) { //Si on veut seulement les annonces qui sont dispos à la location/vente
             $args["tax_query"] = array(
                 array(
                     "taxonomy" => "adAvailable",
@@ -56,72 +55,79 @@ class Export {
 
         if(!empty($ads)) {
             foreach($ads as $ad) {
-                $metas = array_map(function($n) {return $n[0];}, get_post_meta($ad->ID));         
-                $imagesIds = $metas["adImages"]; //On récupère les images
-                $images = array();
-                if(!is_null($imagesIds)) {
-                    $ids = explode(';', $imagesIds); //Les IDs sont séparés par un ;
+                $adID = $ad->ID;
+                $metas = array_map(function($n) {return $n[0];}, get_post_meta($adID));         
+                unset($metas["_thumbnail_id"]);
+                unset($metas["_edit_lock"]);
+                unset($metas["_edit_last"]);
+                
+                $picturesIds = $metas["adImages"]; //On récupère les images
+                $pictures = array();
+                if(!is_null($picturesIds)) {
+                    $ids = explode(';', $picturesIds); //Les IDs sont séparés par un ;
                     foreach ($ids as $id) {
-                        array_push($images, wp_get_attachment_image_url($id, "large")); //Pour chaque image on récupère leur URL
-                    }
-
-                    $sizeImgs = count($images);
-                    if($sizeImgs < 9) {
-                        $images += array_fill($sizeImgs, 9-$sizeImgs, ""); //S'il y a moins de 10 images, le champ sera laissé vide dans le CSV
+                        array_push($pictures, wp_get_attachment_image_url($id, "large")); //Pour chaque image on récupère leur URL
                     }
                 }
 
                 //Récupérer infos agent
-                if($metas["adShowAgent"] === "on" && isset($metas["adAgent"]) && $agent = get_post($metas["adAgent"])) {
-                    $agentEmail = get_post_meta($agent, "agentEmail", true);                 
-                }else{
-                    $agentEmail = "";
+                $agentID = get_post($metas["adIdAgent"]);
+                $agentData = array(
+                    "name"          =>  html_entity_decode(get_the_title($agentID, ENT_COMPAT, "UTF-8")),
+                    "phone"         =>  get_post_meta($agentID, "agentPhone", true),
+                    "mobilePhone"   =>  get_post_meta($agentID, "agentMobilePhone", true),
+                    "email"         =>  get_post_meta($agentID, "agentEmail", true)
+                );
+                
+                $agencyID = wp_get_post_parent_id($agentID);
+                $agencyData = array(
+                    "name"      =>  get_the_title($agencyID, ENT_COMPAT, "UTF-8"),
+                    "phone"     =>  get_post_meta($agencyID, "agencyPhone", true),
+                    "email"     =>  get_post_meta($agencyID, "agencyEmail", true),
+                    "feesUrl"   => sanitize_url($optionsFees["feesUrl"])
+                );
+                
+
+                $adData = array(
+                    "title"         =>  html_entity_decode(get_the_title($ad, ENT_COMPAT, "UTF-8")),
+                    "typeAd"        =>  get_the_terms($ad, "adTypeAd")[0]->name,
+                    "typeProperty"  =>  get_the_terms($ad, "adTypeProperty")[0]->name,
+                    "description"   =>  html_entity_decode(get_the_content(null, null, $ad), ENT_COMPAT, "UTF-8"), 
+                );
+                foreach($metas as $metaKey=>$metaValue) {
+                    $adData[$metaKey] = $metaValue;
                 }
+                
+                $allData = array(           
+                    "adData"        => $adData,
+                    "agentData"     => $agentData,
+                    "agencyData"    => $agencyData,
+                );             
 
-                $arrayAd = [
-                    1                                               => $optionsExports["idAgency"],
-                    SELF::getFieldIdByName($fields, "title")        => html_entity_decode(get_the_title($ad, ENT_COMPAT, "UTF-8")),
-                    SELF::getFieldIdByName($fields, "typeAd")       => get_the_terms($ad, "adTypeAd")[0]->name,
-                    SELF::getFieldIdByName($fields, "typeProperty") => get_the_terms($ad, "adTypeProperty")[0]->name,
-                    SELF::getFieldIdByName($fields, "description")  => html_entity_decode(get_the_content(null, null, $ad), ENT_COMPAT, "UTF-8"), 
-                    SELF::getFieldIdByName($fields, "latitude")     => unserialize($metas["adDataMap"])["lat"],
-                    SELF::getFieldIdByName($fields, "longitude")    => unserialize($metas["adDataMap"])["long"],
-                    SELF::getFieldIdByName($fields, "agentEmail")   => $agentEmail,
-                    SELF::getFieldIdByName($fields, "feesAgency")   => $optionsFees["feesUrl"],
-                    300 => "1" //Précision GPS (?)
-                ];
-
-                $arrayAd[SELF::getFieldIdByName($fields, "thumbnail")] = $images[0];
-                for($i=1; $i<=8; $i++) {
-                    $arrayAd[SELF::getFieldIdByName($fields, "picture".$i)] = $images[$i];
-                }
-
-                //On peut peut-être fusionner les deux for suivants ? 
-
-                foreach($fields as $field) {
-                    if(!array_key_exists($field["id"], $arrayAd)) {
-                        $metaName = "ad".ucfirst($field["name"]);
-                        if(array_key_exists($metaName, $metas)) {
-                            $arrayAd[$field["id"]] = $metas[$metaName];
-                        }else{
-                            echo "Absence du meta-term \"$metaName\" pour l'annonce \"".get_the_title($ad).'"<br />';
-                        }
-                    }
-                }
-
-                for($i=1; $i <= intval($optionsExports["maxCSVColumn"]); $i++) { //Ou au moins optimiser ça ?
-                    if(!array_key_exists($i, $arrayAd)) {
-                        $arrayAd[$i] = "";
-                    }
-                }
-                ksort($arrayAd);
-
-                array_push($arrayAds, $arrayAd);
+                $arrayAds["ad$adID"] = $allData;
             }
         }
         return $arrayAds;
+        
     }
     
+    private static function generateXML($data, &$xml) {
+        foreach($data as $key => $value ) {
+            if(is_array($value)) {
+                if(is_numeric($key)){
+                    $key = "key$key"; 
+                }
+                $subNode = $xml->addChild($key);
+                SELF::generateXML($value, $subNode);
+            }else{
+                $xml->addChild("$key", htmlspecialchars("$value"));
+            }
+         }
+         return html_entity_decode($xml->asXML());
+    }
+   
+    
+    /*
     private static function createCSV($ads) {        
         $optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
         $dirSaves = ABSPATH.$optionsExports["dirExportPath"];
@@ -181,22 +187,35 @@ class Export {
                 }
             }
         }
-    }
+    }*/
     
     private static function startExport() {
-        SELF::createCSV(SELF::getPreparedAds());
+        $optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
+        $dirSaves = ABSPATH.$optionsExports["dirExportPath"];
+        
+        if(!is_dir($dirSaves)) {
+            mkdir($dirSaves);
+        }
+        
+        $ads = SELF::getArrayAds();
+
+        $xml = new SimpleXMLElement('<?xml version="1.0"?><ads></ads>');
+        $XMLContent = "\xEF\xBB\xBF".SELF::generateXML($ads, $xml).PHP_EOL;
+        
+        $datetime = date("d-m-Y");
+        $XMLFile = fopen($dirSaves."Annonces-$datetime.xml", "w+");
+        
+        fwrite($XMLFile, $XMLContent);
+        fclose($XMLFile);        
+        
+        /*SELF::createCSV(SELF::getArrayAds());
         SELF::createConfigFile();
         SELF::createPhotosFile();
-        SELF::createZIP();
+        SELF::createZIP();*/
+        
+        
     }
     
-    private static function getFieldIdByName($fields, $name) {
-        foreach($fields as $field) {
-            if($field["name"] === $name) {
-                return $field["id"];
-            }
-        }
-    }
     
     
     

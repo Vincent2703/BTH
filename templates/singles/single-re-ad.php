@@ -160,37 +160,99 @@
                     <div class="mainFeatures">
                         <h4>Caractéristiques principales</h4>
                         <ul>
-                        <?php foreach($mainFeatures as $mainFeature) { 
-                            $meta = getMeta("ad".ucfirst($mainFeature["name"]));
-                            if(isset($mainFeature["FRValuesReplace"])) {
-                                $value = $mainFeature["FRValuesReplace"][0][$meta];
-                            }else{
-                                $value = $meta;
-                            }
-                            if(!empty($value)) {?>
                             <li>
-                                <span class="nameFeature"><?= $mainFeature["FRName"] ;?></span>
-                                <span class="valueFeature"><?= $value ?></span>
+                                <span class="nameFeature">Référence</span>
+                                <span class="valueFeature"><?= getMeta("adRefAgency") ?></span>
                             </li>
-                            <?php }} ?>
+                            <li>
+                                <span class="nameFeature">Prix</span>
+                                <span class="valueFeature"><?= getMeta("adPrice") ?>€</span>
+                            </li>
+                            <li>
+                                <span class="nameFeature">Charges</span>
+                                <span class="valueFeature"><?= getMeta("adFees") ?>€</span>
+                            </li>
+                            <li>
+                                <span class="nameFeature">Adresse</span>
+                                <span class="valueFeature"><?= getMeta("adAddress") ?></span>
+                            </li>
+                            <li>
+                                <span class="nameFeature">Surface habitable</span>
+                                <span class="valueFeature"><?= getMeta("adSurface") ?>m²</span>
+                            </li>
+                            <?php if(intval(getMeta("adTotalSurface")) > 0) { ?> <!-- UTILISER QU'UNE FOIS GETMETA-->
+                            <li>
+                                <span class="nameFeature">Surface du terrain</span>
+                                <span class="valueFeature"><?= getMeta("adTotalSurface") ?>m²</span>
+                            </li>
+                            <?php } ?>
+                            <li>
+                                <span class="nameFeature">Nombre de pièces</span>
+                                <span class="valueFeature"><?= getMeta("adNbRooms") ?></span>
+                            </li>
+                            <?php if(intval(getMeta("adNbBedrooms")) > 0) { ?>
+                            <li>
+                                <span class="nameFeature">Nombre de chambres</span>
+                                <span class="valueFeature"><?= getMeta("adNbBedrooms") ?></span>
+                            </li>
+                            <?php } ?>
+                            <?php if(intval(getMeta("adNbWC")) > 0) { ?>
+                            <li>
+                                <span class="nameFeature">Nombre de toilettes</span>
+                                <span class="valueFeature"><?= getMeta("adNbWC") ?></span>
+                            </li>
+                            <?php } ?>
+                            <?php if(intval(getMeta("adNbBathrooms")) >0) { ?>
+                            <li>
+                                <span class="nameFeature">Nombre de salles de bain</span>
+                                <span class="valueFeature"><?= getMeta("adNbBathrooms") ?></span>
+                            </li>
+                            <?php } ?>
+                            <?php if(intval(getMeta("adNbWaterRooms")) > 0) { ?>
+                            <li>
+                                <span class="nameFeature">Nombre de pièces d'eau</span>
+                                <span class="valueFeature"><?= getMeta("adNbWaterRooms") ?></span>
+                            </li>
+                            <?php } ?>
                         </ul>
                     </div>
                     <div class="complementaryFeatures">
                         <h4>Caractéristiques complémentaires</h4>
                         <ul>
-                        <?php foreach($complementaryFeatures as $complementaryFeature) { 
-                            $meta = getMeta("ad".ucfirst($complementaryFeature["name"]));
-                            if(isset($complementaryFeature["FRValuesReplace"])) {
-                                $value = $complementaryFeature["FRValuesReplace"][0][$meta];
-                            }else{
-                                $value = $meta;                         
-                            }
-                            if(!empty($value)) {?>
+                            <?php if(intval(getMeta("adFloor")) > 0) { ?>
                             <li>
-                                <span id="<?= $complementaryFeature["name"]; ?>Name" class="nameFeature"><?= isset($complementaryFeature["FRName"])?$complementaryFeature["FRName"]:'' ;?></span>
-                                <span id="<?= $complementaryFeature["name"]; ?>Value" class="valueFeature"><?= $value; ?></span>
+                                <span class="nameFeature">Etage</span>
+                                <span class="valueFeature"><?= getMeta("adFloor"); ?> (sur <?=getMeta("adNbFloors");?>)</span>
                             </li>
-                            <?php }} ?>
+                            <?php } ?>
+                            <?php if(getMeta("adFurnished") == "OUI"/*1*/ ) { ?>
+                            <li>
+                                <span class="nameFeature">Meublé</span>
+                                <span class="valueFeature"><?= getMeta("adFurnished"); ?></span>
+                            </li>
+                            <?php } ?>
+                            <?php if(is_numeric(getMeta("adYear")) && intval(getMeta("adYear"))>0) { ?>
+                            <li>
+                                <span class="nameFeature">Année de construction</span>
+                                <span class="valueFeature"><?= getMeta("adYear"); ?></span>
+                            </li>
+                            <?php } ?>
+                            <li>
+                                <span class="nameFeature">Type de chauffage</span>
+                                <span class="valueFeature"><?= getMeta("adTypeHeating"); ?></span>
+                            </li>
+                            <li>
+                                <span class="nameFeature">Type de cuisine</span>
+                                <span class="valueFeature"><?= getMeta("adTypeKitchen"); ?></span>
+                            </li>
+                            <li>
+                                <span id="DPEName" class="nameFeature">DPE (kWhEP/m²/an)</span>
+                                <span id="DPEValue" class="valueFeature"><?= getMeta("adDPE"); ?></span>
+                            </li>
+                            <li>
+                                <span id="GESName" class="nameFeature">GES (kg eqCO2/m²/an)</span>
+                                <span id="GESValue" class="valueFeature"><?= getMeta("adGES"); ?></span>
+                            </li>
                         </ul>
                     </div>
                 </div>

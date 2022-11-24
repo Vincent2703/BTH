@@ -134,10 +134,10 @@ class EditAd {
                 update_post_meta($adId, "adYear", sanitize_text_field(intval($_POST["year"])));
             }
             if(isset($_POST["typeHeating"]) && !ctype_space($_POST["typeHeating"])) {
-                update_post_meta($adId, "adTypeHeating", sanitize_text_field(intval($_POST["typeHeating"])));
+                update_post_meta($adId, "adTypeHeating", sanitize_text_field($_POST["typeHeating"]));
             }
             if(isset($_POST["typeKitchen"]) && !ctype_space($_POST["typeKitchen"])) {
-                update_post_meta($adId, "adTypeKitchen", sanitize_text_field(intval($_POST["typeKitchen"])));
+                update_post_meta($adId, "adTypeKitchen", sanitize_text_field($_POST["typeKitchen"]));
             }
             /*if(isset($_POST["orientation"]) && !ctype_space($_POST["orientation"])) {
                 update_post_meta($adId, "adOrientation", sanitize_text_field($_POST["orientation"]));
@@ -341,32 +341,39 @@ class EditAd {
             <div class="select">
             <label>Type de chauffage</label>
             <select name="typeHeating">
-                <option value="0" <?=($typeHeating==0)?"selected":NULL;?>>Ne pas renseigner</option>
-                <option value="8704" <?=($typeHeating==8704)?"selected":NULL;?>>
-                    Gaz individuel</option>
-                <option value="4608" <?=($typeHeating==4608)?"selected":NULL;?>>
-                    Gaz collectif</option>
-                <option value="9216" <?=($typeHeating==9216)?"selected":NULL;?>>
-                    Fuel individuel</option>
-                <option value="5120" <?=($typeHeating==5120)?"selected":NULL;?>>
-                    Fuel collectif</option>
-                <option value="10240" <?=($typeHeating==10240)?"selected":NULL;?>>
-                    Electrique individuel</option>
-                <option value="6144" <?=($typeHeating==6144)?"selected":NULL;?>>
-                    Electrique collectif</option>
+                <option value="unknown" <?=($typeHeating==="unknown")?"selected":NULL;?>>
+                    Ne pas renseigner
+                </option>
+                <option value="individualGas" <?=($typeHeating==="individualGas")?"selected":NULL;?>>
+                    Gaz individuel
+                </option>
+                <option value="collectiveGas" <?=($typeHeating==="collectiveGas")?"selected":NULL;?>>
+                    Gaz collectif
+                </option>
+                <option value="individualFuel" <?=($typeHeating==="individualFuel")?"selected":NULL;?>>
+                    Fuel individuel
+                </option>
+                <option value="collectiveFuel" <?=($typeHeating==="collectiveFuel")?"selected":NULL;?>>
+                    Fuel collectif
+                </option>
+                <option value="individualElectric" <?=($typeHeating==="individualElectric")?"selected":NULL;?>>
+                    Electrique individuel
+                </option>
+                <option value="collectiveElectric" <?=($typeHeating==="collectiveElectric")?"selected":NULL;?>>
+                    Electrique collectif
+                </option>
             </select>
             </div>
             <div class="select">
                 <label>Type de cuisine</label>
                 <select name="typeKitchen">
-                    <option value="1" <?=($typeKitchen==1)?"selected":NULL;?>>Aucune</option>
-                    <option value="2" <?=($typeKitchen==2)?"selected":NULL;?>>Américaine</option>
-                    <option value="6" <?=($typeKitchen==6)?"selected":NULL;?>>Américaine équipée</option>
-                    <option value="3" <?=($typeKitchen==3)?"selected":NULL;?>>Séparée</option>
-                    <option value="7" <?=($typeKitchen==7)?"selected":NULL;?>>Séparée équipée</option>
-                    <option value="4" <?=($typeKitchen==4)?"selected":NULL;?>>Industrielle</option>
-                    <option value="5" <?=($typeKitchen==5)?"selected":NULL;?>>Kitchenette</option>
-                    <option value="8" <?=($typeKitchen==8)?"selected":NULL;?>>Kitchenette équipée</option>
+                    <option value="unknown" <?=($typeKitchen==="unknown")?"selected":NULL;?>>
+                        Ne pas renseigner
+                    </option>
+                    <option value="notEquipped" <?=($typeKitchen==="notEquipped")?"selected":NULL;?>>Pas équipée</option>
+                    <option value="kitchenette" <?=($typeKitchen==="kitchenette")?"selected":NULL;?>>Kitchenette</option>
+                    <option value="american" <?=($typeKitchen==="american")?"selected":NULL;?>>Américaine</option>
+                    <option value="industrial" <?=($typeKitchen==="industrial")?"selected":NULL;?>>Industrielle</option>
                 </select>
             </div>
         </div>
