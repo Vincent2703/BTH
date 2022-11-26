@@ -59,19 +59,10 @@ class Export {
                 $metas = array_map(function($n) {return $n[0];}, get_post_meta($adID));         
                 unset($metas["_thumbnail_id"]);
                 unset($metas["_edit_lock"]);
-                unset($metas["_edit_last"]);
-                
-                $picturesIds = $metas["adImages"]; //On récupère les images
-                $pictures = array();
-                if(!is_null($picturesIds)) {
-                    $ids = explode(';', $picturesIds); //Les IDs sont séparés par un ;
-                    foreach ($ids as $id) {
-                        array_push($pictures, wp_get_attachment_image_url($id, "large")); //Pour chaque image on récupère leur URL
-                    }
-                }
+                unset($metas["_edit_last"]);              
 
                 //Récupérer infos agent
-                $agentID = get_post($metas["adIdAgent"]);
+                $agentID = get_post($metas["adIdAgent"])->ID;
                 $agentData = array(
                     "name"          =>  html_entity_decode(get_the_title($agentID, ENT_COMPAT, "UTF-8")),
                     "phone"         =>  get_post_meta($agentID, "agentPhone", true),
@@ -81,10 +72,10 @@ class Export {
                 
                 $agencyID = wp_get_post_parent_id($agentID);
                 $agencyData = array(
-                    "name"      =>  get_the_title($agencyID, ENT_COMPAT, "UTF-8"),
+                    "name"      =>  html_entity_decode(get_the_title($agencyID, ENT_COMPAT, "UTF-8")),
                     "phone"     =>  get_post_meta($agencyID, "agencyPhone", true),
                     "email"     =>  get_post_meta($agencyID, "agencyEmail", true),
-                    "feesUrl"   => sanitize_url($optionsFees["feesUrl"])
+                    "feesUrl"   =>  sanitize_url($optionsFees["feesUrl"])
                 );
                 
 
@@ -94,9 +85,25 @@ class Export {
                     "typeProperty"  =>  get_the_terms($ad, "adTypeProperty")[0]->name,
                     "description"   =>  html_entity_decode(get_the_content(null, null, $ad), ENT_COMPAT, "UTF-8"), 
                 );
+                
+                $uselessKeys = array("adShowAgent", "adShowMap", "adDataMap", "adImages");
+                
                 foreach($metas as $metaKey=>$metaValue) {
-                    $adData[$metaKey] = $metaValue;
+                    if(!in_array($metaKey, $uselessKeys)) {
+                        $metaKey = strtolower(str_replace("ad", '', $metaKey));
+                        $adData[$metaKey] = $metaValue;
+                    }
                 }
+                
+                $picturesIds = $metas["adImages"]; //On récupère les images
+                $pictures = array();
+                if(!is_null($picturesIds)) {
+                    $ids = explode(';', $picturesIds); //Les IDs sont séparés par un ;
+                    foreach ($ids as $id) {
+                        $pictures["img$id"] =  wp_get_attachment_image_url($id, "large"); //Pour chaque image on récupère leur URL
+                    }
+                }
+                $adData["pictures"] = $pictures;
                 
                 $allData = array(           
                     "adData"        => $adData,
@@ -111,7 +118,7 @@ class Export {
         
     }
     
-    private static function generateXML($data, &$xml) {
+    private static function generateXML($data, &$xml) {             
         foreach($data as $key => $value ) {
             if(is_array($value)) {
                 if(is_numeric($key)){

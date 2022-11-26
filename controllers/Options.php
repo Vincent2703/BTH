@@ -52,7 +52,6 @@ class Options {
     public function optionsPageInit() {
         $this->optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");
         $this->optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
-        $this->optionsMapping = get_option(PLUGIN_RE_NAME."OptionsMapping");
         $this->optionsAds = get_option(PLUGIN_RE_NAME."OptionsAds");
         $this->optionsEmail = get_option(PLUGIN_RE_NAME."OptionsEmail");
         $this->optionsFees = get_option(PLUGIN_RE_NAME."OptionsFees");
@@ -117,15 +116,7 @@ class Options {
             null,
             PLUGIN_RE_NAME."OptionsExportsPage" // page
         );
-        
-        add_settings_section( //Section pour le mapping des champs
-            PLUGIN_RE_NAME."optionsSection", // id
-            "Annonces", // title
-            //array($this, "infoExports"), // callback
-            null,
-            PLUGIN_RE_NAME."OptionsAdsPage" // page
-        );     
-        
+                
         add_settings_section( //Section pour les diverses options
             PLUGIN_RE_NAME."optionsSection", // id
             "Mail", // title
@@ -253,11 +244,6 @@ class Options {
         /* Ads */
         
         add_settings_field(
-            /*"mapping", // id
-            null,
-            array($this, "mappingCallback"), // callback
-            PLUGIN_RE_NAME."OptionsMappingPage", // page
-            PLUGIN_RE_NAME."optionsSection" // section*/
             "displayAdsUnavailableAds",
             'Afficher les annonces avec des biens indisponibles <abbr title="Un bien est indisponible quand il n\'est plus à la vente ou à la location"><sup>?</sup></abbr>',
             array($this, "displayAdsUnavailableAdsCallback"),
@@ -392,14 +378,6 @@ class Options {
         if(isset($input["maxCSVColumn"]) && !ctype_space($input["maxCSVColumn"])) {
             $sanitaryValues["maxCSVColumn"] = sanitize_text_field($input["maxCSVColumn"]);
         }
-        
-        return $sanitaryValues;
-    }
-    
-    public function optionsSanitizeMapping($input) {
-        if(isset($input["mappingFields"]) && is_string($input["mappingFields"]) && is_array(json_decode($input["mappingFields"], true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false) {
-            $sanitaryValues = json_decode($input["mappingFields"], true);
-        }      
         
         return $sanitaryValues;
     }
@@ -779,93 +757,7 @@ class Options {
         }
         echo ">";
     }
-    
-    
-    public function mappingCallback() {
-        $mappingFields = get_option(PLUGIN_RE_NAME."OptionsMapping");
-        ?>       
-                <div id="table" class="table-editable">
-                    <a href="#down"><span class="table-add dashicons-before dashicons-plus up"></span></a>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Numéro du champ (CSV)</th>
-                                <th>Nom de la valeur (<?= PLUGIN_RE_NAME;?>)</th>
-                                <th>Type du champ</th>
-                                <th>Section du champ</th>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                                foreach($mappingFields as $field) {
-                                    ?>
-                                    <tr <?php if($field["hidden"] === "true") { echo "class='hiddenField'"; } ?>>
-                                        <td class="editable" contenteditable="true"><span class="id contentTD"><?= $field["id"]; ?></span></td>
-                                        <td <?php if($field["perso"] === "true") { echo "class='editable' contenteditable='true'"; }?>><span class="name contentTD"><?= $field["name"]; ?></span></td>
-                                        <td class="<?php if($field["perso"] === "true") { echo "editable"; }?>">
-                                            <select class="kindField" <?php if($field["perso"] === "false"){echo "disabled";}?>>
-                                                <option<?php if($field["kindField"] === "text"){echo " selected";} ?>>text</option>
-                                                <option<?php if($field["kindField"] === "number"){echo " selected";} ?>>number</option>
-                                                <option<?php if($field["kindField"] === "radio"){echo " selected";} ?>>radio</option>
-                                                <option<?php if($field["kindField"] === "select"){echo " selected";} ?>>select</option>
-                                                <option<?php if($field["kindField"] === "checkbox"){echo " selected";} ?>>checkbox</option>
-                                                <option<?php if($field["kindField"] === "picture"){echo " selected";} ?>>picture</option>
-                                            </select>
-                                        </td>
-                                        <td class="<?php if($field["unchangeable"] === "false") { echo "editable"; }?>">
-                                            <select class="section" <?php if($field["unchangeable"] === "true" || $field["hidden"] === "true"){echo "disabled";}?>>
-                                                <option<?php if($field["section"] === "basics"){echo " selected";} ?>>basics</option>
-                                                <option<?php if($field["section"] === "complementary"){echo " selected";} ?>>complementary</option>
-                                                <option<?php if($field["section"] === "category"){echo " selected";} ?>>category</option>
-                                                <option<?php if($field["section"] === "title"){echo " selected";} ?>>title</option>
-                                                <option<?php if($field["section"] === "description"){echo " selected";} ?>>description</option>
-                                                <option<?php if($field["section"] === "status"){echo " selected";} ?>>status</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <span class="config-toggle dashicons-before dashicons-arrow-down-alt2"></span>
-                                        </td>
-                                        <?php if($field["perso"] === "true") { ?>
-                                        <td>
-                                            <span class="table-up dashicons-before dashicons-arrow-up-alt"></span>
-                                            <span class="table-down dashicons-before dashicons-arrow-down-alt"></span>
-                                        </td>
-                                        <?php } ?>
-                                        <?php if($field["perso"] === "true") { ?>
-                                            <td>
-                                                <span class="table-remove dashicons-before dashicons-trash"></span>
-                                            </td>
-                                        <?php }else if($field["hidden"] === "true") { ?>
-                                            <td>
-                                                <span class="table-visible dashicons-before dashicons-visibility"></span>
-                                            </td>
-                                        <?php }else{ ?>
-                                            <td>
-                                                <span class="table-hidden dashicons-before dashicons-hidden"></span>
-                                            </td>
-                                        <?php } ?>
-                                    </tr>
-                                    <tr class="collapse">
-                                        <td class="editable">Style CSS : <textarea class="css"></textarea></td>
-                                        <td class="editable writeOptions">Options possibles : <textarea class="options"></textarea></td>
-                                    </tr>
-                                    <?php
-                                }
-                                ?>
-                            <tr class="table-separator">
-                                <td colspan="4">Champs personnalisés</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <span id="down" class="table-add dashicons-before dashicons-plus down"></span>
-                </div>                
-            
-            <textarea id="mappingFields" name="<?=PLUGIN_RE_NAME."OptionsMapping[mappingFields]";?>"></textarea>
-        <?php
-    }
-    
+       
     public function displayAdsUnavailableAdsCallback() {
         $args = array(
             "type" => "checkbox",

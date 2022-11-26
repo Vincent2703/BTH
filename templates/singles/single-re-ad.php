@@ -47,7 +47,7 @@
 
             if(!empty($idContact = getMeta("adIdAgent"))) {
                 $getContact = true;
-                if(getMeta("adShowAgent") === "OUI") {
+                if(getMeta("adShowAgent") == '1') {
                     $emailToContact = get_post_meta($idContact, "agentEmail", true);
                     $phone = get_post_meta($idContact, "agentPhone", true);
                     $mobilePhone = get_post_meta($idContact, "agentMobilePhone", true);
@@ -225,10 +225,28 @@
                                 <span class="valueFeature"><?= getMeta("adFloor"); ?> (sur <?=getMeta("adNbFloors");?>)</span>
                             </li>
                             <?php } ?>
-                            <?php if(getMeta("adFurnished") == "OUI"/*1*/ ) { ?>
+                            <?php if(getMeta("adFurnished") == '1' ) { ?>
                             <li>
                                 <span class="nameFeature">Meublé</span>
-                                <span class="valueFeature"><?= getMeta("adFurnished"); ?></span>
+                                <span class="valueFeature">Oui</span>
+                            </li>
+                            <?php } ?>
+                            <?php if(getMeta("adElevator") == '1' ) { ?>
+                            <li>
+                                <span class="nameFeature">Ascenseur</span>
+                                <span class="valueFeature">Oui</span>
+                            </li>
+                            <?php } ?>
+                            <?php if(getMeta("adCellar") == '1' ) { ?>
+                            <li>
+                                <span class="nameFeature">Cave</span>
+                                <span class="valueFeature">Oui</span>
+                            </li>
+                            <?php } ?>
+                            <?php if(getMeta("adTerrace") == '1' ) { ?>
+                            <li>
+                                <span class="nameFeature">Terrasse</span>
+                                <span class="valueFeature">Oui</span>
                             </li>
                             <?php } ?>
                             <?php if(is_numeric(getMeta("adYear")) && intval(getMeta("adYear"))>0) { ?>

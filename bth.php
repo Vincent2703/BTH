@@ -101,13 +101,8 @@ class Bth {
     }
     
     private static function defineGlobalConsts() {
-        $configFile = fopen(__DIR__."/config.json", 'r');
-        $config = json_decode(fread($configFile, filesize(__DIR__."/config.json")), true);
-        fclose($configFile);
-        if(isset($config["PLUGIN_RE_NAME"]) && !empty($config["PLUGIN_RE_NAME"]) && isset($config["PLUGIN_RE_VERSION"]) && !empty($config["PLUGIN_RE_VERSION"])) {
-            define("PLUGIN_RE_NAME", $config["PLUGIN_RE_NAME"]);
-            define("PLUGIN_RE_VERSION", $config["PLUGIN_RE_VERSION"]);
-        }//else error
+        define("PLUGIN_RE_NAME", "BTH");
+        define("PLUGIN_RE_VERSION", "dev");
     }
 
     
@@ -137,12 +132,6 @@ class Bth {
             "emailAd"       => wp_get_current_user()->user_email
         );
         update_option(PLUGIN_RE_NAME."OptionsEmail", $defaultValuesEmail); 
-        
-        $configFile = fopen(__DIR__."/config.json", 'r');
-        $config = json_decode(fread($configFile, filesize(__DIR__."/config.json")), true);
-        fclose($configFile);
-        $defaultMapping = $config["DEFAULT_MAPPING"];
-        update_option(PLUGIN_RE_NAME."OptionsMapping", $defaultMapping); //Enregistrer le mapping par défaut des champs        
     }
     
     public function initObjects() {

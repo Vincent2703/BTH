@@ -108,9 +108,9 @@ class EditAd {
                 update_post_meta($adId, "adIdAgent", sanitize_text_field(intval($_POST["agent"])));
             }
             if(isset($_POST["showAgent"])) {
-                update_post_meta($adId, "adShowAgent", "OUI");
+                update_post_meta($adId, "adShowAgent", '1');
             }else{
-                update_post_meta($adId, "adShowAgent", "NON");
+                update_post_meta($adId, "adShowAgent", '0');
             }
   
                        
@@ -126,9 +126,9 @@ class EditAd {
                 update_post_meta($adId, "adNbFloors", sanitize_text_field(intval($_POST["nbFloors"])));
             }
             if(isset($_POST["furnished"]) && !ctype_space($_POST["furnished"])) {
-                update_post_meta($adId, "adFurnished", "OUI");
+                update_post_meta($adId, "adFurnished", '1');
             }else{
-                update_post_meta($adId, "adFurnished", "NON");
+                update_post_meta($adId, "adFurnished", '0');
             }
             if(isset($_POST["year"]) && !ctype_space($_POST["year"])) {
                 update_post_meta($adId, "adYear", sanitize_text_field(intval($_POST["year"])));
@@ -146,19 +146,19 @@ class EditAd {
                 update_post_meta($adId, "adNbBalconies", sanitize_text_field(intval($_POST["nbBalconies"])));
             }
             if(isset($_POST["elevator"]) && !ctype_space($_POST["elevator"])) {
-                update_post_meta($adId, "adElevator", "OUI");
+                update_post_meta($adId, "adElevator", '1');
             }else{
-                update_post_meta($adId, "adElevator", "NON");
+                update_post_meta($adId, "adElevator", '0');
             }
             if(isset($_POST["cellar"]) && !ctype_space($_POST["cellar"])) {
-                update_post_meta($adId, "adCellar", "OUI");
+                update_post_meta($adId, "adCellar", '1');
             }else{
-                update_post_meta($adId, "adCellar", "NON");                
+                update_post_meta($adId, "adCellar", '0');                
             }
             if(isset($_POST["terrace"]) && !ctype_space($_POST["terrace"])) {
-                update_post_meta($adId, "adTerrace", "OUI");
+                update_post_meta($adId, "adTerrace", '1');
             }else{
-                update_post_meta($adId, "adTerrace", "NON");                
+                update_post_meta($adId, "adTerrace", '0');                
             }
             if(isset($_POST["DPE"]) && !ctype_space($_POST["DPE"])) {
                 update_post_meta($adId, "adDPE", sanitize_text_field(intval($_POST["DPE"])));
@@ -249,9 +249,9 @@ class EditAd {
             </div>             
 
             <div class="radio">
-                <input type="radio" name="showMap" id="map1" value="no" <?=($showMap==="no")?"checked":NULL; //remplacer par la fonction wp checked()?> required><label for="map1">Ne pas afficher l'adresse</label>
-                <input type="radio" name="showMap" id="map2" value="onlyPC" <?=($showMap==="onlyPC"||!$showMap)?"checked":NULL;?> required><label for="map2">Afficher le code postal et la ville</label>
-                <input type="radio" name="showMap" id="map3" value="all" <?=($showMap==="all")?"checked":NULL;?> required><label for="map3">Afficher l'adresse complète</label>
+                <input type="radio" name="showMap" id="map1" value="no" <?php checked($showMap, "no");?> required><label for="map1">Ne pas afficher l'adresse</label>
+                <input type="radio" name="showMap" id="map2" value="onlyPC" <?php checked($showMap, "onlyPC");?> required><label for="map2">Afficher le code postal et la ville</label>
+                <input type="radio" name="showMap" id="map3" value="all" <?php checked($showMap, "all");?> required><label for="map3">Afficher l'adresse complète</label>
             </div>
         </div>
         <div id="nbRooms">
@@ -292,7 +292,7 @@ class EditAd {
                 </select>
             </div>
             <div class="select">
-                <input type="checkbox" id="showAgent" name="showAgent" <?=($showAgent==="OUI")?"checked":NULL;?>>
+                <input type="checkbox" id="showAgent" name="showAgent" <?=($showAgent=='1')?"checked":NULL;?>>
                 <label for="showAgent">Publier le contact de l'agent</label>
                 <a target="_blank" href="post-new.php?post_type=agent">Ajouter un agent</a>
             </div>
@@ -341,25 +341,25 @@ class EditAd {
             <div class="select">
             <label>Type de chauffage</label>
             <select name="typeHeating">
-                <option value="unknown" <?=($typeHeating==="unknown")?"selected":NULL;?>>
+                <option value="unknown" <?php selected($typeHeating, "unknown"); ?>>
                     Ne pas renseigner
                 </option>
-                <option value="individualGas" <?=($typeHeating==="individualGas")?"selected":NULL;?>>
+                <option value="individualGas" <?php selected($typeHeating, "individualGas"); ?>>
                     Gaz individuel
                 </option>
-                <option value="collectiveGas" <?=($typeHeating==="collectiveGas")?"selected":NULL;?>>
+                <option value="collectiveGas" <?php selected($typeHeating, "collectiveGas"); ?>>
                     Gaz collectif
                 </option>
-                <option value="individualFuel" <?=($typeHeating==="individualFuel")?"selected":NULL;?>>
+                <option value="individualFuel" <?php selected($typeHeating, "individualFuel"); ?>>
                     Fuel individuel
                 </option>
-                <option value="collectiveFuel" <?=($typeHeating==="collectiveFuel")?"selected":NULL;?>>
+                <option value="collectiveFuel" <?php selected($typeHeating, "collectiveFuel"); ?>>
                     Fuel collectif
                 </option>
-                <option value="individualElectric" <?=($typeHeating==="individualElectric")?"selected":NULL;?>>
+                <option value="individualElectric" <?php selected($typeHeating, "individualElectric"); ?>>
                     Electrique individuel
                 </option>
-                <option value="collectiveElectric" <?=($typeHeating==="collectiveElectric")?"selected":NULL;?>>
+                <option value="collectiveElectric" <?php selected($typeHeating, "collectiveElectric"); ?>>
                     Electrique collectif
                 </option>
             </select>
@@ -370,21 +370,13 @@ class EditAd {
                     <option value="unknown" <?=($typeKitchen==="unknown")?"selected":NULL;?>>
                         Ne pas renseigner
                     </option>
-                    <option value="notEquipped" <?=($typeKitchen==="notEquipped")?"selected":NULL;?>>Pas équipée</option>
-                    <option value="kitchenette" <?=($typeKitchen==="kitchenette")?"selected":NULL;?>>Kitchenette</option>
-                    <option value="american" <?=($typeKitchen==="american")?"selected":NULL;?>>Américaine</option>
-                    <option value="industrial" <?=($typeKitchen==="industrial")?"selected":NULL;?>>Industrielle</option>
+                    <option value="notEquipped" <?php selected($typeKitchen, "notEquipped"); ?>>Pas équipée</option>
+                    <option value="kitchenette" <?php selected($typeKitchen, "kitchenette"); ?>>Kitchenette</option>
+                    <option value="american" <?php selected($typeKitchen, "american"); ?>>Américaine</option>
+                    <option value="industrial" <?php selected($typeKitchen, "industrial"); ?>>Industrielle</option>
                 </select>
             </div>
         </div>
-        <!--<label>Orientation</label>
-        <select name="orientation">
-            <option value="0" <?//=($orientation==0)?"selected":NULL;?>>Ne pas renseigner</option>
-            <option value="south" <?//=($orientation==="south")?"selected":NULL;?>>Sud</option>
-            <option value="east" <?//=($orientation=="east")?"selected":NULL;?>>Est</option>
-            <option value="west" <?//=($orientation=="west")?"selected":NULL;?>>Ouest</option>
-            <option value="north" <?//=($orientation=="north")?"selected":NULL;?>>Nord</option>
-        </select>-->
         <div id="balconies">
             <div class="text">
                 <label>Nombre de balcons</label>
@@ -394,28 +386,28 @@ class EditAd {
         <div id="propertyHas">
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="elevatorInput" name="elevator" <?=($elevator==="OUI")?"checked":NULL;?>>
+                    <input type="checkbox" id="elevatorInput" name="elevator"<?php checked($elevator, '1'); ?>>
                     <span class="slider"></span>
                 </label> 
                 <label for="elevator">Ascenseur</label>
             </div>
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="cellarInput" name="cellar" <?=($cellar==="OUI")?"checked":NULL;?>>
+                    <input type="checkbox" id="cellarInput" name="cellar" <?php checked($cellar, '1'); ?>>
                     <span class="slider"></span>
                 </label> 
                 <label for="cellar">Cave</label>
             </div>
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="terraceInput" name="terrace" <?=($terrace==="OUI")?"checked":NULL;?>>
+                    <input type="checkbox" id="terraceInput" name="terrace" <?php checked($terrace, '1'); ?>>
                     <span class="slider"></span>
                 </label>   
                 <label for="terrace">Terrasse</label>
             </div>
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="furnishedInput" name="furnished" <?=($furnished==="OUI")?"checked":NULL;?>>
+                    <input type="checkbox" id="furnishedInput" name="furnished" <?php checked($furnished, '1'); ?>>
                     <span class="slider"></span>
                 </label>   
                 <label for="furnished">Meublé</label>
