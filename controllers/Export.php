@@ -80,10 +80,11 @@ class Export {
                 
 
                 $adData = array(
-                    "title"         =>  html_entity_decode(get_the_title($ad, ENT_COMPAT, "UTF-8")),
-                    "typeAd"        =>  get_the_terms($ad, "adTypeAd")[0]->name,
-                    "typeProperty"  =>  get_the_terms($ad, "adTypeProperty")[0]->name,
-                    "description"   =>  html_entity_decode(get_the_content(null, null, $ad), ENT_COMPAT, "UTF-8"), 
+                    "title"         =>  html_entity_decode(get_the_title($adID, ENT_COMPAT, "UTF-8")),
+                    "typeAd"        =>  get_the_terms($adID, "adTypeAd")[0]->name,
+                    "typeProperty"  =>  get_the_terms($adID, "adTypeProperty")[0]->name,
+                    "description"   =>  html_entity_decode(get_the_content(null, null, $adID), ENT_COMPAT, "UTF-8"), 
+                    "thumbnail"     =>  get_the_post_thumbnail_url($adID, "large")
                 );
                 
                 $uselessKeys = array("adShowAgent", "adShowMap", "adDataMap", "adImages");

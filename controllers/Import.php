@@ -57,8 +57,9 @@ class Import {
     }
     
     private static function arrayToAds($arrayAds) {
+        $optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");        
+        $addressePrecision = $optionsImports["addressPrecision"];
         foreach($arrayAds as $ad) {
-            print_r($ad);
             $adData = $ad["adData"];
             $agentData = $ad["agentData"];
             $agencyData = $ad["agencyData"];
@@ -77,32 +78,40 @@ class Import {
             $adWPId = wp_insert_post($post, true); //On crée l'annonce et on obtient l'ID
             
             /* TERMS */
-            wp_set_post_terms($adWPId, $adData["typeProperty"], "adTypeProperty");
+            wp_set_post_terms($adWPId, sanitize_text_field($adData["typeProperty"]), "adTypeProperty");
 
-            wp_set_post_terms($adWPId, $adData["typeAd"], "adTypeAd");
+            wp_set_post_terms($adWPId, sanitize_text_field($adData["typeAd"]), "adTypeAd");
 
             wp_set_post_terms($adWPId, "Disponible", "adAvailable"); //check ?
             
             /* METAS */
-            update_post_meta($adWPId, "adFurnished", $adData["furnished"]); //rajouter sanitize
-            update_post_meta($adWPId, "adElevator", $adData["elevator"]);
-            update_post_meta($adWPId, "adCellar", $adData["cellar"]);
-            update_post_meta($adWPId, "adTerrace", $adData["terrace"]);
-            update_post_meta($adWPId, "adRefAgency", $adData["refagency"]);
-            update_post_meta($adWPId, "adPrice", $adData["price"]);
-            update_post_meta($adWPId, "adFees", $adData["fees"]);
-            update_post_meta($adWPId, "adSurface", $adData["surface"]);
-            update_post_meta($adWPId, "adTotalSurface", $adData["totalsurface"]);
-            update_post_meta($adWPId, "adNbRooms", $adData["nbrooms"]);
-            update_post_meta($adWPId, "adNbBedrooms", $adData["nbbedrooms"]);
-            update_post_meta($adWPId, "adNbBathrooms", $adData["nbbathrooms"]);
-            update_post_meta($adWPId, "adNbWaterRooms", $adData["nbwaterrooms"]);
-            update_post_meta($adWPId, "adNbWC", $adData["nbwc"]);
+            update_post_meta($adWPId, "adFurnished", intval($adData["furnished"]));
+            update_post_meta($adWPId, "adElevator", intval($adData["elevator"]));
+            update_post_meta($adWPId, "adCellar", intval($adData["cellar"]));
+            update_post_meta($adWPId, "adTerrace", intval($adData["terrace"]));
+            update_post_meta($adWPId, "adRefAgency", sanitize_text_field($adData["refagency"]));
+            update_post_meta($adWPId, "adPrice", floatval($adData["price"]));
+            update_post_meta($adWPId, "adFees", floatval($adData["fees"]));
+            update_post_meta($adWPId, "adSurface", floatval($adData["surface"]));
+            update_post_meta($adWPId, "adTotalSurface", floatval($adData["totalsurface"]));
+            update_post_meta($adWPId, "adNbRooms", intval($adData["nbrooms"]));
+            update_post_meta($adWPId, "adNbBedrooms", intval($adData["nbbedrooms"]));
+            update_post_meta($adWPId, "adNbBathrooms", intval($adData["nbbathrooms"]));
+            update_post_meta($adWPId, "adNbWaterRooms", intval($adData["nbwaterrooms"]));
+            update_post_meta($adWPId, "adNbWC", intval($adData["nbwc"]));
+            $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".$adData["address"]."&import";
+            $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true)[0];
+            update_post_meta($adWPId, "adAddress", $addressData["address"]);
+            update_post_meta($adWPId, "adLatitude", $addressData["coordinates"][1]);
+            update_post_meta($adWPId, "adLongitude", $addressData["coordinates"][1]);
+            update_post_meta($adWPId, "adPc", $addressData["postcode"][1]);
+            update_post_meta($adWPId, "adCity", $adData["city"]); //Comment récupérer la ville de façon fiable avec l'api Google ?
+            /*            
             update_post_meta($adWPId, "adAddress", $adData["address"]);
             update_post_meta($adWPId, "adLatitude", $adData["latitude"]);
             update_post_meta($adWPId, "adLongitude", $adData["longitude"]);
             update_post_meta($adWPId, "adPc", $adData["pc"]);
-            update_post_meta($adWPId, "adCity", $adData["city"]);
+            update_post_meta($adWPId, "adCity", $adData["city"]);*/
             update_post_meta($adWPId, "adIdAgent", $adData["idagent"]);
             update_post_meta($adWPId, "adFloor", $adData["floor"]);
             update_post_meta($adWPId, "adNbFloors", $adData["nbfloors"]);
@@ -113,12 +122,121 @@ class Import {
             update_post_meta($adWPId, "adDpe", $adData["dpe"]);
             update_post_meta($adWPId, "adGes", $adData["ges"]);
             
+            update_post_meta($adWPId, "adShowMap", $addressePrecision);
+            
+            
             /* PICTURES */
+            SELF::setPictureProperty($adWPId, $adData["thumbnail"], true); //Pour la miniature
+            foreach($adData["pictures"] as $URLPicture) {
+                SELF::setPictureProperty($adWPId, $URLPicture);
+            }
         }
     }
     
     public function widgetImport() {
         wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetImport", "Importer les annonces", array($this, "showPage"));
+    }
+    
+    
+    private static function setPictureProperty($adWPId, $imgURL, $thumbnail=false) {
+       $optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");
+       $dirSavesPath = ABSPATH.$optionsImports["dirSavesPath"];
+       $propertyImagesEmpty = true;
+       $propertyImages = get_post_meta($adWPId, "adImages", true);
+       $alreadyThisImage = false;
+       if(!empty($propertyImages) && $propertyImages !== false) { //On vérifie s'il n'y a pas des images inscrites dans la BDD pour la galerie de la propriété
+           $propertyImagesEmpty = false;
+
+           $propertyImagesArray = explode(";", $propertyImages);
+           foreach($propertyImagesArray as $propertyImage) { //On vérifie qu'on a pas déjà l'image
+               if(get_post($propertyImage) !== null && get_post($propertyImage)->post_content === $imgURL) { //Vérifier si ça ne vient pas de la même URL. Remplacer par fonction qui compare vraiment l'image ?
+                   $alreadyThisImage = true;
+                   break;
+               }
+           }
+       }
+
+       if($alreadyThisImage === false) { //Si on a pas l'image, on la récupère et on l'enregistre
+           $img = wp_remote_get($imgURL);
+           if(is_array($img) && !is_wp_error($img) && wp_remote_retrieve_response_code($img) === 200) { //si on a bien réussi à la récupérer
+               $imgOrigin = $img["body"];
+               list($widthP, $heightP) = getimagesizefromstring($imgOrigin); //On va la redimensionner et la convertir. Selon les paramètres définis
+               $maxDim = $optionsImports["maxDim"]; //Parametrable
+               if($widthP > $maxDim || $heightP > $maxDim) { //Si l'image est plus petit que $maxDim (px)
+                   $ratio = $widthP/$heightP;
+                   if($ratio > 1) {
+                       $newWidth = $maxDim;
+                       $newHeighteight = $maxDim/$ratio;
+                   }else{
+                       $newWidth = $maxDim*$ratio;
+                       $newHeighteight = $maxDim;
+                   }
+               }else{
+                   $newWidth = $widthP;
+                   $newHeighteight = $heightP;
+               }
+
+               $src = imagecreatefromstring($imgOrigin);
+               $dst = imagecreatetruecolor($newWidth, $newHeighteight);
+               imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeighteight, $widthP, $heightP);
+               imagedestroy($src);
+               $fileName = wp_unique_filename($dirSavesPath, "propertyPicture$adWPId.jpg");
+               $pathImg = $dirSavesPath.$fileName;
+               imagejpeg($dst, $pathImg, 85); //Quality à rajouter en param ?
+               imagedestroy($dst);
+
+               $uploadThumbnail = wp_upload_bits($fileName, null, @file_get_contents($pathImg)); //On l'enregistre dans la BDD
+               unlink($pathImg);
+               if(!$uploadThumbnail["error"]) {
+                   $attachment = array(
+                       "post_author" 	=> 1,
+                       "post_mime_type" => 'image/jpeg',
+                       "post_parent"    => $adWPId,
+                       "post_title"     => $fileName,
+                       "post_content"   => $imgURL,
+                       "post_status"    => 'inherit'
+                   );
+                   $attachmentId = wp_insert_attachment($attachment, $uploadThumbnail["file"], $adWPId, true);
+
+                   if(is_numeric($attachmentId)) {
+                       if($attachmentData = wp_generate_attachment_metadata($attachmentId, $uploadThumbnail["file"])) {
+                           wp_update_attachment_metadata($attachmentId, $attachmentData);
+                       }else{
+                           /*SELF::addLog("Impossible de mettre à jour les metadonnées de l'image $imgURL");
+                           SELF::$errorAds++;*/
+                       }
+
+                       if($thumbnail) {
+                           if(!set_post_thumbnail($adWPId, $attachmentId)) {
+                               /*SELF::addLog("Impossible d'ajouter la miniature à l'annonce $adWPId (id BDD)");
+                               SELF::$errorAds++;*/
+                           }
+                       }
+                       if($propertyImagesEmpty === false) {
+                           $attachmentId = $propertyImages.";".$attachmentId;
+                       }
+                       if(!update_post_meta($adWPId, "adImages", $attachmentId)) { //Important de mettre les ids dans un meta car sinon on peut retrouver seulement les photos uploadées AVEC le post. Ca ne marche pas si elles sont choisies dans la galerie.
+                           /*SELF::addLog("Impossible d'ajouter l'image $imgURL à la galerie d'images de la propriété");
+                           SELF::$errorAds++;*/
+                           return false;
+                       }
+
+                   }else{
+                       return false;
+                   }
+
+               }else{
+                   /*SELF::addLog("Impossible d'enregistrer l'image $imgURL dans le dossier 'uploads' pour l'annonce $adWPId (id BDD) erreur : ".$uploadThumbnail["error"]);
+                   SELF::$errorAds++;*/
+                   return false;
+               }
+           }else{
+               /*SELF::addLog("Impossible de récupérer l'image à l'adresse $imgURL erreur : ".wp_remote_retrieve_response_code($img));
+               SELF::$errorAds++;*/
+               return false;
+           }
+       }
+
     }
    
    

@@ -32,8 +32,9 @@ if(isset($_GET["query"])) {
                         $resultsPCArray = json_decode($resultsPCBody, true);
                         
                         $resultsCleaned = array();
-                        if(isset($_GET["import"]) || isset($_GET["city"])) { //On a besoin du code postal uniquement quand on importe ou qu'on cherche une ville
+                        if(isset($_GET["import"]) || isset($_GET["city"])) { //On a besoin du code postal et/ou du nom de la ville uniquement quand on importe ou qu'on cherche une ville
                             $resultsCleaned["postcode"] = min($resultsPCArray["codesPostaux"]);
+                            $resultsCleaned["city"] = $feature["properties"]["city"];
                         }
                         $resultsCleaned["address"] = $feature["properties"]["label"];
                         $resultsCleaned["coordinates"] = $feature["geometry"]["coordinates"]; //OK pour les coordonnées vu que ça ne coûte rien en plus
@@ -82,6 +83,8 @@ if(isset($_GET["query"])) {
                             $lng = $coords[1];
                             
                             $resultsCleaned["coordinates"] = array_reverse($coords);
+                            
+                            $resultsCleaned["city"] =
 
                             $resultsGeoCodeResponse = wp_remote_get("https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&result_type=postal_code&key=$apiKeyGoogle");
                             if(wp_remote_retrieve_response_code($resultsGeoCodeResponse) === 200) {
