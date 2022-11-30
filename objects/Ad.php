@@ -28,23 +28,23 @@ class Ad {
         register_post_type("re-ad",
             array(
                 "labels" => array(
-                    "name"                  => "Annonces",
-                    "singular_name"         => "Une annonce",
-                    "add_new"               => "Ajouter une annonce",
-                    "add_new_item"          => "Ajouter une annonce",
-                    "edit"                  => "Editer",
-                    "edit_item"             => "Editer une annonce",
-                    "new_item"              => "Nouvelle annonce",
-                    "view"                  => "Voir",
-                    "view_item"             => "Voir une annonce",
-                    "search_items"          => "Chercher des annonces",
-                    "not_found"             => "Aucune annonce trouvée",
-                    "not_found_in_trash"    => "Aucune annonce trouvée dans la corbeille",
-                    "all_items"             => "Toutes les annonces",
-                    "featured_image"        => "Miniature de l'annonce",
-                    "set_featured_image"    => "Choisir une miniature",
-                    "remove_featured_image" => "Enlever la miniature",
-                    "use_featured_image"    => "Utiliser comme",
+                    "name"                  => __("Ads", "retxtdom"),
+                    "singular_name"         => __("An ad", "retxtdom"),
+                    "add_new"               => __("Add an ad", "retxtdom"),
+                    "add_new_item"          => __("Add an ad", "retxtdom"),
+                    "edit"                  => __("Edit", "retxtdom"),
+                    "edit_item"             => __("Edit an ad", "retxtdom"),
+                    "new_item"              => __("New ad", "retxtdom"),
+                    "view"                  => __("View", "retxtdom"),
+                    "view_item"             => __("View an ad", "retxtdom"),
+                    "search_items"          => __("Search ads", "retxtdom"),
+                    "not_found"             => __("No ads found", "retxtdom"),
+                    "not_found_in_trash"    => __("No ads found in trash", "retxtdom"),
+                    "all_items"             => __("All ads", "retxtdom"),
+                    "featured_image"        => __("Ad thumbnail", "retxtdom"),
+                    "set_featured_image"    => __("Choose a thumbnail", "retxtdom"),
+                    "remove_featured_image" => __("Remove thumbnail", "retxtdom"),
+                    "use_featured_image"    => __("Use as thumbnail", "retxtdom"),
                ),
 
                 "public" => true,
@@ -56,16 +56,16 @@ class Ad {
         );
         register_taxonomy("adTypeProperty", array("re-ad"), array(
             "hierarchical"      => false, 
-            "description"       => "Créez un type de bien pour catégoriser vos annonces.", 
-            "label"             => "Types des biens immobiliers", 
+            "description"       => __("Create a property type to categorize your ads", "retxtdom"), 
+            "label"             => __("Property types", "retxtdom"), 
             "show_admin_column" => true, 
             "show_in_menu"      => false,
-            "singular_label"    => "Type de bien", 
+            "singular_label"    => __("Property type", "retxtdom"), 
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
         ));
         
-        wp_insert_term("Appartement", "adTypeProperty");
+        wp_insert_term("Appartement", "adTypeProperty"); //TODO : Trad ?
         wp_insert_term("Bâtiment", "adTypeProperty");
         wp_insert_term("Boutique", "adTypeProperty");
         wp_insert_term("Bureaux", "adTypeProperty");
@@ -77,11 +77,11 @@ class Ad {
         
         register_taxonomy("adTypeAd", array("re-ad"), array(
             "hierarchical"      => false, 
-            "description"       => "Créez un type d'annonce pour catégoriser vos annonces.", 
-            "label"             => "Types des annonces immobilières", 
+            "description"       => __("Create an ad type to categorize your ads", "retxtdom"), 
+            "label"             => __("Ad types", "retxtdom"), 
             "show_admin_column" => true, 
             "show_in_menu"      => false,
-            "singular_label"    => "Type d'annonce", 
+            "singular_label"    => __("Ad type", "retxtdom"), 
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
         ));
@@ -92,11 +92,11 @@ class Ad {
         
         register_taxonomy("adAvailable", array("re-ad"), array(
             "hierarchical"      => false, 
-            "description"       => "Disponibilité de l'annonce.", 
-            "label"             => "Disponibilité de l'annonce", 
+            "description"       => __("Property availability", "retxtdom"), 
+            "label"             => __("Property availability", "retxtdom"), 
             "show_admin_column" => true, 
             "show_in_menu"      => false,
-            "singular_label"    => "Disponibilité de l'annonce", 
+            "singular_label"    => __("Property availability", "retxtdom"), 
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyAdAvailableCheckboxCB"),
             "default_term"      => "Disponible"
@@ -171,9 +171,9 @@ class Ad {
         }
 
         ?>
-        <label title="Le bien est disponible">
+        <label title='<?php _e("The property is available", "retxtdom");?>'>
             <input type="checkbox" name="<?= $taxonomyName; ?>" value="<?php esc_attr_e($terms[0]->name); ?>" <?php checked($terms[0]->name, $name); ?>>
-            <span>Le bien est disponible</span>
+            <span><?php _e("The property is available", "retxtdom");?></span>
         </label>
         <?php
     }

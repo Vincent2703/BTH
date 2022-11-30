@@ -99,30 +99,30 @@ class Import {
             update_post_meta($adWPId, "adNbBathrooms", intval($adData["nbbathrooms"]));
             update_post_meta($adWPId, "adNbWaterRooms", intval($adData["nbwaterrooms"]));
             update_post_meta($adWPId, "adNbWC", intval($adData["nbwc"]));
-            $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".$adData["address"]."&import";
+            /*$url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".$adData["address"]."&import";
             $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true)[0];
-            update_post_meta($adWPId, "adAddress", $addressData["address"]);
-            update_post_meta($adWPId, "adLatitude", $addressData["coordinates"][1]);
-            update_post_meta($adWPId, "adLongitude", $addressData["coordinates"][1]);
-            update_post_meta($adWPId, "adPc", $addressData["postcode"][1]);
-            update_post_meta($adWPId, "adCity", $adData["city"]); //Comment récupérer la ville de façon fiable avec l'api Google ?
-            /*            
+            update_post_meta($adWPId, "adAddress", sanitize_text_field($addressData["address"]));
+            update_post_meta($adWPId, "adLatitude", sanitize_text_field($addressData["coordinates"][1]));
+            update_post_meta($adWPId, "adLongitude", sanitize_text_field($addressData["coordinates"][0]));*/
+                        
             update_post_meta($adWPId, "adAddress", $adData["address"]);
             update_post_meta($adWPId, "adLatitude", $adData["latitude"]);
             update_post_meta($adWPId, "adLongitude", $adData["longitude"]);
             update_post_meta($adWPId, "adPc", $adData["pc"]);
-            update_post_meta($adWPId, "adCity", $adData["city"]);*/
-            update_post_meta($adWPId, "adIdAgent", $adData["idagent"]);
-            update_post_meta($adWPId, "adFloor", $adData["floor"]);
-            update_post_meta($adWPId, "adNbFloors", $adData["nbfloors"]);
-            update_post_meta($adWPId, "adYear", $adData["year"]);
-            update_post_meta($adWPId, "adTypeHeating", $adData["typeheating"]);
-            update_post_meta($adWPId, "adTypeKitchen", $adData["typekitchen"]);
-            update_post_meta($adWPId, "adNbBalconies", $adData["nbbalconies"]);
-            update_post_meta($adWPId, "adDpe", $adData["dpe"]);
-            update_post_meta($adWPId, "adGes", $adData["ges"]);
+            update_post_meta($adWPId, "adCity", $adData["city"]);
+            update_post_meta($adWPId, "adDataMap", array("lat" => $adData["latitude"], "long" => $adData["longitude"], "zoom" => 16, "circ" => 10)); //Pas de verif pour savoir si ville ou non
+
+            update_post_meta($adWPId, "adIdAgent", intval($adData["idagent"]));
+            update_post_meta($adWPId, "adFloor", intval($adData["floor"]));
+            update_post_meta($adWPId, "adNbFloors", intval($adData["nbfloors"]));
+            update_post_meta($adWPId, "adYear", intval($adData["year"]));
+            update_post_meta($adWPId, "adTypeHeating", sanitize_text_field($adData["typeheating"]));
+            update_post_meta($adWPId, "adTypeKitchen", sanitize_text_field($adData["typekitchen"]));
+            update_post_meta($adWPId, "adNbBalconies", sanitize_text_field($adData["nbbalconies"]));
+            update_post_meta($adWPId, "adDPE", intval($adData["dpe"]));
+            update_post_meta($adWPId, "adGES", intval($adData["ges"]));
             
-            update_post_meta($adWPId, "adShowMap", $addressePrecision);
+            update_post_meta($adWPId, "adShowMap", sanitize_text_field($addressePrecision));
             
             
             /* PICTURES */
@@ -190,11 +190,11 @@ class Import {
                if(!$uploadThumbnail["error"]) {
                    $attachment = array(
                        "post_author" 	=> 1,
-                       "post_mime_type" => 'image/jpeg',
+                       "post_mime_type" => "image/jpeg",
                        "post_parent"    => $adWPId,
                        "post_title"     => $fileName,
-                       "post_content"   => $imgURL,
-                       "post_status"    => 'inherit'
+                       "post_content"   => sanitize_url($imgURL),
+                       "post_status"    => "inherit"
                    );
                    $attachmentId = wp_insert_attachment($attachment, $uploadThumbnail["file"], $adWPId, true);
 

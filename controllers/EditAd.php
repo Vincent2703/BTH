@@ -3,7 +3,7 @@ class EditAd {
     public function addMetaBoxes() {
         add_meta_box( 
             "adBasicsMetaBox", //ID HTML
-            "Renseignements basiques", //Display
+            __("Basic information", "retxtdom"), //Display
             array($this, "displayAdBasicsMetaBox"), //Callback
             "re-ad", //Custom type
             "normal", //Location on the page
@@ -12,7 +12,7 @@ class EditAd {
              
         add_meta_box( 
             "adComplementariesMetaBox", //ID HTML
-            "Renseignements complémentaires", //Display
+            __("Complementary information", "retxtdom"), //Display
             array($this, "displayAdComplementariesMetaBox"), //Callback
             "re-ad", //Custom type
             "advanced", //Location on the page
@@ -72,33 +72,29 @@ class EditAd {
                 update_post_meta($adId, "adShowMap", sanitize_text_field($_POST["showMap"]));
                 if(isset($_POST["address"]) && !ctype_space($_POST["address"])) {
                     update_post_meta($adId, "adAddress", sanitize_text_field($_POST["address"]));
-                    if($_POST["showMap"] !== "no") {
                         $query = urlencode(addslashes(htmlentities(sanitize_text_field($_POST["address"]))));
-                        if($_POST["showMap"] === "all") {
-                            $zoom = 16;
-                            $radiusCircle = 10;
-                            $resultsResponse = wp_remote_get("https://api-adresse.data.gouv.fr/search/?q=".$query."&limit=1");
-                        }else if($_POST["showMap"] === "onlyPC") {
+                        if($_POST["showMap"] === "onlyPC") { 
                             $zoom = 14;
                             $radiusCircle = 0;
-                            $resultsResponse = wp_remote_get("https://api-adresse.data.gouv.fr/search/?q=".$query."&type=municipality&limit=1");
+                            $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&city";
+                            $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true)[0];
+                        }else{
+                            $zoom = 16;
+                            $radiusCircle = 10;
+                            $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query";
+                            $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true)[0];
                         }
-                        if(wp_remote_retrieve_response_code($resultsResponse) === 200) {
-                            $resultsBody = wp_remote_retrieve_body($resultsResponse);
-                            $resultsArray = json_decode($resultsBody, true);
+                    
+                        $coordinates = $addressData["coordinates"];
+                        update_post_meta($adId, "adDataMap", array("lat" => $coordinates[1], "long" => $coordinates[0], "zoom" => $zoom, "circ" => $radiusCircle));
+                        update_post_meta($adId, "adLatitude", $coordinates[1]);
+                        update_post_meta($adId, "adLongitude", $coordinates[0]);
 
-                            $coordinates = $resultsArray["features"][0]["geometry"]["coordinates"];
-                            update_post_meta($adId, "adDataMap", array("lat" => $coordinates[1], "long" => $coordinates[0], "zoom" => $zoom, "circ" => $radiusCircle));
-                            update_post_meta($adId, "adLatitude", $coordinates[1]);
-                            update_post_meta($adId, "adLongitude", $coordinates[0]);
+                        $PC = $addressData["postcode"];
+                        update_post_meta($adId, "adPC", $PC);
 
-                            $PC = $resultsArray["features"][0]["properties"]["postcode"];
-                            update_post_meta($adId, "adPC", $PC);
-
-                            $city = $resultsArray["features"][0]["properties"]["city"];
-                            update_post_meta($adId, "adCity", $city);
-                        }
-                    }
+                        $city = $addressData["city"];
+                        update_post_meta($adId, "adCity", $city);
                 }
             }
             if(isset($_POST["images"]) && !ctype_space($_POST["images"])) {
@@ -218,67 +214,67 @@ class EditAd {
         ?>
         <div id="refAgency">
             <div class="text">
-                <label>Référence de l'annonce<span id="generateRef" onclick="document.getElementById('refAgencyInput').value = <?= $ad->ID;?>;">Générer une référence</span></label>
+                <label><?php _e("Ad reference", "retxtdom");?><span id="generateRef" onclick="document.getElementById('refAgencyInput').value = <?= $ad->ID;?>;"><?php _e("Generate a reference", "retxtdom");?></span></label>
                 <input type="text" name="refAgency" id="refAgencyInput" placeholder="Ex : A-123" value="<?= $refAgency; ?>">
             </div>
         </div>
         <div id="prices">
             <div class="text">
-                <label>Prix du bien</label>
+                <label><?php _e("Property price", "retxtdom");?></label>
                 <input type="number" name="price" id="priceInput" placeholder="Ex : 180000" value="<?= $price; ?>" required>
             </div>
             <div class="text">
-                <label>Montant des charges</label>
+                <label><?php _e("Fees amount", "retxtdom");?></label>
                 <input type="number" name="fees" id="feesInput" placeholder="Ex : 85" value="<?= $fees; ?>" required>
             </div>
         </div>
         <div id="surfaces">
             <div class="text">
-                <label>Surface habitable (m²)</label>
+                <label><?php _e("Living space", "retxtdom");?> (m²)</label>
                 <input type="number" name="surface" id="surfaceInput" placeholder="Ex : 90" value="<?= $surface; ?>"  required>
             </div>
             <div class="text">
-                <label>Surface du terrain (m²)</label>
+                <label><?php _e("Land area", "retxtdom");?> (m²)</label>
                 <input type="number" name="landSurface" id="landSurfaceInput" placeholder="Ex : 90" value="<?= $landSurface; ?>">
             </div>
         </div>
         <div id="address">
             <div class="text">
-                <label>Adresse du bien</label>
-                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder="Ex : 123 rue de Grenoble 75002 Paris" value="<?= $address; ?>" required>
+                <label><?php _e("Property address", "retxtdom");?></label>
+                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder='Ex : <?php _e("123 Chester Square, London, United Kingdom", "retxtdom");?>' value="<?= $address; ?>" required>
             </div>             
 
             <div class="radio">
-                <input type="radio" name="showMap" id="map1" value="no" <?php checked($showMap, "no");?> required><label for="map1">Ne pas afficher l'adresse</label>
-                <input type="radio" name="showMap" id="map2" value="onlyPC" <?php checked($showMap, "onlyPC");?> required><label for="map2">Afficher le code postal et la ville</label>
-                <input type="radio" name="showMap" id="map3" value="all" <?php checked($showMap, "all");?> required><label for="map3">Afficher l'adresse complète</label>
+                <input type="radio" name="showMap" id="map1" value="no" <?php checked($showMap, "no");?> required><label for="map1"><?php _e("Do not show address", "retxtdom");?></label>
+                <input type="radio" name="showMap" id="map2" value="onlyPC" <?php checked($showMap, "onlyPC");?> required><label for="map2"><?php _e("Show postal code and city", "retxtdom");?></label>
+                <input type="radio" name="showMap" id="map3" value="all" <?php checked($showMap, "all");?> required><label for="map3"><?php _e("Show full address", "retxtdom");?></label>
             </div>
         </div>
         <div id="nbRooms">
             <div class="text">
-                <label>Nombre de pièces</label>       
-                <input type="number" name="nbRooms" id="nbRoomsInput" placeholder="Nombre de pièces" value="<?= $nbRooms; ?>" required>
+                <label><?php _e("Number rooms", "retxtdom");?></label>       
+                <input type="number" name="nbRooms" id="nbRoomsInput" placeholder="<?php _e("Number rooms", "retxtdom");?>" value="<?= $nbRooms; ?>" required>
             </div>
         </div>
         <div id="otherRooms">
             <div class="text">
-                <label>Nombre de chambres</label>
-                <input type="number" name="nbBedrooms" id="nbBedroomsInput" placeholder="Nombre de chambres" value="<?= $nbBedrooms; ?>" required>
+                <label><?php _e("Number bedrooms", "retxtdom");?></label>
+                <input type="number" name="nbBedrooms" id="nbBedroomsInput" placeholder="<?php _e("Number bedrooms", "retxtdom");?>" value="<?= $nbBedrooms; ?>" required>
 
-                <label>Nombre de salles de bain</label>
-                <input type="number" name="nbBathrooms" id="nbBathroomsInput" placeholder="Nombre de salles de bain" value="<?= $nbBathrooms; ?>" required>
+                <label><?php _e("Number bathrooms", "retxtdom");?></label>
+                <input type="number" name="nbBathrooms" id="nbBathroomsInput" placeholder="<?php _e("Number bathrooms", "retxtdom");?>" value="<?= $nbBathrooms; ?>" required>
             </div>
             <div class="text">
-                <label>Nombre de salles d'eau</label>
-                <input type="number" name="nbWaterRooms" id="nbWaterRoomsInput" placeholder="Nombre de salles d'eau" value="<?= $nbWaterRooms; ?>" required>
+                <label><?php _e("Number shower rooms", "retxtdom");?></label>
+                <input type="number" name="nbWaterRooms" id="nbWaterRoomsInput" placeholder="<?php _e("Number shower rooms", "retxtdom");?>" value="<?= $nbWaterRooms; ?>" required>
 
-                <label>Nombre de toilettes</label>
-                <input type="number" name="nbWC" id="nbWCInput" placeholder="Nombre de toilettes" value="<?= $nbWC; ?>" required>
+                <label><?php _e("Number toilets", "retxtdom");?></label>
+                <input type="number" name="nbWC" id="nbWCInput" placeholder="<?php _e("Number toilets", "retxtdom");?>" value="<?= $nbWC; ?>" required>
             </div>
         </div>
         <div id="agent">
             <div class="text">
-                <label>Agent lié à l'annonce</label>
+                <label><?php _e("Agent linked to the ad", "retxtdom");?></label>
                 <select name="agent" id="agents" onclick="reloadAgents();">
                     <?php
                         foreach($allAgents as $agent) {
@@ -293,12 +289,12 @@ class EditAd {
             </div>
             <div class="select">
                 <input type="checkbox" id="showAgent" name="showAgent" <?=($showAgent=='1')?"checked":NULL;?>>
-                <label for="showAgent">Publier le contact de l'agent</label>
-                <a target="_blank" href="post-new.php?post_type=agent">Ajouter un agent</a>
+                <label for="showAgent"><?php _e("Post agent contact", "retxtdom");?></label>
+                <a target="_blank" href="post-new.php?post_type=agent"><?php _e("Add an agent", "retxtdom");?></a>
             </div>
         </div>
         <div id="addPictures" class="radio">
-            <a href="#" id="insertAdPictures" class="button">Ajouter des photos</a>
+            <a href="#" id="insertAdPictures" class="button"><?php _e("Add pictures", "retxtdom");?></a>
             <input type="hidden" name="images" id="images" value="<?= $images; ?>">
         </div>
             <div id="showPictures" class="radio">
@@ -329,58 +325,58 @@ class EditAd {
         ?>
         <div id="floors">
             <div class="text">
-                <label>Etage</label>
-                <input type="number" name="floor" id="floorInput" placeholder="Etage" value="<?= $floor; ?>" required>
+                <label><?php _e("Floor", "retxtdom");?></label>
+                <input type="number" name="floor" id="floorInput" placeholder="<?php _e("Floor", "retxtdom");?>" value="<?= $floor; ?>" required>
             </div>
             <div class="text">
-                <label>Nombre d'étages</label>
-                <input type="number" name="nbFloors" id="nbFloorsInput" placeholder="Nombre d'étages" value="<?= $nbFloors; ?>" required>
+                <label><?php _e("Number floors", "retxtdom");?></label>
+                <input type="number" name="nbFloors" id="nbFloorsInput" placeholder="<?php _e("Number floors", "retxtdom");?>" value="<?= $nbFloors; ?>" required>
             </div>
         </div>
         <div id="kitchenHeater">
             <div class="select">
-            <label>Type de chauffage</label>
+            <label><?php _e("Type heating", "retxtdom");?></label>
             <select name="typeHeating">
                 <option value="unknown" <?php selected($typeHeating, "unknown"); ?>>
-                    Ne pas renseigner
+                    <?php _e("Do not fill", "retxtdom");?>
                 </option>
                 <option value="individualGas" <?php selected($typeHeating, "individualGas"); ?>>
-                    Gaz individuel
+                    <?php _e("Invidual gas", "retxtdom");?>
                 </option>
                 <option value="collectiveGas" <?php selected($typeHeating, "collectiveGas"); ?>>
-                    Gaz collectif
+                    <?php _e("Collective gas", "retxtdom");?>
                 </option>
                 <option value="individualFuel" <?php selected($typeHeating, "individualFuel"); ?>>
-                    Fuel individuel
+                    <?php _e("Individual fuel", "retxtdom");?>
                 </option>
                 <option value="collectiveFuel" <?php selected($typeHeating, "collectiveFuel"); ?>>
-                    Fuel collectif
+                    <?php _e("Collective fuel", "retxtdom");?>
                 </option>
                 <option value="individualElectric" <?php selected($typeHeating, "individualElectric"); ?>>
-                    Electrique individuel
+                    <?php _e("Individual electric", "retxtdom");?>
                 </option>
                 <option value="collectiveElectric" <?php selected($typeHeating, "collectiveElectric"); ?>>
-                    Electrique collectif
+                    <?php _e("Collective electric", "retxtdom");?>
                 </option>
             </select>
             </div>
             <div class="select">
-                <label>Type de cuisine</label>
+                <label><?php _e("Type kitchen", "retxtdom");?></label>
                 <select name="typeKitchen">
                     <option value="unknown" <?=($typeKitchen==="unknown")?"selected":NULL;?>>
-                        Ne pas renseigner
+                        <?php _e("Do not fill", "retxtdom");?>
                     </option>
-                    <option value="notEquipped" <?php selected($typeKitchen, "notEquipped"); ?>>Pas équipée</option>
-                    <option value="kitchenette" <?php selected($typeKitchen, "kitchenette"); ?>>Kitchenette</option>
-                    <option value="american" <?php selected($typeKitchen, "american"); ?>>Américaine</option>
-                    <option value="industrial" <?php selected($typeKitchen, "industrial"); ?>>Industrielle</option>
+                    <option value="notEquipped" <?php selected($typeKitchen, "notEquipped"); ?>><?php _e("Not equipped", "retxtdom");?></option>
+                    <option value="kitchenette" <?php selected($typeKitchen, "kitchenette"); ?>><?php _e("Kitchenette", "retxtdom");?></option>
+                    <option value="american" <?php selected($typeKitchen, "american"); ?>><?php _e("American", "retxtdom");?></option>
+                    <option value="industrial" <?php selected($typeKitchen, "industrial"); ?>><?php _e("Industrial", "retxtdom");?></option>
                 </select>
             </div>
         </div>
         <div id="balconies">
             <div class="text">
-                <label>Nombre de balcons</label>
-                <input type="number" name="nbBalconies" id="nbBalconiesInput" placeholder="Nombre de balcons" value="<?= $nbBalconies; ?>" required>
+                <label><?php _e("Number balconies", "retxtdom");?></label>
+                <input type="number" name="nbBalconies" id="nbBalconiesInput" placeholder="<?php _e("Number balconies", "retxtdom");?>" value="<?= $nbBalconies; ?>" required>
             </div>
         </div>
         <div id="propertyHas">
@@ -389,43 +385,43 @@ class EditAd {
                     <input type="checkbox" id="elevatorInput" name="elevator"<?php checked($elevator, '1'); ?>>
                     <span class="slider"></span>
                 </label> 
-                <label for="elevator">Ascenseur</label>
+                <label for="elevator"><?php _e("Elevator", "retxtdom");?></label>
             </div>
             <div class="checkbox">
                 <label class="switch">
                     <input type="checkbox" id="cellarInput" name="cellar" <?php checked($cellar, '1'); ?>>
                     <span class="slider"></span>
                 </label> 
-                <label for="cellar">Cave</label>
+                <label for="cellar"><?php _e("Cellar", "retxtdom");?></label>
             </div>
             <div class="checkbox">
                 <label class="switch">
                     <input type="checkbox" id="terraceInput" name="terrace" <?php checked($terrace, '1'); ?>>
                     <span class="slider"></span>
                 </label>   
-                <label for="terrace">Terrasse</label>
+                <label for="terrace"><?php _e("Terrace", "retxtdom");?></label>
             </div>
             <div class="checkbox">
                 <label class="switch">
                     <input type="checkbox" id="furnishedInput" name="furnished" <?php checked($furnished, '1'); ?>>
                     <span class="slider"></span>
                 </label>   
-                <label for="furnished">Meublé</label>
+                <label for="furnished"><?php _e("Furnished", "retxtdom");?></label>
             </div>
         </div>
         <div id="year">
             <div class="text">
-                <label>Année de construction</label>
-                <input type="number" name="year" id="yearInput" placeholder="Année de construction" value="<?= $year; ?>" required>
+                <label><?php _e("Construction year", "retxtdom");?></label>
+                <input type="number" name="year" id="yearInput" placeholder="<?php _e("Construction year", "retxtdom");?>" value="<?= $year; ?>" required>
             </div>
         </div>
         <div id="diag">
             <div class="text">
-                <label>DPE en kWhEP/m²/an</label>
+                <label><?php _e("EPD in kWhPE/m²/year", "retxtdom");?></label>
                 <input type="number" id="DPE" name="DPE" value="<?= $DPE; ?>">
             </div>
             <div class="text">
-                <label>GES en kg éqCO2/m²/an</label>
+                <label><?php _e("Greenhouse gas in kg eqCO2/m²/year", "retxtdom");?></label>
                 <input type="number" id="GES" name="GES" value="<?= $GES; ?>">
             </div>
         </div>

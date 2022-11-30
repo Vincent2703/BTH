@@ -32,6 +32,7 @@ class Bth {
         $this->Export       = new Export;
         $this->Import       = new Import;
         
+        add_action("init", array($this, "loadLanguages")); 
         add_action("init", array($this, "initObjects"));
 
 	register_activation_hook(__FILE__, array($this, "activationPlugin")); //A l'activation du plugin...
@@ -40,7 +41,7 @@ class Bth {
         add_action("admin_init", array($this, "initAdmin"));
         
         add_action("admin_menu", array($this, "completeMenu"));
-                
+  
         add_action("admin_enqueue_scripts", array($this, "registerPluginStylesAdmin"));
         add_action("admin_enqueue_scripts", array($this, "registerPluginScriptsAdmin"));        
         
@@ -108,22 +109,24 @@ class Bth {
     
     public function activationPlugin() { //A l'activation du plugin
         //Enregistrer les valeurs par défaut
+        
+        $defaultValuesLanguage = array(
+            "language" => "en",
+            "currency" => "$"
+        );
+        update_option(PLUGIN_RE_NAME."OptionsLanguage", $defaultValuesLanguage); 
+        
         $defaultValuesImports = array(
-            "autoImport"        => true, 
-            "dirImportPath"     => "wp-content/plugins/".PLUGIN_RE_NAME."/import/",
-            "saveCSVImport"     => true,
-            "dirSavesPath"      => "wp-content/plugins/".PLUGIN_RE_NAME."/saves/",
-            "maxSaves"          => 2,
-            "maxDim"            => 1024,
-            "addressPrecision"  => "onlyPC"
+            "maxSavesImports"       => 2,
+            "maxDim"                => 1024,
+            "qualityPictures"       => 85,
+            "templateUsedImport"    => "stdxml"
         );
         update_option(PLUGIN_RE_NAME."OptionsImports", $defaultValuesImports); 
         
         $defaultValuesExports = array(
-            "dirExportPath"     => "wp-content/plugins/".PLUGIN_RE_NAME."/export/",
-            "versionSeLoger"    => "4.08-007",
-            "idAgency"          => "monAgence",
-            "maxCSVColumn"      => 328
+            "templateUsedExport"    => "stdxml",
+            "maxSavesExports"       => 1
         );
         update_option(PLUGIN_RE_NAME."OptionsExports", $defaultValuesExports); 
         
@@ -145,6 +148,10 @@ class Bth {
         $this->EditAgent->addMetaBoxes();
         $this->EditAgency->addMetaBox();
         $this->Options->optionsPageInit();
+    }
+    
+    public function loadLanguages() {
+        load_plugin_textdomain("retxtdom", false, dirname(plugin_basename(__FILE__)).'/languages/');
     }
         
     public function registerPluginStylesAdmin() {
@@ -203,11 +210,8 @@ class Bth {
                 wp_enqueue_script("reloadAgencies");
                 wp_add_inline_script("reloadAgencies", 'var pluginName="'.PLUGIN_RE_NAME.'";');
             }
-        }else if($base === "ad_page_bthoptions") {
-            wp_register_script("options", plugins_url(PLUGIN_RE_NAME."/includes/js/others/options.js"), array(), PLUGIN_RE_VERSION);
-
-            wp_enqueue_script("options");
-        }      
+        }/*else if($base === "ad_page_bthoptions") {
+        }  */    
     }
       
     public function completeMenu() {

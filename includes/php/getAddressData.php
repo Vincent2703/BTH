@@ -72,6 +72,8 @@ if(isset($_GET["query"])) {
                     
                     $resultsCleaned["address"] = $address;
                     
+                    $resultsCleaned["city"] = $feature["terms"][count($feature["terms"])-2]["value"];
+                    
                     if(isset($_GET["import"]) || isset($_GET["city"])) { //On a besoin des coords GPS et du CP uniquement quand on cherche une ville ou qu'on importe
                         $resultsDetailsResponse = wp_remote_get("https://maps.googleapis.com/maps/api/place/details/json?fields=geometry%2Caddress_component&place_id=$idPlace&key=$apiKeyGoogle");
                         if(wp_remote_retrieve_response_code($resultsDetailsResponse) === 200) {
@@ -84,13 +86,16 @@ if(isset($_GET["query"])) {
                             
                             $resultsCleaned["coordinates"] = array_reverse($coords);
                             
-                            $resultsCleaned["city"] =
-
                             $resultsGeoCodeResponse = wp_remote_get("https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&result_type=postal_code&key=$apiKeyGoogle");
                             if(wp_remote_retrieve_response_code($resultsGeoCodeResponse) === 200) {
                                 $resultsGeoCodeBody = wp_remote_retrieve_body($resultsGeoCodeResponse);
                                 $resultsGeoCodeArray = json_decode($resultsGeoCodeBody, true);
                                 $resultsCleaned["postcode"] = $resultsGeoCodeArray["results"][0]["address_components"][0]["long_name"];
+                                /*foreach($resultsGeoCodeArray["results"][0]["address_components"] as $addressComp) {
+                                    if(empty(array_diff($addressComp["types"], array("sublocality_level_1", "neighborhood", "locality", "postal_town", "political")))) {
+                                        $resultsCleaned["city"] = $addressComp["long_name"];
+                                    }
+                                } Marche pas si cp contient plusieurs communes*/ 
                             }           
                         }
                     }
