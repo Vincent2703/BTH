@@ -1,5 +1,5 @@
 <?php
-    require_once(preg_replace( '/wp-content(?!.*wp-content).*/', '', __DIR__ )."wp-load.php");
+    require_once(preg_replace("/wp-content(?!.*wp-content).*/", '', __DIR__ )."wp-load.php");
     $adTypesAd = get_terms(array(
         "taxonomy" => "adTypeAd",
         "hide_empty" => true,
@@ -54,14 +54,14 @@
             <div class="compSearchBarInputs" style="display: none;">
                 <div class="searchBarInput">
                     <label for="minSurface">Surface habitable</label>
-                    <input type="number" name="minSurface" id="minSurface" placeholder="min" value="<?= isset($_GET["minSurface"])?intval($_GET["minSurface"]):''; ?>">
-                    <input type="number" name="maxSurface" id="maxSurface" placeholder="max" value="<?= isset($_GET["maxSurface"])?intval($_GET["maxSurface"]):''; ?>">
+                    <input type="number" name="minSurface" id="minSurface" placeholder="min" value="<?= isset($_GET["minSurface"])&&intval($_GET["minSurface"])!=0?intval($_GET["minSurface"]):''; ?>">
+                    <input type="number" name="maxSurface" id="maxSurface" placeholder="max" value="<?= isset($_GET["maxSurface"])&&intval($_GET["minSurface"])!=0?intval($_GET["maxSurface"]):''; ?>">
                 </div>
                
                 <div class="searchBarInput">
                     <label for="minPrice">Prix</label>
-                    <input type="number" name="minPrice" id="minPrice" placeholder="min" value="<?= isset($_GET["minPrice"])?intval($_GET["minPrice"]):''; ?>">
-                    <input type="number" name="maxPrice" id="maxPrice" placeholder="max" value="<?= isset($_GET["maxPrice"])?intval($_GET["maxPrice"]):''; ?>">
+                    <input type="number" name="minPrice" id="minPrice" placeholder="min" value="<?= isset($_GET["minPrice"])&&intval($_GET["minSurface"])!=0?intval($_GET["minPrice"]):''; ?>">
+                    <input type="number" name="maxPrice" id="maxPrice" placeholder="max" value="<?= isset($_GET["maxPrice"])&&intval($_GET["minSurface"])!=0?intval($_GET["maxPrice"]):''; ?>">
                 </div>   
             </div>
             

@@ -241,7 +241,7 @@ class EditAd {
         <div id="address">
             <div class="text">
                 <label><?php _e("Property address", "retxtdom");?></label>
-                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder='Ex : <?php _e("123 Chester Square, London, United Kingdom", "retxtdom");?>' value="<?= $address; ?>" required>
+                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder='Ex : <?php _e("123 Chester Square, London", "retxtdom");?>' value="<?= $address; ?>" required>
             </div>             
 
             <div class="radio">

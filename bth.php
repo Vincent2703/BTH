@@ -163,7 +163,7 @@ class Bth {
 
             wp_enqueue_style("editAd");
             wp_enqueue_style("autocompleteAddress");
-        }else if($postType === "re-ad" && $base === "ad_page_bthoptions") {
+        }else if($postType === "re-ad" && $base === "re-ad_page_bthoptions") {
             wp_register_style("options", plugins_url(PLUGIN_RE_NAME."/includes/css/others/options.css"), array(), PLUGIN_RE_VERSION);
             
             wp_enqueue_style("options");
@@ -187,7 +187,7 @@ class Bth {
     public function registerPluginScriptsAdmin() { //Mettre dans une autre classe et créer des fonctions pour simplifier la gestion des ressources ?
         $postType = get_current_screen()->post_type;
         $base = get_current_screen()->base;
-        
+                
         if($base === "post") {
             if($postType === "re-ad") {
                 wp_enqueue_media();
@@ -206,12 +206,14 @@ class Bth {
                 wp_enqueue_script("autocompleteAddress");
                 wp_add_inline_script("autocompleteAddress", 'var URLGetAddressDataFile="'.plugins_url(PLUGIN_RE_NAME."/includes/php/getAddressData.php").'";');
             }else if($postType === "agent") {
-                wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgencies.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgencies.js"), array("jquery"), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("reloadAgencies");
                 wp_add_inline_script("reloadAgencies", 'var pluginName="'.PLUGIN_RE_NAME.'";');
             }
-        }/*else if($base === "ad_page_bthoptions") {
-        }  */    
+        }else if($base === "re-ad_page_bthoptions") {
+            wp_register_script("options", plugins_url(PLUGIN_RE_NAME."/includes/js/others/options.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+            wp_enqueue_script("options");
+        }    
     }
       
     public function completeMenu() {

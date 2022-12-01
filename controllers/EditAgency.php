@@ -3,12 +3,12 @@
 class editAgency {
     public function addMetaBox() {
         add_meta_box( 
-            'agencyMetaBox', //ID HTML
+            "agencyMetaBox", //ID HTML
             "Coordonnées de l'agence", //Display
-            array($this, 'displayAgencyMetaBox'), //Callback
-            'agency', //Custom type
-            'normal', //Location on the page
-            'high' //Priority
+            array($this, "displayAgencyMetaBox"), //Callback
+            "agency", //Custom type
+            "normal", //Location on the page
+            "high" //Priority
         );
     }
     
@@ -31,9 +31,9 @@ class editAgency {
         $email = esc_html(get_post_meta($agency->ID, "agencyEmail", true));
         $address = esc_html(get_post_meta($agency->ID, "agencyAddress", true));
         ?>
-            <input type="text" name="phone" id="phone" placeholder="Téléphone fixe" value="<?= $phone; ?>">
-            <input type="email" name="email" id="email" placeholder="Adresse mail" value="<?= $email; ?>">
-            <input type="text" name="address" id="addressInput" autocomplete="off" placeholder="Ex : 123 rue de Grenoble 75002 Paris" value="<?= $address; ?>">
+            <input type="text" name="phone" id="phone" placeholder="<?php _e("Phone", "retxtdom"); ?>" value="<?= $phone; ?>">
+            <input type="email" name="email" id="email" placeholder="<?php _e("Email address", "retxtdom"); ?>" value="<?= $email; ?>">
+            <input type="text" name="address" id="addressInput" autocomplete="off" placeholder="<?php _e("123 Chester Square, London", "Postal address example", "retxtdom"); ?>" value="<?= $address; ?>">
         <?php
     }
     

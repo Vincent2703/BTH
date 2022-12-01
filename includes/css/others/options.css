@@ -3,92 +3,15 @@ sup {
     cursor: help;
 }
 
-/* Editable table */
+/* Custom fields */
 
-.table-editable {
-    position: relative;
-}
-
-.table-remove, .table-hidden {
-    color: #700;
-    cursor: pointer;
-}
-  
-.table-remove:hover, .table-hidden:hover {
-    color: #f00;
+#customFields {
+    display: flex;
+    width: 35%;
+    border: 1px solid black;
 }
 
-.table-visible {
-    color: #00BB00;
-}
 
-.table-visible:hover {
-    color: #006600;
-}
-
-.table-up, .table-down {
-    color: #007;
-    cursor: pointer;
-}
-
-.table-up:hover, .table-down:hover {
-    color: #00f;
-}
-
-.table-add {
-    color: #070;
-    cursor: cell;
-    position: absolute;
-    right: 50px;
-}
-
-.table-add.up {
-    margin-top: 25px;
-}
-  
-.table-add:hover {
-    color: #0b0;
-}
-
-.table-editable td .contentTD {
-    cursor: pointer;
-}
-
-.table-editable td:not(.editable) *:not(.dashicons-before){
-    cursor: not-allowed;
-    font-weight: bold;
-}
-
-#table .table-separator td {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-}
-
-#table .table-separator td:before, #table .table-separator td:after{
-  content: "";
-  flex: 1 1;
-  border-bottom: 1px solid;
-  margin: auto;
-}
-
-#table .table-separator td:before {
-  margin-right: 10px
-}
-
-#table .table-separator td:after {
-  margin-left: 10px
-}
-
-.hiddenField {
-    color: grey;
-    background-color: #ebebeb;
-}
-
-.collapse {
-    display: none;
-}
-
-.writeOptions {
-    display: none;
+#customFields td {
+    background-color: white;
 }

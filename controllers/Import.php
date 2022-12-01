@@ -5,8 +5,7 @@ require_once(ABSPATH . "wp-admin/includes/image.php"); //Pour importer des image
 class Import {
 
     public function showPage() {
-        $optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");        
-        $dirPath = ABSPATH.$optionsImports["dirImportPath"];
+        $dirPath = plugin_dir_path(__DIR__)."import";
         $extAccepted = array(".zip", ".xml");
         ?>
         <div class="wrap">

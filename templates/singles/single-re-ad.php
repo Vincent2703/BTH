@@ -2,8 +2,8 @@
     if(have_posts()) {
         get_header();                 
         while(have_posts()) { //?
-   if ( is_active_sidebar( 'before_content-side-bar' ) ) {
-      dynamic_sidebar( 'before_content-side-bar' );
+   if (is_active_sidebar("before_content-side-bar") ) {
+      dynamic_sidebar("before_content-side-bar");
    }
             the_post();
 
@@ -70,32 +70,18 @@
                 $email = sanitize_email($_POST["email"]);
                 $messageInput = sanitize_textarea_field($_POST["message"]);
 
-                $subject = "Contact au sujet de l'annonce $adRef";
-                $message = "Message de la part de : $names<br />"
-                        . "Téléphone : $phone - Adresse mail : $email<br />"
-                        . "A propos de \"" . get_the_title() . "\"<br /><br />"
-                        . "Message :<br />"
+                $subject = __("Message about the ad", "retxtdom")." $adRef";
+                $message = __("Message from", "retxtdom")." : $names<br />"
+                        . __("Phone", "retxtdom")." : $phone - ".__("Email address", "retxtdom")." : $email<br />"
+                        . __("About", "retxtdom")." \"" . get_the_title() . "\"<br /><br />"
+                        . __("Message", "retxtdom")." :<br />"
                         . $messageInput;
                 $headers = array("Content-Type: text/html; charset=UTF-8");
 
                 if(wp_mail($emailToContact, $subject, $message, $headers)) {
-                    echo "Le mail a bien été envoyé.";
+                    _e("The email has been sent successfully", "retxtdom").'.';
                 }else{
-                    echo "Le mail n'a pas pu être envoyé.";
-                }
-            }
-
-            $mapping = get_option(PLUGIN_RE_NAME."OptionsMapping");
-            $mainFeatures = array();
-            $complementaryFeatures = array();
-            foreach($mapping as $field) {           
-                $feature = array();
-                $feature["name"] = isset($field["FRName"]) ? $field["FRName"] : $field["name"];
-
-                if($field["section"] === "mainFeatures") {
-                    array_push($mainFeatures, $field);
-                }else if($field["section"] === "complementaryFeatures") {
-                    array_push($complementaryFeatures, $field);
+                    _e("The email could not be sent", "retxtdom").'.';
                 }
             }
 
@@ -158,117 +144,117 @@
                         <?= the_content(); ?>
                     </div>
                     <div class="mainFeatures">
-                        <h4>Caractéristiques principales</h4>
+                        <h4><?php _e("Main characteristics", "retxtdom"); ?></h4>
                         <ul>
                             <li>
-                                <span class="nameFeature">Référence</span>
+                                <span class="nameFeature"><?php _e("Reference", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adRefAgency") ?></span>
                             </li>
                             <li>
-                                <span class="nameFeature">Prix</span>
+                                <span class="nameFeature"><?php _e("Price", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adPrice") ?>€</span>
                             </li>
                             <li>
-                                <span class="nameFeature">Charges</span>
+                                <span class="nameFeature"><?php _e("Fees", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adFees") ?>€</span>
                             </li>
                             <li>
-                                <span class="nameFeature">Adresse</span>
+                                <span class="nameFeature"><?php _e("Address", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adAddress") ?></span>
                             </li>
                             <li>
-                                <span class="nameFeature">Surface habitable</span>
+                                <span class="nameFeature"><?php _e("Living space", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adSurface") ?>m²</span>
                             </li>
                             <?php if(intval(getMeta("adTotalSurface")) > 0) { ?> <!-- UTILISER QU'UNE FOIS GETMETA-->
                             <li>
-                                <span class="nameFeature">Surface du terrain</span>
+                                <span class="nameFeature"><?php _e("Land area", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adTotalSurface") ?>m²</span>
                             </li>
                             <?php } ?>
                             <li>
-                                <span class="nameFeature">Nombre de pièces</span>
+                                <span class="nameFeature"><?php _e("Number rooms", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adNbRooms") ?></span>
                             </li>
                             <?php if(intval(getMeta("adNbBedrooms")) > 0) { ?>
                             <li>
-                                <span class="nameFeature">Nombre de chambres</span>
+                                <span class="nameFeature"><?php _e("Number bedrooms", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adNbBedrooms") ?></span>
                             </li>
                             <?php } ?>
                             <?php if(intval(getMeta("adNbWC")) > 0) { ?>
                             <li>
-                                <span class="nameFeature">Nombre de toilettes</span>
+                                <span class="nameFeature"><?php _e("Number toilets", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adNbWC") ?></span>
                             </li>
                             <?php } ?>
                             <?php if(intval(getMeta("adNbBathrooms")) >0) { ?>
                             <li>
-                                <span class="nameFeature">Nombre de salles de bain</span>
+                                <span class="nameFeature"><?php _e("Number bathrooms", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adNbBathrooms") ?></span>
                             </li>
                             <?php } ?>
                             <?php if(intval(getMeta("adNbWaterRooms")) > 0) { ?>
                             <li>
-                                <span class="nameFeature">Nombre de pièces d'eau</span>
+                                <span class="nameFeature"><?php _e("Number shower rooms", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adNbWaterRooms") ?></span>
                             </li>
                             <?php } ?>
                         </ul>
                     </div>
                     <div class="complementaryFeatures">
-                        <h4>Caractéristiques complémentaires</h4>
+                        <h4><?php _e("Complementary characteristics", "retxtdom"); ?></h4>
                         <ul>
                             <?php if(intval(getMeta("adFloor")) > 0) { ?>
                             <li>
-                                <span class="nameFeature">Etage</span>
+                                <span class="nameFeature"><?php _e("Floor", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adFloor"); ?> (sur <?=getMeta("adNbFloors");?>)</span>
                             </li>
                             <?php } ?>
                             <?php if(getMeta("adFurnished") == '1' ) { ?>
                             <li>
-                                <span class="nameFeature">Meublé</span>
-                                <span class="valueFeature">Oui</span>
+                                <span class="nameFeature"><?php _e("Furnished", "retxtdom"); ?></span>
+                                <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
                             </li>
                             <?php } ?>
                             <?php if(getMeta("adElevator") == '1' ) { ?>
                             <li>
-                                <span class="nameFeature">Ascenseur</span>
-                                <span class="valueFeature">Oui</span>
+                                <span class="nameFeature"><?php _e("Elevator", "retxtdom"); ?></span>
+                                <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
                             </li>
                             <?php } ?>
                             <?php if(getMeta("adCellar") == '1' ) { ?>
                             <li>
-                                <span class="nameFeature">Cave</span>
-                                <span class="valueFeature">Oui</span>
+                                <span class="nameFeature"><?php _e("Cellar", "retxtdom"); ?></span>
+                                <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
                             </li>
                             <?php } ?>
                             <?php if(getMeta("adTerrace") == '1' ) { ?>
                             <li>
-                                <span class="nameFeature">Terrasse</span>
-                                <span class="valueFeature">Oui</span>
+                                <span class="nameFeature"><?php _e("Terrace", "retxtdom"); ?></span>
+                                <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
                             </li>
                             <?php } ?>
                             <?php if(is_numeric(getMeta("adYear")) && intval(getMeta("adYear"))>0) { ?>
                             <li>
-                                <span class="nameFeature">Année de construction</span>
+                                <span class="nameFeature"><?php _e("Construction year", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adYear"); ?></span>
                             </li>
                             <?php } ?>
                             <li>
-                                <span class="nameFeature">Type de chauffage</span>
+                                <span class="nameFeature"><?php _e("Type heating", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adTypeHeating"); ?></span>
                             </li>
                             <li>
-                                <span class="nameFeature">Type de cuisine</span>
+                                <span class="nameFeature"><?php _e("Type kitchen", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adTypeKitchen"); ?></span>
                             </li>
                             <li>
-                                <span id="DPEName" class="nameFeature">DPE (kWhEP/m²/an)</span>
+                                <span id="DPEName" class="nameFeature"><?php _e("EPD in kWhPE/m²/year", "retxtdom"); ?></span>
                                 <span id="DPEValue" class="valueFeature"><?= getMeta("adDPE"); ?></span>
                             </li>
                             <li>
-                                <span id="GESName" class="nameFeature">GES (kg eqCO2/m²/an)</span>
+                                <span id="GESName" class="nameFeature"><?php _e("Greenhouse gas in kg eqCO2/m²/year", "retxtdom"); ?></span>
                                 <span id="GESValue" class="valueFeature"><?= getMeta("adGES"); ?></span>
                             </li>
                         </ul>
@@ -277,7 +263,7 @@
                 <div class="contentRightAd">
                     <?php if($getCoords) {  
                         if($showMap == "onlyPC") { ?>
-                            <span id="addressApprox">L'emplacement du bien est approximatif.</span>
+                            <span id="addressApprox"><?php _e("The location of the property is approximate", "retxtdom"); ?>.</span>
                         <?php } ?>
                         <div id="map" class="map" data-coords="<?= implode(',', $coords); ?>"></div>
                     <?php } ?>
@@ -285,7 +271,7 @@
                         <div class="headerContact">
                             <?php if($getContact) { ?>
                             <div class="headerContactLeft">
-                                <img src="<?= $thumbnailContact; ?>" alt="Miniature du contact" id="thumbnailContact">
+                                <img src="<?= $thumbnailContact; ?>" alt="<?php _e("Contact thumbnail", "retxtdom"); ?>" id="thumbnailContact">
                             </div>
                             <div class="headerContactRight">
                                 <span id="nameContact"><?= $nameContact; ?></span>
@@ -299,21 +285,21 @@
                                 <span id="mobilePhoneContact"><a href="tel:<?= $mobilePhone; ?>"><?= isset($mobilePhone)?$mobilePhone:'' ?></a></span>
                             </div>
                             <?php }else{ ?>
-                            <span id="noContactTitle">Formulaire de contact</span>
+                            <span id="noContactTitle"><?php _e("Contact form", "retxtdom"); ?></span>
                             <?php } ?>
                         </div>
                         <form action="" method="post" class="formContact">
-                            <label for="names">Nom et prénom</label><input type="text" name="names" class="formContactInput" required>
-                            <label for="phone">Téléphone</label><input type="tel" name="phone" class="formContactInput" required>
-                            <label for="email">Adresse mail</label><input type="text" name="email" class="formContactInput" required>
-                            <label for="message">Message</label><textarea name="message" class="formContactInput" cols="22" required></textarea>
-                            <input type="submit" name="submit" id="formContactSubmit" value="Envoyer">
+                            <label for="names"><?php _e("First name and surname", "retxtdom"); ?></label><input type="text" name="names" class="formContactInput" required>
+                            <label for="phone"><?php _e("Phone", "retxtdom"); ?></label><input type="tel" name="phone" class="formContactInput" required>
+                            <label for="email"><?php _e("Email address", "retxtdom"); ?></label><input type="text" name="email" class="formContactInput" required>
+                            <label for="message"><?php _e("Message", "retxtdom"); ?></label><textarea name="message" class="formContactInput" cols="22" required></textarea>
+                            <input type="submit" name="submit" id="formContactSubmit" value="<?php _e("Send", "retxtdom"); ?>">
                         </form>
                     </div>
                 </div>
                 <?php if(!empty($morePosts)) { ?>
                 <div class="more">
-                    <span id="moreTitle">Autres <?= lcfirst($typeAd); ?>s à <?= ucfirst($city); ?></span><br />
+                    <span id="moreTitle"><?php _e("Other", "retxtdom"); ?> <?= lcfirst($typeAd); ?>s <?= _e("in", "retxtdom"); ?> <?= ucfirst($city); ?></span><br />
                     <div class="morePosts">
                         <?php 
                             $nbPosts = count($morePosts);

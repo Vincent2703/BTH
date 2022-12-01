@@ -3,20 +3,20 @@
 class editAgent {
     public function addMetaBoxes() {
         add_meta_box( 
-            'agentMetaBox', //ID HTML
+            "agentMetaBox", //ID HTML
             "Coordonnées de l'agent", //Display
-            array($this, 'displayAgentMetaBox'), //Callback
-            'agent', //Custom type
-            'normal', //Location on the page
-            'high' //Priority
+            array($this, "displayAgentMetaBox"), //Callback
+            "agent", //Custom type
+            "normal", //Location on the page
+            "high" //Priority
         );
         add_meta_box( 
-            'agencyMetaBox', //ID HTML
+            "agencyMetaBox", //ID HTML
             "Agence", //Display
-            array($this, 'displayAgencyMetaBox'), //Callback
-            'agent', //Custom type
-            'side', //Location on the page
-            'low' //Priority
+            array($this, "displayAgencyMetaBox"), //Callback
+            "agent", //Custom type
+            "side", //Location on the page
+            "low" //Priority
         );
     }
     
@@ -53,9 +53,9 @@ class editAgent {
         $mobilePhone = esc_html(get_post_meta($agent->ID, "agentMobilePhone", true));
         $email = esc_html(get_post_meta($agent->ID, "agentEmail", true));
         ?>
-            <input type="text" name="phone" id="phone" placeholder="Téléphone fixe" value="<?= $phone; ?>">
-            <input type="text" name="mobilePhone" id="mobilePhone" placeholder="Téléphone mobile" value="<?= $mobilePhone; ?>">
-            <input type="email" name="email" id="email" placeholder="Adresse mail" value="<?= $email; ?>">
+            <input type="text" name="phone" id="phone" placeholder="<?php _e("Phone", "Home phone", "retxtdom"); ?>" value="<?= $phone; ?>">
+            <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("Mobile phone", "retxtdom"); ?>" value="<?= $mobilePhone; ?>">
+            <input type="email" name="email" id="email" placeholder="<?php _e("Email address", "retxtdom"); ?>" value="<?= $email; ?>">
         <?php
     }
     
@@ -73,7 +73,7 @@ class editAgent {
                     }
                 ?>
             </select>
-            <a target="_blank" href="post-new.php?post_type=agency">Ajouter une agence</a>
+            <a target="_blank" href="post-new.php?post_type=agency"><?php _e("Add an agent", "retxtdom"); ?></a>
         <?php
     }
 }

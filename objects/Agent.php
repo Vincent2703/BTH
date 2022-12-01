@@ -5,23 +5,23 @@ class Agent {
         register_post_type("agent",
             array(
                 "labels" => array(
-                    "name"                  => "Agents",
-                    "singular_name"         => "Un agent",
-                    "add_new"               => "Ajouter",
-                    "add_new_item"          => "Ajouter un agent",
-                    "edit"                  => "Editer",
-                    "edit_item"             => "Editer un agent",
-                    "new_item"              => "Nouvel agent",
-                    "view"                  => "Voir",
-                    "view_item"             => "Voir un agent",
-                    "search_items"          => "Chercher des agents",
-                    "not_found"             => "Aucun agent trouvé",
-                    "not_found_in_trash"    => "Aucun agent trouvé dans la corbeille",
-                    "all_items"             => "Tous les agents",
-                    "featured_image"        => "Avatar de l'agent",
-                    "set_featured_image"    => "Choisir un avatar",
-                    "remove_featured_image" => "Enlever l'avatar",
-                    "use_featured_image"    => "Utiliser comme",
+                    "name"                  => __("Agents", "retxtdom"),
+                    "singular_name"         => __("An agent", "retxtdom"),
+                    "add_new"               => __("Add", "retxtdom"),
+                    "add_new_item"          => __("Add an agent", "retxtdom"),
+                    "edit"                  => __("Edit", "retxtdom"),
+                    "edit_item"             => __("Edit an agent", "retxtdom"),
+                    "new_item"              => __("New agent", "retxtdom"),
+                    "view"                  => __("View", "retxtdom"),
+                    "view_item"             => __("View an agent", "retxtdom"),
+                    "search_items"          => __("Search agents", "retxtdom"),
+                    "not_found"             => __("No agents found", "retxtdom"),
+                    "not_found_in_trash"    => __("No agents found in trash", "retxtdom"),
+                    "all_items"             => __("All agents", "retxtdom"),
+                    "featured_image"        => __("Agent thumbnail", "retxtdom"),
+                    "set_featured_image"    => __("Choose a thumbnail", "retxtdom"),
+                    "remove_featured_image" => __("Remove thumbnail", "retxtdom"),
+                    "use_featured_image"    => __("Use as thumbnail", "retxtdom"),
                 ),
 
                 "public" => true,
@@ -85,7 +85,7 @@ class Agent {
     public function customAgentSortableColumns($columns) {
         unset($columns["date"]);
 
-        $columns["agency"] = "Agence";
+        $columns["agency"] = __("Agency", "retxtdom");
 
         return $columns;
     }
@@ -95,7 +95,7 @@ class Agent {
             if(!empty($parent = get_post_parent($postID))) {
                 echo "<a href='edit.php?post_type=agent&post_parent=".$parent->ID."'>".get_the_title($parent)."</a>";
             } else {
-               echo "Pas d'agence attribuée";
+               _e("No assigned agency", "retxtdom");
             }
         }
     }

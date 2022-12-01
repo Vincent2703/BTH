@@ -11,7 +11,7 @@ class Options {
                     if(isset($_GET["tab"])) { //Si on a sélectionné un onglet
                         $option = "Options".ucfirst($_GET["tab"]); //On affiche la page correspondante
                     }else{
-                        $option = "OptionsImports"; //Page par défaut
+                        $option = "OptionsDisplayads"; //Page par défaut
                     }
                     settings_fields(PLUGIN_RE_NAME.$option."Group");
                     do_settings_sections(PLUGIN_RE_NAME.$option."Page");
@@ -28,7 +28,7 @@ class Options {
                 if(isset($_GET["tab"])) { //S'il y a un $_GET tab
                     $tab = $_GET["tab"]; //On le prend
                 }else{
-                    $tab = "imports"; //Sinon par défaut
+                    $tab = "displayads"; //Sinon par défaut
                 }
             }else{ //Sinon on est sur la page edit-tags
                 $tab = "tags";
@@ -36,14 +36,14 @@ class Options {
             <h2><?= PLUGIN_RE_NAME; ?></h2>
             <p>Interface de configuration - <?= PLUGIN_RE_NAME; ?></p>
             <h2 class="nav-tab-wrapper">
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=language" class="nav-tab <?= $tab === "language" ? "nav-tab-active" : ''; ?>">Langage</a>
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>">Imports</a>
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>">Exports</a>
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>">Mail</a>
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>">Barème des honoraires</a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=displayads" class="nav-tab <?= $tab === "displayads" ? "nav-tab-active" : ''; ?>"><?php _e("Ads display", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>"><?php _e("Imports", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>"><?php _e("Exports", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>"><?php _e("Email", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>"><?php _e("Fees schedule", "retxtdom"); ?></a>
                 <a href="edit.php?post_type=re-ad&page=bthoptions&tab=apis" class="nav-tab <?= $tab === "apis" ? "nav-tab-active" : ''; ?>">APIs</a>    
                 <?php if($this->optionsImports["templateUsedImport"] == "seloger" || $this->optionsExports["templateUsedExport"] == "seloger") { ?>
-                    <a href="edit.php?post_type=re-ad&page=bthoptions&tab=seloger" class="nav-tab <?= $tab === "seloger" ? "nav-tab-active" : ''; ?>">Modèle SeLoger</a>  
+                    <a href="edit.php?post_type=re-ad&page=bthoptions&tab=seloger" class="nav-tab <?= $tab === "seloger" ? "nav-tab-active" : ''; ?>"><?php _e("Template", "retxtdom"); ?> SeLoger</a>  
                 <?php } ?>
             </h2>
         <?php   
@@ -51,7 +51,7 @@ class Options {
     }
 
     public function optionsPageInit() {
-        $this->optionsLanguage = get_option(PLUGIN_RE_NAME."OptionsLanguage");
+        $this->optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
         $this->optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");
         $this->optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
         $this->optionsAds = get_option(PLUGIN_RE_NAME."OptionsAds");
@@ -61,10 +61,10 @@ class Options {
         $this->optionsApis = get_option(PLUGIN_RE_NAME."OptionsApis");
         $this->optionsSeLoger = get_option(PLUGIN_RE_NAME."OptionsSeloger");
         
-        register_setting( //Enregistrement des options pour la langue
-            PLUGIN_RE_NAME."OptionsLanguageGroup", // option_group
-            PLUGIN_RE_NAME."OptionsLanguage", // option_name
-            array($this, "optionsSanitizeLanguage") // sanitizeCallback
+        register_setting( //Enregistrement des options pour l'affichage des annonces
+            PLUGIN_RE_NAME."OptionsDisplayadsGroup", // option_group
+            PLUGIN_RE_NAME."OptionsDisplayads", // option_name
+            array($this, "optionsSanitizeDisplayads") // sanitizeCallback
         );
         
         register_setting( //Enregistrement des options pour les importations
@@ -105,15 +105,15 @@ class Options {
         
         add_settings_section( //Section pour les options de la langue
             PLUGIN_RE_NAME."optionsSection", // id
-            "Langage", // title
+            __("Ads display", "retxtdom"), // title
             //array($this, "infoImports"), // callback
             null,
-            PLUGIN_RE_NAME."OptionsLanguagePage" // page
+            PLUGIN_RE_NAME."OptionsDisplayadsPage" // page
         );
         
         add_settings_section( //Section pour les options d'imports
             PLUGIN_RE_NAME."optionsSection", // id
-            "Importation", // title
+            __("Imports", "retxtdom"), // title
             //array($this, "infoImports"), // callback
             null,
             PLUGIN_RE_NAME."OptionsImportsPage" // page
@@ -121,7 +121,7 @@ class Options {
         
         add_settings_section( //Section pour les options d'exports
             PLUGIN_RE_NAME."optionsSection", // id
-            "Exportation", // title
+            __("Exports", "retxtdom"), // title
             //array($this, "infoExports"), // callback
             null,
             PLUGIN_RE_NAME."OptionsExportsPage" // page
@@ -129,7 +129,7 @@ class Options {
                 
         add_settings_section( //Section pour les options des mails
             PLUGIN_RE_NAME."optionsSection", // id
-            "Mail", // title
+            __("Email", "retxtdom"), // title
             //array($this, "infoDivers"), // callback
             null,
             PLUGIN_RE_NAME."OptionsEmailPage" // page
@@ -137,7 +137,7 @@ class Options {
         
         add_settings_section( //Section pour les options d'honoraires
             PLUGIN_RE_NAME."optionsSection", // id
-            "Honoraires", // title
+            __("Fees", "retxtdom"), // title
             //array($this, "infoDivers"), // callback
             null,
             PLUGIN_RE_NAME."OptionsFeesPage" // page
@@ -157,20 +157,21 @@ class Options {
             PLUGIN_RE_NAME."OptionsSelogerPage" // page
         );
         
-        /* Langage */
+        /* Affichage annonces */
+        
         add_settings_field(
-            "language", // id
-            'Langue', // title
-            array($this, "languageCallback"), // callback
-            PLUGIN_RE_NAME."OptionsLanguagePage", // page
+            "currency", // id
+            __("Currency", "retxtdom"), // title
+            array($this, "currencyCallback"), // callback
+            PLUGIN_RE_NAME."OptionsDisplayadsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
         add_settings_field(
-            "currency", // id
-            'Devise', // title
-            array($this, "currencyCallback"), // callback
-            PLUGIN_RE_NAME."OptionsLanguagePage", // page
+            "customFields", // id
+            __("Customs fields", "retxtdom"), // title
+            array($this, "customFieldsCallback"), // callback
+            PLUGIN_RE_NAME."OptionsDisplayadsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
@@ -178,7 +179,7 @@ class Options {
      
         add_settings_field(
             "templateUsedImport", // id
-            'Modèle d\'importation <abbr title="Modèle à utiliser pour les importations"><sup>?</sup></abbr>', // title
+            __("Import template", "retxtdom")." <abbr title=\"".__("Template to use for imports", "retxtdom")."\"><sup>?</sup></abbr>",
             array($this, "templateUsedImportCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -186,7 +187,7 @@ class Options {
              
         add_settings_field(
             "maxSavesImports", // id
-            'Nombre de sauvegardes <abbr title="Nombre de copies des fichiers contenant les annonces importées à conserver"><sup>?</sup></abbr>', // title
+            __("Backups number", "retxtdom")." <abbr title=\"".__("Number of copies of files containing imported ads to keep", "retxtdom")."\"><sup>?</sup></abbr>",
             array($this, "maxSavesImportsCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -194,7 +195,7 @@ class Options {
         
         add_settings_field(
             "maxDim", // id
-            'Taille des images <abbr title="Dimension maximale des images importées"><sup>?</sup></abbr>', // title
+            __("Pictures size", "retxtdom")." <abbr title=\"".__("Maximum size of imported pictures", "retxtdom")."\"><sup>?</sup></abbr>",
             array($this, "maxDimCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -202,7 +203,7 @@ class Options {
         
         add_settings_field(
             "qualityPictures", // id
-            'Qualité des images <abbr title="Plus la valeur est elevée, plus la qualité est fidèle à l\'original, au dépend du poids de l\'image"><sup>?</sup></abbr>', // title
+            __("Pictures quality", "retxtdom")." <abbr title=\"".__("The higher the value, the more the quality is faithful to the original, at the expense of the weight of the image", "retxtdom")."\"><sup>?</sup></abbr>",
             array($this, "qualityPicturesCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -210,7 +211,7 @@ class Options {
         
         add_settings_field(
             "allowAutoImport", // id
-            'Autoriser l\'import automatique des annonces <abbr title=""><sup>?</sup></abbr>', // title
+            __("Automatic ads import", "retxtdom")." <abbr title=\""."\"><sup>?</sup></abbr>",
             array($this, "allowAutoImportCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -221,7 +222,7 @@ class Options {
         
         add_settings_field(
             "templateUsedExport", // id
-            'Modèle d\'exportation <abbr title="Modèle à utiliser pour les exportations"><sup>?</sup></abbr>', // title
+            __("Export template", "retxtdom")." <abbr title=\"".__("Template to use for exports", "retxtdom")."\"><sup>?</sup></abbr>",
             array($this, "templateUsedExportCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -229,7 +230,7 @@ class Options {
         
         add_settings_field(
             "maxSavesExports", // id
-            'Nombre de sauvegardes <abbr title="Nombre de copies des fichiers contenant les annonces exportées à conserver"><sup>?</sup></abbr>', // title
+            __("Backups number", "retxtdom")." <abbr title=\"".__("Number of copies of files containing exported ads to keep", "retxtdom")."\"><sup>?</sup></abbr>",
             array($this, "maxSavesExportsCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -237,7 +238,7 @@ class Options {
         
         add_settings_field(
             "allowAutoExport", // id
-            'Autoriser l\'export automatique des annonces <abbr title=""><sup>?</sup></abbr>', // title
+            __("Automatic ads export", "retxtdom")." <abbr title=\""."\"><sup>?</sup></abbr>",
             array($this, "allowAutoExportCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -247,7 +248,7 @@ class Options {
 
         add_settings_field(
             "sendMail", // id
-            'Envoi mail si erreur <abbr title="Un mail sera envoyé à l\'adresse indiquée si le plugin détecte une erreur lors d\'une exportation ou d\'une importation"><sup>?</sup></abbr>', // title
+            __("Send email in case of error", "retxtdom")." <abbr title=\"".__("An email will be sent to the following email address if the plugin detects an error during an export or import", "retxtdom")."\"><sup>?</sup></abbr>",
             array($this, "sendMailCallback"), // callback
             PLUGIN_RE_NAME."OptionsEmailPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -255,7 +256,7 @@ class Options {
 
         add_settings_field(
             "emailError", // id
-            "Adresse mail à contacter en cas d'erreur", // title
+            __("Email address to contact in case of error", "retxtdom"), // title
             array($this, "emailErrorCallback"), // callback
             PLUGIN_RE_NAME."OptionsEmailPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -263,7 +264,7 @@ class Options {
         
         add_settings_field(
             "emailAd", // id
-            'Adresse mail à contacter pour les annonces par défaut <abbr title="Adresse mail à contacter s\'il n\'est pas possible de contacter un agent ou une agence pour une annonce"><sup>?</sup></abbr>', // title
+            __("Email address to contact by default for ads", "retxtdom")." <abbr title=\"".__("Email address to contact if it is not possible to contact an agent or agency about an ad", "retxtdom")."\"><sup>?</sup></abbr>",
             array($this, "emailAdCallback"), // callback
             PLUGIN_RE_NAME."OptionsEmailPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -273,7 +274,7 @@ class Options {
         
         add_settings_field(
             "feesUrl", // id
-            "Adresse URL vers le barème des honoraires", // title
+            __("URL address to the fees schedule", "retxtdom"), // title
             array($this, "feesUrlCallback"), // callback
             PLUGIN_RE_NAME."OptionsFeesPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -281,7 +282,7 @@ class Options {
         
         add_settings_field(
             "feesFile", // id
-            "Fichier avec le barème des honoraires", // title
+            __("File with the fees schedule", "retxtdom"), // title
             array($this, "feesFileCallback"), // callback
             PLUGIN_RE_NAME."OptionsFeesPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -292,7 +293,7 @@ class Options {
         
         add_settings_field(
             "apiUsed", // id
-            "API à utiliser", // title
+            __("API to use", "retxtdom"), // title
             array($this, "apiUsedCallback"), // callback
             PLUGIN_RE_NAME."OptionsApisPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -300,7 +301,7 @@ class Options {
         
         add_settings_field(
             "apiKeyGoogle", // id
-            "Clé API Google", // title
+            __("Google API key", "retxtdom"), // title, // title
             array($this, "apiKeyGoogleCallback"), // callback
             PLUGIN_RE_NAME."OptionsApisPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -308,7 +309,7 @@ class Options {
         
         add_settings_field(
             "apiLimitCountry", // id
-            "Limiter les recherches à un pays", // title
+            __("Limit search to one country", "retxtdom"), // title
             array($this, "apiLimitCountryCallback"), // callback
             PLUGIN_RE_NAME."OptionsApisPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -318,7 +319,7 @@ class Options {
         
         add_settings_field(
             "versionSeLoger", // id
-            'Version SeLoger <abbr title="Version et révision du format SeLoger utilisé"><sup>?</sup></abbr>', // title
+            __("Version", "retxtdom").' SeLoger <abbr title="'.__("Version and revision of the template used", "retxtdom").'"><sup>?</sup></abbr>', // title
             array($this, "versionSeLogerCallback"), // callback
             PLUGIN_RE_NAME."OptionsSelogerPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -326,7 +327,7 @@ class Options {
         
         add_settings_field(
             "idAgency", // id
-            'Identifiant agence <abbr title="Identifiant pour utiliser le format SeLoger"><sup>?</sup></abbr>', // title
+            __("Agency ID ", "retxtdom").' <abbr title="'.__("ID for using the template", "retxtdom").'"><sup>?</sup></abbr>', // title    
             array($this, "idAgencyCallback"), // callback
             PLUGIN_RE_NAME."OptionsSelogerPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -334,7 +335,7 @@ class Options {
         
     }
     
-    public function optionsSanitizeLanguage($input) {
+    public function optionsSanitizeDisplayads($input) {
         $sanitaryValues = array();
         
         if(isset($input["language"]) && in_array($input["language"], array("fr", "en", "es", "de", "it"))) {
@@ -476,24 +477,34 @@ class Options {
         
     }
     
-    /* LANGAGE */
-    
-    public function languageCallback() { ?>
-        <select name="<?=PLUGIN_RE_NAME."OptionsLanguage[language]";?>" id="langage">
-            <option value="fr" <?php selected($this->optionsLanguage["language"], "fr"); ?>>Français</option>
-            <option value="en" <?php selected($this->optionsLanguage["language"], "en"); ?>>English</option>
-            <option value="es" <?php selected($this->optionsLanguage["language"], "es"); ?>>Español</option>
-            <option value="de" <?php selected($this->optionsLanguage["language"], "de"); ?>>Deutsch</option>
-            <option value="it" <?php selected($this->optionsLanguage["language"], "it"); ?>>Italiano</option>
-        </select>
-    <?php }
+    /* AFFICHAGE ANNONCES */
     
     public function currencyCallback() { 
-        isset($this->optionsLanguage["currency"]) ? absint($this->optionsLanguage["currency"]) : '1'; ?>
+        isset($this->optionsDisplayads["currency"]) ? absint($this->optionsDisplayads["currency"]) : '1'; ?>
             <input type="text" id="currency" class="regular-text" 
-               name="<?=PLUGIN_RE_NAME."OptionsLanguage[currency]";?>" 
+               name="<?=PLUGIN_RE_NAME."OptionsDisplayads[currency]";?>" 
                placeholder='€' 
-               value="<?=isset($this->optionsLanguage["currency"]) ? esc_attr($this->optionsLanguage["currency"]) : '$';?>">
+               value="<?=isset($this->optionsDisplayads["currency"]) ? esc_attr($this->optionsDisplayads["currency"]) : '$';?>">
+    <?php }
+    
+    public function customFieldsCallback() { ?>
+            <table id="customFields">
+                <tr>
+                    <th><?php _e("Field name", "retxtdom"); ?></th>
+                    <th><?php _e("Values to replaced", "retxtdom"); ?></th>
+                    <th>
+                        <span class="table-up dashicons-before dashicons-arrow-up-alt"></span>
+                        <span class="table-down dashicons-before dashicons-arrow-down-alt"></span>
+                    </th>
+                    <th>
+                        <span class="table-remove dashicons-before dashicons-trash"></span>
+                    </th>
+                </tr>
+                <tr>
+                    <td contenteditable class="fieldName"></td>
+                    <td contenteditable class="valuesToReplace"></td>
+                </tr>
+            </table>
     <?php }
 
     /* IMPORTS */   
@@ -534,7 +545,7 @@ class Options {
         <input type="checkbox" 
                name="<?=PLUGIN_RE_NAME."OptionsImports[allowAutoImport]";?>" id="allowAutoImport" 
                    <?php isset($this->optionsImports["allowAutoImport"])?checked($this->optionsImports["allowAutoImport"], true):''?>>&nbsp;
-        <label for="allowAutoImport">Oui</label>
+        <label for="allowAutoImport"><?php _e("Yes", "retxtdom"); ?></label>
     <?php }
       
     
@@ -558,7 +569,7 @@ class Options {
         <input type="checkbox" 
                name="<?=PLUGIN_RE_NAME."OptionsExports[allowAutoExport]";?>" id="allowAutoExport" 
                    <?php isset($this->optionsExports["allowAutoExport"])?checked($this->optionsExports["allowAutoExport"], true):''?>>&nbsp;
-        <label for="allowAutoExport">Oui</label>
+        <label for="allowAutoExport"><?php _e("Yes", "retxtdom"); ?></label>
     <?php }
     
     /* EMAIL */
@@ -567,7 +578,7 @@ class Options {
         <input type="checkbox" 
                name="<?=PLUGIN_RE_NAME."OptionsEmail[sendMail]";?>" id="sendMail" 
                    <?php isset($this->optionsEmail["sendMail"])?checked($this->optionsEmail["sendMail"], true):''?>>&nbsp;
-        <label for="sendMail">Oui</label>
+        <label for="sendMail"><?php _e("Yes", "retxtdom"); ?></label>
     <?php }
 
     public function emailErrorCallback() {      
@@ -575,13 +586,13 @@ class Options {
         ?>
         <input type="email" class="regular-text" 
                name="<?=PLUGIN_RE_NAME."OptionsEmail[emailError]";?>" 
-               id="emailError" placeholder="adresse@mail.com" 
+               id="emailError" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" 
                value="<?=$value;?>">
     <?php }
     
     public function emailAdCallback() { ?>
         <input type="email" class="regular-text" 
-               name="<?=PLUGIN_RE_NAME."OptionsEmail[emailAd]";?>" id="emailAd" placeholder="adresse@mail.com" 
+               name="<?=PLUGIN_RE_NAME."OptionsEmail[emailAd]";?>" id="emailAd" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" 
                value="<?=isset($this->optionsEmail["emailAd"]) ? esc_attr($this->optionsEmail["emailAd"]) : '';?>">
     <?php }
        
@@ -590,7 +601,7 @@ class Options {
     public function feesUrlCallback() { ?>
         <input type="text" id="feesUrl" class="regular-text" 
                name="<?=PLUGIN_RE_NAME."OptionsFees[feesUrl]";?>" 
-               placeholder="<?=$_SERVER["HTTP_HOST"]."/honoraires.pdf";?>" 
+               placeholder="<?=$_SERVER["HTTP_HOST"].'/'. __("feesSchedule", "retxtdom").".pdf";?>" 
                value="<?=isset($this->optionsFees["feesUrl"]) ? esc_attr($this->optionsFees["feesUrl"]) : '';?>">
     <?php }
     
@@ -604,8 +615,8 @@ class Options {
     public function apiUsedCallback() {         
         $name = PLUGIN_RE_NAME."OptionsApis[apiUsed]";
         ?>
-            <input type="radio" name="<?=$name;?>" id="govFr" value="govFr" <?php isset($this->optionsApis["apiUsed"])?checked($this->optionsApis["apiUsed"], "govFr"):'';?>><label for="govFr">Api adresse.data.gouv.fr&nbsp;</label><br />
-            <input type="radio" name="<?=$name;?>" value="google" id="google" <?php isset($this->optionsApis["apiUsed"])?checked($this->optionsApis["apiUsed"], "google"):'';?>><label for="google">Api Google&nbsp;</label>
+            <input type="radio" name="<?=$name;?>" id="govFr" value="govFr" <?php isset($this->optionsApis["apiUsed"])?checked($this->optionsApis["apiUsed"], "govFr"):'';?>><label for="govFr">adresse.data.gouv.fr API&nbsp;</label><br />
+            <input type="radio" name="<?=$name;?>" value="google" id="google" <?php isset($this->optionsApis["apiUsed"])?checked($this->optionsApis["apiUsed"], "google"):'';?>><label for="google">Google API&nbsp;</label>
         <?php
     }
     
@@ -631,7 +642,7 @@ class Options {
         $value = isset($this->optionsSeLoger["idAgency"]) ? esc_attr($this->optionsSeLoger["idAgency"]) : '';
         ?>
             <input type="text" class="regular-text" 
-                   name="<?=PLUGIN_RE_NAME."OptionsSeLoger[idAgency]";?>" id="idAgency" placeholder="MonAgence" 
+                   name="<?=PLUGIN_RE_NAME."OptionsSeLoger[idAgency]";?>" id="idAgency" placeholder="<?php _e("MyAgency", "retxtdom"); ?>" 
                    value="<?=$value;?>">         
     <?php }
     
