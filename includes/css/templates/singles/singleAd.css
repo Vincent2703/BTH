@@ -1,5 +1,13 @@
 /* Mise en page générale */
 
+.single-featured-image-header { /*Hide post picture in header*/
+    display: none !important;
+}
+
+#primary { /*Content width's ad must always be 100%*/
+    width: 100% !important;
+}
+
 .bth .site-main {
     display: flex;
     flex-flow: row wrap;
@@ -141,6 +149,7 @@
 
 .bth #DPEValueSmall, .bth #GESValueSmall {
     margin-top: 5px;
+    margin-bottom: 10px;
 }
 
 .bth .map {

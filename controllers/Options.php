@@ -5,7 +5,7 @@ class Options {
     public function showPage() {
         settings_errors();
         ?>
-        <div class="wrap">
+        <div class="wrap" id="REOptions">
             <form method="post" action="options.php" enctype="multipart/form-data">
                 <?php
                     if(isset($_GET["tab"])) { //Si on a sélectionné un onglet
@@ -31,12 +31,12 @@ class Options {
                     $tab = "displayads"; //Sinon par défaut
                 }
             }else{ //Sinon on est sur la page edit-tags
-                $tab = "tags";
+                $tab = "displayads";
             }?>
             <h2><?= PLUGIN_RE_NAME; ?></h2>
             <p>Interface de configuration - <?= PLUGIN_RE_NAME; ?></p>
             <h2 class="nav-tab-wrapper">
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=displayads" class="nav-tab <?= $tab === "displayads" ? "nav-tab-active" : ''; ?>"><?php _e("Ads display", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=displayads" class="nav-tab <?= $tab === "displayads" ? "nav-tab-active" : ''; ?>"><?php _e("Ads", "retxtdom"); ?></a>
                 <a href="edit.php?post_type=re-ad&page=bthoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>"><?php _e("Imports", "retxtdom"); ?></a>
                 <a href="edit.php?post_type=re-ad&page=bthoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>"><?php _e("Exports", "retxtdom"); ?></a>
                 <a href="edit.php?post_type=re-ad&page=bthoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>"><?php _e("Email", "retxtdom"); ?></a>
@@ -51,7 +51,7 @@ class Options {
     }
 
     public function optionsPageInit() {
-        $this->optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
+        $this->optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads"); //TODO : Enlever this ?
         $this->optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");
         $this->optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
         $this->optionsAds = get_option(PLUGIN_RE_NAME."OptionsAds");
@@ -105,9 +105,9 @@ class Options {
         
         add_settings_section( //Section pour les options de la langue
             PLUGIN_RE_NAME."optionsSection", // id
-            __("Ads display", "retxtdom"), // title
-            //array($this, "infoImports"), // callback
-            null,
+            __("Ads", "retxtdom"), // title
+            array($this, "infoAds"), // callback
+            //null,
             PLUGIN_RE_NAME."OptionsDisplayadsPage" // page
         );
         
@@ -338,13 +338,13 @@ class Options {
     public function optionsSanitizeDisplayads($input) {
         $sanitaryValues = array();
         
-        if(isset($input["language"]) && in_array($input["language"], array("fr", "en", "es", "de", "it"))) {
-            $sanitaryValues["language"] = $input["language"];
-        }
-        
         if(isset($input["currency"])) {
             $sanitaryValues["currency"] = sanitize_text_field($input["currency"]);
         }
+        
+        if(isset($input["customFields"]) && $input["customFields"][0] === '[' && $input["customFields"][-1] === ']') {
+           $sanitaryValues["customFields"] = $input["customFields"];
+        }   
         
         return $sanitaryValues;
     }
@@ -469,13 +469,13 @@ class Options {
     }
     
     
-    public function infoImports() {
-        
-    }
-    
-    public function infoExports() {
-        
-    }
+    public function infoAds() { ?>
+        <p>
+            <a target="_blank" href="edit-tags.php?taxonomy=adTypeProperty&post_type=re-ad"><?php _e("Click here to update the property types"); ?></a><br />
+            <br />
+            <a target="_blank" href="edit-tags.php?taxonomy=adTypeAd&post_type=re-ad"><?php _e("Click here to update the ad types"); ?></a><br />
+        </p>
+    <?php }
     
     /* AFFICHAGE ANNONCES */
     
@@ -489,22 +489,54 @@ class Options {
     
     public function customFieldsCallback() { ?>
             <table id="customFields">
-                <tr>
-                    <th><?php _e("Field name", "retxtdom"); ?></th>
-                    <th><?php _e("Values to replaced", "retxtdom"); ?></th>
-                    <th>
-                        <span class="table-up dashicons-before dashicons-arrow-up-alt"></span>
-                        <span class="table-down dashicons-before dashicons-arrow-down-alt"></span>
-                    </th>
-                    <th>
-                        <span class="table-remove dashicons-before dashicons-trash"></span>
-                    </th>
-                </tr>
-                <tr>
-                    <td contenteditable class="fieldName"></td>
-                    <td contenteditable class="valuesToReplace"></td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th id="fieldName"><?php _e("Field name", "retxtdom"); ?></th>
+                        <th id="section"><?php _e("Section", "retxtdom"); ?></th>
+                        <th id="arrows">
+                            <span class="dashicons-before dashicons-arrow-up-alt"></span>
+                            <span class="dashicons-before dashicons-arrow-down-alt"></span>
+                        </th>
+                        <th id="trash">
+                            <span class="dashicons-before dashicons-trash"></span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="demo">
+                        <td class="fieldName"><input type="text" oninput="removeDemo();" placeholder="Ex : Orientation"></td>
+                        <td class="section"><select><option id="mainFeatures"><?php _e("Main characteristics", "retxtdom"); ?></option><option id="complementaryFeatures"><?php _e("Complementary characteristics", "retxtdom"); ?></option></select></td>
+                        <td>
+                            <span class="dashicons-before dashicons-arrow-up-alt fieldUp" onclick="moveRow(this, 'up');"></span>
+                            <span class="dashicons-before dashicons-arrow-down-alt fieldDown" onclick="moveRow(this, 'down');"></span>
+                        </td>
+                        <td>
+                            <span class="dashicons-before dashicons-trash fieldTrash" onclick="deleteRow(this);"></span>
+                        </td>
+                    </tr>
+                    <?php 
+                    if(isset($this->optionsDisplayads["customFields"])) {
+                        $customFields = json_decode($this->optionsDisplayads["customFields"], true);
+                        foreach($customFields as $field) { ?>
+                            <tr>
+                                <td class="fieldName"><input type="text" oninput="removeDemo();" value="<?=$field["name"];?>"></td>
+                                <td class="section"><select><option id="mainFeatures" <?php selected($field["section"], "mainFeatures"); ?>><?php _e("Main characteristics", "retxtdom"); ?></option><option id="complementaryFeatures"  <?php selected($field["section"], "complementaryFeatures"); ?>><?php _e("Complementary characteristics", "retxtdom"); ?></option></select></td>
+                                <td>
+                                    <span class="dashicons-before dashicons-arrow-up-alt fieldUp" onclick="moveRow(this, 'up');"></span>
+                                    <span class="dashicons-before dashicons-arrow-down-alt fieldDown" onclick="moveRow(this, 'down');"></span>
+                                </td>
+                                <td>
+                                    <span class="dashicons-before dashicons-trash fieldTrash" onclick="deleteRow(this);"></span>
+                                </td>
+                            </tr>
+                    <?php               
+                        } 
+                    }?>
+                </tbody>
             </table>
+            <br />
+            <span class="dashicons-before dashicons-plus fieldPlus"></span>
+            <input type="hidden" name="<?=PLUGIN_RE_NAME."OptionsDisplayads[customFields]";?>" id="customFieldsData">
     <?php }
 
     /* IMPORTS */   

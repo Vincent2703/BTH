@@ -1,17 +1,64 @@
-sup {
+#REOptions sup {
     color: blue;
     cursor: help;
 }
 
 /* Custom fields */
 
-#customFields {
-    display: flex;
-    width: 35%;
+#REOptions #customFields {
+    width: 40%;
     border: 1px solid black;
 }
 
+#REOptions #customFields th, #REOptions #customFields td {
+    text-align: center;
+}
 
-#customFields td {
+#REOptions #customFields #fieldName {
+    width: 40%
+}
+
+#REOptions #customFields #section {
+    width: 30%;
+}
+
+#REOptions #customFields #arrows {
+    width: 20%;
+}
+
+#REOptions #customFields #trash {
+    width: 10%;
+}
+
+#REOptions #customFields tbody tr:not(.demo) .fieldUp, #REOptions #customFields tbody tr:not(.demo) .fieldDown, #REOptions #customFields tbody tr:not(.demo) .fieldTrash {
+    cursor: pointer;
+}
+
+#REOptions #customFields tbody tr.demo .fieldUp, #REOptions #customFields tbody tr.demo .fieldDown, #REOptions #customFields tbody tr.demo .fieldTrash {
+    cursor: not-allowed;
+    color: grey;
+}
+
+#REOptions #customFields tbody tr:not(.demo) .fieldTrash:hover {
+    color: red;
+}
+
+#REOptions #customFields tbody tr:not(.demo) .fieldUp:hover, #REOptions #customFields tbody tr:not(.demo) .fieldDown:hover {
+    color: dodgerblue;
+}
+
+#REOptions #customFields tbody tr:not(.demo) .section select:hover {
+    color: #2c3338;
+}
+
+#REOptions .fieldPlus:hover {
+    color: green;
+}
+
+/*#REOptions #customFields tbody tr.demo {
+}*/
+
+
+#REOptions #customFields td {
     background-color: white;
 }

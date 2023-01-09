@@ -111,6 +111,19 @@
                     )
                 )
             ));
+            
+            $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["customFields"];
+            $customMainFields = array();
+            $customComplementaryFields = array();
+            if(!empty($optionsDisplayads) || $optionsDisplayads !== "[]") {
+               foreach(json_decode($optionsDisplayads, true) as $field) {
+                   if($field["section"] === "mainFeatures") {
+                       array_push($customMainFields, $field["name"]);
+                   }else if($field["section"] === "complementaryFeatures") {
+                       array_push($customComplementaryFields, $field["name"]);
+                   }
+               }
+            }
 
     ?>
 
@@ -200,6 +213,16 @@
                                 <span class="valueFeature"><?= getMeta("adNbWaterRooms") ?></span>
                             </li>
                             <?php } ?>
+                            <?php if(!empty($customMainFields)) {
+                                foreach($customMainFields as $fieldName) {
+                                    if(!empty(getMeta("adCF".$fieldName))) { ?>
+                                        <li>
+                                            <span class="nameFeature"><?= $fieldName; ?></span>
+                                            <span class="valueFeature"><?= getMeta("adCF".$fieldName); ?></span>
+                                        </li>
+                                    <?php }
+                                }
+                            } ?>
                         </ul>
                     </div>
                     <div class="complementaryFeatures">
@@ -257,6 +280,16 @@
                                 <span id="GESName" class="nameFeature"><?php _e("Greenhouse gas in kg eqCO2/m²/year", "retxtdom"); ?></span>
                                 <span id="GESValue" class="valueFeature"><?= getMeta("adGES"); ?></span>
                             </li>
+                            <?php if(!empty($customComplementaryFields)) {
+                                foreach($customComplementaryFields as $fieldName) {
+                                    if(!empty(getMeta("adCF".$fieldName))) { ?>
+                                        <li>
+                                            <span class="nameFeature"><?= $fieldName; ?></span>
+                                            <span class="valueFeature"><?= getMeta("adCF".$fieldName); ?></span>
+                                        </li>
+                                    <?php }
+                                }
+                            } ?>
                         </ul>
                     </div>
                 </div>

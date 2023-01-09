@@ -212,6 +212,11 @@ class Bth {
             }
         }else if($base === "re-ad_page_bthoptions") {
             wp_register_script("options", plugins_url(PLUGIN_RE_NAME."/includes/js/others/options.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+            $translations = array(
+                "mainFeatures" => __("Main characteristics", "retxtdom"),
+                "complementaryFeatures" => __("Complementary characteristics", "retxtdom")
+            );
+            wp_localize_script("options", "translations", $translations);
             wp_enqueue_script("options");
         }    
     }

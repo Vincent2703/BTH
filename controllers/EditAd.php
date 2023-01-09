@@ -135,9 +135,6 @@ class EditAd {
             if(isset($_POST["typeKitchen"]) && !ctype_space($_POST["typeKitchen"])) {
                 update_post_meta($adId, "adTypeKitchen", sanitize_text_field($_POST["typeKitchen"]));
             }
-            /*if(isset($_POST["orientation"]) && !ctype_space($_POST["orientation"])) {
-                update_post_meta($adId, "adOrientation", sanitize_text_field($_POST["orientation"]));
-            }*/
             if(isset($_POST["nbBalconies"]) && !ctype_space($_POST["nbBalconies"])) {
                 update_post_meta($adId, "adNbBalconies", sanitize_text_field(intval($_POST["nbBalconies"])));
             }
@@ -162,6 +159,16 @@ class EditAd {
             if(isset($_POST["GES"]) && !ctype_space($_POST["GES"])) {
                 update_post_meta($adId, "adGES", sanitize_text_field(intval($_POST["GES"])));
             }
+            
+            $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["customFields"];
+            if(!empty($optionsDisplayads) || $optionsDisplayads !== "[]") {
+                foreach(json_decode($optionsDisplayads, true) as $field) {
+                    if(isset($_POST["CF".$field["name"]]) && !ctype_space($_POST["CF".$field["name"]])) {
+                        update_post_meta($adId, "adCF".$field["name"], sanitize_text_field($_POST["CF".$field["name"]]));
+                    }
+                }
+            }
+            
         }
     }
     
@@ -195,22 +202,33 @@ class EditAd {
     }
     
     public function displayAdBasicsMetaBox($ad) {
-        $refAgency = esc_html(get_post_meta($ad->ID, "adRefAgency", true));
+        $refAgency = sanitize_text_field(get_post_meta($ad->ID, "adRefAgency", true));
         $price = intval(get_post_meta($ad->ID, "adPrice", true));
         $fees = intval(get_post_meta($ad->ID, "adFees", true));
-        $surface = esc_html(get_post_meta($ad->ID, "adSurface", true));
-        $landSurface = esc_html(get_post_meta($ad->ID, "adTotalSurface", true));
+        $surface = sanitize_text_field(get_post_meta($ad->ID, "adSurface", true));
+        $landSurface = sanitize_text_field(get_post_meta($ad->ID, "adTotalSurface", true));
         $nbRooms = intval(get_post_meta($ad->ID, "adNbRooms", true));
         $nbBedrooms = intval(get_post_meta($ad->ID, "adNbBedrooms", true));
         $nbBathrooms = intval(get_post_meta($ad->ID, "adNbBathrooms", true));
         $nbWaterRooms = intval(get_post_meta($ad->ID, "adNbWaterRooms", true));
         $nbWC = intval(get_post_meta($ad->ID, "adNbWC", true));
-        $address = esc_html(get_post_meta($ad->ID, "adAddress", true));
-        $showMap = esc_html(get_post_meta($ad->ID, "adShowMap", true));
-        $images = esc_html(get_post_meta($ad->ID, "adImages", true));
+        $address = sanitize_text_field(get_post_meta($ad->ID, "adAddress", true));
+        $showMap = sanitize_text_field(get_post_meta($ad->ID, "adShowMap", true));
+        $images = sanitize_text_field(get_post_meta($ad->ID, "adImages", true));
         $allAgents = get_posts(array("post_type" => "agent"));
-        $agentSaved = esc_html(get_post_meta($ad->ID, "adAgent", true));
-        $showAgent = esc_html(get_post_meta($ad->ID, "adShowAgent", true));
+        $agentSaved = sanitize_text_field(get_post_meta($ad->ID, "adAgent", true));
+        $showAgent = sanitize_text_field(get_post_meta($ad->ID, "adShowAgent", true));
+        
+        $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["customFields"];
+        $customFieldsMF = array();
+        if(!empty($optionsDisplayads) || $optionsDisplayads !== "[]") {
+            foreach(json_decode($optionsDisplayads, true) as $field) {
+                if($field["section"] === "mainFeatures") {
+                    $customFieldsMF[$field["name"]] = sanitize_text_field(get_post_meta($ad->ID, "adCF".$field["name"], true));
+                }
+            }
+        }
+        
         ?>
         <div id="refAgency">
             <div class="text">
@@ -297,7 +315,7 @@ class EditAd {
             <a href="#" id="insertAdPictures" class="button"><?php _e("Add pictures", "retxtdom");?></a>
             <input type="hidden" name="images" id="images" value="<?= $images; ?>">
         </div>
-            <div id="showPictures" class="radio">
+        <div id="showPictures" class="radio">
                 <?php if(!is_null($images)) {
                     $ids = explode(';', $images);
                     foreach ($ids as $id) {
@@ -305,23 +323,45 @@ class EditAd {
                     }
                 }?>
         </div>
-        <?php
+
+        <?php 
+            if(!empty($optionsDisplayads) && $optionsDisplayads !== "[]") {
+                echo '<div id="customMFields">';
+                foreach($customFieldsMF as $kField => $vField) { ?>
+                    <div class="text">
+                        <label><?=$kField;?></label>
+                        <input type="text" name="CF<?=$kField;?>" value="<?=$vField;?>">
+                    </div>
+                    <?php 
+                }
+                echo "</div>";                         
+            }
     }
       
     public function displayAdComplementariesMetaBox($ad) {
         $floor = intval(get_post_meta($ad->ID, "adFloor", true));
         $nbFloors = intval(get_post_meta($ad->ID, "adNbFloors", true));
-        $furnished = esc_html(get_post_meta($ad->ID, "adFurnished", true));
+        $furnished = sanitize_text_field(get_post_meta($ad->ID, "adFurnished", true));
         $year = intval(get_post_meta($ad->ID, "adYear", true));
-        $typeHeating = esc_html(get_post_meta($ad->ID, "adTypeHeating", true));
-        $typeKitchen = esc_html(get_post_meta($ad->ID, "adTypeKitchen", true));
+        $typeHeating = sanitize_text_field(get_post_meta($ad->ID, "adTypeHeating", true));
+        $typeKitchen = sanitize_text_field(get_post_meta($ad->ID, "adTypeKitchen", true));
         //$orientation = intval(get_post_meta($ad->ID, "adOrientation", true));
         $nbBalconies = intval(get_post_meta($ad->ID, "adNbBalconies", true));
-        $elevator = esc_html(get_post_meta($ad->ID, "adElevator", true));
-        $cellar = esc_html(get_post_meta($ad->ID, "adCellar", true));
-        $terrace = esc_html(get_post_meta($ad->ID, "adTerrace", true));
+        $elevator = sanitize_text_field(get_post_meta($ad->ID, "adElevator", true));
+        $cellar = sanitize_text_field(get_post_meta($ad->ID, "adCellar", true));
+        $terrace = sanitize_text_field(get_post_meta($ad->ID, "adTerrace", true));
         $DPE = intval(get_post_meta($ad->ID, "adDPE", true));
         $GES = intval(get_post_meta($ad->ID, "adGES", true));
+        
+        $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["customFields"];
+        $customFieldsCF = array();
+        if(!empty($optionsDisplayads) || $optionsDisplayads !== "[]") {
+            foreach(json_decode($optionsDisplayads, true) as $field) {
+                if($field["section"] === "complementaryFeatures") {
+                    $customFieldsCF[$field["name"]] = sanitize_text_field(get_post_meta($ad->ID, "adCF".$field["name"], true));
+                }
+            }
+        }
         ?>
         <div id="floors">
             <div class="text">
@@ -426,7 +466,19 @@ class EditAd {
             </div>
         </div>
 
-        <?php
+        <?php 
+            if(!empty($optionsDisplayads) && $optionsDisplayads !== "[]") {
+                echo '<div id="customCFields">';
+                foreach($customFieldsCF as $kField => $vField) { ?>
+                    <div class="text">
+                        <label><?=$kField;?></label>
+                        <input type="text" name="CF<?=$kField;?>" value="<?=$vField;?>">
+                    </div>
+                    <?php 
+                }
+                echo "</div>";                         
+            }
+
     }
     
 }
