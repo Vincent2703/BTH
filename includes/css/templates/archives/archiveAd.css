@@ -1,36 +1,94 @@
-.headerAd {
-    text-align: center;
-}
-
-.thumbnailAd {
+.rowAd {
     display: flex;
     justify-content: center;
+    margin-bottom: 100px;
 }
 
-.inShort {
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 15vh;
+.inShortAd {
+    display: flex;
+    width: 70%;
+    gap: 0 30px;
 }
 
-.inShort, .inShort tr, .inShort td, .inShort th {
-    border: none;
+.inShortAd .thumbnailAd {
+    position: relative;
+    width: 40%;
 }
 
-.inShort td {
-    width: 50%;
+.inShortAd .thumbnailAd .typeAd {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 5px;
+    padding: 5px;
+    color: white;
+    font-size: 12px;
+    top: 5px;
+    left: 5px;
 }
 
-.inShort td:last-child {
-    text-align: right;
+.inShortAd .thumbnailAd .typeProperty {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 5px;
+    padding: 5px;
+    color: white;
+    font-size: 12px;
+    top: 5px;
+    right: 5px;
 }
 
-.inShort th {
-    text-align: center;
-    border-bottom: 1px solid grey;
+.inShortAd .detailsAd {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
 }
 
-.inShort td:first-child {
-    border-right: 1px solid grey;
+.inShortAd .detailsAd>span {
+    display: block;
+}
+
+.inShortAd .detailsAd .titleAd {
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.inShortAd .detailsAd .address {
+    font-size: 16px;
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+.inShortAd .detailsAd .shortDescription {
+    font-size: 14px;
+    height: 35%;
+}
+
+.inShortAd .detailsAd .price {
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.inShortAd .detailsAd .iconsDate {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 13px;
+    margin-top: auto;
+}
+
+.inShortAd .detailsAd .iconsDate .icons {
+    display: flex;
+    align-items: flex-end;
+    gap: 0 10px;
+}
+
+.inShortAd .detailsAd .iconsDate .date {
+    
+}
+
+.bathIcon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: url("../../../images/bathIcon.svg") no-repeat;
 }

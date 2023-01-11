@@ -53,9 +53,20 @@ class editAgent {
         $mobilePhone = esc_html(get_post_meta($agent->ID, "agentMobilePhone", true));
         $email = esc_html(get_post_meta($agent->ID, "agentEmail", true));
         ?>
-            <input type="text" name="phone" id="phone" placeholder="<?php _e("Phone", "Home phone", "retxtdom"); ?>" value="<?= $phone; ?>">
-            <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("Mobile phone", "retxtdom"); ?>" value="<?= $mobilePhone; ?>">
-            <input type="email" name="email" id="email" placeholder="<?php _e("Email address", "retxtdom"); ?>" value="<?= $email; ?>">
+            <div id="agentDetails">
+                <div class="text">
+                    <label><?php _e("Phone"); ?></label>
+                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "Home phone", "retxtdom"); ?>" value="<?= $phone; ?>">
+                </div>
+                <div class="text">
+                    <label><?php _e("Mobile phone"); ?></label>
+                    <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("0600000000", "retxtdom"); ?>" value="<?= $mobilePhone; ?>">
+                </div>
+                <div class="text">
+                    <label><?php _e("Email address"); ?></label>
+                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= $email; ?>">
+                </div>
+            </div>
         <?php
     }
     

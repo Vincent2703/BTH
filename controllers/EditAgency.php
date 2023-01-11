@@ -31,9 +31,20 @@ class editAgency {
         $email = esc_html(get_post_meta($agency->ID, "agencyEmail", true));
         $address = esc_html(get_post_meta($agency->ID, "agencyAddress", true));
         ?>
-            <input type="text" name="phone" id="phone" placeholder="<?php _e("Phone", "retxtdom"); ?>" value="<?= $phone; ?>">
-            <input type="email" name="email" id="email" placeholder="<?php _e("Email address", "retxtdom"); ?>" value="<?= $email; ?>">
-            <input type="text" name="address" id="addressInput" autocomplete="off" placeholder="<?php _e("123 Chester Square, London", "Postal address example", "retxtdom"); ?>" value="<?= $address; ?>">
+            <div id="agencyDetails">
+                <div class="text">
+                    <label for="phone"><?php _e("Phone", "retxtdom"); ?></label>
+                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "retxtdom"); ?>" value="<?= $phone; ?>">
+                </div>
+                <div class="text">
+                    <label for="email"><?php _e("Email address", "retxtdom"); ?></label>
+                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= $email; ?>">
+                </div>
+                <div class="text">
+                    <label for="addressInput"><?php _e("Postal address", "retxtdom"); ?></label>
+                    <input type="text" name="address" id="addressInput" autocomplete="off" placeholder="<?php _e("123 Chester Square, London", "Postal address example", "retxtdom"); ?>" value="<?= $address; ?>">
+                </div>
+            </div>
         <?php
     }
     

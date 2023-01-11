@@ -21,7 +21,7 @@
             $images = getMeta("adImages");
             $typeAd = get_the_terms($idPost, "adTypeAd")[0]->name;
             $afterPrice = '€';
-            if($typeAd === "Location") {
+            if($typeAd === "Rental") {
                 $afterPrice .= "/mois";
             }
 

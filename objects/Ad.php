@@ -54,7 +54,7 @@ class Ad {
                 "has_archive" => true
             )
         );
-        register_taxonomy("adTypeProperty", array("re-ad"), array(
+        register_taxonomy("adTypeProperty", array("re-ad"), array( //CACHER POUR LA VERSION GREATUITE ?
             "hierarchical"      => false, 
             "description"       => __("Create a property type to categorize your ads", "retxtdom"), 
             "label"             => __("Property types", "retxtdom"), 
@@ -65,15 +65,13 @@ class Ad {
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
         ));
         
-        wp_insert_term("Appartement", "adTypeProperty"); //TODO : Trad ?
-        wp_insert_term("Bâtiment", "adTypeProperty");
-        wp_insert_term("Boutique", "adTypeProperty");
-        wp_insert_term("Bureaux", "adTypeProperty");
-        wp_insert_term("Local", "adTypeProperty");
-        wp_insert_term("Maison/villa", "adTypeProperty");
-        wp_insert_term("Maison avec terrain", "adTypeProperty");
-        wp_insert_term("Parking/box", "adTypeProperty");
-        wp_insert_term("Terrain", "adTypeProperty");
+        wp_insert_term(__("House", "retxtdom"), "adTypeProperty");
+        wp_insert_term(__("Apartment", "retxtdom"), "adTypeProperty");
+        wp_insert_term(__("Shop", "retxtdom"), "adTypeProperty");
+        wp_insert_term(__("Office", "retxtdom"), "adTypeProperty");
+        wp_insert_term(__("Parking/garage", "retxtdom"), "adTypeProperty");
+        wp_insert_term(__("Building", "retxtdom"), "adTypeProperty");
+        wp_insert_term(__("Land", "retxtdom"), "adTypeProperty");
         
         register_taxonomy("adTypeAd", array("re-ad"), array(
             "hierarchical"      => false, 
@@ -86,9 +84,8 @@ class Ad {
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
         ));
         
-        wp_insert_term("Location", "adTypeAd");
-        wp_insert_term("Vente", "adTypeAd");
-        wp_insert_term("Vente de prestige", "adTypeAd");
+        wp_insert_term("Rental", "adTypeAd"); //Display in the correct language on the front-end
+        wp_insert_term("Sell", "adTypeAd");
         
         register_taxonomy("adAvailable", array("re-ad"), array(
             "hierarchical"      => false, 
