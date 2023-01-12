@@ -1,3 +1,8 @@
+.site-main h3 {
+    text-align: center;
+    margin: 0 0 50px 0;
+}
+
 .rowAd {
     display: flex;
     justify-content: center;
@@ -52,10 +57,14 @@
     margin-bottom: 5px;
 }
 
+.inShortAd .detailsAd .titleAd a {
+    text-decoration: none;
+}
+
 .inShortAd .detailsAd .address {
     font-size: 16px;
     font-style: italic;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .inShortAd .detailsAd .shortDescription {
@@ -64,8 +73,15 @@
 }
 
 .inShortAd .detailsAd .price {
-    font-weight: bold;
     margin-bottom: 25px;
+}
+
+.inShortAd .detailsAd .price .includingFees {
+    font-weight: bold;
+}
+
+.inShortAd .detailsAd .price .fees {
+    font-size: 12px;
 }
 
 .inShortAd .detailsAd .iconsDate {
@@ -79,16 +95,26 @@
 .inShortAd .detailsAd .iconsDate .icons {
     display: flex;
     align-items: flex-end;
-    gap: 0 10px;
+    gap: 0 15px;
 }
 
-.inShortAd .detailsAd .iconsDate .date {
-    
+.inShortAd .detailsAd .iconsDate .icons span {
+    display: flex;
+    align-items: center;
 }
 
-.bathIcon {
+.inShortAd .detailsAd .iconsDate .icons span span {
+    margin-right: 5px;
+}
+
+.inShortAd .detailsAd .iconsDate .icons .nbBathrooms {
+    display: flex;
+    align-items: center;
+}
+
+.inShortAd .detailsAd .iconsDate .icons .nbBathrooms .bathIcon {
   display: inline-block;
   width: 24px;
   height: 24px;
-  background: url("../../../images/bathIcon.svg") no-repeat;
+  background: url("../../../images/bathIcon.svg") no-repeat bottom;
 }

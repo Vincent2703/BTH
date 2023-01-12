@@ -141,3 +141,8 @@ input:checked + .slider:before {
 #reloadAgents {
     cursor: pointer;
 }
+
+abbr sup {
+    color: blue;
+    cursor: help;
+}

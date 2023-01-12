@@ -2,9 +2,7 @@
         <div id="primary" class="content-area">
             <main id="main" class="site-main">
             <?php if(have_posts()) { //Rajouter une limite de posts?>
-                <header class="archive-header has-text-align-center">
-                    <h1 class="archive-title">Liste des <span class="color-accent">Annonces</span></h1>
-                </header>
+                <h3>Liste des <span class="color-accent"><?php _e("Ads", "retxtdom"); ?></span></h3>
                 <?php
                 while(have_posts()) {
                     the_post();
@@ -22,6 +20,7 @@
                     $city = get_post_meta($idPost, "adCity", true);
                     $postalCode = get_post_meta($idPost, "adPC", true);
                     $price = get_post_meta($idPost, "adPrice", true);
+                    $fees = get_post_meta($idPost, "adFees", true);
                     $currency = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["currency"];
                     $surface = get_post_meta($idPost, "adSurface", true);
                     $nbRooms = get_post_meta($idPost, "adNbRooms", true);
@@ -41,18 +40,18 @@
                                 <span class="titleAd"><a href="<?= get_post_permalink($idPost); ?>"><?php the_title(); ?></a></span>
                                 <span class="address"><?= "$city $postalCode"; ?></span>
                                 <span class="shortDescription"><?= $shortDescriptionAd; ?></span>
-                                <span class="price"><?= $price.$currency; ?><?= $typeAd==="Location"?'/'.__("month", "retxtdom"):'';?></span>
+                                <span class="price"><span class="includingFees"><?= $price.$currency; ?><?= $typeAd==="Location"?'/'.__("month", "retxtdom"):'';?></span>&nbsp;<span class="fees"><?= !empty($fees)||$fees!=0?__("including", "retxtdom")." $fees$currency of fees":'';?></span></span>
                                 <span class="iconsDate">
                                     <span class="icons">
-                                        <span class="surface"><span class="dashicons dashicons-fullscreen-alt"></span><?="$surface m²";?></span>
+                                        <span class="surface"><span class="dashicons dashicons-fullscreen-alt"></span><span><?="$surface m²";?></span></span>
                                         <?php if(!empty($nbRooms) || $nbRooms != 0) { ?>
-                                        <span class="nbRooms"><span class="dashicons dashicons-grid-view"></span><?=$nbRooms;?></span>
+                                        <span class="nbRooms"><span class="dashicons dashicons-grid-view"></span><span><?=$nbRooms;?></span></span>
                                         <?php } ?>
                                         <?php if(!empty($nbWaterRooms) || !empty($nbBathrooms) || $nbWaterRooms != 0 || $nbBathrooms != 0) { ?>
-                                        <span class="nbBathrooms"><span class="bathIcon"></span><?=intval($nbWaterRooms)+intval($nbBathrooms);?></span>
+                                        <span class="nbBathrooms"><span class="bathIcon"></span><span><?=intval($nbWaterRooms)+intval($nbBathrooms);?></span></span>
                                         <?php } ?>
                                         <?php if($typeAd==="Rental" && furnished == 1) { ?>
-                                        <span class="furnished"><span class="dashicons dashicons-archive"></span><?php _e("furnished");?></span>
+                                        <span class="furnished"><span class="dashicons dashicons-archive"></span><span><?php _e("furnished", "retxtdom");?></span></span>
                                         <?php } ?>
                                     </span>
                                     <span class="date"><?= get_the_date(); ?></span>

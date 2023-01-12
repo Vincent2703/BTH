@@ -238,7 +238,7 @@ class EditAd {
         </div>
         <div id="prices">
             <div class="text">
-                <label><?php _e("Property price", "retxtdom");?></label>
+                <label><?php _e("Property price", "retxtdom");?> <abbr title="<?php _e("Charges included", "retxtdom"); ?>"><sup>?</sup></abbr></label>
                 <input type="number" name="price" id="priceInput" placeholder="Ex : 180000" value="<?= $price; ?>" required>
             </div>
             <div class="text">

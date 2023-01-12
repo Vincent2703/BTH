@@ -1,7 +1,11 @@
 .searchBar {
-    background-color: rgba(0, 0, 0, 0.25);
+    width: 70%;
+    margin: auto;
+    background-color: white;
     padding: 5px 0 10px 0;
     margin-bottom: 35px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .searchBar .compSearchBarInputs {
@@ -37,13 +41,14 @@
 
 .searchBar .searchForm #filters {
     font-size: 14px;
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 0.5em;
     align-self: flex-end;
 }
 
 .searchBar form input[type=submit] {
     display: flex;
+    font-size: 14px;
     margin: auto;
     margin-top: 25px;
 }

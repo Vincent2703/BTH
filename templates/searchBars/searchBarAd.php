@@ -17,7 +17,7 @@
         <div class="searchForm">
             <div class="mainSearchBarInputs">
                 <div class="searchBarInput">
-                    <label for="typeAd">Type d'annonce</label>
+                    <label for="typeAd"><?php _e("Ad type", "retxtdom"); ?></label>
                     <select name="typeAd" id="typeAd">
                         <?php
                         foreach($adTypesAd as $adTypeAd) { ?>
@@ -28,7 +28,7 @@
                 </div>
 
                 <div class="searchBarInput">
-                    <label for="typeProperty">Type de bien</label>
+                    <label for="typeProperty"><?php _e("Property type", "retxtdom"); ?></label>
                     <select name="typeProperty" id="typeProperty">
                         <?php
                         foreach($adTypesProperty as $adTypeProperty) { ?>
@@ -39,33 +39,38 @@
                 </div>
                 
                 <div class="searchBarInput">
-                    <label for="addressInput">Ville</label>
-                    <input type="text" name="city" id="addressInput" class="ui-autocomplete-input" autocomplete="off" size="15" placeholder="Ex : Paris" <?= isset($_GET["city"]) && !empty($_GET["city"])?'value="'.sanitize_text_field($_GET["city"]).'"':''; ?>>
+                    <label for="addressInput"><?php _e("City", "retxtdom"); ?></label>
+                    <input type="text" name="city" id="addressInput" class="ui-autocomplete-input" autocomplete="off" size="15" placeholder="<?php _e("Ex: London", "retxtdom"); ?>" <?= isset($_GET["city"]) && !empty($_GET["city"])?'value="'.sanitize_text_field($_GET["city"]).'"':''; ?>>
                 </div>
 
                 <div class="searchBarInput">
-                    <label for="radius">Rayon de la recherche</label>
+                    <label for="radius"><?php _e("Search radius", "retxtdom"); ?></label>
                     <input type="number" name="radius" id="radius" value="<?= isset($_GET["radius"])?intval($_GET["radius"]):'10'; ?>">
                 </div>
                 
-                <button type="button" id="filters" onclick="addFilters(this);">Filtres +</button>
+                <button type="button" id="filters" onclick="addFilters(this);"><?php _e("Filters", "retxtdom"); ?> +</button>
             </div>          
             
-            <div class="compSearchBarInputs" style="display: none;">
+            <div class="compSearchBarInputs" style="display: none;">             
                 <div class="searchBarInput">
-                    <label for="minSurface">Surface habitable</label>
-                    <input type="number" name="minSurface" id="minSurface" placeholder="min" value="<?= isset($_GET["minSurface"])&&intval($_GET["minSurface"])!=0?intval($_GET["minSurface"]):''; ?>">
-                    <input type="number" name="maxSurface" id="maxSurface" placeholder="max" value="<?= isset($_GET["maxSurface"])&&intval($_GET["minSurface"])!=0?intval($_GET["maxSurface"]):''; ?>">
-                </div>
-               
-                <div class="searchBarInput">
-                    <label for="minPrice">Prix</label>
-                    <input type="number" name="minPrice" id="minPrice" placeholder="min" value="<?= isset($_GET["minPrice"])&&intval($_GET["minSurface"])!=0?intval($_GET["minPrice"]):''; ?>">
-                    <input type="number" name="maxPrice" id="maxPrice" placeholder="max" value="<?= isset($_GET["maxPrice"])&&intval($_GET["minSurface"])!=0?intval($_GET["maxPrice"]):''; ?>">
+                    <label for="minPrice"><?php _e("Price", "retxtdom"); ?></label>
+                    <input type="number" name="minPrice" id="minPrice" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minPrice"])&&intval($_GET["minSurface"])!=0?intval($_GET["minPrice"]):''; ?>">
+                    <input type="number" name="maxPrice" id="maxPrice" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxPrice"])&&intval($_GET["minSurface"])!=0?intval($_GET["maxPrice"]):''; ?>">
                 </div>   
+                
+                <div class="searchBarInput">
+                    <label for="minSurface"><?php _e("Living space", "retxtdom"); ?></label>
+                    <input type="number" name="minSurface" id="minSurface" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minSurface"])&&intval($_GET["minSurface"])!=0?intval($_GET["minSurface"]):''; ?>">
+                    <input type="number" name="maxSurface" id="maxSurface" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxSurface"])&&intval($_GET["minSurface"])!=0?intval($_GET["maxSurface"]):''; ?>">
+                </div>
+                
+                <!--<div class="searchBarInput">
+                    
+                </div>-->
+
             </div>
             
         </div>      
-        <input type="submit" value="Rechercher">
+        <input type="submit" value="<?php _e("Search", "retxtdom"); ?>">
     </form>
 </div>
