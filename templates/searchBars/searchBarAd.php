@@ -18,7 +18,7 @@
             <div class="mainSearchBarInputs">
                 <div class="searchBarInput">
                     <label for="typeAd"><?php _e("Ad type", "retxtdom"); ?></label>
-                    <select name="typeAd" id="typeAd">
+                    <select name="typeAd" id="typeAd" onchange="changeAdType(this)">
                         <?php
                         foreach($adTypesAd as $adTypeAd) { ?>
                             <option value="<?= $adTypeAd->slug; ?>" <?= isset($_GET["typeAd"]) && $_GET["typeAd"] === $adTypeAd->slug?"selected":''; ?>><?= $adTypeAd->name; ?></option>                 
@@ -54,19 +54,20 @@
             <div class="compSearchBarInputs" style="display: none;">             
                 <div class="searchBarInput">
                     <label for="minPrice"><?php _e("Price", "retxtdom"); ?></label>
-                    <input type="number" name="minPrice" id="minPrice" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minPrice"])&&intval($_GET["minSurface"])!=0?intval($_GET["minPrice"]):''; ?>">
-                    <input type="number" name="maxPrice" id="maxPrice" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxPrice"])&&intval($_GET["minSurface"])!=0?intval($_GET["maxPrice"]):''; ?>">
+                    <input type="number" name="minPrice" id="minPrice" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minPrice"])&&intval($_GET["minPrice"])!==0?intval($_GET["minPrice"]):''; ?>">
+                    <input type="number" name="maxPrice" id="maxPrice" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxPrice"])&&intval($_GET["maxPrice"])!==0?intval($_GET["maxPrice"]):''; ?>">
                 </div>   
                 
                 <div class="searchBarInput">
                     <label for="minSurface"><?php _e("Living space", "retxtdom"); ?></label>
-                    <input type="number" name="minSurface" id="minSurface" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minSurface"])&&intval($_GET["minSurface"])!=0?intval($_GET["minSurface"]):''; ?>">
-                    <input type="number" name="maxSurface" id="maxSurface" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxSurface"])&&intval($_GET["minSurface"])!=0?intval($_GET["maxSurface"]):''; ?>">
+                    <input type="number" name="minSurface" id="minSurface" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minSurface"])&&intval($_GET["minSurface"])!==0?intval($_GET["minSurface"]):''; ?>">
+                    <input type="number" name="maxSurface" id="maxSurface" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxSurface"])&&intval($_GET["maxSurface"])!==0?intval($_GET["maxSurface"]):''; ?>">
                 </div>
                 
-                <!--<div class="searchBarInput">
-                    
-                </div>-->
+                <div class="searchBarInput">
+                    <label for="furnished"><?php _e("Furnished", "retxtdom"); ?></label>
+                    <input type="checkbox" name="furnished" id="furnished" <?php checked(isset($_GET["furnished"])&&intval($_GET["furnished"])!==0); ?>>
+                </div>
 
             </div>
             

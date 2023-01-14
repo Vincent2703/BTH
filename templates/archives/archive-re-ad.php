@@ -50,7 +50,7 @@
                                         <?php if(!empty($nbWaterRooms) || !empty($nbBathrooms) || $nbWaterRooms != 0 || $nbBathrooms != 0) { ?>
                                         <span class="nbBathrooms"><span class="bathIcon"></span><span><?=intval($nbWaterRooms)+intval($nbBathrooms);?></span></span>
                                         <?php } ?>
-                                        <?php if($typeAd==="Rental" && furnished == 1) { ?>
+                                        <?php if($typeAd==="Rental" && $furnished == 1) { ?>
                                         <span class="furnished"><span class="dashicons dashicons-archive"></span><span><?php _e("furnished", "retxtdom");?></span></span>
                                         <?php } ?>
                                     </span>

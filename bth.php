@@ -32,7 +32,7 @@ class Bth {
         $this->Export       = new Export;
         $this->Import       = new Import;
         
-        add_action("init", array($this, "loadLanguages")); 
+        add_action("init", array($this, "loadLanguages"));  /* VOIR POUR LIMITER L'EXECUTION DES ACTIONS ET FILTRES */
         add_action("init", array($this, "initObjects"));
 
 	register_activation_hook(__FILE__, array($this, "activationPlugin")); //A l'activation du plugin...
@@ -58,9 +58,16 @@ class Bth {
 
         add_action("admin_init", array($this->Agent, "publicQueryAgentPostParent"));
         add_filter("manage_agent_posts_columns", array($this->Agent, "customAgentSortableColumns"));
-        add_action("manage_agent_posts_custom_column" , array($this->Agent, "selectCustomAgentColumn"), 10, 2 );
+        add_action("manage_agent_posts_custom_column" , array($this->Agent, "selectCustomAgentColumn"), 10, 2);
         add_filter("manage_edit-agent_sortable_columns", array($this->Agent, "customAgentColumn"));
         
+        add_action("created_term", array($this->Ad, "termTypePropertyUpdate"), 10, 3);
+        add_action("edit_term", array($this->Ad, "termTypePropertyUpdate"), 10, 3);
+        add_action("adTypeProperty_add_form_fields", array($this->Ad, "typePropertyCreateFields"));
+        add_action("adTypeProperty_edit_form_fields", array($this->Ad, "typePropertyEditFields"), 10, 2);
+        add_filter("manage_adTypeProperty_custom_column", array($this->Ad, "typePropertyHabitableColumn"), 15, 3);
+        add_filter("manage_edit-adTypeProperty_columns", array($this->Ad, "typePropertyColumns"));
+
         
         add_filter("template_include", array($this->Ad, "templatePostAd"), 1);
         add_filter("template_include", array($this->Agency, "templatePostAgency"), 1);
@@ -89,11 +96,15 @@ class Bth {
         global $post_type;
         global $pagenow;
         if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {
-            wp_enqueue_script("jquery-ui-autocomplete");
-            wp_register_script("addSearchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/searchBars/addSearchBarAd.js"), array("jquery"), PLUGIN_RE_VERSION, false);
+            wp_register_script("addSearchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/searchBars/addSearchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
+            $variables = array(
+                "filters" => __("FILTERS", "retxtdom"),
+                "pluginName" => PLUGIN_RE_NAME
+            );
+            wp_localize_script("addSearchBarAd", "variables", $variables);
             wp_enqueue_script("addSearchBarAd");
-            wp_add_inline_script("addSearchBarAd", 'let pluginName="'.PLUGIN_RE_NAME.'";var URLGetAddressDataFile="'.plugins_url(PLUGIN_RE_NAME."/includes/php/getAddressData.php").'";');
-            
+            wp_add_inline_script("addSearchBarAd", 'var URLGetAddressDataFile="'.plugins_url(PLUGIN_RE_NAME."/includes/php/getAddressData.php").'";');
+
             wp_register_style("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
             wp_enqueue_style("searchBarAd");
             wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);

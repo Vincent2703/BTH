@@ -24,7 +24,7 @@ class Ad {
             wp_enqueue_script("dpeges");
         }
     
-        public function createAd() {
+        public function createAd() { //TODO : CHECK IF EVERYTHING IS ALREADY CREATED BEFORE ? OR CHANGE INIT BY SOMETHING ELSE ?
         register_post_type("re-ad",
             array(
                 "labels" => array(
@@ -54,7 +54,7 @@ class Ad {
                 "has_archive" => true
             )
         );
-        register_taxonomy("adTypeProperty", array("re-ad"), array( //CACHER POUR LA VERSION GREATUITE ?
+        register_taxonomy("adTypeProperty", array("re-ad"), array(
             "hierarchical"      => false, 
             "description"       => __("Create a property type to categorize your ads", "retxtdom"), 
             "label"             => __("Property types", "retxtdom"), 
@@ -65,7 +65,10 @@ class Ad {
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
         ));
         
-        wp_insert_term(__("House", "retxtdom"), "adTypeProperty");
+        $termIds = wp_insert_term(__("House", "retxtdom"), "adTypeProperty");
+        if(!is_wp_error($termIds)) {
+            add_term_meta($termIds["term_id"], "habitable", true);
+        }
         wp_insert_term(__("Apartment", "retxtdom"), "adTypeProperty");
         wp_insert_term(__("Shop", "retxtdom"), "adTypeProperty");
         wp_insert_term(__("Office", "retxtdom"), "adTypeProperty");
@@ -197,6 +200,51 @@ class Ad {
         }
     }
     
+    public function typePropertyColumns($originalColumns) {
+        $newColumns = $originalColumns;
+        array_splice($newColumns, 1);
+        $newColumns["habitable"] = "Habitable";
+        $posts = $originalColumns["posts"];
+        unset($originalColumns["posts"]);
+        $newColumns = array_merge($originalColumns, $newColumns);
+        $newColumns["posts"] = $posts;
+        return $newColumns;
+    }
+    
+    
+    public function typePropertyHabitableColumn($row, $columnName, $termId) {
+        $meta = get_term_meta($termId, "habitable", true);
+        if ("habitable" === $columnName) {
+            if($meta == 1) {
+                return $row . __("Yes", "retxtdom");
+            }else {
+                return $row . __("No", "retxtdom");
+            }   
+        }
+    }
+    
+    public function typePropertyCreateFields($taxonomy) { ?>
+        <?php _e("Habitable", "retxtdom"); ?> <input type="checkbox" name="habitable">
+        <p class="description" id="description-description"><?php _e("Is this type of property habitable ?", "retxtdom"); ?></p><br />
+    <?php }
+    
+    public function typePropertyEditFields($term, $taxonomy) {
+        $checked = get_term_meta($term->term_id, "habitable", true)==1;
+        $html ='
+            <tr class="form-field form-required">
+              <th scope="row" valign="top"><label for="tag-type">'.__("Habitable", "retxtdom").'</label></th>
+              <td><input type="checkbox" name="habitable"'.checked($checked, true, false).'>
+              <p class="description" id="description-description">'.__("Is this type of property habitable ?", "retxtdom").'</p>
+            </td>
+            </tr>';
+        echo $html;
+    }
+    
+    public function termTypePropertyUpdate($termId, $ttId, $taxonomy) {
+        update_term_meta($termId, "habitable", isset($_POST["habitable"]));   
+    }
+    
+    
     public function searchAds($query) {
         if(!is_admin() && $query->is_search && isset($_GET["post_type"]) && $_GET["post_type"] === "re-ad") {        
             $query->set("post_type", "re-ad");
@@ -222,7 +270,7 @@ class Ad {
                     )
                 );
             }
-            if(isset($_GET["minSurface"]) && isset($_GET["maxSurface"]) && is_numeric($_GET["minSurface"]) && is_numeric($_GET["maxSurface"])) {
+            if(isset($_GET["minSurface"]) && isset($_GET["maxSurface"]) && intval($_GET["maxSurface"]) !== 0) {
                 array_push($metas,
                     array(
                         "key" => "adSurface",
@@ -232,7 +280,7 @@ class Ad {
                     )
                 );
             }         
-            if(isset($_GET["minPrice"]) && isset($_GET["maxPrice"]) && is_numeric($_GET["minPrice"]) && is_numeric($_GET["maxPrice"])) {
+            if(isset($_GET["minPrice"]) && isset($_GET["maxPrice"]) && intval($_GET["maxPrice"]) !== 0) {
                 array_push($metas,
                     array(
                         "key" => "adPrice",
