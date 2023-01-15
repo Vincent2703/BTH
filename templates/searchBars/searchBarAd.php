@@ -51,22 +51,30 @@
                 <button type="button" id="filters" onclick="addFilters(this);"><?php _e("Filters", "retxtdom"); ?> +</button>
             </div>          
             
-            <div class="compSearchBarInputs" style="display: none;">             
-                <div class="searchBarInput">
-                    <label for="minPrice"><?php _e("Price", "retxtdom"); ?></label>
-                    <input type="number" name="minPrice" id="minPrice" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minPrice"])&&intval($_GET["minPrice"])!==0?intval($_GET["minPrice"]):''; ?>">
-                    <input type="number" name="maxPrice" id="maxPrice" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxPrice"])&&intval($_GET["maxPrice"])!==0?intval($_GET["maxPrice"]):''; ?>">
-                </div>   
+            <div class="compSearchBarInputs" style="display: none;">      
+                <div class="pricesSurfacesInputs">
+                    <div class="searchBarInput">
+                        <label for="minPrice"><?php _e("Price", "retxtdom"); ?></label>
+                        <input type="number" name="minPrice" id="minPrice" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minPrice"])&&intval($_GET["minPrice"])!==0?intval($_GET["minPrice"]):''; ?>">
+                        <input type="number" name="maxPrice" id="maxPrice" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxPrice"])&&intval($_GET["maxPrice"])!==0?intval($_GET["maxPrice"]):''; ?>">
+                    </div>   
                 
-                <div class="searchBarInput">
-                    <label for="minSurface"><?php _e("Living space", "retxtdom"); ?></label>
-                    <input type="number" name="minSurface" id="minSurface" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minSurface"])&&intval($_GET["minSurface"])!==0?intval($_GET["minSurface"]):''; ?>">
-                    <input type="number" name="maxSurface" id="maxSurface" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxSurface"])&&intval($_GET["maxSurface"])!==0?intval($_GET["maxSurface"]):''; ?>">
+                    <div class="searchBarInput">
+                        <label for="minSurface"><?php _e("Living space", "retxtdom"); ?></label>
+                        <input type="number" name="minSurface" id="minSurface" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minSurface"])&&intval($_GET["minSurface"])!==0?intval($_GET["minSurface"]):''; ?>">
+                        <input type="number" name="maxSurface" id="maxSurface" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxSurface"])&&intval($_GET["maxSurface"])!==0?intval($_GET["maxSurface"]):''; ?>">
+                    </div>
                 </div>
                 
-                <div class="searchBarInput">
+                <div class="searchBarInput otherDetails">
                     <label for="furnished"><?php _e("Furnished", "retxtdom"); ?></label>
                     <input type="checkbox" name="furnished" id="furnished" <?php checked(isset($_GET["furnished"])&&intval($_GET["furnished"])!==0); ?>>
+                    <label for="rooms"><?php _e("Number of rooms", "retxtdom"); ?></label>
+                    <input type="number" name="nbRooms" id="rooms" value="<?= isset($_GET["nbRooms"])&&intval($_GET["nbRooms"])!==0?intval($_GET["nbRooms"]):''; ?>">
+                    <label for="bedrooms"><?php _e("Number of bedrooms", "retxtdom"); ?></label>
+                    <input type="number" name="nbBedrooms" id="bedrooms" value="<?= isset($_GET["nbBedrooms"])&&intval($_GET["nbBedrooms"])!==0?intval($_GET["nbBedrooms"]):''; ?>">
+                    <label for="bathrooms"><?php _e("Number of bathrooms", "retxtdom"); ?></label>
+                    <input type="number" name="nbBathrooms" id="bathrooms" value="<?= isset($_GET["nbBathrooms"])&&intval($_GET["nbBathrooms"])!==0?intval($_GET["nbBathrooms"]):''; ?>">
                 </div>
 
             </div>

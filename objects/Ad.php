@@ -54,27 +54,58 @@ class Ad {
                 "has_archive" => true
             )
         );
-        register_taxonomy("adTypeProperty", array("re-ad"), array(
-            "hierarchical"      => false, 
-            "description"       => __("Create a property type to categorize your ads", "retxtdom"), 
-            "label"             => __("Property types", "retxtdom"), 
-            "show_admin_column" => true, 
-            "show_in_menu"      => false,
-            "singular_label"    => __("Property type", "retxtdom"), 
-            "rewrite"           => false,
-            "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
-        ));
         
-        $termIds = wp_insert_term(__("House", "retxtdom"), "adTypeProperty");
-        if(!is_wp_error($termIds)) {
-            add_term_meta($termIds["term_id"], "habitable", true);
-        }
-        wp_insert_term(__("Apartment", "retxtdom"), "adTypeProperty");
-        wp_insert_term(__("Shop", "retxtdom"), "adTypeProperty");
-        wp_insert_term(__("Office", "retxtdom"), "adTypeProperty");
-        wp_insert_term(__("Parking/garage", "retxtdom"), "adTypeProperty");
-        wp_insert_term(__("Building", "retxtdom"), "adTypeProperty");
-        wp_insert_term(__("Land", "retxtdom"), "adTypeProperty");
+
+            register_taxonomy("adTypeProperty", array("re-ad"), array(
+                "hierarchical"      => false, 
+                "description"       => __("Create a property type to categorize your ads", "retxtdom"), 
+                "label"             => __("Property types", "retxtdom"), 
+                "show_admin_column" => true, 
+                "show_in_menu"      => false,
+                "singular_label"    => __("Property type", "retxtdom"), 
+                "rewrite"           => false,
+                "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
+            ));
+
+            if(get_option("REPluginActivation") != 1) { //If option not exists
+                $termIds = wp_insert_term(__("House", "retxtdom"), "adTypeProperty", array("slug"=>"house"));
+                if(!is_wp_error($termIds)) {
+                    update_term_meta($termIds["term_id"], "habitable", true);
+                }
+
+                $termIds = wp_insert_term(__("Apartment", "retxtdom"), "adTypeProperty", array("slug"=>"apartment"));
+                if(!is_wp_error($termIds)) {
+                    update_term_meta($termIds["term_id"], "habitable", true);
+                }
+
+                $termIds = wp_insert_term(__("Shop", "retxtdom"), "adTypeProperty", array("slug"=>"shop"));
+                if(!is_wp_error($termIds)) {
+                    update_term_meta($termIds["term_id"], "habitable", false);
+                }
+
+                $termIds = wp_insert_term(__("Office", "retxtdom"), "adTypeProperty", array("slug"=>"office"));
+                if(!is_wp_error($termIds)) {
+                    update_term_meta($termIds["term_id"], "habitable", false);
+                }
+
+                $termIds = wp_insert_term(__("Parking/garage", "retxtdom"), "adTypeProperty", array("slug"=>"parking-garage"));
+                if(!is_wp_error($termIds)) {
+                    update_term_meta($termIds["term_id"], "habitable", false);
+                }
+
+                $termIds = wp_insert_term(__("Building", "retxtdom"), "adTypeProperty", array("slug"=>"building"));
+                if(!is_wp_error($termIds)) {
+                    update_term_meta($termIds["term_id"], "habitable", false);
+                }
+
+                $termIds = wp_insert_term(__("Land", "retxtdom"), "adTypeProperty", array("slug"=>"land"));
+                if(!is_wp_error($termIds)) {
+                    update_term_meta($termIds["term_id"], "habitable", false);
+                }
+                add_option("REPluginActivation", 1, false);
+            }
+            
+
         
         register_taxonomy("adTypeAd", array("re-ad"), array(
             "hierarchical"      => false, 
@@ -87,8 +118,8 @@ class Ad {
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
         ));
         
-        wp_insert_term("Rental", "adTypeAd"); //Display in the correct language on the front-end
-        wp_insert_term("Sell", "adTypeAd");
+        wp_insert_term(__("Rental", "retxtdom"), "adTypeAd", array("slug"=>"rental"));
+        wp_insert_term(__("Sell", "retxtdom"), "adTypeAd", array("slug"=>"sell"));
         
         register_taxonomy("adAvailable", array("re-ad"), array(
             "hierarchical"      => false, 
@@ -99,12 +130,12 @@ class Ad {
             "singular_label"    => __("Property availability", "retxtdom"), 
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyAdAvailableCheckboxCB"),
-            "default_term"      => "Disponible"
+            "default_term"      => array("slug"=>"available")
         ));
         
-        wp_insert_term("Disponible", "adAvailable");
-        wp_insert_term("Indisponible", "adAvailable");
-
+        wp_insert_term(__("Available", "retxtdom"), "adAvailable", array("slug"=>"available"));
+        wp_insert_term(__("Unavailable", "retxtdom"), "adAvailable", array("slug"=>"unavailable"));
+        
     }
     
     public function showPage() {
@@ -159,20 +190,11 @@ class Ad {
         }
     }
     
-    public function taxonomyAdAvailableCheckboxCB($post/*, $taxonomy*/) {
-        $taxonomyName = "adAvailable";
-        $terms = get_terms($taxonomyName, array("hide_empty" => false));
-	$term = wp_get_object_terms($post->ID, $taxonomyName, array("orderby" => "term_id", "order" => "ASC"));
-	$name  = '';
-        if(!is_wp_error($term)) {
-            if(isset($term[0]) && isset($term[0]->name)) {
-                $name = $term[0]->name;
-            }
-        }
-
+    public function taxonomyAdAvailableCheckboxCB($post) {
+        $available = wp_get_post_terms($post->ID, "adAvailable", array("fields"=>"slugs"))[0]==="available";
         ?>
         <label title='<?php _e("The property is available", "retxtdom");?>'>
-            <input type="checkbox" name="<?= $taxonomyName; ?>" value="<?php esc_attr_e($terms[0]->name); ?>" <?php checked($terms[0]->name, $name); ?>>
+            <input type="checkbox" name="adAvailable" value="available" <?php checked($available); ?>>
             <span><?php _e("The property is available", "retxtdom");?></span>
         </label>
         <?php
@@ -233,7 +255,7 @@ class Ad {
         $html ='
             <tr class="form-field form-required">
               <th scope="row" valign="top"><label for="tag-type">'.__("Habitable", "retxtdom").'</label></th>
-              <td><input type="checkbox" name="habitable"'.checked($checked, true, false).'>
+              <td><input type="checkbox" name="habitable"'.checked($checked).'>
               <p class="description" id="description-description">'.__("Is this type of property habitable ?", "retxtdom").'</p>
             </td>
             </tr>';
@@ -279,7 +301,16 @@ class Ad {
                         "type" => "DECIMAL"
                     )
                 );
-            }         
+            }else if(isset($_GET["minSurface"]) && intval($_GET["minSurface"]) !== 0) {
+                array_push($metas,
+                    array(
+                        "key" => "adSurface",
+                        "value" => intval($_GET["minSurface"]),
+                        "compare" => ">=",
+                        "type" => "DECIMAL"
+                    )
+                );
+            }        
             if(isset($_GET["minPrice"]) && isset($_GET["maxPrice"]) && intval($_GET["maxPrice"]) !== 0) {
                 array_push($metas,
                     array(
@@ -287,6 +318,45 @@ class Ad {
                         "value" => array(intval($_GET["minPrice"]), intval($_GET["maxPrice"])),
                         "compare" => "BETWEEN",
                         "type" => "DECIMAL"
+                    )
+                );
+            }else if(isset($_GET["minPrice"]) && intval($_GET["minPrice"]) !== 0) {
+                array_push($metas,
+                    array(
+                        "key" => "adPrice",
+                        "value" => intval($_GET["minPrice"]),
+                        "compare" => ">=",
+                        "type" => "DECIMAL"
+                    )
+                );
+            }
+            if(isset($_GET["nbRooms"]) && intval($_GET["nbRooms"]) !== 0) {
+                array_push($metas,
+                    array(
+                        "key" => "adNbRooms",
+                        "value" => intval($_GET["nbRooms"]),
+                        "compare" => ">=",
+                        "type" => "NUMERIC"
+                    )
+                );
+            } 
+            if(isset($_GET["nbBedrooms"]) && intval($_GET["nbBedrooms"]) !== 0) {
+                array_push($metas,
+                    array(
+                        "key" => "adNbBedrooms",
+                        "value" => intval($_GET["nbBedrooms"]),
+                        "compare" => ">=",
+                        "type" => "NUMERIC"
+                    )
+                );
+            } 
+            if(isset($_GET["nbBathrooms"]) && intval($_GET["nbBathrooms"]) !== 0) {
+                array_push($metas,
+                    array(
+                        "key" => "adNbBathWaterRooms",
+                        "value" => intval($_GET["nbBathrooms"]),
+                        "compare" => ">=",
+                        "type" => "NUMERIC"
                     )
                 );
             } 

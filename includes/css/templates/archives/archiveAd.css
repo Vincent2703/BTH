@@ -107,14 +107,21 @@
     margin-right: 5px;
 }
 
-.inShortAd .detailsAd .iconsDate .icons .nbBathrooms {
+.inShortAd .detailsAd .iconsDate .icons .nbBathrooms, .inShortAd .detailsAd .iconsDate .icons .nbBedrooms {
     display: flex;
     align-items: center;
 }
 
 .inShortAd .detailsAd .iconsDate .icons .nbBathrooms .bathIcon {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  background: url("../../../images/bathIcon.svg") no-repeat bottom;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: url("../../../images/bathIcon.svg") no-repeat bottom;
+}
+
+.inShortAd .detailsAd .iconsDate .icons .nbBedrooms .bedIcon {
+    display: inline-block;
+    width: 22px;
+    height: 20px;
+    background: url("../../../images/bedIcon.svg") no-repeat bottom;    
 }

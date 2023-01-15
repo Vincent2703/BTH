@@ -52,14 +52,16 @@
     margin: auto;
     margin-top: 25px;
 }
-/*
-.ui-menu-item {
-    list-style: none !important;
+
+.searchBar .searchForm .compSearchBarInputs .pricesSurfacesInputs {
+    display: flex;
 }
 
-ul {
-    background-color: white;
-}*/
+.searchBar .searchForm .compSearchBarInputs .pricesSurfacesInputs+div {
+    display: flex;
+        flex-direction: column;
+
+}
 
 @media only screen and (max-width : 768px) {
     .mainSearchBarInputs {

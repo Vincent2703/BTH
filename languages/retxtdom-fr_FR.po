@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-12-01 14:54+0100\n"
+"POT-Creation-Date: 2023-01-15 10:04+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -16,6 +16,20 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: includes/js\n"
 
+#: bth.php:101
+msgid "FILTERS"
+msgstr "FILTRES"
+
+#: bth.php:227 controllers/Options.php:508 controllers/Options.php:523
+#: templates/singles/single-re-ad.php:160
+msgid "Main characteristics"
+msgstr "Caractéristiques principales"
+
+#: bth.php:228 controllers/Options.php:508 controllers/Options.php:523
+#: templates/singles/single-re-ad.php:229
+msgid "Complementary characteristics"
+msgstr "Caractéristiques complémentaires"
+
 #: controllers/EditAd.php:6
 msgid "Basic information"
 msgstr "Renseignements basiques"
@@ -24,202 +38,226 @@ msgstr "Renseignements basiques"
 msgid "Complementary information"
 msgstr "Renseignements complémentaires"
 
-#: controllers/EditAd.php:217
+#: controllers/EditAd.php:235
 msgid "Ad reference"
 msgstr "Référence de l'annonce"
 
-#: controllers/EditAd.php:217
+#: controllers/EditAd.php:235
 msgid "Generate a reference"
 msgstr "Générer une référence"
 
-#: controllers/EditAd.php:223
+#: controllers/EditAd.php:241
 msgid "Property price"
 msgstr "Prix du bien"
 
-#: controllers/EditAd.php:227
+#: controllers/EditAd.php:241
+msgid "Charges included"
+msgstr "Charges incluses"
+
+#: controllers/EditAd.php:245
 msgid "Fees amount"
 msgstr "Montant des charges"
 
-#: controllers/EditAd.php:233 templates/singles/single-re-ad.php:166
+#: controllers/EditAd.php:251 templates/searchBars/searchBarAd.php:62
+#: templates/singles/single-re-ad.php:179
 msgid "Living space"
 msgstr "Surface habitable"
 
-#: controllers/EditAd.php:237 templates/singles/single-re-ad.php:171
+#: controllers/EditAd.php:255 templates/singles/single-re-ad.php:184
 msgid "Land area"
 msgstr "Surface du terrain"
 
-#: controllers/EditAd.php:243
+#: controllers/EditAd.php:261
 msgid "Property address"
 msgstr "Adresse du bien"
 
-#: controllers/EditAd.php:244 controllers/EditAgency.php:36
+#: controllers/EditAd.php:262 controllers/EditAgency.php:45
 msgid "123 Chester Square, London"
 msgstr "123 rue de Grenoble 75002 Paris"
 
-#: controllers/EditAd.php:248
+#: controllers/EditAd.php:266
 msgid "Do not show address"
 msgstr "Ne pas afficher l'adresse"
 
-#: controllers/EditAd.php:249
+#: controllers/EditAd.php:267
 msgid "Show postal code and city"
 msgstr "Afficher le code postal et la ville"
 
-#: controllers/EditAd.php:250
+#: controllers/EditAd.php:268
 msgid "Show full address"
 msgstr "Afficher l'adresse complète"
 
-#: controllers/EditAd.php:255 controllers/EditAd.php:256
-#: templates/singles/single-re-ad.php:176
+#: controllers/EditAd.php:273 controllers/EditAd.php:274
+#: templates/singles/single-re-ad.php:189
 msgid "Number rooms"
 msgstr "Nombre de pièces"
 
-#: controllers/EditAd.php:261 controllers/EditAd.php:262
-#: templates/singles/single-re-ad.php:181
+#: controllers/EditAd.php:279 controllers/EditAd.php:280
+#: templates/singles/single-re-ad.php:194
 msgid "Number bedrooms"
 msgstr "Nombre de chambres"
 
-#: controllers/EditAd.php:264 controllers/EditAd.php:265
-#: templates/singles/single-re-ad.php:193
+#: controllers/EditAd.php:282 controllers/EditAd.php:283
+#: templates/singles/single-re-ad.php:206
 msgid "Number bathrooms"
 msgstr "Nombre de salles de bain"
 
-#: controllers/EditAd.php:268 controllers/EditAd.php:269
-#: templates/singles/single-re-ad.php:199
+#: controllers/EditAd.php:286 controllers/EditAd.php:287
+#: templates/singles/single-re-ad.php:212
 msgid "Number shower rooms"
 msgstr "Nombre de salles d'eau"
 
-#: controllers/EditAd.php:271 controllers/EditAd.php:272
-#: templates/singles/single-re-ad.php:187
+#: controllers/EditAd.php:289 controllers/EditAd.php:290
+#: templates/singles/single-re-ad.php:200
 msgid "Number toilets"
 msgstr "Nombre de toilettes"
 
-#: controllers/EditAd.php:277
+#: controllers/EditAd.php:295
 msgid "Agent linked to the ad"
 msgstr "Agent lié à l'annonce"
 
-#: controllers/EditAd.php:292
+#: controllers/EditAd.php:310
 msgid "Post agent contact"
 msgstr "Publier le contact de l'agent"
 
-#: controllers/EditAd.php:293 controllers/EditAgent.php:76 objects/Agent.php:11
+#: controllers/EditAd.php:311 controllers/EditAgent.php:87 objects/Agent.php:11
 msgid "Add an agent"
 msgstr "Ajouter un agent"
 
-#: controllers/EditAd.php:297
+#: controllers/EditAd.php:315
 msgid "Add pictures"
 msgstr "Ajouter des photos"
 
-#: controllers/EditAd.php:328 controllers/EditAd.php:329
-#: templates/singles/single-re-ad.php:210
+#: controllers/EditAd.php:368 controllers/EditAd.php:369
+#: templates/singles/single-re-ad.php:233
 msgid "Floor"
 msgstr "Etage"
 
-#: controllers/EditAd.php:332 controllers/EditAd.php:333
+#: controllers/EditAd.php:372 controllers/EditAd.php:373
 msgid "Number floors"
 msgstr "Nombre d'étages"
 
-#: controllers/EditAd.php:338 templates/singles/single-re-ad.php:245
+#: controllers/EditAd.php:378 templates/singles/single-re-ad.php:268
 msgid "Type heating"
 msgstr "Type de chauffage"
 
-#: controllers/EditAd.php:341 controllers/EditAd.php:367
+#: controllers/EditAd.php:381 controllers/EditAd.php:407
 msgid "Do not fill"
 msgstr "Ne pas remplir"
 
-#: controllers/EditAd.php:344
+#: controllers/EditAd.php:384
 msgid "Invidual gas"
 msgstr "Gaz individuel"
 
-#: controllers/EditAd.php:347
+#: controllers/EditAd.php:387
 msgid "Collective gas"
 msgstr "Gaz collectif"
 
-#: controllers/EditAd.php:350
+#: controllers/EditAd.php:390
 msgid "Individual fuel"
 msgstr "Fuel individuel"
 
-#: controllers/EditAd.php:353
+#: controllers/EditAd.php:393
 msgid "Collective fuel"
 msgstr "Fuel collectif"
 
-#: controllers/EditAd.php:356
+#: controllers/EditAd.php:396
 msgid "Individual electric"
 msgstr "Electrique individuel"
 
-#: controllers/EditAd.php:359
+#: controllers/EditAd.php:399
 msgid "Collective electric"
-msgstr "Electric collectif"
+msgstr "Electrique collectif"
 
-#: controllers/EditAd.php:364 templates/singles/single-re-ad.php:249
+#: controllers/EditAd.php:404 templates/singles/single-re-ad.php:272
 msgid "Type kitchen"
 msgstr "Type de cuisine"
 
-#: controllers/EditAd.php:369
+#: controllers/EditAd.php:409
 msgid "Not equipped"
 msgstr "Pas équipée"
 
-#: controllers/EditAd.php:370
+#: controllers/EditAd.php:410
 msgid "Kitchenette"
 msgstr "Kitchenette"
 
-#: controllers/EditAd.php:371
+#: controllers/EditAd.php:411
 msgid "American"
 msgstr "Américaine"
 
-#: controllers/EditAd.php:372
+#: controllers/EditAd.php:412
 msgid "Industrial"
 msgstr "Industrielle"
 
-#: controllers/EditAd.php:378 controllers/EditAd.php:379
+#: controllers/EditAd.php:418 controllers/EditAd.php:419
 msgid "Number balconies"
 msgstr "Nombre de balcons"
 
-#: controllers/EditAd.php:388 templates/singles/single-re-ad.php:222
+#: controllers/EditAd.php:428 templates/singles/single-re-ad.php:245
 msgid "Elevator"
 msgstr "Ascenseur"
 
-#: controllers/EditAd.php:395 templates/singles/single-re-ad.php:228
+#: controllers/EditAd.php:435 templates/singles/single-re-ad.php:251
 msgid "Cellar"
 msgstr "Cave"
 
-#: controllers/EditAd.php:402 templates/singles/single-re-ad.php:234
+#: controllers/EditAd.php:442 templates/singles/single-re-ad.php:257
 msgid "Terrace"
 msgstr "Terrasse"
 
-#: controllers/EditAd.php:409 templates/singles/single-re-ad.php:216
+#: controllers/EditAd.php:449 templates/searchBars/searchBarAd.php:68
+#: templates/singles/single-re-ad.php:239
 msgid "Furnished"
 msgstr "Meublé"
 
-#: controllers/EditAd.php:414 controllers/EditAd.php:415
-#: templates/singles/single-re-ad.php:240
+#: controllers/EditAd.php:454 controllers/EditAd.php:455
+#: templates/singles/single-re-ad.php:263
 msgid "Construction year"
 msgstr "Année de construction"
 
-#: controllers/EditAd.php:420 templates/singles/single-re-ad.php:253
+#: controllers/EditAd.php:460 templates/singles/single-re-ad.php:276
 msgid "EPD in kWhPE/m²/year"
 msgstr "DPE en kWhEP/m²/an"
 
-#: controllers/EditAd.php:424 templates/singles/single-re-ad.php:257
+#: controllers/EditAd.php:464 templates/singles/single-re-ad.php:280
 msgid "Greenhouse gas in kg eqCO2/m²/year"
 msgstr "GES en kg éqCO2/m²/an"
 
-#: controllers/EditAgency.php:34 controllers/EditAgent.php:56
-#: templates/singles/single-re-ad.php:75 templates/singles/single-re-ad.php:293
+#: controllers/EditAgency.php:36 controllers/EditAgent.php:58
+#: templates/singles/single-re-ad.php:75 templates/singles/single-re-ad.php:326
 msgid "Phone"
 msgstr "Téléphone"
 
-#: controllers/EditAgency.php:35 controllers/EditAgent.php:58
-#: templates/singles/single-re-ad.php:75 templates/singles/single-re-ad.php:294
+#: controllers/EditAgency.php:37 controllers/EditAgent.php:59
+msgid "0100000000"
+msgstr ""
+
+#: controllers/EditAgency.php:40 controllers/EditAgent.php:66
+#: templates/singles/single-re-ad.php:75 templates/singles/single-re-ad.php:327
 msgid "Email address"
 msgstr "Adresse mail"
 
-#: controllers/EditAgent.php:57
+#: controllers/EditAgency.php:41 controllers/EditAgent.php:67
+#: controllers/Options.php:621 controllers/Options.php:627
+msgid "address@email.com"
+msgstr "adresse@mail.fr"
+
+#: controllers/EditAgency.php:44
+msgid "Postal address"
+msgstr "Adresse postale"
+
+#: controllers/EditAgent.php:62
 msgid "Mobile phone"
 msgstr "Téléphone portable"
 
-#: controllers/Options.php:39 controllers/Options.php:108
-msgid "Ads display"
-msgstr "Affichage des annonces"
+#: controllers/EditAgent.php:63
+msgid "0600000000"
+msgstr ""
+
+#: controllers/Options.php:39 controllers/Options.php:108 objects/Ad.php:31
+#: templates/archives/archive-re-ad.php:5
+msgid "Ads"
+msgstr "Annonces"
 
 #: controllers/Options.php:40 controllers/Options.php:116
 msgid "Imports"
@@ -241,7 +279,7 @@ msgstr "Barème des honoraires"
 msgid "Template"
 msgstr "Modèle"
 
-#: controllers/Options.php:140 templates/singles/single-re-ad.php:158
+#: controllers/Options.php:140 templates/singles/single-re-ad.php:171
 msgid "Fees"
 msgstr "Charges"
 
@@ -373,37 +411,38 @@ msgstr "Identifiant de l'agence"
 msgid "ID for using the template"
 msgstr "Identifiant pour utiliser le modèle"
 
-#: controllers/Options.php:493
+#: controllers/Options.php:474
+msgid "Click here to update the property types"
+msgstr "Cliquer ici pour mettre à jour les types de propriétés"
+
+#: controllers/Options.php:476
+msgid "Click here to update the ad types"
+msgstr "Cliquer ici pour mettre à jour les types d'annonces"
+
+#: controllers/Options.php:494
 msgid "Field name"
 msgstr "Nom du champ"
 
-#: controllers/Options.php:494
-msgid "Values to replaced"
-msgstr "Valeurs à remplacer"
+#: controllers/Options.php:495
+msgid "Section"
+msgstr "Section"
 
-#: controllers/Options.php:548 controllers/Options.php:572
-#: controllers/Options.php:581 templates/singles/single-re-ad.php:217
-#: templates/singles/single-re-ad.php:223
-#: templates/singles/single-re-ad.php:229
-#: templates/singles/single-re-ad.php:235
+#: controllers/Options.php:580 controllers/Options.php:604
+#: controllers/Options.php:613 objects/Ad.php:250
+#: templates/singles/single-re-ad.php:240
+#: templates/singles/single-re-ad.php:246
+#: templates/singles/single-re-ad.php:252
+#: templates/singles/single-re-ad.php:258
 msgid "Yes"
 msgstr "Oui"
 
-#: controllers/Options.php:589 controllers/Options.php:595
-msgid "address@email.com"
-msgstr "adresse@mail.fr"
-
-#: controllers/Options.php:604
+#: controllers/Options.php:636
 msgid "feesSchedule"
 msgstr "Barème des honoraires"
 
-#: controllers/Options.php:645
+#: controllers/Options.php:677
 msgid "MyAgency"
 msgstr "MonAgence"
-
-#: objects/Ad.php:31
-msgid "Ads"
-msgstr "Annonces"
 
 #: objects/Ad.php:32
 msgid "An ad"
@@ -465,37 +504,93 @@ msgstr "Enlever la miniature"
 msgid "Use as thumbnail"
 msgstr "Utiliser comme miniature"
 
-#: objects/Ad.php:59
+#: objects/Ad.php:61
 msgid "Create a property type to categorize your ads"
 msgstr "Créez un type de bien pour catégoriser vos annonces"
 
-#: objects/Ad.php:60
+#: objects/Ad.php:62
 msgid "Property types"
 msgstr "Types de bien"
 
-#: objects/Ad.php:63
+#: objects/Ad.php:65 templates/searchBars/searchBarAd.php:31
 msgid "Property type"
 msgstr "Type de bien"
 
-#: objects/Ad.php:80
+#: objects/Ad.php:71
+msgid "House"
+msgstr "Maison"
+
+#: objects/Ad.php:76
+msgid "Apartment"
+msgstr "Appartement"
+
+#: objects/Ad.php:81
+msgid "Shop"
+msgstr "Magasin"
+
+#: objects/Ad.php:86
+msgid "Office"
+msgstr "Bureau"
+
+#: objects/Ad.php:91
+msgid "Parking/garage"
+msgstr "Parking/garage"
+
+#: objects/Ad.php:96
+msgid "Building"
+msgstr "Bâtiment"
+
+#: objects/Ad.php:101
+msgid "Land"
+msgstr "Terrain"
+
+#: objects/Ad.php:112
 msgid "Create an ad type to categorize your ads"
 msgstr "Créez un type d'annonce pour les catégoriser"
 
-#: objects/Ad.php:81
+#: objects/Ad.php:113
 msgid "Ad types"
 msgstr "Types d'annonce"
 
-#: objects/Ad.php:84
+#: objects/Ad.php:116 templates/searchBars/searchBarAd.php:20
 msgid "Ad type"
 msgstr "Type d'annonce"
 
-#: objects/Ad.php:95 objects/Ad.php:96 objects/Ad.php:99
+#: objects/Ad.php:121
+msgid "Rental"
+msgstr "Location"
+
+#: objects/Ad.php:122
+msgid "Sell"
+msgstr "Vente"
+
+#: objects/Ad.php:126 objects/Ad.php:127 objects/Ad.php:130
 msgid "Property availability"
 msgstr "Disponibilité du bien"
 
-#: objects/Ad.php:174 objects/Ad.php:176
+#: objects/Ad.php:136
+msgid "Available"
+msgstr "Disponible"
+
+#: objects/Ad.php:137
+msgid "Unavailable"
+msgstr "Indisponible"
+
+#: objects/Ad.php:205 objects/Ad.php:207
 msgid "The property is available"
 msgstr "Le bien est disponible"
+
+#: objects/Ad.php:252
+msgid "No"
+msgstr "Non"
+
+#: objects/Ad.php:258 objects/Ad.php:266
+msgid "Habitable"
+msgstr "Habitable"
+
+#: objects/Ad.php:259 objects/Ad.php:268
+msgid "Is this type of property habitable ?"
+msgstr "Est-ce que ce type de propriété est habitable ?"
 
 #: objects/Agency.php:8
 msgid "Agencies"
@@ -593,6 +688,53 @@ msgstr "Agence"
 msgid "No assigned agency"
 msgstr "Pas d'agence attribuée"
 
+#: templates/archives/archive-re-ad.php:43
+msgid "month"
+msgstr "mois"
+
+#: templates/archives/archive-re-ad.php:43
+msgid "including"
+msgstr "Inclus"
+
+#: templates/archives/archive-re-ad.php:54
+msgid "furnished"
+msgstr "meublé"
+
+#: templates/searchBars/searchBarAd.php:42
+msgid "City"
+msgstr "Ville"
+
+#: templates/searchBars/searchBarAd.php:43
+msgid "Ex: London"
+msgstr "Ex: Paris"
+
+#: templates/searchBars/searchBarAd.php:47
+msgid "Search radius"
+msgstr "Rayon de la recherche"
+
+#: templates/searchBars/searchBarAd.php:51
+msgid "Filters"
+msgstr "Filtres"
+
+#: templates/searchBars/searchBarAd.php:56
+#: templates/singles/single-re-ad.php:167
+msgid "Price"
+msgstr "Prix"
+
+#: templates/searchBars/searchBarAd.php:57
+#: templates/searchBars/searchBarAd.php:63
+msgid "min"
+msgstr "min"
+
+#: templates/searchBars/searchBarAd.php:58
+#: templates/searchBars/searchBarAd.php:64
+msgid "max"
+msgstr "max"
+
+#: templates/searchBars/searchBarAd.php:75
+msgid "Search"
+msgstr "Chercher"
+
 #: templates/singles/single-re-ad.php:73
 msgid "Message about the ad"
 msgstr "Message à propos de l'annonce"
@@ -605,7 +747,7 @@ msgstr "Message de"
 msgid "About"
 msgstr "A propos de"
 
-#: templates/singles/single-re-ad.php:77 templates/singles/single-re-ad.php:295
+#: templates/singles/single-re-ad.php:77 templates/singles/single-re-ad.php:328
 msgid "Message"
 msgstr "Message"
 
@@ -617,53 +759,47 @@ msgstr "Le mail a été envoyé avec succès"
 msgid "The email could not be sent"
 msgstr "Le mail n'a pas pu être envoyé"
 
-#: templates/singles/single-re-ad.php:147
-msgid "Main characteristics"
-msgstr "Caractéristiques principales"
-
-#: templates/singles/single-re-ad.php:150
+#: templates/singles/single-re-ad.php:163
 msgid "Reference"
 msgstr "Référence"
 
-#: templates/singles/single-re-ad.php:154
-msgid "Price"
-msgstr "Prix"
-
-#: templates/singles/single-re-ad.php:162
+#: templates/singles/single-re-ad.php:175
 msgid "Address"
 msgstr "Adresse"
 
-#: templates/singles/single-re-ad.php:206
-msgid "Complementary characteristics"
-msgstr "Caractéristiques complémentaires"
-
-#: templates/singles/single-re-ad.php:266
+#: templates/singles/single-re-ad.php:299
 msgid "The location of the property is approximate"
 msgstr "L'emplacement du bien est approximative"
 
-#: templates/singles/single-re-ad.php:274
+#: templates/singles/single-re-ad.php:307
 msgid "Contact thumbnail"
 msgstr "Miniature du contact"
 
-#: templates/singles/single-re-ad.php:288
+#: templates/singles/single-re-ad.php:321
 msgid "Contact form"
 msgstr "Formulaire de contact"
 
-#: templates/singles/single-re-ad.php:292
+#: templates/singles/single-re-ad.php:325
 msgid "First name and surname"
 msgstr "Nom et prénom"
 
-#: templates/singles/single-re-ad.php:296
+#: templates/singles/single-re-ad.php:329
 msgid "Send"
 msgstr "Envoyer"
 
-#: templates/singles/single-re-ad.php:302
+#: templates/singles/single-re-ad.php:335
 msgid "Other"
 msgstr "Autres"
 
-#: templates/singles/single-re-ad.php:302
+#: templates/singles/single-re-ad.php:335
 msgid "in"
 msgstr "à"
+
+#~ msgid "Ads display"
+#~ msgstr "Affichage des annonces"
+
+#~ msgid "Values to replaced"
+#~ msgstr "Valeurs à remplacer"
 
 #~ msgid "email address"
 #~ msgstr "Adresse mail"

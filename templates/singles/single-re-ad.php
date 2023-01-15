@@ -1,28 +1,30 @@
 <?php
     if(have_posts()) {
-        get_header();                 
-        while(have_posts()) { //?
-   if (is_active_sidebar("before_content-side-bar") ) {
-      dynamic_sidebar("before_content-side-bar");
-   }
+        $currency = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["currency"];
+        while(have_posts()) {
+            if (is_active_sidebar("before_content-side-bar") ) {
+               dynamic_sidebar("before_content-side-bar");
+            }
             the_post();
 
             $idPost = get_the_id();
 
-            if(wp_get_post_terms($idPost, "adAvailable")[0]->name === "Indisponible" && !get_option(PLUGIN_RE_NAME."OptionsAds")["displayAdsUnavailable"]) {
+            if(wp_get_post_terms($idPost, "adAvailable")[0]->slug === "unavailable" /*&& !get_option(PLUGIN_RE_NAME."OptionsAds")["displayAdsUnavailable"]*/) {
                 wp_redirect(get_home_url(), "302");
                 exit();
             }
-
+            get_header();  
+            
             $metas = get_post_custom();
            
 
             $price = getMeta("adPrice");
             $images = getMeta("adImages");
             $typeAd = get_the_terms($idPost, "adTypeAd")[0]->name;
-            $afterPrice = '€';
-            if($typeAd === "Rental") {
-                $afterPrice .= "/mois";
+            $typeAdSlug = get_the_terms($idPost, "adTypeAd")[0]->slug;
+            $afterPrice = $currency;
+            if($typeAdSlug === "rental") {
+                $afterPrice .= '/'.__("month", "retxtdom");
             }
 
             if(!is_null($images)) {
