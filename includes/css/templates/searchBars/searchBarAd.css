@@ -12,14 +12,6 @@
     margin-top: 20px;
 }
 
-.searchBar .searchForm #minSurface, .searchBar .searchForm #maxSurface {
-    width: 30%;
-}
-
-.searchBar .searchForm #minPrice, .searchBar .searchForm #maxPrice {
-    width: 45%;
-}
-
 .searchBar .searchForm>div {
     display: flex;
     justify-content: space-evenly;
@@ -30,9 +22,10 @@
     font-weight: 600;
 }
 
-.searchBar .searchForm>div .searchBarInput input, .searchBar .searchForm>div .searchBarInput select {
+.searchBar .searchForm>div .searchBarInput input:not(input[type="checkbox"]), .searchBar .searchForm>div .searchBarInput select {
     font-size: 16px;
-    padding: 0.5rem 0.5rem;
+    padding: 5px 0 5px 10px;
+    border-radius: 20px;
 }
 
 .searchBar .searchForm #radius {
@@ -53,22 +46,79 @@
     margin-top: 25px;
 }
 
+
+
 .searchBar .searchForm .compSearchBarInputs .pricesSurfacesInputs {
     display: flex;
+    flex-direction: column;
 }
 
-.searchBar .searchForm .compSearchBarInputs .pricesSurfacesInputs+div {
+.searchBar .searchForm .compSearchBarInputs .otherDetails {
     display: flex;
-        flex-direction: column;
-
 }
 
-@media only screen and (max-width : 768px) {
-    .mainSearchBarInputs {
+.searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas {
+    display: flex;
+    margin-left: 80px;
+    gap: 50px;
+}
+
+.searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas div {
+    display: flex;
+    flex-direction: column;
+}
+
+.searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas div input {
+    margin-bottom: 20px;
+}
+
+.searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas div label {
+    margin-left: 0;
+}
+
+/* REPONSIVE */
+
+@media only screen and (max-width : 1100px) {
+    .searchBar {
+        width: 100%;
+        border-radius: 0;
+    }
+    
+    .searchBar .searchForm {
+        width: 90%;
+        margin: auto;
+    }
+    
+    .searchBar .searchForm div {
         flex-direction: column;
     }
     
-    #addressInput {
-        width: 50%;
+    .searchBar .searchForm .mainSearchBarInputs button {
+        align-self: center !important;
+        margin-bottom: 15px;
+    }
+    
+    .searchBar .searchForm>div .searchBarInput label {
+        display: block;
+        font-weight: 500;
+    }
+    
+    .searchBar .searchForm .mainSearchBarInputs .searchBarInput, .searchBar .searchForm .compSearchBarInputs div .searchBarInput {
+        display: flex;
+        margin-bottom: 20px;
+    }
+    
+    .searchBar .searchForm .compSearchBarInputs .otherDetails {
+        display: flex;
+        flex-direction: row;
+    }
+    
+    .searchBar .searchForm .compSearchBarInputs .otherDetails .nbRooms {
+        width: 30%;
+    }
+    
+    .searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas {
+        width: 70%;
+        flex-direction: row;
     }
 }

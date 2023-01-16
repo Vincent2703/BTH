@@ -67,14 +67,30 @@
                 </div>
                 
                 <div class="searchBarInput otherDetails">
-                    <label for="furnished"><?php _e("Furnished", "retxtdom"); ?></label>
-                    <input type="checkbox" name="furnished" id="furnished" <?php checked(isset($_GET["furnished"])&&intval($_GET["furnished"])!==0); ?>>
-                    <label for="rooms"><?php _e("Number of rooms", "retxtdom"); ?></label>
-                    <input type="number" name="nbRooms" id="rooms" value="<?= isset($_GET["nbRooms"])&&intval($_GET["nbRooms"])!==0?intval($_GET["nbRooms"]):''; ?>">
-                    <label for="bedrooms"><?php _e("Number of bedrooms", "retxtdom"); ?></label>
-                    <input type="number" name="nbBedrooms" id="bedrooms" value="<?= isset($_GET["nbBedrooms"])&&intval($_GET["nbBedrooms"])!==0?intval($_GET["nbBedrooms"]):''; ?>">
-                    <label for="bathrooms"><?php _e("Number of bathrooms", "retxtdom"); ?></label>
-                    <input type="number" name="nbBathrooms" id="bathrooms" value="<?= isset($_GET["nbBathrooms"])&&intval($_GET["nbBathrooms"])!==0?intval($_GET["nbBathrooms"]):''; ?>">
+                    <div class="nbRooms">
+                        <label for="rooms"><?php _e("Number of rooms", "retxtdom"); ?></label>
+                        <input type="number" name="nbRooms" id="rooms" value="<?= isset($_GET["nbRooms"])&&intval($_GET["nbRooms"])!==0?intval($_GET["nbRooms"]):''; ?>">
+                        <label for="bedrooms"><?php _e("Number of bedrooms", "retxtdom"); ?></label>
+                        <input type="number" name="nbBedrooms" id="bedrooms" value="<?= isset($_GET["nbBedrooms"])&&intval($_GET["nbBedrooms"])!==0?intval($_GET["nbBedrooms"]):''; ?>">
+                        <label for="bathrooms"><?php _e("Number of bathrooms", "retxtdom"); ?></label>
+                        <input type="number" name="nbBathrooms" id="bathrooms" value="<?= isset($_GET["nbBathrooms"])&&intval($_GET["nbBathrooms"])!==0?intval($_GET["nbBathrooms"]):''; ?>">
+                    </div>
+                    <div class="propertyHas">
+                        <div>
+                            <label for="furnished"><?php _e("Furnished", "retxtdom"); ?></label>
+                            <input type="checkbox" name="furnished" id="furnished" <?php checked(isset($_GET["furnished"])&&$_GET["furnished"]==="on"); ?>>
+                            <label for="land"><?php _e("Land", "retxtdom"); ?></label>
+                            <input type="checkbox" name="land" id="land" <?php checked(isset($_GET["land"])&&$_GET["land"]==="on"); ?>>
+                            <label for="cellar"><?php _e("Cellar", "retxtdom"); ?></label>
+                            <input type="checkbox" name="cellar" id="cellar" <?php checked(isset($_GET["cellar"])&&$_GET["cellar"]==="on"); ?>>
+                        </div>
+                        <div>
+                            <label for="terrace"><?php _e("Terrace", "retxtdom"); ?></label>
+                            <input type="checkbox" name="terrace" id="terrace" <?php checked(isset($_GET["terrace"])&&$_GET["terrace"]==="on"); ?>>
+                            <label for="elevator"><?php _e("Elevator", "retxtdom"); ?></label>
+                            <input type="checkbox" name="elevator" id="elevator" <?php checked(isset($_GET["elevator"])&&$_GET["elevator"]==="on"); ?>>
+                        </div>
+                    </div>
                 </div>
 
             </div>

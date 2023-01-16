@@ -130,7 +130,7 @@
     ?>
 
 
-        <div id="primary" class="content-area bth">
+        <div id="primary" class="content-area contentAd">
             <main id="main" class="site-main">
                 <span class="titleAd"><h1><?= the_title(); ?></h1></span>
                 <span class="subtitleAd"><?= ucfirst($city)." - $price$afterPrice"; ?></span>
@@ -181,10 +181,10 @@
                                 <span class="nameFeature"><?php _e("Living space", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adSurface") ?>m²</span>
                             </li>
-                            <?php if(intval(getMeta("adTotalSurface")) > 0) { ?> <!-- UTILISER QU'UNE FOIS GETMETA-->
+                            <?php if(intval(getMeta("adLandSurface")) > 0) { ?> <!-- UTILISER QU'UNE FOIS GETMETA-->
                             <li>
                                 <span class="nameFeature"><?php _e("Land area", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adTotalSurface") ?>m²</span>
+                                <span class="valueFeature"><?= getMeta("adLandSurface") ?>m²</span>
                             </li>
                             <?php } ?>
                             <li>

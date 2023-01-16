@@ -50,7 +50,7 @@ class EditAd {
                 update_post_meta($adId, "adSurface", intval($_POST["surface"]));
             }
             if(isset($_POST["landSurface"]) && !ctype_space($_POST["landSurface"])) {
-                update_post_meta($adId, "adTotalSurface", intval($_POST["landSurface"]));
+                update_post_meta($adId, "adLandSurface", intval($_POST["landSurface"]));
             }
             if(isset($_POST["nbRooms"]) && !ctype_space($_POST["nbRooms"])) {
                 update_post_meta($adId, "adNbRooms", intval($_POST["nbRooms"]));
@@ -210,7 +210,7 @@ class EditAd {
         $price = intval(get_post_meta($ad->ID, "adPrice", true));
         $fees = intval(get_post_meta($ad->ID, "adFees", true));
         $surface = sanitize_text_field(get_post_meta($ad->ID, "adSurface", true));
-        $landSurface = sanitize_text_field(get_post_meta($ad->ID, "adTotalSurface", true));
+        $landSurface = sanitize_text_field(get_post_meta($ad->ID, "adLandSurface", true));
         $nbRooms = intval(get_post_meta($ad->ID, "adNbRooms", true));
         $nbBedrooms = intval(get_post_meta($ad->ID, "adNbBedrooms", true));
         $nbBathrooms = intval(get_post_meta($ad->ID, "adNbBathrooms", true));

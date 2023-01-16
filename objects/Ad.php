@@ -360,6 +360,52 @@ class Ad {
                     )
                 );
             } 
+            if(isset($_GET["furnished"]) && $_GET["furnished"] === "on") {
+                array_push($metas,
+                    array(
+                        "key" => "adFurnished",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+            if(isset($_GET["land"]) && $_GET["land"] === "on") {
+                array_push($metas,
+                    array(
+                        "key" => "adLandSurface",
+                        "value" => '0',
+                        "compare" => ">",
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+            if(isset($_GET["cellar"]) && $_GET["cellar"] === "on") {
+                array_push($metas,
+                    array(
+                        "key" => "adCellar",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+            if(isset($_GET["terrace"]) && $_GET["terrace"] === "on") {
+                array_push($metas,
+                    array(
+                        "key" => "adTerrace",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+            if(isset($_GET["elevator"]) && $_GET["elevator"] === "on") {
+                array_push($metas,
+                    array(
+                        "key" => "adElevator",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
             if(isset($_GET["city"]) && isset($_GET["radius"]) && !empty($_GET["city"]) && !empty($_GET["radius"])) {
                 $city = sanitize_text_field($_GET["city"]);
                 $radius = intval($_GET["radius"]);

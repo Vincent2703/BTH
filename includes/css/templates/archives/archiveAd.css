@@ -125,3 +125,26 @@
     height: 20px;
     background: url("../../../images/bedIcon.svg") no-repeat bottom;    
 }
+
+/* REPONSIVE */
+
+@media only screen and (max-width : 900px) {
+    .inShortAd {
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .inShortAd .thumbnailAd {
+        width: 90%;
+        margin-bottom: 20px;
+    }
+    
+    .inShortAd .detailsAd {
+        width: 90%;
+    }
+    
+    .inShortAd .detailsAd .shortDescription {
+        margin-bottom: 10px;
+    }
+}

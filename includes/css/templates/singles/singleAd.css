@@ -4,38 +4,38 @@
     display: none !important;
 }
 
-#primary { /*Content width's ad must always be 100%*/
+.contentAd { /*Content width's ad must always be 100%*/
     width: 100% !important;
 }
 
-.bth .site-main {
+.contentAd .site-main {
     display: flex;
     flex-flow: row wrap;
 }
 
-.bth .titleAd {
+.contentAd .titleAd {
     flex: 0 1 100%;
     text-align: center;
 }
 
-.bth .subtitleAd {
+.contentAd .subtitleAd {
     flex: 0 1 100%;
     text-align: center;
     font-size: 16px;
     font-weight: bold;
 }
 
-.bth .titleAd h1 {
+.contentAd .titleAd h1 {
     font-size: 32px;
 }
 
-.bth .sliders {
+.contentAd .sliders {
     flex: 0 1 100%;
     margin-bottom: 3vh;
     object-fit: contain;
 }
 
-.bth .more {
+.contentAd .more {
     display: flex;
     width: 100%;
     flex-direction: column;
@@ -44,45 +44,45 @@
     margin-bottom: 10px;
 }
 
-.bth #moreTitle {
+.contentAd #moreTitle {
     display: flex;
     justify-content: center;
 }
 
-.bth .morePostsPanel {
+.contentAd .morePostsPanel {
     display: flex;    
     gap: 15px;
 
 }
 
-.bth .morePosts {
+.contentAd .morePosts {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
 }
 
-.bth .moreAd {
+.contentAd .moreAd {
     display: flex;
     flex-direction: column;
     width: 150px;
     user-select: none;
 }
 
-.bth .prevMorePosts, .bth .nextMorePosts {
+.contentAd .prevMorePosts, .contentAd .nextMorePosts {
     font-size: 20px;
     align-self: center;
     cursor: pointer;
     user-select: none;
 }
 
-.bth .moreThumbnailAd {
+.contentAd .moreThumbnailAd {
 }
 
-.bth .moreTitleAd {
+.contentAd .moreTitleAd {
     font-size: 10px;
 }
 
-.bth .contentRightAd, .bth .contentLeftAd {
+.contentAd .contentRightAd, .contentAd .contentLeftAd {
     display: flex;
     flex-direction: column;
     background-color: rgba(255, 255, 255, 0.7);
@@ -90,127 +90,110 @@
     padding-bottom: 1vh;
 }
 
-.bth .contentRightAd div, .bth .contentLeftAd div {
+.contentAd .contentRightAd div, .contentAd .contentLeftAd div {
     flex-grow: 1;
 }
 
-.bth .contentLeftAd {
+.contentAd .contentLeftAd {
     flex: 1 0 75%;
     padding-left: 6vw;
     padding-right: 6vw;
     border-right: 1px solid black;
 }
 
-.bth .contentRightAd {
+.contentAd .contentRightAd {
     flex: 1 0 25%;
     padding-right: 6vw;
     padding-left: 1vw;
 }
 
-.bth .description h4 {
+.contentAd .description h4 {
     margin-top: 0;
 }
 
-.bth .mainFeatures {
+.contentAd .mainFeatures {
     
 }
 
-.bth .mainFeatures ul, .bth .complementaryFeatures ul {
+.contentAd .mainFeatures ul, .contentAd .complementaryFeatures ul {
     list-style: none;
     columns: 2;
 }
-@media only screen and (max-width : 768px) {
-    .bth .mainFeatures ul, .bth .complementaryFeatures ul {
-        columns: 1;
-    }
-    
-    .bth .mainFeatures ul li, .bth .complementaryFeatures ul li {
-        margin-bottom: 15px;
-    }
-    
-    .bth #map { 
-        margin-left: 10px; /*Pas trouvé mieux*/
-    }
-    
-    .bth .contact {
-        margin-left: 10px;
-    }
-}
 
-.bth .nameFeature {
+.contentAd .nameFeature {
     font-weight: bold;
 }
 
-.bth .valueFeature {
+.contentAd .valueFeature {
 }
 
-.bth .complementaryFeatures {
+.contentAd .complementaryFeatures {
 }
 
-.bth #DPEValueSmall, .bth #GESValueSmall {
+.contentAd #DPEValueSmall, .contentAd #GESValueSmall {
     margin-top: 5px;
     margin-bottom: 10px;
 }
 
-.bth .map {
+.contentAd .map {
     margin-bottom: 5vh;
 }
 
-.bth #addressApprox {
+.contentAd #addressApprox {
     font-style: italic;
     font-size: 10px;
 }
 
-.bth .contact {
+.contentAd .contact {
 }
 
-.bth .headerContact {
+.contentAd .headerContact {
     display: flex;
     align-items: center;
     margin-bottom: 5vh;
 }
 
-.bth .formContact label {
+.contentAd .formContact label {
     display: block;
 }
 
-.bth .formContactInput {
+.contentAd .formContactInput {
     margin-bottom: 3vh !important;
 }
 
-.bth #formContactSubmit {
+.contentAd #formContactSubmit {
     display: block;
     width: auto;
     margin: auto;
 }
 
-.bth .headerContactLeft {
+.contentAd .headerContactLeft {
     display: flex;
     justify-content: center;
 }
 
-.bth .headerContactRight {
+.contentAd .headerContactRight {
 
 }
 
-.bth #phoneContact {
+.contentAd #phoneContact {
     display: flex;
     align-items: center;
 }
 
-.bth #phoneContact a {
+.contentAd #phoneContact a {
     margin-left: 0.3vw;
     font-size: 15px;
 }
 
-.bth #thumbnailContact {
+.contentAd #thumbnailContact {
     width: 70%;
     border-radius: 50%;
 }
 
 
 /* carte */
-.bth #map { 
+.contentAd #map { 
     width: 100%;
     height: 0; /*Pour utiliser la même valeur que width*/
     padding-bottom: 100%;
@@ -218,14 +201,14 @@
 
 /* slider photos */
 
-.bth #miniSlider {
+.contentAd #miniSlider {
    position: relative;
    overflow: hidden;
    margin: 20px auto 0 auto;
    border-radius: 4px;
 }    
 
-.bth #miniSlider ul {
+.contentAd #miniSlider ul {
    position: relative;
    margin: 0;
    padding: 0;
@@ -233,7 +216,7 @@
    list-style: none;
 }
 
-.bth #miniSlider ul li {
+.contentAd #miniSlider ul li {
    position: relative;
    display: block;
    float: left;
@@ -246,13 +229,13 @@
    line-height: 300px;
 }
 
-.bth #miniSlider ul li img {
+.contentAd #miniSlider ul li img {
     object-fit: cover;
     width: 100%; 
     height: 100%;
 }
 
-.bth .controlPrev, .bth .controlNext {
+.contentAd .controlPrev, .contentAd .controlNext {
    position: absolute;
    top: 40%;
    z-index: 999;
@@ -270,21 +253,21 @@
    user-select: none;
 }
 
-.bth .controlPrev:hover, .bth .controlNext:hover {
+.contentAd .controlPrev:hover, .contentAd .controlNext:hover {
    opacity: 1;
    -webkit-transition: all 0.2s ease;
 }
 
-.bth .controlPrev {
+.contentAd .controlPrev {
    border-radius: 0 2px 2px 0;
 }
 
-.bth .controlNext {
+.contentAd .controlNext {
    right: 0;
    border-radius: 2px 0 0 2px;
 }
 
-.bth #fullscreenSlider {
+.contentAd #fullscreenSlider {
     display: none;
     position: fixed;
     z-index: 100000;
@@ -295,7 +278,7 @@
     background-color: black;
 }
 
-.bth #fullscreenSlider .displayFullscreen {
+.contentAd #fullscreenSlider .displayFullscreen {
     width: 100vw;
     height: 100vh;
     /*background-size: 80%;*/
@@ -303,7 +286,7 @@
     background-position: center center;
 }
 
-.bth #fullscreenSlider .controlClose {
+.contentAd #fullscreenSlider .controlClose {
     font-size: 4rem;
     color: white;
     position: absolute;
@@ -313,12 +296,12 @@
     user-select: none;
 }
 
-.bth #fullscreenSlider .controlNext, .bth #fullscreenSlider .controlPrev {
+.contentAd #fullscreenSlider .controlNext, .contentAd #fullscreenSlider .controlPrev {
     background-color: rgba(128,128,128,0.5);
     font-size: 4rem;
 }
 
-.bth .pagingImg {
+.contentAd .pagingImg {
     z-index: 999;
     font-weight: 200;
     color: white;
@@ -327,11 +310,43 @@
     user-select: none;
 }
 
-.bth #miniSlider .pagingImg {
+.contentAd #miniSlider .pagingImg {
     bottom: 0%
 }
 
-.bth #fullscreenSlider .pagingImg {
+.contentAd #fullscreenSlider .pagingImg {
     bottom: 10%;
 }
 
+@media only screen and (max-width : 900px) {
+    .contentAd  h4 {
+        text-align: center;
+    }
+    
+    .contentAd .contentLeftAd, .contentAd .contentRightAd {
+        padding: 0;
+    }
+    
+    .contentAd .contentLeftAd, .contentAd .contentRightAd, .contentAd .contentLeftAd, .contentAd .contentLeftAd { 
+        /*flex: 0;*/
+    }
+    
+    .contentAd .contentLeftAd, .contentAd .contentLeftAd .description {
+        width: 90%;
+        margin: auto;
+        text-align: justify;
+    }
+    
+    .contentAd .contentLeftAd .mainFeatures ul, .contentAd .contentLeftAd .complementaryFeatures ul {
+        columns: 1;
+    }
+    
+    .contentAd .contentLeftAd .mainFeatures ul li, .contentAd .contentLeftAd .complementaryFeatures ul li {
+        margin: 0 0 15px 0;
+    }
+    
+    .contentAd #addressApprox {
+        font-size: 12px;
+    }
+
+}

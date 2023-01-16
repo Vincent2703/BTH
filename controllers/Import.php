@@ -92,7 +92,7 @@ class Import {
             update_post_meta($adWPId, "adPrice", floatval($adData["price"]));
             update_post_meta($adWPId, "adFees", floatval($adData["fees"]));
             update_post_meta($adWPId, "adSurface", floatval($adData["surface"]));
-            update_post_meta($adWPId, "adTotalSurface", floatval($adData["totalsurface"]));
+            update_post_meta($adWPId, "adLandSurface", floatval($adData["landsurface"]));
             update_post_meta($adWPId, "adNbRooms", intval($adData["nbrooms"]));
             update_post_meta($adWPId, "adNbBedrooms", intval($adData["nbbedrooms"]));
             update_post_meta($adWPId, "adNbBathrooms", intval($adData["nbbathrooms"]));
