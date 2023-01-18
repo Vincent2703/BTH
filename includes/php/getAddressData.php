@@ -1,7 +1,6 @@
 <?php
 require_once(preg_replace('/wp-content(?!.*wp-content).*/', '', __DIR__ )."wp-load.php");
-
-if(isset($_GET["query"])) {
+if(isset($_GET["query"]) && isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest") {
     $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
     $apiUsed = $apisOptions["apiUsed"];
 

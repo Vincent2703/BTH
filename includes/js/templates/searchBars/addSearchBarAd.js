@@ -1,12 +1,13 @@
 jQuery(document).ready(function($) {
 
     $.ajax({
-        url: "wp-content/plugins/"+variables.pluginName+"/templates/searchBars/searchBarAd.php"+window.location.search,
+        url: variables.searchBarURL+window.location.search,
         type: "GET"                 
     }).done(function(response) {
+        URLGetAddressDataFile = variables.getAddressDataURL;
         $("header:first").after(response);
         $.ajax({
-           url: "wp-content/plugins/"+variables.pluginName+"/includes/js/ajax/autocompleteAddress.js",
+           url: variables.autocompleteURL,
            dataType: "script"
         });
     });

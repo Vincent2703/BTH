@@ -79,7 +79,9 @@
 }
 
 .contentAd .moreTitleAd {
-    font-size: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+    text-align: center;
 }
 
 .contentAd .contentRightAd, .contentAd .contentLeftAd {
@@ -105,6 +107,10 @@
     flex: 1 0 25%;
     padding-right: 6vw;
     padding-left: 1vw;
+}
+
+.contentAd .description {
+    text-align: justify;
 }
 
 .contentAd .description h4 {
@@ -172,8 +178,8 @@
     justify-content: center;
 }
 
-.contentAd .headerContactRight {
-
+.contentAd .headerContactRight #nameContact {
+    white-space: nowrap;
 }
 
 .contentAd #phoneContact {
@@ -183,7 +189,7 @@
 
 .contentAd #phoneContact a {
     margin-left: 0.3vw;
-    font-size: 15px;
+    white-space: nowrap;
 }
 
 .contentAd #thumbnailContact {
@@ -318,7 +324,7 @@
     bottom: 10%;
 }
 
-@media only screen and (max-width : 900px) {
+@media only screen and (max-width : 1100px) {
     .contentAd  h4 {
         text-align: center;
     }
@@ -328,17 +334,16 @@
     }
     
     .contentAd .contentLeftAd, .contentAd .contentRightAd, .contentAd .contentLeftAd, .contentAd .contentLeftAd { 
-        /*flex: 0;*/
+        flex: 100%;
     }
     
     .contentAd .contentLeftAd, .contentAd .contentLeftAd .description {
         width: 90%;
         margin: auto;
-        text-align: justify;
     }
     
     .contentAd .contentLeftAd .mainFeatures ul, .contentAd .contentLeftAd .complementaryFeatures ul {
-        columns: 1;
+        /*columns: 1;*/
     }
     
     .contentAd .contentLeftAd .mainFeatures ul li, .contentAd .contentLeftAd .complementaryFeatures ul li {
@@ -348,5 +353,19 @@
     .contentAd #addressApprox {
         font-size: 12px;
     }
+    
+    .contentAd .headerContactRight {
+        font-size: 25px;
+    }
 
+}
+
+@media only screen and (max-width : 700px) {
+    .contentAd .contentLeftAd .mainFeatures ul, .contentAd .contentLeftAd .complementaryFeatures ul {
+        columns: 1;
+    }
+    
+    /*.contentAd .headerContactRight {
+        font-size: 23px;
+    }*/
 }

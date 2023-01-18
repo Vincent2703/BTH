@@ -108,8 +108,8 @@
                     ),
                     array(
                         "taxonomy" => "adAvailable",
-                        "field" => "name",
-                        "terms" => "Disponible"
+                        "field" => "slug",
+                        "terms" => "available"
                     )
                 )
             ));
@@ -163,56 +163,56 @@
                         <ul>
                             <li>
                                 <span class="nameFeature"><?php _e("Reference", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adRefAgency") ?></span>
+                                <span class="valueFeature"><?= getMeta("adRefAgency"); ?></span>
                             </li>
                             <li>
                                 <span class="nameFeature"><?php _e("Price", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adPrice") ?>€</span>
+                                <span class="valueFeature"><?= getMeta("adPrice"); ?>€</span>
                             </li>
                             <li>
                                 <span class="nameFeature"><?php _e("Fees", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adFees") ?>€</span>
+                                <span class="valueFeature"><?= getMeta("adFees"); ?>€</span>
                             </li>
                             <li>
                                 <span class="nameFeature"><?php _e("Address", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adAddress") ?></span>
+                                <span class="valueFeature"><?= getMeta("adCity").' '.getMeta("adPC"); ?></span>
                             </li>
                             <li>
                                 <span class="nameFeature"><?php _e("Living space", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adSurface") ?>m²</span>
+                                <span class="valueFeature"><?= getMeta("adSurface"); ?>m²</span>
                             </li>
-                            <?php if(intval(getMeta("adLandSurface")) > 0) { ?> <!-- UTILISER QU'UNE FOIS GETMETA-->
+                            <?php if(intval(getMeta("adLandSurface")) > 0) { ?> 
                             <li>
                                 <span class="nameFeature"><?php _e("Land area", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adLandSurface") ?>m²</span>
+                                <span class="valueFeature"><?= getMeta("adLandSurface"); ?>m²</span>
                             </li>
                             <?php } ?>
                             <li>
                                 <span class="nameFeature"><?php _e("Number rooms", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adNbRooms") ?></span>
+                                <span class="valueFeature"><?= getMeta("adNbRooms"); ?></span>
                             </li>
                             <?php if(intval(getMeta("adNbBedrooms")) > 0) { ?>
                             <li>
                                 <span class="nameFeature"><?php _e("Number bedrooms", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adNbBedrooms") ?></span>
+                                <span class="valueFeature"><?= getMeta("adNbBedrooms"); ?></span>
                             </li>
                             <?php } ?>
                             <?php if(intval(getMeta("adNbWC")) > 0) { ?>
                             <li>
                                 <span class="nameFeature"><?php _e("Number toilets", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adNbWC") ?></span>
+                                <span class="valueFeature"><?= getMeta("adNbWC"); ?></span>
                             </li>
                             <?php } ?>
                             <?php if(intval(getMeta("adNbBathrooms")) >0) { ?>
                             <li>
                                 <span class="nameFeature"><?php _e("Number bathrooms", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adNbBathrooms") ?></span>
+                                <span class="valueFeature"><?= getMeta("adNbBathrooms"); ?></span>
                             </li>
                             <?php } ?>
                             <?php if(intval(getMeta("adNbWaterRooms")) > 0) { ?>
                             <li>
                                 <span class="nameFeature"><?php _e("Number shower rooms", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adNbWaterRooms") ?></span>
+                                <span class="valueFeature"><?= getMeta("adNbWaterRooms"); ?></span>
                             </li>
                             <?php } ?>
                             <?php if(!empty($customMainFields)) {
@@ -314,10 +314,14 @@
                                     <span class="material-symbols-outlined">
                                         call
                                     </span>
-                                    <a href="tel:<?= $phone; ?>"><?= isset($phone)?$phone:'' ?></a>
+                                    <?php if(isset($phone)) { ?>
+                                    <a href="tel:<?= $phone; ?>"><?= $phone ?></a>
+                                    <?php } ?>
                                 </div>
 
-                                <span id="mobilePhoneContact"><a href="tel:<?= $mobilePhone; ?>"><?= isset($mobilePhone)?$mobilePhone:'' ?></a></span>
+                                <?php if(isset($mobilePhone)) { ?>
+                                <span id="mobilePhoneContact"><a href="tel:<?= $mobilePhone; ?>"><?= $mobilePhone; ?></a></span>
+                                <?php } ?>
                             </div>
                             <?php }else{ ?>
                             <span id="noContactTitle"><?php _e("Contact form", "retxtdom"); ?></span>
@@ -342,7 +346,7 @@
                             $nbPanels = ceil($nbPosts/$adByPanel);
                             for($i=0; $i<$nbPanels; $i++) { ?>
                                 <div class="morePostsPanel" <?= $i>0 ? 'style="display: none;"':'';?>>
-                                    <span class="prevMorePosts" ><</span>
+                                    <span class="prevMorePosts" <?= $nbPanels<$adByPanel ? 'style="display: none;"':'';?>><</span>
                                     <?php for($y=0; $y<$adByPanel; $y++) {
                                         $currentNbPost = $i*5+$y;
                                         if(isset($morePosts[$currentNbPost]) && get_the_post_thumbnail_url($morePosts[$currentNbPost]) !== false) { 
@@ -355,7 +359,7 @@
                                             </div>
                                         <?php }
                                     } ?>
-                                    <span class="nextMorePosts" >></span>
+                                    <span class="nextMorePosts" <?= $nbPanels<$adByPanel ? 'style="display: none;"':'';?>>></span>
                                 </div>
                             <?php }
                         ?>

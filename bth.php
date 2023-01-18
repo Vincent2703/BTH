@@ -99,14 +99,16 @@ class Bth {
             wp_register_script("addSearchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/searchBars/addSearchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
             $variables = array(
                 "filters" => __("FILTERS", "retxtdom"),
-                "pluginName" => PLUGIN_RE_NAME
+                "searchBarURL" => plugin_dir_url(__FILE__)."/templates/searchBars/searchBarAd.php",
+                "autocompleteURL" => plugin_dir_url(__FILE__)."/includes/js/ajax/autocompleteAddress.js",
+                "getAddressDataURL" => plugin_dir_url(__FILE__)."/includes/php/getAddressData.php"
             );
             wp_localize_script("addSearchBarAd", "variables", $variables);
             wp_enqueue_script("addSearchBarAd");
-            wp_add_inline_script("addSearchBarAd", 'var URLGetAddressDataFile="'.plugins_url(PLUGIN_RE_NAME."/includes/php/getAddressData.php").'";');
 
             wp_register_style("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
             wp_enqueue_style("searchBarAd");
+            
             wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
             wp_enqueue_style("autocompleteAddress");
         }

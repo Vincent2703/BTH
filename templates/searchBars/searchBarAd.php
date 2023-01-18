@@ -68,11 +68,11 @@
                 
                 <div class="searchBarInput otherDetails">
                     <div class="nbRooms">
-                        <label for="rooms"><?php _e("Number of rooms", "retxtdom"); ?></label>
+                        <label for="rooms"><?php _e("Rooms", "retxtdom"); ?></label>
                         <input type="number" name="nbRooms" id="rooms" value="<?= isset($_GET["nbRooms"])&&intval($_GET["nbRooms"])!==0?intval($_GET["nbRooms"]):''; ?>">
-                        <label for="bedrooms"><?php _e("Number of bedrooms", "retxtdom"); ?></label>
+                        <label for="bedrooms"><?php _e("Bedrooms", "retxtdom"); ?></label>
                         <input type="number" name="nbBedrooms" id="bedrooms" value="<?= isset($_GET["nbBedrooms"])&&intval($_GET["nbBedrooms"])!==0?intval($_GET["nbBedrooms"]):''; ?>">
-                        <label for="bathrooms"><?php _e("Number of bathrooms", "retxtdom"); ?></label>
+                        <label for="bathrooms"><?php _e("Bathrooms", "retxtdom"); ?></label>
                         <input type="number" name="nbBathrooms" id="bathrooms" value="<?= isset($_GET["nbBathrooms"])&&intval($_GET["nbBathrooms"])!==0?intval($_GET["nbBathrooms"]):''; ?>">
                     </div>
                     <div class="propertyHas">

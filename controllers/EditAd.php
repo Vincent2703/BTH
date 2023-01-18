@@ -77,7 +77,7 @@ class EditAd {
                 if(isset($_POST["address"]) && !ctype_space($_POST["address"])) {
                     update_post_meta($adId, "adAddress", sanitize_text_field($_POST["address"]));
                         $query = urlencode(addslashes(htmlentities(sanitize_text_field($_POST["address"]))));
-                        if($_POST["showMap"] === "onlyPC") { 
+                        if($_POST["showMap"] !== "onlyPC") { 
                             $zoom = 14;
                             $radiusCircle = 0;
                             $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&city";

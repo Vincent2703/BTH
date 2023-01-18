@@ -121,4 +121,8 @@
         width: 70%;
         flex-direction: row;
     }
+    
+    .searchBar .propertyHas label, .searchBar .nbRooms label {
+        white-space: nowrap;
+    }
 }
