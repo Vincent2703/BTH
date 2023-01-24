@@ -4,27 +4,32 @@
         var input = $("#addressInput");
 
         if(input.attr("name") === "address") {
-            var url = URLGetAddressDataFile;
+            var context = "searchAddress";
             var minLength = 5;
         } else if(input.attr("name") === "city") {
-            var url = URLGetAddressDataFile + "?city";
+            var context = "searchBar";
             var minLength = 3;
         }
 
         input.autocomplete({
             source: function(request, response) {
                 $.ajax({
-                    url: url,
+                    url: URLGetAddressDataFile,
                     data: {
-                        "query": input.val()
+                        "query": input.val(),
+                        "context": context
                     },
                     dataType: "json",
                     success: function(data) {
                         var labels = [];
                         data.forEach(result => {
-                            var valueLabel = result.address;
                             if(input.attr("name") === "city") {
-                                valueLabel += ' ' + result.postcode;
+                                var valueLabel = result.city + '';
+                                if(typeof(result.postcode) !== "undefined") {
+                                    valueLabel += ' ' + result.postcode;
+                                }
+                            }else if(input.attr("name") === "address") {
+                                var valueLabel = result.address;
                             }
                             labels.push(valueLabel);
                         });

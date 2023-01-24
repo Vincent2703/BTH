@@ -175,7 +175,7 @@
                             </li>
                             <li>
                                 <span class="nameFeature"><?php _e("Address", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= getMeta("adCity").' '.getMeta("adPC"); ?></span>
+                                <span class="valueFeature"><?= $address; ?></span>
                             </li>
                             <li>
                                 <span class="nameFeature"><?php _e("Living space", "retxtdom"); ?></span>

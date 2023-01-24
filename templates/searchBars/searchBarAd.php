@@ -39,11 +39,15 @@
                 </div>
                 
                 <div class="searchBarInput">
-                    <label for="addressInput"><?php _e("City", "retxtdom"); ?></label>
+                    <label for="addressInput"><?php _e("City and postcode", "retxtdom"); ?></label>
                     <input type="text" name="city" id="addressInput" class="ui-autocomplete-input" autocomplete="off" size="15" placeholder="<?php _e("Ex: London", "retxtdom"); ?>" <?= isset($_GET["city"]) && !empty($_GET["city"])?'value="'.sanitize_text_field($_GET["city"]).'"':''; ?>>
                 </div>
 
                 <div class="searchBarInput">
+                    <select id="searchBy" name="searchBy">
+                        <option value="city" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city"); ?>><?php _e("City", "retxtdom"); ?></option>
+                        <option value="radius" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"); ?>><?php _e("Radius", "retxtdom"); ?></option>
+                    </select>
                     <label for="radius"><?php _e("Search radius", "retxtdom"); ?></label>
                     <input type="number" name="radius" id="radius" value="<?= isset($_GET["radius"])?intval($_GET["radius"]):'10'; ?>">
                 </div>

@@ -406,34 +406,48 @@ class Ad {
                     )
                 );
             }
-            if(isset($_GET["city"]) && isset($_GET["radius"]) && !empty($_GET["city"]) && !empty($_GET["radius"])) {
-                $city = sanitize_text_field($_GET["city"]);
-                $radius = intval($_GET["radius"]);
-                $url = "https://api-adresse.data.gouv.fr/search/?q=".$city."&type=municipality&limit=1"; 
-                $apiResponse = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                if(isset($apiResponse["features"])) {
-                    $coordsGPS = $apiResponse["features"][0]["geometry"]["coordinates"];
-                    $minLat = $coordsGPS[1]-$radius/111;
-                    $maxLat = $coordsGPS[1]+$radius/111;
-                    $minLong = $coordsGPS[0]-$radius/76;
-                    $maxLong = $coordsGPS[0]+$radius/76;
+            
+            if(isset($_GET["city"]) && !empty($_GET["city"])) {
+                if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
+                    $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".$_GET["city"]."&context=searchAds&searchBy=city";
+                    $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
+                    
+                    array_push($metas,
+                        array(
+                            "key" => "adCity",
+                            "value" => $addressData["city"],
+                            "compare" => "IN"
+                        )    
+                    );
+                    
+                    if(isset($addressData["postCode"])) {
+                        array_push($metas,
+                            array(
+                                "key" => "adPC",
+                                "value" => $addressData["postCode"],
+                            )
+                        );
+                    }
+                }else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"){ 
+                    $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".$_GET["city"]."&context=searchAds&searchBy=radius&radius=".intval($_GET["radius"]);
+                    $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
+                    
                     array_push($metas,
                         array(
                             "key" => "adLatitude",
-                            "value" => array($minLat, $maxLat),
+                            "value" => array($addressData["minLat"], $addressData["maxLat"]),
                             "compare" => "BETWEEN"
                         )
                     );
                     array_push($metas,
                         array(
                             "key" => "adLongitude",
-                            "value" => array($minLong, $maxLong),
+                            "value" => array($addressData["minLong"], $addressData["maxLong"]),
                             "compare" => "BETWEEN"
                         )
                     );
-                } 
-            }
-                           
+                }
+            }                         
             if(!empty($terms)) {
                 $query->set("tax_query", array($terms));
             }

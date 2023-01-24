@@ -77,22 +77,22 @@ class EditAd {
                 if(isset($_POST["address"]) && !ctype_space($_POST["address"])) {
                     update_post_meta($adId, "adAddress", sanitize_text_field($_POST["address"]));
                         $query = urlencode(addslashes(htmlentities(sanitize_text_field($_POST["address"]))));
-                        if($_POST["showMap"] !== "onlyPC") { 
+                        if($_POST["showMap"] !== "all") { 
                             $zoom = 14;
                             $radiusCircle = 0;
-                            $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&city";
-                            $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true)[0];
+                            $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&context=saveAd&coordsApprox";
+                            $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                         }else{
                             $zoom = 16;
-                            $radiusCircle = 10;
-                            $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query";
-                            $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true)[0];
+                            $radiusCircle = 0;
+                            $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&context=saveAd";
+                            $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                         }
                     
                         $coordinates = $addressData["coordinates"];
-                        update_post_meta($adId, "adDataMap", array("lat" => $coordinates[1], "long" => $coordinates[0], "zoom" => $zoom, "circ" => $radiusCircle));
-                        update_post_meta($adId, "adLatitude", $coordinates[1]);
-                        update_post_meta($adId, "adLongitude", $coordinates[0]);
+                        update_post_meta($adId, "adDataMap", array("lat" => $coordinates["lat"], "long" => $coordinates["long"], "zoom" => $zoom, "circ" => $radiusCircle));
+                        update_post_meta($adId, "adLatitude", $coordinates["lat"]);
+                        update_post_meta($adId, "adLongitude", $coordinates["long"]);
 
                         $PC = $addressData["postcode"];
                         update_post_meta($adId, "adPC", $PC);
@@ -275,23 +275,23 @@ class EditAd {
         <div id="nbRooms">
             <div class="text">
                 <label><?php _e("Number rooms", "retxtdom");?></label>       
-                <input type="number" name="nbRooms" id="nbRoomsInput" placeholder="<?php _e("Number rooms", "retxtdom");?>" value="<?= $nbRooms; ?>" required>
+                <input type="number" name="nbRooms" id="nbRoomsInput" placeholder="<?php _e("Number rooms", "retxtdom");?>" value="<?= $nbRooms; ?>">
             </div>
         </div>
         <div id="otherRooms">
             <div class="text">
                 <label><?php _e("Number bedrooms", "retxtdom");?></label>
-                <input type="number" name="nbBedrooms" id="nbBedroomsInput" placeholder="<?php _e("Number bedrooms", "retxtdom");?>" value="<?= $nbBedrooms; ?>" required>
+                <input type="number" name="nbBedrooms" id="nbBedroomsInput" placeholder="<?php _e("Number bedrooms", "retxtdom");?>" value="<?= $nbBedrooms; ?>">
 
                 <label><?php _e("Number bathrooms", "retxtdom");?></label>
-                <input type="number" name="nbBathrooms" id="nbBathroomsInput" placeholder="<?php _e("Number bathrooms", "retxtdom");?>" value="<?= $nbBathrooms; ?>" required>
+                <input type="number" name="nbBathrooms" id="nbBathroomsInput" placeholder="<?php _e("Number bathrooms", "retxtdom");?>" value="<?= $nbBathrooms; ?>">
             </div>
             <div class="text">
                 <label><?php _e("Number shower rooms", "retxtdom");?></label>
-                <input type="number" name="nbWaterRooms" id="nbWaterRoomsInput" placeholder="<?php _e("Number shower rooms", "retxtdom");?>" value="<?= $nbWaterRooms; ?>" required>
+                <input type="number" name="nbWaterRooms" id="nbWaterRoomsInput" placeholder="<?php _e("Number shower rooms", "retxtdom");?>" value="<?= $nbWaterRooms; ?>">
 
                 <label><?php _e("Number toilets", "retxtdom");?></label>
-                <input type="number" name="nbWC" id="nbWCInput" placeholder="<?php _e("Number toilets", "retxtdom");?>" value="<?= $nbWC; ?>" required>
+                <input type="number" name="nbWC" id="nbWCInput" placeholder="<?php _e("Number toilets", "retxtdom");?>" value="<?= $nbWC; ?>">
             </div>
         </div>
         <div id="agent">
@@ -370,11 +370,11 @@ class EditAd {
         <div id="floors">
             <div class="text">
                 <label><?php _e("Floor", "retxtdom");?></label>
-                <input type="number" name="floor" id="floorInput" placeholder="<?php _e("Floor", "retxtdom");?>" value="<?= $floor; ?>" required>
+                <input type="number" name="floor" id="floorInput" placeholder="<?php _e("Floor", "retxtdom");?>" value="<?= $floor; ?>">
             </div>
             <div class="text">
                 <label><?php _e("Number floors", "retxtdom");?></label>
-                <input type="number" name="nbFloors" id="nbFloorsInput" placeholder="<?php _e("Number floors", "retxtdom");?>" value="<?= $nbFloors; ?>" required>
+                <input type="number" name="nbFloors" id="nbFloorsInput" placeholder="<?php _e("Number floors", "retxtdom");?>" value="<?= $nbFloors; ?>">
             </div>
         </div>
         <div id="kitchenHeater">
@@ -420,7 +420,7 @@ class EditAd {
         <div id="balconies">
             <div class="text">
                 <label><?php _e("Number balconies", "retxtdom");?></label>
-                <input type="number" name="nbBalconies" id="nbBalconiesInput" placeholder="<?php _e("Number balconies", "retxtdom");?>" value="<?= $nbBalconies; ?>" required>
+                <input type="number" name="nbBalconies" id="nbBalconiesInput" placeholder="<?php _e("Number balconies", "retxtdom");?>" value="<?= $nbBalconies; ?>">
             </div>
         </div>
         <div id="propertyHas">
@@ -456,7 +456,7 @@ class EditAd {
         <div id="year">
             <div class="text">
                 <label><?php _e("Construction year", "retxtdom");?></label>
-                <input type="number" name="year" id="yearInput" placeholder="<?php _e("Construction year", "retxtdom");?>" value="<?= $year; ?>" required>
+                <input type="number" name="year" id="yearInput" placeholder="<?php _e("Construction year", "retxtdom");?>" value="<?= $year; ?>">
             </div>
         </div>
         <div id="diag">
