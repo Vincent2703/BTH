@@ -34,7 +34,16 @@
             $showMap = getMeta("adShowMap");
             if($showMap !== "no" && $showMap) {
                 if($showMap === "onlyPC") {
-                    $address = getMeta("adPC").", ". getMeta("adCity");
+                    $address = getMeta("adCity").' '.getMeta("adPostCode");
+                    $optionsApis = get_option(PLUGIN_RE_NAME."OptionsApis");
+                    $displayAdminLvl1 = $optionsApis["apiAdminAreaLvl1"] == 1;
+                    $displayAdminLvl2 = $optionsApis["apiAdminAreaLvl2"] == 1;
+                    if($displayAdminLvl2 && !empty(getMeta("adAdminLvl2"))) {
+                        $address .= ' '.getMeta("adAdminLvl2");
+                    }
+                    if($displayAdminLvl1 && !empty(getMeta("adAdminLvl1"))) {
+                        $address .= ' '.getMeta("adAdminLvl1");
+                    }
                 }else if($showMap === "all"){
                     $address = getMeta("adAddress");
                 }

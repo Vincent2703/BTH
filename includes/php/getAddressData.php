@@ -1,6 +1,6 @@
 <?php
 require_once(preg_replace('/wp-content(?!.*wp-content).*/', '', __DIR__ )."wp-load.php");
-if(/*isset($_GET["query"]) && isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest"*/true) {
+if(isset($_GET["query"]) && isset($_GET["context"])/*&& isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest"*/) {
     $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
     $apiUsed = $apisOptions["apiUsed"];
     $context = $_GET["context"];
@@ -27,7 +27,7 @@ if(/*isset($_GET["query"]) && isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtol
                             $resultsArrayGeoAPI = json_decode($resultsBodyGeoAPI, true);
 
                             $resultsCleaned["city"] = $city["properties"]["city"];
-                            $resultsCleaned["postcode"] = min($resultsArrayGeoAPI["codesPostaux"]);
+                            $resultsCleaned["postCode"] = min($resultsArrayGeoAPI["codesPostaux"]);
                         }
                         array_push($arrayCleaned, $resultsCleaned);
                     }
@@ -35,7 +35,7 @@ if(/*isset($_GET["query"]) && isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtol
                 }
             break;
             
-            case "searchAds": ///We need the postcode or a perimeter in coordinates                
+            case "searchAds": ///We need the postcode + city or a perimeter in coordinates                
                 $resultsResponseDataAPI = wp_remote_get("https://api-adresse.data.gouv.fr/search/?q=$query&type=municipality&limit=1");
                 if(wp_remote_retrieve_response_code($resultsResponseDataAPI) === 200) {
                     $resultsBodyDataAPI = wp_remote_retrieve_body($resultsResponseDataAPI);
@@ -69,7 +69,7 @@ if(/*isset($_GET["query"]) && isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtol
             break;
 
             case "searchAddress": //We need full address cleaned
-                $resultsResponseDataAPI = wp_remote_get("https://api-adresse.data.gouv.fr/search/?q=$query&limit=5");
+                $resultsResponseDataAPI = wp_remote_get("https://api-adresse.data.gouv.fr/search/?q=$query&type=housenumber&limit=5");
                 if(wp_remote_retrieve_response_code($resultsResponseDataAPI) === 200) {
                     $resultsBodyDataAPI = wp_remote_retrieve_body($resultsResponseDataAPI);
                     $resultsArrayDataAPI = json_decode($resultsBodyDataAPI, true);
@@ -82,7 +82,7 @@ if(/*isset($_GET["query"]) && isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtol
                 }
             break;
 
-            case "saveAd": //We need full adress cleaned, coordinates (of the city or of the precise address)n postcode and city name
+            case "saveAd": //We need the full address cleaned, coordinates (of the city or of the precise address), postcode and city name
                 $resultsResponseDataAPI = wp_remote_get("https://api-adresse.data.gouv.fr/search/?q=$query&limit=1");
                 if(wp_remote_retrieve_response_code($resultsResponseDataAPI) === 200) {
                     $resultsBodyDataAPI = wp_remote_retrieve_body($resultsResponseDataAPI);
@@ -91,7 +91,7 @@ if(/*isset($_GET["query"]) && isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtol
                     $address = $resultsArrayDataAPI["features"][0];
                     $arrayCleaned = array(
                         "address" => $address["properties"]["label"],                     
-                        "postcode" => $address["properties"]["postcode"],
+                        "postCode" => $address["properties"]["postcode"],
                         "city"  => $address["properties"]["city"]
                     );
                     $cityCode = $address["properties"]["citycode"];
@@ -122,7 +122,10 @@ if(/*isset($_GET["query"]) && isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtol
         
         switch($context) {
             case "searchBar": //We need city name and post code for results in searchbar
-                $resultsResponsePlaceAPI = wp_remote_get("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query&language=$country&types=geocode&components=country:$country&key=$apiKeyGoogle");
+                $optionsApis = get_option(PLUGIN_RE_NAME."OptionsApis");
+                $displayAdminLvl1 = $optionsApis["apiAdminAreaLvl1"] == 1;
+                $displayAdminLvl2 = $optionsApis["apiAdminAreaLvl2"] == 1;
+                $resultsResponsePlaceAPI = wp_remote_get("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query&language=$country&types=locality|sublocality&components=country:$country&key=$apiKeyGoogle");
                 if(wp_remote_retrieve_response_code($resultsResponsePlaceAPI) === 200) {
                     $resultsBodyPlaceAPI = wp_remote_retrieve_body($resultsResponsePlaceAPI);
                     $resultsArrayPlaceAPI = json_decode($resultsBodyPlaceAPI, true);
@@ -137,15 +140,20 @@ if(/*isset($_GET["query"]) && isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtol
                             $resultsBodyGeocodeAPI = wp_remote_retrieve_body($resultsResponseGeocodeAPI);
                             $resultsArrayGeocodeAPI = json_decode($resultsBodyGeocodeAPI, true);
 
-                            $adressComponents = $resultsArrayGeocodeAPI["results"][0]["address_components"];
-                            foreach($adressComponents as $comp) {
-                                if($comp["types"][0] === "postal_code") {
-                                    $resultsCleaned["postcode"] = $comp["long_name"];
+                            $addressComponents = $resultsArrayGeocodeAPI["results"][0]["address_components"];
+                            foreach($addressComponents as $comp) {
+                                if(in_array("postal_code", $comp["types"], true)) {
+                                    $resultsCleaned["postCode"] = $comp["long_name"];
                                 }
-                                else if($comp["types"][0] === "locality") {
+                                else if(in_array("locality", $comp["types"], true)) {
                                     $resultsCleaned["city"] = $comp["long_name"];
                                 }
-                            }
+                                else if($displayAdminLvl1 && in_array("administrative_area_level_1", $comp["types"], true)) {
+                                    $resultsCleaned["adminLvl1"] = $comp["long_name"];
+                                }else if($displayAdminLvl2 && in_array("administrative_area_level_2", $comp["types"], true)) {
+                                    $resultsCleaned["adminLvl2"] = $comp["long_name"];
+                                }
+                            }//Don't keep if no PC ?
                             if(!empty($resultsCleaned)) {
                                 array_push($arrayCleaned, $resultsCleaned);
                             }
@@ -154,69 +162,107 @@ if(/*isset($_GET["query"]) && isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtol
                 }
             break;
         
-            case "searchAds": ///We need the postcode or a perimeter in coordinates            
+            case "searchAds": ///We need the postcode + city or a perimeter in coordinates     
+                $resultsResponseGeocodeAPI = wp_remote_get("https://maps.googleapis.com/maps/api/geocode/json?address=$query&language=$country&components=country:$country&key=$apiKeyGoogle");
+                if(wp_remote_retrieve_response_code($resultsResponseGeocodeAPI) === 200) {
+
+                    $resultsBodyGeocodeAPI = wp_remote_retrieve_body($resultsResponseGeocodeAPI);
+                    $resultsArrayGeocodeAPI = json_decode($resultsBodyGeocodeAPI, true);    
+                    
+                    $addressComponents = $resultsArrayGeocodeAPI["results"][0]["address_components"];
+                    
+                    if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
+                        foreach($addressComponents as $comp) {
+                            if(in_array("postal_code", $comp["types"], true)) { 
+                                $arrayCleaned["postCode"] = $comp["long_name"];
+                            }
+                            else if(in_array("locality", $comp["types"], true)) {
+                                $arrayCleaned["city"] = $comp["long_name"];
+                            }
+                        }            
+                    }else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius") {
+                        $radius = intval($_GET["radius"]);
+                        $long = $resultsArrayGeocodeAPI["results"][0]["geometry"]["location"]["lng"];
+                        $lat = $resultsArrayGeocodeAPI["results"][0]["geometry"]["location"]["lat"];
+
+                        $arrayCleaned["minLat"] = $lat-$radius/111;
+                        $arrayCleaned["maxLat"] = $lat+$radius/111;
+                        $arrayCleaned["minLong"] = $long-$radius/76;
+                        $arrayCleaned["maxLong"] = $long+$radius/76;
+                    }    
+                }              
             break;
             
             case "searchAddress": //We need full address cleaned
-            break;
-            
-            case "saveAd": //We need full adress cleaned, coordinates (of the city or of the precise address)n postcode and city name
-            break;
-        
-        
-        /*if(!isset($_GET["city"])) {
-            $resultsResponse = wp_remote_get("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query&language=$country&types=address&components=country:$country&key=$apiKeyGoogle");
-        }else{
-            $resultsResponse = wp_remote_get("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query&language=$country&types=%28regions%29&components=country:$country&key=$apiKeyGoogle");
-        }
-
-        if(wp_remote_retrieve_response_code($resultsResponse) === 200) {
-            $resultsBody = wp_remote_retrieve_body($resultsResponse);
-            $resultsArray = json_decode($resultsBody, true);
-
-            $arrayCleaned = array();
-
-            foreach($resultsArray["predictions"] as $feature) {
-                $resultsCleaned = array();
-                $idPlace = $feature["place_id"];
-
-                if(isset($_GET["city"])) {
-                    $address = $feature["structured_formatting"]["main_text"];
-                }else{
-                    $address = substr($feature["description"], 0, strrpos($feature["description"], ',')); //Pour avoir le nom de la ville + CP sans le pays
-                }
-
-                $resultsCleaned["address"] = $address;
-
-                $resultsCleaned["city"] = $feature["terms"][count($feature["terms"])-2]["value"];
-
-                if(isset($_GET["import"]) || isset($_GET["city"])) { //On a besoin des coords GPS et du CP uniquement quand on cherche une ville ou qu'on importe
-                    $resultsDetailsResponse = wp_remote_get("https://maps.googleapis.com/maps/api/place/details/json?fields=geometry%2Caddress_component&place_id=$idPlace&key=$apiKeyGoogle");
-                    if(wp_remote_retrieve_response_code($resultsDetailsResponse) === 200) {
-                        $resultsDetailsBody = wp_remote_retrieve_body($resultsDetailsResponse);
-                        $resultsDetailsArray = json_decode($resultsDetailsBody, true);
-
-                        $coords = array_values($resultsDetailsArray["result"]["geometry"]["location"]);
-                        $lat = $coords[0];
-                        $lng = $coords[1];
-
-                        $resultsCleaned["coordinates"] = array_reverse($coords);
-
-                        $resultsGeoCodeResponse = wp_remote_get("https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&result_type=postal_code&key=$apiKeyGoogle");
-                        if(wp_remote_retrieve_response_code($resultsGeoCodeResponse) === 200) {
-                            $resultsGeoCodeBody = wp_remote_retrieve_body($resultsGeoCodeResponse);
-                            $resultsGeoCodeArray = json_decode($resultsGeoCodeBody, true);
-                            $resultsCleaned["postcode"] = $resultsGeoCodeArray["results"][0]["address_components"][0]["long_name"];
-                            /*foreach($resultsGeoCodeArray["results"][0]["address_components"] as $addressComp) {
-                                if(empty(array_diff($addressComp["types"], array("sublocality_level_1", "neighborhood", "locality", "postal_town", "political")))) {
-                                    $resultsCleaned["city"] = $addressComp["long_name"];
-                                }
-                            } Marche pas si cp contient plusieurs communes*
-                        }           
+                $resultsResponsePlaceAPI = wp_remote_get("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query&language=$country&types=address&components=country:$country&key=$apiKeyGoogle");
+                if(wp_remote_retrieve_response_code($resultsResponsePlaceAPI) === 200) {
+                    $resultsBodyPlaceAPI = wp_remote_retrieve_body($resultsResponsePlaceAPI);
+                    $resultsArrayPlaceAPI = json_decode($resultsBodyPlaceAPI, true);
+                    
+                    foreach($resultsArrayPlaceAPI["predictions"] as $address) {
+                        $resultsCleaned = array();
+                        
+                        $resultsCleaned["address"] = str_replace(',', '', substr($address["description"], 0, strrpos($address["description"], ',')));
+                        array_push($arrayCleaned, $resultsCleaned);
                     }
                 }
-                array_push($arrayCleaned, $resultsCleaned);                
-            }*/
+            break;
+            
+            case "saveAd": //We need the full address cleaned, coordinates (of the city or of the precise address), postcode and city name
+                $optionsApis = get_option(PLUGIN_RE_NAME."OptionsApis");
+                $displayAdminLvl1 = $optionsApis["apiAdminAreaLvl1"] == 1;
+                $displayAdminLvl2 = $optionsApis["apiAdminAreaLvl2"] == 1;
+                $resultsResponseGeocodeAPI = wp_remote_get("https://maps.googleapis.com/maps/api/geocode/json?address=$query&language=$country&components=country:$country&key=$apiKeyGoogle");
+                if(wp_remote_retrieve_response_code($resultsResponseGeocodeAPI) === 200) {
+                    
+                    $resultsBodyGeocodeAPI = wp_remote_retrieve_body($resultsResponseGeocodeAPI);
+                    $resultsArrayGeocodeAPI = json_decode($resultsBodyGeocodeAPI, true);    
+
+                    $addressComponents = $resultsArrayGeocodeAPI["results"][0]["address_components"];
+                    
+                    $arrayCleaned = array(
+                        "streetNumber" => '',
+                        "route" => '',
+                        "city" => '',
+                        "postCode" => '',
+                        "adminLvl1" => '',
+                        "adminLvl2" => ''
+                    );                   
+                    foreach($addressComponents as $comp) {                       
+                        if(in_array("street_number", $comp["types"], true)) {                       
+                            $arrayCleaned["streetNumber"] = $comp["long_name"];
+                        }else if(in_array("route", $comp["types"], true)) {
+                            $arrayCleaned["route"] = $comp["long_name"];
+                        }else if(in_array("locality", $comp["types"], true)) {
+                            $arrayCleaned["city"] = $comp["long_name"];                            
+                        }else if(in_array("postal_code", $comp["types"], true)) { 
+                            $arrayCleaned["postCode"] = $comp["long_name"];
+                        }else if($displayAdminLvl2 && in_array("administrative_area_level_2", $comp["types"], true)) {
+                            $arrayCleaned["adminLvl1"] = $comp["long_name"];
+                        }else if($displayAdminLvl1 && in_array("administrative_area_level_1", $comp["types"], true)) {
+                            $arrayCleaned["adminLvl2"] = $comp["long_name"];
+                        }
+                    }               
+                    $arrayCleaned["address"] = rtrim(implode(' ', $arrayCleaned));
+                    
+
+                    if(isset($_GET["coordsApprox"])) { //To economize the API requests, using randomness instead of looking for the cityhall
+                        $minLat = $resultsArrayGeocodeAPI["results"][0]["geometry"]["viewport"]["southwest"]["lat"]-0.001;
+                        $minLong = $resultsArrayGeocodeAPI["results"][0]["geometry"]["viewport"]["southwest"]["lng"]-0.001;
+                        $maxLat = $resultsArrayGeocodeAPI["results"][0]["geometry"]["viewport"]["northeast"]["lat"]+0.001;
+                        $maxLong = $resultsArrayGeocodeAPI["results"][0]["geometry"]["viewport"]["northeast"]["lng"]+0.001;
+                        $mult = 10000000;
+                        
+                        $randLat = mt_rand($minLat*$mult, $maxLat*$mult)/$mult;
+                        $randLong = mt_rand($minLong*$mult, $maxLong*$mult)/$mult;
+                        
+                        $arrayCleaned["coordinates"] = array("long" => $randLong, "lat" => $randLat);          
+                    }else{
+                        $arrayCleaned["coordinates"] = array("long" => $resultsArrayGeocodeAPI["results"][0]["geometry"]["location"]["lng"], "lat" => $resultsArrayGeocodeAPI["results"][0]["geometry"]["location"]["lat"]);
+                    }                   
+                }
+            break;  
+        
         }
             echo json_encode($arrayCleaned);
         

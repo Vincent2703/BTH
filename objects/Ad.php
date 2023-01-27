@@ -423,7 +423,7 @@ class Ad {
                     if(isset($addressData["postCode"])) {
                         array_push($metas,
                             array(
-                                "key" => "adPC",
+                                "key" => "adPostCode",
                                 "value" => $addressData["postCode"],
                             )
                         );

@@ -74,31 +74,40 @@ class EditAd {
             
             if(isset($_POST["showMap"]) && !ctype_space($_POST["showMap"])) {
                 update_post_meta($adId, "adShowMap", sanitize_text_field($_POST["showMap"]));
-                if(isset($_POST["address"]) && !ctype_space($_POST["address"])) {
-                    update_post_meta($adId, "adAddress", sanitize_text_field($_POST["address"]));
-                        $query = urlencode(addslashes(htmlentities(sanitize_text_field($_POST["address"]))));
-                        if($_POST["showMap"] !== "all") { 
-                            $zoom = 14;
-                            $radiusCircle = 0;
-                            $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&context=saveAd&coordsApprox";
-                            $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                        }else{
-                            $zoom = 16;
-                            $radiusCircle = 0;
-                            $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&context=saveAd";
-                            $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                        }
+                if(isset($_POST["address"]) && !ctype_space($_POST["address"])) {                   
+                    $query = urlencode(addslashes(htmlentities(sanitize_text_field($_POST["address"]))));
+                    if($_POST["showMap"] !== "all") { 
+                        $zoom = 14;
+                        $radiusCircle = 0;
+                        $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&context=saveAd&coordsApprox";
+                        $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
+                    }else{
+                        $zoom = 16;
+                        $radiusCircle = 0;
+                        $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&context=saveAd";
+                        $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
+                    }
+
+                    $coordinates = $addressData["coordinates"];
+                    update_post_meta($adId, "adDataMap", array("lat" => $coordinates["lat"], "long" => $coordinates["long"], "zoom" => $zoom, "circ" => $radiusCircle));
+                    update_post_meta($adId, "adLatitude", $coordinates["lat"]);
+                    update_post_meta($adId, "adLongitude", $coordinates["long"]);
                     
-                        $coordinates = $addressData["coordinates"];
-                        update_post_meta($adId, "adDataMap", array("lat" => $coordinates["lat"], "long" => $coordinates["long"], "zoom" => $zoom, "circ" => $radiusCircle));
-                        update_post_meta($adId, "adLatitude", $coordinates["lat"]);
-                        update_post_meta($adId, "adLongitude", $coordinates["long"]);
+                    $address = $addressData["address"];
+                    update_post_meta($adId, "adAddress", $address);
 
-                        $PC = $addressData["postcode"];
-                        update_post_meta($adId, "adPC", $PC);
-
-                        $city = $addressData["city"];
-                        update_post_meta($adId, "adCity", $city);
+                    $postCode = $addressData["postCode"];
+                    update_post_meta($adId, "adPostCode", $postCode);
+                    
+                    if(isset($addressData["adminLvl1"])) {
+                        update_post_meta($adId, "adAdminLvl1", $addressData["adminLvl1"]);
+                    }
+                    if(isset($addressData["adminLvl2"])) {
+                        update_post_meta($adId, "adAdminLvl2", $addressData["adminLvl2"]);
+                    }
+                    
+                    $city = $addressData["city"];
+                    update_post_meta($adId, "adCity", $city);
                 }
             }
             if(isset($_POST["images"]) && !ctype_space($_POST["images"])) {

@@ -26,9 +26,18 @@ function addFilters(button) {
     
 }
 
+function searchByR(select) {
+    var value = jQuery(select).val();
+    if(value==="radius") {
+        jQuery("#radiusInput").show("slow");
+    }else{
+        jQuery("#radiusInput").hide("slow");
+    }
+}
+
 function changeAdType(select) {
-    var type = jQuery(select).val();
+    /*var type = jQuery(select).val();
     if(type==="rental") {
         console.log("coucou");
-    }
+    }*/
 }

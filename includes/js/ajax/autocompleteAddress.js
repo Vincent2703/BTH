@@ -25,8 +25,14 @@
                         data.forEach(result => {
                             if(input.attr("name") === "city") {
                                 var valueLabel = result.city + '';
-                                if(typeof(result.postcode) !== "undefined") {
-                                    valueLabel += ' ' + result.postcode;
+                                if(typeof(result.postCode) !== "undefined") {
+                                    valueLabel += ' ' + result.postCode;
+                                }
+                                if(typeof(result.adminLvl2) !== "undefined") {
+                                    valueLabel += ' ' + result.adminLvl2;
+                                }
+                                if(typeof(result.adminLvl1) !== "undefined") {
+                                    valueLabel += ' ' + result.adminLvl1;
                                 }
                             }else if(input.attr("name") === "address") {
                                 var valueLabel = result.address;

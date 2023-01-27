@@ -18,7 +18,7 @@
             <div class="mainSearchBarInputs">
                 <div class="searchBarInput">
                     <label for="typeAd"><?php _e("Ad type", "retxtdom"); ?></label>
-                    <select name="typeAd" id="typeAd" onchange="changeAdType(this)">
+                    <select name="typeAd" id="typeAd" onchange="changeAdType(this);">
                         <?php
                         foreach($adTypesAd as $adTypeAd) { ?>
                             <option value="<?= $adTypeAd->slug; ?>" <?= isset($_GET["typeAd"]) && $_GET["typeAd"] === $adTypeAd->slug?"selected":''; ?>><?= $adTypeAd->name; ?></option>                 
@@ -43,13 +43,18 @@
                     <input type="text" name="city" id="addressInput" class="ui-autocomplete-input" autocomplete="off" size="15" placeholder="<?php _e("Ex: London", "retxtdom"); ?>" <?= isset($_GET["city"]) && !empty($_GET["city"])?'value="'.sanitize_text_field($_GET["city"]).'"':''; ?>>
                 </div>
 
-                <div class="searchBarInput">
-                    <select id="searchBy" name="searchBy">
-                        <option value="city" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city"); ?>><?php _e("City", "retxtdom"); ?></option>
-                        <option value="radius" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"); ?>><?php _e("Radius", "retxtdom"); ?></option>
-                    </select>
-                    <label for="radius"><?php _e("Search radius", "retxtdom"); ?></label>
-                    <input type="number" name="radius" id="radius" value="<?= isset($_GET["radius"])?intval($_GET["radius"]):'10'; ?>">
+                <div id="searchBy" class="searchBarInput">
+                    <div id="searchBySelect">
+                        <label for="searchBySelect"><?php _e("Search by", "retxtdom");?></label>
+                        <select id="searchBySelect" name="searchBy" onchange="searchByR(this);">
+                            <option value="city" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city"); ?>><?php _e("City", "retxtdom"); ?></option>
+                            <option value="radius" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"); ?>><?php _e("Radius", "retxtdom"); ?></option>
+                        </select>
+                    </div>
+                    <div id="radiusInput" <?= !isset($_GET["searchBy"]) || $_GET["searchBy"]==="city"?'style="display: none;"':''; ?>>
+                        <label for="radius"><?php _e("Radius", "retxtdom"); ?></label>
+                        <input type="number" name="radius" id="radius" value="<?= isset($_GET["radius"])?intval($_GET["radius"]):'10'; ?>">
+                    </div>
                 </div>
                 
                 <button type="button" id="filters" onclick="addFilters(this);"><?php _e("Filters", "retxtdom"); ?> +</button>

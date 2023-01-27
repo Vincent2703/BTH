@@ -107,7 +107,7 @@ class Import {
             update_post_meta($adWPId, "adAddress", $adData["address"]);
             update_post_meta($adWPId, "adLatitude", $adData["latitude"]);
             update_post_meta($adWPId, "adLongitude", $adData["longitude"]);
-            update_post_meta($adWPId, "adPc", $adData["pc"]);
+            update_post_meta($adWPId, "adPostCode", $adData["pc"]);
             update_post_meta($adWPId, "adCity", $adData["city"]);
             update_post_meta($adWPId, "adDataMap", array("lat" => $adData["latitude"], "long" => $adData["longitude"], "zoom" => 16, "circ" => 10)); //Pas de verif pour savoir si ville ou non
 

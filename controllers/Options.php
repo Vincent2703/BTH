@@ -315,6 +315,22 @@ class Options {
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
+        add_settings_field(
+            "apiAdminAreaLvl1", // id
+            __("Display addresses with the administration area level 1 (generally state or prefecture)", "retxtdom"), // title
+            array($this, "apiAdminAreaLvl1Callback"), // callback
+            PLUGIN_RE_NAME."OptionsApisPage", // page
+            PLUGIN_RE_NAME."optionsSection" // section
+        );
+        
+        add_settings_field(
+            "apiAdminAreaLvl2", // id
+            __("Display addresses with the administration area level 2 (generally countries or districts)", "retxtdom"), // title
+            array($this, "apiAdminAreaLvl2Callback"), // callback
+            PLUGIN_RE_NAME."OptionsApisPage", // page
+            PLUGIN_RE_NAME."optionsSection" // section
+        );
+        
         /* Modèle SeLoger */
         
         add_settings_field(
@@ -449,6 +465,18 @@ class Options {
         
         if(isset($input["apiLimitCountry"]) && !ctype_space($input["apiLimitCountry"])) {
             $sanitaryValues["apiLimitCountry"] = sanitize_text_field($input["apiLimitCountry"]);
+        }
+        
+        if(isset($input["apiAdminAreaLvl1"])) {
+            $sanitaryValues["apiAdminAreaLvl1"] = true;
+        }else{
+            $sanitaryValues["apiAdminAreaLvl1"] = false;
+        }
+        
+        if(isset($input["apiAdminAreaLvl2"])) {
+            $sanitaryValues["apiAdminAreaLvl2"] = true;
+        }else{
+            $sanitaryValues["apiAdminAreaLvl2"] = false;
         }
         
         return $sanitaryValues;
@@ -667,6 +695,21 @@ class Options {
                    name="<?=PLUGIN_RE_NAME."OptionsApis[apiLimitCountry]";?>" id="apiLimitCountry" placeholder="fr" 
                    value="<?=$value;?>">
     <?php }
+    
+    public function apiAdminAreaLvl1Callback() { ?>
+        <input type="checkbox" 
+               name="<?=PLUGIN_RE_NAME."OptionsApis[apiAdminAreaLvl1]";?>" id="apiAdminAreaLvl1" 
+                   <?php isset($this->optionsApis["apiAdminAreaLvl1"])?checked($this->optionsApis["apiAdminAreaLvl1"], true):''?>>&nbsp;
+        <label for="apiAdminAreaLvl1"><?php _e("Yes", "retxtdom"); ?></label>
+    <?php }
+    
+    public function apiAdminAreaLvl2Callback() { ?>
+        <input type="checkbox" 
+               name="<?=PLUGIN_RE_NAME."OptionsApis[apiAdminAreaLvl2]";?>" id="apiAdminAreaLvl2" 
+                   <?php isset($this->optionsApis["apiAdminAreaLvl2"])?checked($this->optionsApis["apiAdminAreaLvl2"], true):''?>>&nbsp;
+        <label for="apiAdminAreaLvl1"><?php _e("Yes", "retxtdom"); ?></label>
+    <?php }
+    
     
     /* Modèle SeLoger */
     

@@ -76,6 +76,11 @@
     margin-left: 0;
 }
 
+.searchBar .searchForm #searchBy {
+    display: flex;
+    gap: 30px;
+}
+
 /* REPONSIVE */
 
 @media only screen and (max-width : 1100px) {
@@ -125,4 +130,10 @@
     .searchBar .propertyHas label, .searchBar .nbRooms label {
         white-space: nowrap;
     }
+    
+    .searchBar .searchForm #searchBy {
+        flex-direction: row;   
+        justify-content: space-evenly;
+    }
+
 }

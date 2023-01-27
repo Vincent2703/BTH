@@ -21,7 +21,7 @@
                         $typeAd = get_the_terms($idPost, "adTypeAd")[0]->name;
                         $typeProperty = get_the_terms($idPost, "adTypeProperty")[0]->name;
                         $city = get_post_meta($idPost, "adCity", true);
-                        $postalCode = get_post_meta($idPost, "adPC", true);
+                        $postalCode = get_post_meta($idPost, "adPostCode", true);
                         $price = get_post_meta($idPost, "adPrice", true);
                         $fees = get_post_meta($idPost, "adFees", true);
                         $currency = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["currency"];
