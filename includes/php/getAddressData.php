@@ -1,9 +1,10 @@
 <?php
-require_once(preg_replace('/wp-content(?!.*wp-content).*/', '', __DIR__ )."wp-load.php");
-if(isset($_GET["query"]) && isset($_GET["context"])/*&& isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest"*/) {
+session_start();
+require_once(preg_replace("/wp-content(?!.*wp-content).*/", '', __DIR__ )."wp-load.php");
+if(isset($_SESSION["token"]) && isset($_SERVER["HTTP_X_CSRF_TOKEN"]) && $_SESSION["token"]["value"] === $_SERVER["HTTP_X_CSRF_TOKEN"] && isset($_GET["query"]) && isset($_GET["context"])) {
     $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
     $apiUsed = $apisOptions["apiUsed"];
-    $context = $_GET["context"];
+    $context = sanitize_text_field($_GET["context"]);
 
     $query = urlencode(addslashes(sanitize_text_field($_GET["query"])));
     
@@ -269,4 +270,6 @@ if(isset($_GET["query"]) && isset($_GET["context"])/*&& isset($_SERVER["HTTP_X_R
         
     }
 
+}else{
+    http_response_code(403);
 }

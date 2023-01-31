@@ -26,7 +26,7 @@ class Agency {
 
                 "public" => true,
                 "menu_position" => 17,
-                "supports" => array("title", "thumbnail"),
+                "supports" => array("title", "editor", "thumbnail"),
                 "menu_icon" => "dashicons-admin-multisite",
                 "has_archive" => false
             )

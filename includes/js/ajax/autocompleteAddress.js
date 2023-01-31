@@ -15,6 +15,9 @@
             source: function(request, response) {
                 $.ajax({
                     url: URLGetAddressDataFile,
+                    headers: {
+                        'X-CSRF-Token': tokenValue
+                    },
                     data: {
                         "query": input.val(),
                         "context": context
@@ -44,7 +47,8 @@
                 });
             },
             minLength: minLength,
-            mustMatch: false
+            mustMatch: false,
+            delay: 500
         });
 
     });

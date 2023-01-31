@@ -409,16 +409,26 @@ class Ad {
             
             if(isset($_GET["city"]) && !empty($_GET["city"])) {
                 if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
-                    $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".$_GET["city"]."&context=searchAds&searchBy=city";
+                    $url = urlencode(plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=city");
                     $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                     
-                    array_push($metas,
-                        array(
-                            "key" => "adCity",
-                            "value" => $addressData["city"],
-                            "compare" => "IN"
-                        )    
-                    );
+                    if(isset($addressData["city"])) {
+                        array_push($metas,
+                            array(
+                                "key" => "adCity",
+                                "value" => $addressData["city"],
+                                "compare" => "IN"
+                            )    
+                        );
+                    }else{
+                        array_push($metas,
+                            array(
+                                "key" => "adCity",
+                                "value" => $_GET["city"],
+                                "compare" => "IN"
+                            )    
+                        );
+                    }
                     
                     if(isset($addressData["postCode"])) {
                         array_push($metas,
@@ -429,7 +439,7 @@ class Ad {
                         );
                     }
                 }else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"){ 
-                    $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".$_GET["city"]."&context=searchAds&searchBy=radius&radius=".intval($_GET["radius"]);
+                    $url = urlencode(plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=radius&radius=".intval($_GET["radius"]));
                     $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                     
                     array_push($metas,

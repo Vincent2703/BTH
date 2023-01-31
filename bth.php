@@ -96,12 +96,16 @@ class Bth {
         global $post_type;
         global $pagenow;
         if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {
+            session_start();
+            $token = bin2hex(random_bytes(32));
+            $_SESSION["token"] = array("value" => $token, "timestamp" => time());
             wp_register_script("addSearchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/searchBars/addSearchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
             $variables = array(
                 "filters" => __("FILTERS", "retxtdom"),
-                "searchBarURL" => plugin_dir_url(__FILE__)."/templates/searchBars/searchBarAd.php",
-                "autocompleteURL" => plugin_dir_url(__FILE__)."/includes/js/ajax/autocompleteAddress.js",
-                "getAddressDataURL" => plugin_dir_url(__FILE__)."/includes/php/getAddressData.php"
+                "searchBarURL" => plugin_dir_url(__FILE__)."templates/searchBars/searchBarAd.php",
+                "autocompleteURL" => plugin_dir_url(__FILE__)."includes/js/ajax/autocompleteAddress.js",
+                "getAddressDataURL" => plugin_dir_url(__FILE__)."includes/php/getAddressData.php",
+                "tokenValue" => $_SESSION["token"]["value"]
             );
             wp_localize_script("addSearchBarAd", "variables", $variables);
             wp_enqueue_script("addSearchBarAd");

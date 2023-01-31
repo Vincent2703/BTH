@@ -141,7 +141,7 @@
 
         <div id="primary" class="content-area contentAd">
             <main id="main" class="site-main">
-                <span class="titleAd"><h1><?= the_title(); ?></h1></span>
+                <span class="titleAd"><h1><?php the_title(); ?></h1></span>
                 <span class="subtitleAd"><?= ucfirst($city)." - $price$afterPrice"; ?></span>
                 <div class="sliders">
                     <div id="miniSlider">
@@ -165,7 +165,7 @@
                 <div class="contentLeftAd">
                     <div class="description">
                         <h4>Description</h4>
-                        <?= the_content(); ?>
+                        <?php the_content(); ?>
                     </div>
                     <div class="mainFeatures">
                         <h4><?php _e("Main characteristics", "retxtdom"); ?></h4>
@@ -184,7 +184,7 @@
                             </li>
                             <li>
                                 <span class="nameFeature"><?php _e("Address", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= $address; ?></span>
+                                <span class="valueFeature"><a target="_blank" href="https://www.google.fr/maps/place/<?=$address;?>"><?= $address; ?></a></span>
                             </li>
                             <li>
                                 <span class="nameFeature"><?php _e("Living space", "retxtdom"); ?></span>
@@ -319,17 +319,18 @@
                             </div>
                             <div class="headerContactRight">
                                 <span id="nameContact"><?= $nameContact; ?></span>
-                                <div id="phoneContact">
-                                    <span class="material-symbols-outlined">
-                                        call
-                                    </span>
-                                    <?php if(isset($phone)) { ?>
-                                    <a href="tel:<?= $phone; ?>"><?= $phone ?></a>
-                                    <?php } ?>
-                                </div>
-
-                                <?php if(isset($mobilePhone)) { ?>
-                                <span id="mobilePhoneContact"><a href="tel:<?= $mobilePhone; ?>"><?= $mobilePhone; ?></a></span>
+                                <?php if(isset($phone) || isset($mobilePhone)) { ?>
+                                <table id="phoneContact">
+                                    <tbody>
+                                        <tr>
+                                            <td id="phoneIcon" rowspan="2"><span class="material-symbols-outlined">call</span></td>
+                                            <?php if(isset($phone)) { ?><td id="phoneContact"><a href="tel:<?= $phone; ?>"><?= $phone ?></a></td><?php } ?>
+                                        </tr>
+                                        <tr>
+                                            <?php if(isset($mobilePhone)) { ?><td><span id="mobilePhoneContact"><a href="tel:<?= $mobilePhone; ?>"><?= $mobilePhone; ?></a></span></td><?php } ?>
+                                        </tr>
+                                    </tbody>
+                                </table>
                                 <?php } ?>
                             </div>
                             <?php }else{ ?>

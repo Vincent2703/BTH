@@ -6,6 +6,7 @@
 
 .contentAd { /*Content width's ad must always be 100%*/
     width: 100% !important;
+    color: #252525;
 }
 
 .contentAd .site-main {
@@ -24,6 +25,8 @@
     font-size: 16px;
     font-weight: bold;
 }
+
+/* */
 
 .contentAd .titleAd h1 {
     font-size: 32px;
@@ -183,13 +186,27 @@
 }
 
 .contentAd #phoneContact {
-    display: flex;
-    align-items: center;
+    margin: 0;
+    border: 0;
+    margin-top: 10px;
 }
 
-.contentAd #phoneContact a {
+.contentAd #phoneContact tr, .contentAd #phoneContact td {
+    line-height: 0.3em;
+    padding-left: 0;
+    padding-right: 0;
+   border: 0;
+}
+
+.contentAd #phoneContact #phoneIcon {
+    padding: 0;
+}
+
+.contentAd #phoneContact a, .contentAd #mobilePhoneContact a {
     margin-left: 0.3vw;
     white-space: nowrap;
+    text-decoration: none;
+    color: #252525;
 }
 
 .contentAd #thumbnailContact {
@@ -212,6 +229,7 @@
    overflow: hidden;
    margin: 20px auto 0 auto;
    border-radius: 4px;
+   cursor: zoom-in;
 }    
 
 .contentAd #miniSlider ul {
@@ -249,19 +267,19 @@
    padding: 4% 3%;
    width: auto;
    height: auto;
-   background: #2a2a2a;
-   color: #fff;
+   background: rgba(42, 42, 42, 0.3);
+   color: rgba(255, 255, 255, 0.4);
    text-decoration: none;
    font-weight: 600;
    font-size: 18px;
-   opacity: 0.8;
    cursor: pointer;
    user-select: none;
 }
 
 .contentAd .controlPrev:hover, .contentAd .controlNext:hover {
-   opacity: 1;
-   -webkit-transition: all 0.2s ease;
+    background: rgba(42, 42, 42, 1);
+    color: rgba(255, 255, 255, 1);
+    -webkit-transition: all 0.2s ease;
 }
 
 .contentAd .controlPrev {
@@ -287,7 +305,6 @@
 .contentAd #fullscreenSlider .displayFullscreen {
     width: 100vw;
     height: 100vh;
-    /*background-size: 80%;*/
     background-repeat: no-repeat no-repeat;
     background-position: center center;
 }
