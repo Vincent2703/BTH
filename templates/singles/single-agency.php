@@ -98,12 +98,12 @@
                     <div class="rowAd">
                         <div class="inShortAd">
                             <div class="thumbnailAd">
-                                <a href="<?= get_post_permalink($idPost); ?>"><?= get_the_post_thumbnail($id, array(600, 600)); ?></a>
+                                <a href="<?= get_post_permalink($id); ?>"><?= get_the_post_thumbnail($id, array(600, 600)); ?></a>
                                 <span class="typeAd"><?php _e($typeAd, "retxtdom"); ?></span>
                                 <span class="typeProperty"><?= $typeProperty; ?></span>
                             </div>
                             <div class="detailsAd">
-                                <span class="titleAd"><a href="<?= get_post_permalink($idPost); ?>"><?php the_title($id); ?></a></span>
+                                <span class="titleAd"><a href="<?= get_post_permalink($id); ?>"><?php get_the_title($id); ?></a></span>
                                 <span class="address"><?= "$city $postalCode"; ?></span>
                                 <span class="shortDescription"><?= $shortDescriptionAd; ?></span>
                                 <span class="price"><span class="includingFees"><?= $price.$currency; ?><?= $typeAd==="Location"?'/'.__("month", "retxtdom"):'';?></span>&nbsp;<span class="fees"><?= !empty($fees)||$fees!=0?__("including", "retxtdom")." $fees$currency of fees":'';?></span></span>

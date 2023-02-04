@@ -79,15 +79,14 @@ class EditAd {
                     if($_POST["showMap"] !== "all") { 
                         $zoom = 14;
                         $radiusCircle = 0;
-                        $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&context=saveAd&coordsApprox";
+                        $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=$query&context=saveAd&coordsApprox";
                         $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                     }else{
                         $zoom = 16;
                         $radiusCircle = 0;
-                        $url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=$query&context=saveAd";
+                        $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=$query&context=saveAd";
                         $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                     }
-
                     $coordinates = $addressData["coordinates"];
                     update_post_meta($adId, "adDataMap", array("lat" => $coordinates["lat"], "long" => $coordinates["long"], "zoom" => $zoom, "circ" => $radiusCircle));
                     update_post_meta($adId, "adLatitude", $coordinates["lat"]);

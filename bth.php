@@ -84,6 +84,8 @@ class Bth {
         add_action("widgets_init", array($this, "removeSearchWidget"));
         
         add_filter("wp_enqueue_scripts", array($this, "updateHeader"));
+        
+        add_action("rest_api_init", array($this, "registerRouteCustomAPI"));
                 
         SELF::defineGlobalConsts();
     }
@@ -95,17 +97,14 @@ class Bth {
     public function updateHeader() {
         global $post_type;
         global $pagenow;
-        if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {
-            session_start();
-            $token = bin2hex(random_bytes(32));
-            $_SESSION["token"] = array("value" => $token, "timestamp" => time());
+        if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {         
             wp_register_script("addSearchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/searchBars/addSearchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
             $variables = array(
                 "filters" => __("FILTERS", "retxtdom"),
                 "searchBarURL" => plugin_dir_url(__FILE__)."templates/searchBars/searchBarAd.php",
                 "autocompleteURL" => plugin_dir_url(__FILE__)."includes/js/ajax/autocompleteAddress.js",
-                "getAddressDataURL" => plugin_dir_url(__FILE__)."includes/php/getAddressData.php",
-                "tokenValue" => $_SESSION["token"]["value"]
+                "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
+                "nonce" => wp_create_nonce("searchNonce")
             );
             wp_localize_script("addSearchBarAd", "variables", $variables);
             wp_enqueue_script("addSearchBarAd");
@@ -213,15 +212,21 @@ class Bth {
                 wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
 
                 wp_enqueue_script("mediaButton");
+                $variables = array(
+                    "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
+                );
+                wp_localize_script("autocompleteAddress", "variables", $variables);
                 wp_enqueue_script("autocompleteAddress");
                 wp_enqueue_script("reloadAgents");
-                
-                wp_add_inline_script("autocompleteAddress", 'var URLGetAddressDataFile="'.plugins_url(PLUGIN_RE_NAME."/includes/php/getAddressData.php").'";');
                 wp_add_inline_script("reloadAgents", 'var pluginName="'.PLUGIN_RE_NAME.'";');
             }else if($postType === "agency") {
                 wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                wp_enqueue_script("mediaButton");
+                $variables = array(
+                    "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
+                );
+                wp_localize_script("autocompleteAddress", "variables", $variables);
                 wp_enqueue_script("autocompleteAddress");
-                wp_add_inline_script("autocompleteAddress", 'var URLGetAddressDataFile="'.plugins_url(PLUGIN_RE_NAME."/includes/php/getAddressData.php").'";');
             }else if($postType === "agent") {
                 wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgencies.js"), array("jquery"), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("reloadAgencies");
@@ -311,6 +316,15 @@ class Bth {
             }
         }
 
+    }
+    
+    public function registerRouteCustomAPI() {
+        require_once("includes/php/getAddressData.php");
+        register_rest_route(PLUGIN_RE_NAME."/v1", "address", array( /*address?query=(?P<query>((?!\s*$).+))&context=(?P<context>(searchBar|searchAds|searchAddress|saveAd))*/
+            "methods" => "GET",
+            "callback" => "getAddressData",
+//check get params
+        ));
     }
 	
 }

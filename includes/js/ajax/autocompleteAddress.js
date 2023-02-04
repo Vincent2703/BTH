@@ -10,18 +10,23 @@
             var context = "searchBar";
             var minLength = 3;
         }
-
+        
+        if(typeof URLGetAddressDataFile === "undefined") {
+            URLGetAddressDataFile = variables.getAddressDataURL;
+        }
+        if(typeof nonce === "undefined") {
+            nonce = variables.nonce;
+        }
+        
         input.autocomplete({
             source: function(request, response) {
                 $.ajax({
                     url: URLGetAddressDataFile,
-                    headers: {
-                        'X-CSRF-Token': tokenValue
-                    },
                     data: {
                         "query": input.val(),
                         "context": context
                     },
+                    type: "GET",
                     dataType: "json",
                     success: function(data) {
                         var labels = [];
@@ -43,6 +48,9 @@
                             labels.push(valueLabel);
                         });
                         response(labels);
+                    },
+                    error: function(error) {
+                        response([]);
                     }
                 });
             },

@@ -28,7 +28,10 @@ class Agent {
                 "menu_position" => 16,
                 "supports" => array("title", "thumbnail"),
                 "menu_icon" => "dashicons-businessperson",
-                "has_archive" => false
+                "has_archive" => false,
+                "publicly_queryable" => false,
+                "query_var" => false,
+                "exclude_from_search" => true
             )
         );
     }

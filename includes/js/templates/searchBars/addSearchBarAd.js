@@ -5,7 +5,7 @@ jQuery(document).ready(function($) {
         type: "GET"                 
     }).done(function(response) {
         URLGetAddressDataFile = variables.getAddressDataURL;
-        tokenValue = variables.tokenValue;
+        nonce = variables.nonce;
         $("header:first").after(response);
         $.ajax({
            url: variables.autocompleteURL,

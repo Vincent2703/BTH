@@ -24,7 +24,7 @@ jQuery(document).ready(function ($) {
     var autoplay = true;
    
     setInterval(function () {
-        if(autoplay) {
+        if(autoplay && jQuery("#miniSlider:hover").length===0) {
             moveSlide("right");
             pagingUpdate("right");
         }
@@ -91,6 +91,8 @@ jQuery(document).ready(function ($) {
         pagingUpdate("right");
         autoplay = false;
     });
+    
+    
     
     $("body").keyup(function() {
         $("#fullscreenSlider").hide("fast");

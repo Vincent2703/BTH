@@ -409,7 +409,7 @@ class Ad {
             
             if(isset($_GET["city"]) && !empty($_GET["city"])) {
                 if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
-                    $url = urlencode(plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=city");
+                    $url = urlencode(get_rest_url(null, PLUGIN_RE_NAME."/v1/address") ."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=city");
                     $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                     
                     if(isset($addressData["city"])) {
@@ -439,9 +439,10 @@ class Ad {
                         );
                     }
                 }else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"){ 
-                    $url = urlencode(plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=radius&radius=".intval($_GET["radius"]));
+                    $url = urlencode(get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=radius&radius=".intval($_GET["radius"]));
+                    echo urldecode($url);
                     $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                    
+                    print_r($addressData);
                     array_push($metas,
                         array(
                             "key" => "adLatitude",

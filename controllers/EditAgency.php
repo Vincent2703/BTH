@@ -21,7 +21,7 @@ class editAgency {
                 update_post_meta($agencyId, "agencyEmail", sanitize_text_field($_POST["email"]));
             }
             if(isset($_POST["address"]) && $_POST["address"] !== '') {
-                update_post_meta($agencyId, "agencyAddress", sanitize_text_field($_POST["address"]));
+                update_post_meta($agencyId, "agencyAddress", sanitize_text_field($_POST["address"])); //No need to check with the API
             }         
         }    
     }

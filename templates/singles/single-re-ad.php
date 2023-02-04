@@ -184,7 +184,7 @@
                             </li>
                             <li>
                                 <span class="nameFeature"><?php _e("Address", "retxtdom"); ?></span>
-                                <span class="valueFeature"><a target="_blank" href="https://www.google.fr/maps/place/<?=$address;?>"><?= $address; ?></a></span>
+                                <span class="valueFeature"><a target="_blank" href="https://www.google.fr/maps/place/<?=urlencode($address);?>"><?= $address; ?></a></span>
                             </li>
                             <li>
                                 <span class="nameFeature"><?php _e("Living space", "retxtdom"); ?></span>
