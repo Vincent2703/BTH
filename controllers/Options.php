@@ -308,6 +308,22 @@ class Options {
         );
         
         add_settings_field(
+            "apiLimitNbRequests",
+            __("Limit number of requests per day and user", "retxtdom"),
+            array($this, "apiLimitNbRequestsCallback"),
+            PLUGIN_RE_NAME."OptionsApisPage",
+            PLUGIN_RE_NAME."optionsSection"
+        );
+        
+        add_settings_field(
+            "apiMaxNbRequests",
+            __("The maximum number of requests made by a user in a day", "retxtdom"),
+            array($this, "apiMaxNbRequestsCallback"),
+            PLUGIN_RE_NAME."OptionsApisPage",
+            PLUGIN_RE_NAME."optionsSection"
+        );
+        
+        add_settings_field(
             "apiLimitCountry", // id
             __("Limit search to one country", "retxtdom"), // title
             array($this, "apiLimitCountryCallback"), // callback
@@ -354,12 +370,12 @@ class Options {
     public function optionsSanitizeDisplayads($input) {
         $sanitaryValues = array();
         
-        if(isset($input["currency"])) {
+        if(isset($input["currency"]) && !ctype_space($input["currency"])) {
             $sanitaryValues["currency"] = sanitize_text_field($input["currency"]);
         }
         
         if(isset($input["customFields"]) && $input["customFields"][0] === '[' && $input["customFields"][-1] === ']') {
-           $sanitaryValues["customFields"] = $input["customFields"];
+           $sanitaryValues["customFields"] = sanitize_text_field($input["customFields"]);
         }   
         
         return $sanitaryValues;
@@ -368,7 +384,7 @@ class Options {
     public function optionsSanitizeImport($input) {
         $sanitaryValues = array();
         
-        if(isset($input["templateUsedImport"])) {
+        if(isset($input["templateUsedImport"]) && !ctype_space($input["templateUsedImport"])) {
             $sanitaryValues["templateUsedImport"] = sanitize_text_field($input["templateUsedImport"]);
         }
 
@@ -384,11 +400,8 @@ class Options {
             $sanitaryValues["qualityPictures"] = absint($input["qualityPictures"]);
         }
         
-        if(isset($input["allowAutoImport"])) {
-            $sanitaryValues["allowAutoImport"] = true;
-        }else{
-            $sanitaryValues["allowAutoImport"] = false;
-        }
+        $sanitaryValues["allowAutoImport"] = isset($input["allowAutoImport"]);
+
         
         return $sanitaryValues;
 }
@@ -400,11 +413,8 @@ class Options {
             $sanitaryValues["templateUsedExport"] = sanitize_text_field($input["templateUsedExport"]);
         }
         
-        if(isset($input["allowAutoExport"])) {
-            $sanitaryValues["allowAutoExport"] = true;
-        }else{
-            $sanitaryValues["allowAutoExport"] = false;
-        }
+        $sanitaryValues["allowAutoExport"] = isset($input["allowAutoExport"]);
+
         
         return $sanitaryValues;
     }
@@ -413,11 +423,8 @@ class Options {
     public function optionsSanitizeEmail($input) {
         $sanitaryValues = array();
         
-        if(isset($input["sendMail"])) {
-            $sanitaryValues["sendMail"] = true;
-        }else{
-            $sanitaryValues["sendMail"] = false;
-        }
+        $sanitaryValues["sendMail"] = isset($input["sendMail"]);
+
 
         if(isset($input["emailError"]) && is_email($input["emailError"])) {
             $sanitaryValues["emailError"] = sanitize_text_field($input["emailError"]);
@@ -463,21 +470,21 @@ class Options {
             $sanitaryValues["apiKeyGoogle"] = sanitize_text_field($input["apiKeyGoogle"]);
         }
         
+        $sanitaryValues["apiLimitNbRequests"] = isset($input["apiLimitNbRequests"]);
+        
+        if(isset($input["apiMaxNbRequests"]) && is_numeric($input["apiMaxNbRequests"])) {
+             $sanitaryValues["apiMaxNbRequests"] = intval($input["apiMaxNbRequests"]);
+        }
+        
         if(isset($input["apiLimitCountry"]) && !ctype_space($input["apiLimitCountry"])) {
             $sanitaryValues["apiLimitCountry"] = sanitize_text_field($input["apiLimitCountry"]);
         }
         
-        if(isset($input["apiAdminAreaLvl1"])) {
-            $sanitaryValues["apiAdminAreaLvl1"] = true;
-        }else{
-            $sanitaryValues["apiAdminAreaLvl1"] = false;
-        }
+        $sanitaryValues["apiAdminAreaLvl1"] = isset($input["apiAdminAreaLvl1"]);
+
         
-        if(isset($input["apiAdminAreaLvl2"])) {
-            $sanitaryValues["apiAdminAreaLvl2"] = true;
-        }else{
-            $sanitaryValues["apiAdminAreaLvl2"] = false;
-        }
+        $sanitaryValues["apiAdminAreaLvl2"] = isset($input["apiAdminAreaLvl2"]);
+
         
         return $sanitaryValues;
     }
@@ -673,24 +680,35 @@ class Options {
     /* APIs */
     
     public function apiUsedCallback() {         
-        $name = PLUGIN_RE_NAME."OptionsApis[apiUsed]";
-        ?>
+        $name = PLUGIN_RE_NAME."OptionsApis[apiUsed]"; ?>
             <input type="radio" name="<?=$name;?>" id="govFr" value="govFr" <?php isset($this->optionsApis["apiUsed"])?checked($this->optionsApis["apiUsed"], "govFr"):'';?>><label for="govFr">adresse.data.gouv.fr API&nbsp;</label><br />
             <input type="radio" name="<?=$name;?>" value="google" id="google" <?php isset($this->optionsApis["apiUsed"])?checked($this->optionsApis["apiUsed"], "google"):'';?>><label for="google">Google API&nbsp;</label>
         <?php
     }
     
     public function apiKeyGoogleCallback() {
-        $value = isset($this->optionsApis["apiKeyGoogle"]) ? esc_attr($this->optionsApis["apiKeyGoogle"]) : '';
-        ?>
+        $value = isset($this->optionsApis["apiKeyGoogle"]) ? esc_attr($this->optionsApis["apiKeyGoogle"]) : ''; ?>
             <input type="text" class="regular-text" 
                    name="<?=PLUGIN_RE_NAME."OptionsApis[apiKeyGoogle]";?>" id="apiKeyGoogle" placeholder="123" 
                    value="<?=$value;?>">
     <?php }
     
+    public function apiLimitNbRequestsCallback() { ?>
+        <input type="checkbox" 
+               name="<?=PLUGIN_RE_NAME."OptionsApis[apiLimitNbRequests]";?>" id="apiLimitNbRequests" 
+                   <?php checked($this->optionsApis["apiLimitNbRequests"]); ?>>&nbsp;
+        <label for="apiAdminAreaLvl1"><?php _e("Yes", "retxtdom"); ?></label>
+    <?php }
+    
+    public function apiMaxNbRequestsCallback() {
+        $value = isset($this->optionsApis["apiMaxNbRequests"]) ? absint($this->optionsApis["apiMaxNbRequests"]) : "300"; ?>
+        <input type="number" min="1" id="apiMaxNbRequests" class="regular-text" required
+                name="<?=PLUGIN_RE_NAME."OptionsApis[apiMaxNbRequests];"?>" 
+                value="<?=$value;?>">
+    <?php }
+        
     public function apiLimitCountryCallback() {
-        $value = isset($this->optionsApis["apiLimitCountry"]) ? esc_attr($this->optionsApis["apiLimitCountry"]) : '';
-        ?>
+        $value = isset($this->optionsApis["apiLimitCountry"]) ? esc_attr($this->optionsApis["apiLimitCountry"]) : ''; ?>
             <input type="text" class="regular-text" 
                    name="<?=PLUGIN_RE_NAME."OptionsApis[apiLimitCountry]";?>" id="apiLimitCountry" placeholder="fr" 
                    value="<?=$value;?>">
@@ -699,14 +717,14 @@ class Options {
     public function apiAdminAreaLvl1Callback() { ?>
         <input type="checkbox" 
                name="<?=PLUGIN_RE_NAME."OptionsApis[apiAdminAreaLvl1]";?>" id="apiAdminAreaLvl1" 
-                   <?php isset($this->optionsApis["apiAdminAreaLvl1"])?checked($this->optionsApis["apiAdminAreaLvl1"], true):''?>>&nbsp;
+                   <?php checked($this->optionsApis["apiAdminAreaLvl1"]); ?>>&nbsp;
         <label for="apiAdminAreaLvl1"><?php _e("Yes", "retxtdom"); ?></label>
     <?php }
     
     public function apiAdminAreaLvl2Callback() { ?>
         <input type="checkbox" 
                name="<?=PLUGIN_RE_NAME."OptionsApis[apiAdminAreaLvl2]";?>" id="apiAdminAreaLvl2" 
-                   <?php isset($this->optionsApis["apiAdminAreaLvl2"])?checked($this->optionsApis["apiAdminAreaLvl2"], true):''?>>&nbsp;
+                   <?php checked($this->optionsApis["apiAdminAreaLvl2"]); ?>>&nbsp;
         <label for="apiAdminAreaLvl1"><?php _e("Yes", "retxtdom"); ?></label>
     <?php }
     

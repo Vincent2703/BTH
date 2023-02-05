@@ -151,6 +151,15 @@ class Bth {
             "emailAd"       => wp_get_current_user()->user_email
         );
         update_option(PLUGIN_RE_NAME."OptionsEmail", $defaultValuesEmail); 
+        
+        $defaultValuesApis = array(
+            "apiUsed" => "govFr",
+            "apiLimitNbRequests" => true,
+            "apiMaxNbRequests" => 300,
+            "apiAdminAreaLvl1" => false,
+            "apiAdminAreaLvl2" => false
+        );
+        update_option(PLUGIN_RE_NAME."OptionsApis", $defaultValuesEmail); 
     }
     
     public function initObjects() {
@@ -320,7 +329,7 @@ class Bth {
     
     public function registerRouteCustomAPI() {
         require_once("includes/php/getAddressData.php");
-        register_rest_route(PLUGIN_RE_NAME."/v1", "address", array( /*address?query=(?P<query>((?!\s*$).+))&context=(?P<context>(searchBar|searchAds|searchAddress|saveAd))*/
+        register_rest_route(PLUGIN_RE_NAME."/v1", "address", array( 
             "methods" => "GET",
             "callback" => "getAddressData",
 //check get params

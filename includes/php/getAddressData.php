@@ -5,12 +5,13 @@ $isAdmin = current_user_can("administrator");
 
 function getAddressData($data) {
     global $isAdmin;
-    if($isAdmin) {
+    $apisOptions = get_option(PLUGIN_RE_NAME . "OptionsApis");
+    if($isAdmin || !boolval($apisOptions["apiLimitNbRequests"])) {
         $clientAllowed = true;
     }else{
         $logsAPI = get_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests");
         $date = date("m-d-Y");
-        $maxRequests = 2;
+        $maxRequests = intval($apisOptions["apiMaxNbRequests"]);
         $clientIP = $_SERVER["REMOTE_ADDR"]; 
 
         if($logsAPI !== false) {
@@ -31,7 +32,6 @@ function getAddressData($data) {
         update_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests", $newLogsAPI);
     }
     if($clientAllowed && $data->get_param("query") !== null && $data->get_param("context") !== null) {
-        $apisOptions = get_option(PLUGIN_RE_NAME . "OptionsApis");
         $apiUsed = $apisOptions["apiUsed"];
         $query = urlencode(addslashes(sanitize_text_field($data->get_param("query"))));
         $context = sanitize_text_field($data->get_param("context"));
