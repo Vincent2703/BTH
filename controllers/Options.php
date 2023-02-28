@@ -11,7 +11,7 @@ class Options {
                     if(isset($_GET["tab"])) { //Si on a sélectionné un onglet
                         $option = "Options".ucfirst($_GET["tab"]); //On affiche la page correspondante
                     }else{
-                        $option = "OptionsDisplayads"; //Page par défaut
+                        $option = "OptionsLanguage"; //Page par défaut
                     }
                     settings_fields(PLUGIN_RE_NAME.$option."Group");
                     do_settings_sections(PLUGIN_RE_NAME.$option."Page");
@@ -23,8 +23,8 @@ class Options {
     
     public function tabsOption() { 
         $base = get_current_screen()->base;
-        if($base === "edit-tags" || $base === "re-ad_page_bthoptions") { 
-            if($base === "re-ad_page_bthoptions") { //Si on est sur la page des options custom
+        if($base === "edit-tags" || $base === "re-ad_page_repoptions") { 
+            if($base === "re-ad_page_repoptions") { //Si on est sur la page des options custom
                 if(isset($_GET["tab"])) { //S'il y a un $_GET tab
                     $tab = $_GET["tab"]; //On le prend
                 }else{
@@ -36,14 +36,14 @@ class Options {
             <h2><?= PLUGIN_RE_NAME; ?></h2>
             <p>Interface de configuration - <?= PLUGIN_RE_NAME; ?></p>
             <h2 class="nav-tab-wrapper">
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=displayads" class="nav-tab <?= $tab === "displayads" ? "nav-tab-active" : ''; ?>"><?php _e("Ads", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>"><?php _e("Imports", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>"><?php _e("Exports", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>"><?php _e("Email", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>"><?php _e("Fees schedule", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=bthoptions&tab=apis" class="nav-tab <?= $tab === "apis" ? "nav-tab-active" : ''; ?>">APIs</a>    
+                <a href="edit.php?post_type=re-ad&page=repoptions&tab=displayads" class="nav-tab <?= $tab === "displayads" ? "nav-tab-active" : ''; ?>"><?php _e("Ads", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=repoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>"><?php _e("Imports", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=repoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>"><?php _e("Exports", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=repoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>"><?php _e("Email", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=repoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>"><?php _e("Fees schedule", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=repoptions&tab=apis" class="nav-tab <?= $tab === "apis" ? "nav-tab-active" : ''; ?>">APIs</a>    
                 <?php if($this->optionsImports["templateUsedImport"] == "seloger" || $this->optionsExports["templateUsedExport"] == "seloger") { ?>
-                    <a href="edit.php?post_type=re-ad&page=bthoptions&tab=seloger" class="nav-tab <?= $tab === "seloger" ? "nav-tab-active" : ''; ?>"><?php _e("Template", "retxtdom"); ?> SeLoger</a>  
+                    <a href="edit.php?post_type=re-ad&page=repoptions&tab=seloger" class="nav-tab <?= $tab === "seloger" ? "nav-tab-active" : ''; ?>"><?php _e("Template", "retxtdom"); ?> SeLoger</a>  
                 <?php } ?>
             </h2>
         <?php   
@@ -51,7 +51,7 @@ class Options {
     }
 
     public function optionsPageInit() {
-        $this->optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads"); //TODO : Enlever this ?
+        $this->optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsLanguage"); //TODO : Enlever this ?
         $this->optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");
         $this->optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
         $this->optionsAds = get_option(PLUGIN_RE_NAME."OptionsAds");
@@ -62,8 +62,8 @@ class Options {
         $this->optionsSeLoger = get_option(PLUGIN_RE_NAME."OptionsSeloger");
         
         register_setting( //Enregistrement des options pour l'affichage des annonces
-            PLUGIN_RE_NAME."OptionsDisplayadsGroup", // option_group
-            PLUGIN_RE_NAME."OptionsDisplayads", // option_name
+            PLUGIN_RE_NAME."OptionsLanguageGroup", // option_group
+            PLUGIN_RE_NAME."OptionsLanguage", // option_name
             array($this, "optionsSanitizeDisplayads") // sanitizeCallback
         );
         
@@ -108,7 +108,7 @@ class Options {
             __("Ads", "retxtdom"), // title
             array($this, "infoAds"), // callback
             //null,
-            PLUGIN_RE_NAME."OptionsDisplayadsPage" // page
+            PLUGIN_RE_NAME."OptionsLanguagePage" // page
         );
         
         add_settings_section( //Section pour les options d'imports
@@ -163,7 +163,7 @@ class Options {
             "currency", // id
             __("Currency", "retxtdom"), // title
             array($this, "currencyCallback"), // callback
-            PLUGIN_RE_NAME."OptionsDisplayadsPage", // page
+            PLUGIN_RE_NAME."OptionsLanguagePage", // page
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
@@ -171,7 +171,7 @@ class Options {
             "customFields", // id
             __("Customs fields", "retxtdom"), // title
             array($this, "customFieldsCallback"), // callback
-            PLUGIN_RE_NAME."OptionsDisplayadsPage", // page
+            PLUGIN_RE_NAME."OptionsLanguagePage", // page
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
@@ -517,7 +517,7 @@ class Options {
     public function currencyCallback() { 
         isset($this->optionsDisplayads["currency"]) ? absint($this->optionsDisplayads["currency"]) : '1'; ?>
             <input type="text" id="currency" class="regular-text" 
-               name="<?=PLUGIN_RE_NAME."OptionsDisplayads[currency]";?>" 
+               name="<?=PLUGIN_RE_NAME."OptionsLanguage[currency]";?>" 
                placeholder='€' 
                value="<?=isset($this->optionsDisplayads["currency"]) ? esc_attr($this->optionsDisplayads["currency"]) : '$';?>">
     <?php }
@@ -571,7 +571,7 @@ class Options {
             </table>
             <br />
             <span class="dashicons-before dashicons-plus fieldPlus"></span>
-            <input type="hidden" name="<?=PLUGIN_RE_NAME."OptionsDisplayads[customFields]";?>" id="customFieldsData">
+            <input type="hidden" name="<?=PLUGIN_RE_NAME."OptionsLanguage[customFields]";?>" id="customFieldsData">
     <?php }
 
     /* IMPORTS */   
@@ -696,7 +696,7 @@ class Options {
     public function apiLimitNbRequestsCallback() { ?>
         <input type="checkbox" 
                name="<?=PLUGIN_RE_NAME."OptionsApis[apiLimitNbRequests]";?>" id="apiLimitNbRequests" 
-                   <?php checked($this->optionsApis["apiLimitNbRequests"]); ?>>&nbsp;
+                   <?php checked(isset($this->optionsApis["apiLimitNbRequests"]) && $this->optionsApis["apiLimitNbRequests"]); ?>>&nbsp;
         <label for="apiAdminAreaLvl1"><?php _e("Yes", "retxtdom"); ?></label>
     <?php }
     
@@ -717,14 +717,14 @@ class Options {
     public function apiAdminAreaLvl1Callback() { ?>
         <input type="checkbox" 
                name="<?=PLUGIN_RE_NAME."OptionsApis[apiAdminAreaLvl1]";?>" id="apiAdminAreaLvl1" 
-                   <?php checked($this->optionsApis["apiAdminAreaLvl1"]); ?>>&nbsp;
+                   <?php checked(isset($this->optionsApis["apiAdminAreaLvl1"]) && $this->optionsApis["apiAdminAreaLvl1"]); ?>>&nbsp;
         <label for="apiAdminAreaLvl1"><?php _e("Yes", "retxtdom"); ?></label>
     <?php }
     
     public function apiAdminAreaLvl2Callback() { ?>
         <input type="checkbox" 
                name="<?=PLUGIN_RE_NAME."OptionsApis[apiAdminAreaLvl2]";?>" id="apiAdminAreaLvl2" 
-                   <?php checked($this->optionsApis["apiAdminAreaLvl2"]); ?>>&nbsp;
+                   <?php checked(isset($this->optionsApis["apiAdminAreaLvl2"]) && $this->optionsApis["apiAdminAreaLvl2"]); ?>>&nbsp;
         <label for="apiAdminAreaLvl1"><?php _e("Yes", "retxtdom"); ?></label>
     <?php }
     

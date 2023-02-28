@@ -7,7 +7,7 @@ class Export {
         $base = get_current_screen()->base;
         ?>
         <div class="wrap">
-            <?php if($postType==="re-ad" && $base="bthexport") { ?>
+            <?php if($postType==="re-ad" && $base="repexport") { ?>
                 <h2>Exportez les annonces</h2>
             <?php } ?>
                 <form action="" method="post">

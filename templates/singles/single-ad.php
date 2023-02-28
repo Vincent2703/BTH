@@ -1,6 +1,6 @@
 <?php
     if(have_posts()) {
-        $currency = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["currency"];
+        $currency = get_option(PLUGIN_RE_NAME."OptionsLanguage")["currency"];
         while(have_posts()) {
             if (is_active_sidebar("before_content-side-bar") ) {
                dynamic_sidebar("before_content-side-bar");
@@ -32,23 +32,22 @@
             }
 
             $showMap = getMeta("adShowMap");
-            if($showMap !== "no" && $showMap) {
-                if($showMap === "onlyPC") {
-                    $address = getMeta("adCity").' '.getMeta("adPostCode");
-                    $optionsApis = get_option(PLUGIN_RE_NAME."OptionsApis");
-                    $displayAdminLvl1 = $optionsApis["apiAdminAreaLvl1"] == 1;
-                    $displayAdminLvl2 = $optionsApis["apiAdminAreaLvl2"] == 1;
-                    if($displayAdminLvl2 && !empty(getMeta("adAdminLvl2"))) {
-                        $address .= ' '.getMeta("adAdminLvl2");
-                    }
-                    if($displayAdminLvl1 && !empty(getMeta("adAdminLvl1"))) {
-                        $address .= ' '.getMeta("adAdminLvl1");
-                    }
-                }else if($showMap === "all"){
-                    $address = getMeta("adAddress");
+            if($showMap === "onlyPC") {
+                $address = getMeta("adCity").' '.getMeta("adPostCode");
+                $optionsApis = get_option(PLUGIN_RE_NAME."OptionsApis");
+                $displayAdminLvl1 = $optionsApis["apiAdminAreaLvl1"] == 1;
+                $displayAdminLvl2 = $optionsApis["apiAdminAreaLvl2"] == 1;
+                if($displayAdminLvl2 && !empty(getMeta("adAdminLvl2"))) {
+                    $address .= ' '.getMeta("adAdminLvl2");
                 }
-                $coords = unserialize(getMeta("adDataMap"));
+                if($displayAdminLvl1 && !empty(getMeta("adAdminLvl1"))) {
+                    $address .= ' '.getMeta("adAdminLvl1");
+                }
+            }else if($showMap === "all"){
+                $address = getMeta("adAddress");
             }
+            $coords = unserialize(getMeta("adDataMap"));
+            
             if(isset($coords) && !empty($coords) && is_array($coords)) {
                 $getCoords = true;
             }else{
@@ -123,17 +122,20 @@
                 )
             ));
             
-            $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["customFields"];
             $customMainFields = array();
             $customComplementaryFields = array();
-            if(!empty($optionsDisplayads) || $optionsDisplayads !== "[]") {
-               foreach(json_decode($optionsDisplayads, true) as $field) {
-                   if($field["section"] === "mainFeatures") {
-                       array_push($customMainFields, $field["name"]);
-                   }else if($field["section"] === "complementaryFeatures") {
-                       array_push($customComplementaryFields, $field["name"]);
+            $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
+            if($optionsDisplayads !== false ) {
+                $customFields = $optionsDisplayads["customFields"];
+                if(!empty($customFields) || $customFields !== "[]") {
+                   foreach(json_decode($customFields, true) as $field) {
+                       if($field["section"] === "mainFeatures") {
+                           array_push($customMainFields, $field["name"]);
+                       }else if($field["section"] === "complementaryFeatures") {
+                           array_push($customComplementaryFields, $field["name"]);
+                       }
                    }
-               }
+                }
             }
 
     ?>

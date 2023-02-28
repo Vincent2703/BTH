@@ -1,6 +1,14 @@
 <?php
-
+/*
+ * 
+ * Agent class
+ * 
+ */
 class Agent {
+    
+    /*
+     * Create the custom post Agent
+     */
     public function createAgent() {
         register_post_type("agent",
             array(
@@ -36,6 +44,9 @@ class Agent {
         );
     }
     
+    /*
+     * Fetch the single custom post Agency template
+     */
     public function templatePostAgent($path) {
 	if(get_post_type() == "agent") {
             if(is_single()) {
@@ -49,7 +60,9 @@ class Agent {
 	return $path;
     }
     
-        
+    /*
+     * Set up public query vars for agent post type
+     */    
     public function publicQueryAgentPostParent() {
         global $pagenow;
         global $typenow;
@@ -58,6 +71,9 @@ class Agent {
         }
     }
 
+    /*
+     * Filter the agents by agency
+     */
     public function agentFilterByAgency() {
         global $wpdb;
         if (isset($_GET["post_type"]) && $_GET["post_type"] === "agent") {
@@ -79,12 +95,17 @@ class Agent {
     }
     
     
+    /*
+     * Add a column to display the agent's agency
+     */
     public function customAgentColumn($columns) {
         $columns["agency"] = "agency";
         return $columns;
     }
     
-    
+    /*
+     * Order the agents by agency
+     */
     public function customAgentSortableColumns($columns) {
         unset($columns["date"]);
 
@@ -93,6 +114,9 @@ class Agent {
         return $columns;
     }
 
+    /*
+     * Display a link to the agent's agency
+     */
     public function selectCustomAgentColumn($column, $postID) {
         if($column === "agency") {
             if(!empty($parent = get_post_parent($postID))) {

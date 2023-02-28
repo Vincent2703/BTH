@@ -24,7 +24,7 @@
                         $postalCode = get_post_meta($idPost, "adPostCode", true);
                         $price = get_post_meta($idPost, "adPrice", true);
                         $fees = get_post_meta($idPost, "adFees", true);
-                        $currency = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["currency"];
+                        $currency = get_option(PLUGIN_RE_NAME."OptionsLanguage")["currency"];
                         $surface = get_post_meta($idPost, "adSurface", true);
                         $nbRooms = get_post_meta($idPost, "adNbRooms", true);
                         $nbBedrooms = get_post_meta($idPost, "adNbBedrooms", true);

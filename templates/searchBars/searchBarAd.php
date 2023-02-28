@@ -20,9 +20,13 @@
                     <label for="typeAd"><?php _e("Ad type", "retxtdom"); ?></label>
                     <select name="typeAd" id="typeAd" onchange="changeAdType(this);">
                         <?php
+                        if(empty($adTypesAd)) { ?>
+                            <option disabled selected><?php _e("No ad posted", "retxtdom") ;?></option>
+                        <?php }else{
                         foreach($adTypesAd as $adTypeAd) { ?>
                             <option value="<?= $adTypeAd->slug; ?>" <?= isset($_GET["typeAd"]) && $_GET["typeAd"] === $adTypeAd->slug?"selected":''; ?>><?= $adTypeAd->name; ?></option>                 
                         <?php }
+                        }
                         ?>
                     </select>
                 </div>
@@ -31,9 +35,13 @@
                     <label for="typeProperty"><?php _e("Property type", "retxtdom"); ?></label>
                     <select name="typeProperty" id="typeProperty">
                         <?php
+                        if(empty($adTypesProperty)) { ?>
+                            <option disabled selected><?php _e("No ad posted", "retxtdom") ;?></option>
+                        <?php }else{
                         foreach($adTypesProperty as $adTypeProperty) { ?>
                             <option value="<?= $adTypeProperty->slug; ?>" <?= isset($_GET["typeProperty"]) && $_GET["typeProperty"] === $adTypeProperty->slug?"selected":''; ?>><?= $adTypeProperty->name; ?></option>                 
                         <?php }
+                        }
                         ?>
                     </select>
                 </div>

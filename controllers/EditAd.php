@@ -172,11 +172,14 @@ class EditAd {
                 update_post_meta($adId, "adGES", intval($_POST["GES"]));
             }
             
-            $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["customFields"];
-            if(!empty($optionsDisplayads) || $optionsDisplayads !== "[]") {
-                foreach(json_decode($optionsDisplayads, true) as $field) {
-                    if(isset($_POST["CF".$field["name"]]) && !ctype_space($_POST["CF".$field["name"]])) {
-                        update_post_meta($adId, "adCF".$field["name"], sanitize_text_field($_POST["CF".$field["name"]]));
+            $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
+            if($optionsDisplayads !== false) {
+            $customFields = $optionsDisplayads["customFields"];
+                if(!empty($customFields) || $customFields !== "[]") {
+                    foreach(json_decode($optionsDisplayads, true) as $field) {
+                        if(isset($_POST["CF".$field["name"]]) && !ctype_space($_POST["CF".$field["name"]])) {
+                            update_post_meta($adId, "adCF".$field["name"], sanitize_text_field($_POST["CF".$field["name"]]));
+                        }
                     }
                 }
             }
@@ -231,12 +234,15 @@ class EditAd {
         $agentSaved = sanitize_text_field(get_post_meta($ad->ID, "adAgent", true));
         $showAgent = sanitize_text_field(get_post_meta($ad->ID, "adShowAgent", true));
         
-        $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["customFields"];
-        $customFieldsMF = array();
-        if(!empty($optionsDisplayads) || $optionsDisplayads !== "[]") {
-            foreach(json_decode($optionsDisplayads, true) as $field) {
-                if($field["section"] === "mainFeatures") {
-                    $customFieldsMF[$field["name"]] = sanitize_text_field(get_post_meta($ad->ID, "adCF".$field["name"], true));
+        $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
+        if($optionsDisplayads !== false) {
+            $customFields = $optionsDisplayads["customFields"];
+            $customFieldsMF = array();
+            if(!empty($customFields) || $customFields !== "[]") {
+                foreach(json_decode($customFields, true) as $field) {
+                    if($field["section"] === "mainFeatures") {
+                        $customFieldsMF[$field["name"]] = sanitize_text_field(get_post_meta($ad->ID, "adCF".$field["name"], true));
+                    }
                 }
             }
         }
@@ -275,9 +281,8 @@ class EditAd {
             </div>             
 
             <div class="radio">
-                <input type="radio" name="showMap" id="map1" value="no" <?php checked($showMap, "no");?> required><label for="map1"><?php _e("Do not show address", "retxtdom");?></label>
-                <input type="radio" name="showMap" id="map2" value="onlyPC" <?php checked($showMap, "onlyPC");?> required><label for="map2"><?php _e("Show postal code and city", "retxtdom");?></label>
-                <input type="radio" name="showMap" id="map3" value="all" <?php checked($showMap, "all");?> required><label for="map3"><?php _e("Show full address", "retxtdom");?></label>
+                <input type="radio" name="showMap" id="map1" value="onlyPC" <?php checked($showMap, "onlyPC");?> required><label for="map1"><?php _e("Show postal code and city", "retxtdom");?></label>
+                <input type="radio" name="showMap" id="map2" value="all" <?php checked($showMap, "all");?> required><label for="map2"><?php _e("Show full address", "retxtdom");?></label>
             </div>
         </div>
         <div id="nbRooms">
@@ -328,16 +333,22 @@ class EditAd {
             <input type="hidden" name="images" id="images" value="<?= $images; ?>">
         </div>
         <div id="showPictures" class="radio">
-                <?php if(!is_null($images)) {
-                    $ids = explode(';', $images);
-                    foreach ($ids as $id) {
-                        echo wp_get_attachment_image($id, array(150, 150), false, array("class" => "imgAd"));
-                    }
-                }?>
+            <?php if(!is_null($images)) {
+                $ids = explode(';', $images);
+                foreach ($ids as $id) { ?>
+                    <div class="aPicture">
+                        <?= wp_get_attachment_image($id, array(150, 150), false, array("class" => "imgAd")); ?>
+                        <div class="controlPicture">
+                            <span class="moveToLeft">←</span>
+                            <span class="deletePicture"><?php _e("delete", "retxtdom"); ?></span>
+                            <span class="moveToRight">→</span></div>
+                    </div>
+                <?php }
+            }?>
         </div>
 
         <?php 
-            if(!empty($optionsDisplayads) && $optionsDisplayads !== "[]") {
+            if(isset($customFieldsMF) && !empty($customFieldsMF)) {
                 echo '<div id="customMFields">';
                 foreach($customFieldsMF as $kField => $vField) { ?>
                     <div class="text">
@@ -365,12 +376,15 @@ class EditAd {
         $DPE = intval(get_post_meta($ad->ID, "adDPE", true));
         $GES = intval(get_post_meta($ad->ID, "adGES", true));
         
-        $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads")["customFields"];
-        $customFieldsCF = array();
-        if(!empty($optionsDisplayads) || $optionsDisplayads !== "[]") {
-            foreach(json_decode($optionsDisplayads, true) as $field) {
-                if($field["section"] === "complementaryFeatures") {
-                    $customFieldsCF[$field["name"]] = sanitize_text_field(get_post_meta($ad->ID, "adCF".$field["name"], true));
+        $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
+        if($optionsDisplayads !== false) {
+            $customFields = $optionsDisplayads["customFields"];
+            $customFieldsCF = array();
+            if(!empty($customFields) || $customFields !== "[]") {
+                foreach(json_decode($customFields, true) as $field) {
+                    if($field["section"] === "complementaryFeatures") {
+                        $customFieldsCF[$field["name"]] = sanitize_text_field(get_post_meta($ad->ID, "adCF".$field["name"], true));
+                    }
                 }
             }
         }
@@ -387,7 +401,7 @@ class EditAd {
         </div>
         <div id="kitchenHeater">
             <div class="select">
-            <label><?php _e("Type heating", "retxtdom");?></label>
+            <label><?php _e("Type heating", "retxtdom");?></label>&nbsp;
             <select name="typeHeating">
                 <option value="unknown" <?php selected($typeHeating, "unknown"); ?>>
                     <?php _e("Do not fill", "retxtdom");?>
@@ -413,7 +427,7 @@ class EditAd {
             </select>
             </div>
             <div class="select">
-                <label><?php _e("Type kitchen", "retxtdom");?></label>
+                <label><?php _e("Type kitchen", "retxtdom");?></label>&nbsp;
                 <select name="typeKitchen">
                     <option value="unknown" <?=($typeKitchen==="unknown")?"selected":NULL;?>>
                         <?php _e("Do not fill", "retxtdom");?>
@@ -479,7 +493,7 @@ class EditAd {
         </div>
 
         <?php 
-            if(!empty($optionsDisplayads) && $optionsDisplayads !== "[]") {
+            if(isset($customFieldsCF) && !empty($customFieldsCF)) {
                 echo '<div id="customCFields">';
                 foreach($customFieldsCF as $kField => $vField) { ?>
                     <div class="text">

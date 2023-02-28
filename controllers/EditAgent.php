@@ -84,7 +84,7 @@ class editAgent {
                     }
                 ?>
             </select>
-            <a target="_blank" href="post-new.php?post_type=agency"><?php _e("Add an agent", "retxtdom"); ?></a>
+            <a target="_blank" href="post-new.php?post_type=agency"><?php _e("Add an agency", "retxtdom"); ?></a>
         <?php
     }
 }

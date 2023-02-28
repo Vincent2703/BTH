@@ -16,16 +16,16 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: includes/js\n"
 
-#: bth.php:101
+#: rep.php:101
 msgid "FILTERS"
 msgstr "FILTRES"
 
-#: bth.php:227 controllers/Options.php:508 controllers/Options.php:523
+#: rep.php:227 controllers/Options.php:508 controllers/Options.php:523
 #: templates/singles/single-re-ad.php:160
 msgid "Main characteristics"
 msgstr "Caractéristiques principales"
 
-#: bth.php:228 controllers/Options.php:508 controllers/Options.php:523
+#: rep.php:228 controllers/Options.php:508 controllers/Options.php:523
 #: templates/singles/single-re-ad.php:229
 msgid "Complementary characteristics"
 msgstr "Caractéristiques complémentaires"

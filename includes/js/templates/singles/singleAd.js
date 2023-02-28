@@ -21,7 +21,7 @@ jQuery(document).ready(function ($) {
 
 
     /* Slider */
-    var autoplay = true;
+    var autoplay = $("#miniSlider ul li").length > 1;
    
     setInterval(function () {
         if(autoplay && jQuery("#miniSlider:hover").length===0) {

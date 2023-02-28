@@ -1,6 +1,14 @@
 <?php
-
+/*
+ * 
+ * Agency class
+ * 
+ */
 class Agency {
+    
+    /*
+     * Create the custom post Agency
+     */
     public function createAgency() {
         register_post_type("agency",
             array(
@@ -33,6 +41,9 @@ class Agency {
         );
     }
     
+    /*
+     * Fetch the single custom post Agency template
+     */
     function templatePostAgency($path) {
 	if(get_post_type() == "agency") {
             if(is_single()) {

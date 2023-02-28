@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {    
-    if($("input[name='option_page']").val() === "BTHOptionsDisplayadsGroup") { //If we are in the displayads tab
+    if($("input[name='option_page']").val() === "repOptionsDisplayadsGroup") { //If we are in the displayads tab
             
         /* Add a row */
         $(".fieldPlus").click(function() {

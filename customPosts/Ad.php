@@ -1,8 +1,15 @@
 <?php
-
+/*
+ * 
+ * Ad class
+ * 
+ */
 class Ad {
     
-        public function registerPluginStylesSingleAd() {
+        /*
+         * Register plugin styles for the singleAd template
+         */
+        private function registerPluginStylesSingleAd() {
             wp_register_style("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leaflet.min.css"), array(), "1.8.0");
             wp_register_style("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leafletFullscreen.min.css"), array(), "2.3.0");
             wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/singles/singleAd.css"));
@@ -13,7 +20,10 @@ class Ad {
             wp_enqueue_style("googleIcons");
         }
 
-        public function registerPluginScriptsSingleAd() {
+        /*
+         * Register plugin scripts for the singleAd template
+         */
+        private function registerPluginScriptsSingleAd() {
             wp_register_script("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leaflet.min.js"), array(), "1.8.0", true);
             wp_register_script("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leafletFullscreen.min.js"), array(), "2.3.0", true);
             wp_register_script("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/singles/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
@@ -24,8 +34,11 @@ class Ad {
             wp_enqueue_script("dpeges");
         }
     
-        public function createAd() { //TODO : CHECK IF EVERYTHING IS ALREADY CREATED BEFORE ? OR CHANGE INIT BY SOMETHING ELSE ?
-        register_post_type("re-ad",
+        /*
+         * Create the custom post Ad
+         */
+        public function createAd() {
+        register_post_type("re-ad", //Just ad doesn't work for some reason
             array(
                 "labels" => array(
                     "name"                  => __("Ads", "retxtdom"),
@@ -138,28 +151,31 @@ class Ad {
         
     }
     
-    public function showPage() {
+    /*public function showPage() {
     ?>
 
     <div class="wrap">
-        <h2>BTH Accueil</h2>
+        <h2>rep Accueil</h2>
         <p>Bien le bonjour</p>
         <?php settings_errors(); ?>
     </div>
-    <?php }
+    <?php }*/
     
   
+    /*
+     * Fetch the single or archive custom post Ad template
+     */
     public function templatePostAd($path) {
 	if(get_post_type() == "re-ad") {
             if(is_single()) {
                 if(!locate_template(array("single-ad.php"))) {
-                    $path = plugin_dir_path(__DIR__)."templates/singles/single-re-ad.php";
+                    $path = plugin_dir_path(__DIR__)."templates/singles/single-ad.php";
                     $this->registerPluginScriptsSingleAd();
                     $this->registerPluginStylesSingleAd();
                 }
             }else if(is_post_type_archive("re-ad")) { 
-                if(!locate_template(array("archive-re-ad.php"))) {
-                    $path = plugin_dir_path(__DIR__)."templates/archives/archive-re-ad.php";
+                if(!locate_template(array("archive-ad.php"))) {
+                    $path = plugin_dir_path(__DIR__)."templates/archives/archive-ad.php";
                     wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
                     wp_enqueue_style("archiveAd");
                 }
@@ -168,6 +184,9 @@ class Ad {
 	return $path;
     }
     
+    /*
+     * Add a metabox to display the taxonomies adType and adProperty
+     */
     public function taxonomyMetaBoxCB($post, $taxonomy) {
         $taxonomyName = $taxonomy["args"]["taxonomy"];
         $terms = get_terms($taxonomyName, array("hide_empty" => false));
@@ -183,23 +202,30 @@ class Ad {
         foreach ($terms as $term) {
         ?>
             <label title="<?php esc_attr_e($term->name); ?>">
-                <input type="radio" name="<?= $taxonomyName; ?>" value="<?php esc_attr_e($term->name); ?>" <?php checked($term->name, $name); ?>>
+                <input type="radio" name="<?= $taxonomyName; ?>" value="<?php esc_attr_e($term->name); ?>" <?php checked($term->name, $name); ?> required>
                     <span><?php esc_html_e($term->name); ?></span>
             </label><br>
         <?php
         }
     }
     
+    /*
+     * Add a metabox to display the ad's availability
+     */
     public function taxonomyAdAvailableCheckboxCB($post) {
+        global $pagenow;
         $available = wp_get_post_terms($post->ID, "adAvailable", array("fields"=>"slugs"))[0]==="available";
         ?>
         <label title='<?php _e("The property is available", "retxtdom");?>'>
-            <input type="checkbox" name="adAvailable" value="available" <?php checked($available); ?>>
+            <input type="checkbox" name="adAvailable" value="available" <?php checked($pagenow==="post-new.php" || $available); ?>>
             <span><?php _e("The property is available", "retxtdom");?></span>
         </label>
         <?php
     }
     
+    /*
+     * Filtering the ads by the taxonomies in the admin area
+     */
     public function filterAdsByTaxonomies() {
         global $typenow;
         $postType = "re-ad"; 
@@ -222,6 +248,9 @@ class Ad {
         }
     }
     
+    /*
+     * Add a column to display the typeProperty
+     */
     public function typePropertyColumns($originalColumns) {
         $newColumns = $originalColumns;
         array_splice($newColumns, 1);
@@ -233,7 +262,9 @@ class Ad {
         return $newColumns;
     }
     
-    
+    /*
+     * Add a column to display the property habitability
+     */
     public function typePropertyHabitableColumn($row, $columnName, $termId) {
         $meta = get_term_meta($termId, "habitable", true);
         if ("habitable" === $columnName) {
@@ -245,11 +276,17 @@ class Ad {
         }
     }
     
+    /*
+     * When adding a property's type, ask if it's habitable
+     */
     public function typePropertyCreateFields($taxonomy) { ?>
         <?php _e("Habitable", "retxtdom"); ?> <input type="checkbox" name="habitable">
         <p class="description" id="description-description"><?php _e("Is this type of property habitable ?", "retxtdom"); ?></p><br />
     <?php }
     
+    /*
+     * When updating a property's type, ask if it's habitable
+     */
     public function typePropertyEditFields($term, $taxonomy) {
         $checked = get_term_meta($term->term_id, "habitable", true)==1;
         $html ='
@@ -262,11 +299,16 @@ class Ad {
         echo $html;
     }
     
+    /*
+     * Update the property's type habitability 
+     */
     public function termTypePropertyUpdate($termId, $ttId, $taxonomy) {
         update_term_meta($termId, "habitable", isset($_POST["habitable"]));   
     }
     
-    
+    /*
+     * Search an ad in the front end
+     */
     public function searchAds($query) {
         if(!is_admin() && $query->is_search && isset($_GET["post_type"]) && $_GET["post_type"] === "re-ad") {        
             $query->set("post_type", "re-ad");
