@@ -54,41 +54,42 @@
                 $getCoords = false;
             }
             $city = getMeta("adCity");
-
+            
             if(!empty($idContact = getMeta("adIdAgent"))) {
                 $getContact = true;
                 if(getMeta("adShowAgent") == '1') {
-                    $emailToContact = get_post_meta($idContact, "agentEmail", true);
+                    $email = get_post_meta($idContact, "agentEmail", true);
                     $phone = get_post_meta($idContact, "agentPhone", true);
                     $mobilePhone = get_post_meta($idContact, "agentMobilePhone", true);
                 }else{
                     $idContact = wp_get_post_parent_id($idContact);
-                    $emailToContact = get_post_meta($idContact, "agencyEmail", true);
+                    $email = get_post_meta($idContact, "agencyEmail", true);
                     $phone = get_post_meta($idContact, "agencyPhone", true);
+                    $linkAgency = get_post_permalink($idContact);
                 }
                 $thumbnailContact = get_the_post_thumbnail_url($idContact, "thumbnail");
                 $nameContact = get_the_title($idContact);
             }else{
-                $emailToContact = get_option(PLUGIN_RE_NAME."OptionsEmail")["emailAd"];
+                $email = get_option(PLUGIN_RE_NAME."OptionsEmail")["emailAd"];
                 $getContact = false;
             }
 
-            if(isset($_POST["submit"])) {         
+            if(isset($_POST["submit"])) {       //ajouter nonce  
                 $adRef = getMeta("adRefAgency");
-                $names = sanitize_text_field($_POST["names"]);
-                $phone = sanitize_text_field($_POST["phone"]);
-                $email = sanitize_email($_POST["email"]);
+                $contactNames = sanitize_text_field($_POST["names"]);
+                $contactPhone = sanitize_text_field($_POST["phone"]);
+                $contactEmail = sanitize_email($_POST["email"]);
                 $messageInput = sanitize_textarea_field($_POST["message"]);
 
                 $subject = __("Message about the ad", "retxtdom")." $adRef";
-                $message = __("Message from", "retxtdom")." : $names<br />"
-                        . __("Phone", "retxtdom")." : $phone - ".__("Email address", "retxtdom")." : $email<br />"
+                $message = __("Message from", "retxtdom")." : $contactNames<br />"
+                        . __("Phone", "retxtdom")." : $contactPhone - ".__("Email address", "retxtdom")." : $contactEmail<br />"
                         . __("About", "retxtdom")." \"" . get_the_title() . "\"<br /><br />"
                         . __("Message", "retxtdom")." :<br />"
                         . $messageInput;
                 $headers = array("Content-Type: text/html; charset=UTF-8");
 
-                if(wp_mail($emailToContact, $subject, $message, $headers)) {
+                if(wp_mail($email, $subject, $message, $headers)) {
                     _e("The email has been sent successfully", "retxtdom").'.';
                 }else{
                     _e("The email could not be sent", "retxtdom").'.';
@@ -152,6 +153,7 @@
                         <span class="pagingImg"></span>
                         <ul>
                         <?php foreach ($imagesIds as $id) {
+                            echo $id;
                             echo "<li>".wp_get_attachment_image($id, "large")."</li>";
                         } ?>
                         </ul>
@@ -171,139 +173,139 @@
                     </div>
                     <div class="mainFeatures">
                         <h4><?php _e("Main characteristics", "retxtdom"); ?></h4>
-                        <ul>
-                            <li>
+                        <div class="listFeatures">
+                            <div>
                                 <span class="nameFeature"><?php _e("Reference", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adRefAgency"); ?></span>
-                            </li>
-                            <li>
+                            </div>
+                            <div>
                                 <span class="nameFeature"><?php _e("Price", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adPrice"); ?>€</span>
-                            </li>
-                            <li>
+                            </div>
+                            <div>
                                 <span class="nameFeature"><?php _e("Fees", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adFees"); ?>€</span>
-                            </li>
-                            <li>
+                            </div>
+                            <div>
                                 <span class="nameFeature"><?php _e("Address", "retxtdom"); ?></span>
                                 <span class="valueFeature"><a target="_blank" href="https://www.google.fr/maps/place/<?=urlencode($address);?>"><?= $address; ?></a></span>
-                            </li>
-                            <li>
+                            </div>
+                            <div>
                                 <span class="nameFeature"><?php _e("Living space", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adSurface"); ?>m²</span>
-                            </li>
+                            </div>
                             <?php if(intval(getMeta("adLandSurface")) > 0) { ?> 
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Land area", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adLandSurface"); ?>m²</span>
-                            </li>
+                            </div>
                             <?php } ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Number rooms", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adNbRooms"); ?></span>
-                            </li>
+                            </div>
                             <?php if(intval(getMeta("adNbBedrooms")) > 0) { ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Number bedrooms", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adNbBedrooms"); ?></span>
-                            </li>
+                            </div>
                             <?php } ?>
                             <?php if(intval(getMeta("adNbWC")) > 0) { ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Number toilets", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adNbWC"); ?></span>
-                            </li>
+                            </div>
                             <?php } ?>
                             <?php if(intval(getMeta("adNbBathrooms")) >0) { ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Number bathrooms", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adNbBathrooms"); ?></span>
-                            </li>
+                            </div>
                             <?php } ?>
                             <?php if(intval(getMeta("adNbWaterRooms")) > 0) { ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Number shower rooms", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adNbWaterRooms"); ?></span>
-                            </li>
+                            </div>
                             <?php } ?>
                             <?php if(!empty($customMainFields)) {
                                 foreach($customMainFields as $fieldName) {
                                     if(!empty(getMeta("adCF".$fieldName))) { ?>
-                                        <li>
+                                        <div>
                                             <span class="nameFeature"><?= $fieldName; ?></span>
                                             <span class="valueFeature"><?= getMeta("adCF".$fieldName); ?></span>
-                                        </li>
+                                        </div>
                                     <?php }
                                 }
                             } ?>
-                        </ul>
+                        </div>
                     </div>
                     <div class="complementaryFeatures">
                         <h4><?php _e("Complementary characteristics", "retxtdom"); ?></h4>
-                        <ul>
+                        <div class="listFeatures">
                             <?php if(intval(getMeta("adFloor")) > 0) { ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Floor", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adFloor"); ?> (sur <?=getMeta("adNbFloors");?>)</span>
-                            </li>
+                            </div>
                             <?php } ?>
                             <?php if(getMeta("adFurnished") == '1' ) { ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Furnished", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
-                            </li>
+                            </div>
                             <?php } ?>
                             <?php if(getMeta("adElevator") == '1' ) { ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Elevator", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
-                            </li>
+                            </div>
                             <?php } ?>
                             <?php if(getMeta("adCellar") == '1' ) { ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Cellar", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
-                            </li>
+                            </div>
                             <?php } ?>
                             <?php if(getMeta("adTerrace") == '1' ) { ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Terrace", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
-                            </li>
+                            </div>
                             <?php } ?>
                             <?php if(is_numeric(getMeta("adYear")) && intval(getMeta("adYear"))>0) { ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Construction year", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adYear"); ?></span>
-                            </li>
+                            </div>
                             <?php } ?>
-                            <li>
+                            <div>
                                 <span class="nameFeature"><?php _e("Type heating", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adTypeHeating"); ?></span>
-                            </li>
-                            <li>
+                            </div>
+                            <div>
                                 <span class="nameFeature"><?php _e("Type kitchen", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?= getMeta("adTypeKitchen"); ?></span>
-                            </li>
-                            <li>
+                            </div>
+                            <div>
                                 <span id="DPEName" class="nameFeature"><?php _e("EPD in kWhPE/m²/year", "retxtdom"); ?></span>
                                 <span id="DPEValue" class="valueFeature"><?= getMeta("adDPE"); ?></span>
-                            </li>
-                            <li>
+                            </div>
+                            <div>
                                 <span id="GESName" class="nameFeature"><?php _e("Greenhouse gas in kg eqCO2/m²/year", "retxtdom"); ?></span>
                                 <span id="GESValue" class="valueFeature"><?= getMeta("adGES"); ?></span>
-                            </li>
+                            </div>
                             <?php if(!empty($customComplementaryFields)) {
                                 foreach($customComplementaryFields as $fieldName) {
                                     if(!empty(getMeta("adCF".$fieldName))) { ?>
-                                        <li>
+                                        <div>
                                             <span class="nameFeature"><?= $fieldName; ?></span>
                                             <span class="valueFeature"><?= getMeta("adCF".$fieldName); ?></span>
-                                        </li>
+                                        </div>
                                     <?php }
                                 }
                             } ?>
-                        </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="contentRightAd">
@@ -317,11 +319,17 @@
                         <div class="headerContact">
                             <?php if($getContact) { ?>
                             <div class="headerContactLeft">
-                                <img src="<?= $thumbnailContact; ?>" alt="<?php _e("Contact thumbnail", "retxtdom"); ?>" id="thumbnailContact">
+                                <?php if(isset($linkAgency)&&$linkAgency) { ?>
+                                <a href="<?=$linkAgency;?>">
+                                    <img src="<?= $thumbnailContact; ?>" alt="<?php _e("Contact thumbnail", "retxtdom"); ?>" id="thumbnailContact">
+                                </a>
+                                <?php }else{ ?>
+                                    <img src="<?= $thumbnailContact; ?>" alt="<?php _e("Contact thumbnail", "retxtdom"); ?>" id="thumbnailContact">
+                                <?php } ?>
                             </div>
                             <div class="headerContactRight">
                                 <span id="nameContact"><?= $nameContact; ?></span>
-                                <?php if(isset($phone) || isset($mobilePhone)) { ?>
+                                <?php if(isset($phone) && $phone!==false || isset($mobilePhone) && $mobilePhone!==false) { ?>
                                 <table id="phoneContact">
                                     <tbody>
                                         <tr>

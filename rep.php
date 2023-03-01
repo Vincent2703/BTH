@@ -332,11 +332,16 @@ class Rep {
         if($base === "post") {
             if($postType === "re-ad") {
                 wp_enqueue_media();
-                wp_register_script("mediaButton", plugins_url(PLUGIN_RE_NAME."/includes/js/edits/editAd.js"), array('jquery'), PLUGIN_RE_VERSION);
+                wp_register_script("editAd", plugins_url(PLUGIN_RE_NAME."/includes/js/edits/editAd.js"), array('jquery'), PLUGIN_RE_VERSION);
+                $translations = array(
+                    "delete" => __("Delete", "retxtdom")
+                );
+                wp_localize_script("editAd", "translations", $translations);
+                wp_enqueue_script("editAd");
+                
                 wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
 
-                wp_enqueue_script("mediaButton");
                 $variables = array(
                     "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
                 );

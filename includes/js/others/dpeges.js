@@ -1,6 +1,4 @@
 var DPEGES = function(diag, domID) {
-    var detailsDiag = document.createElement("div");
-
     var smallDiag = document.createElement("div");
     smallDiag.id = domID+"Small";
     smallDiag.setAttribute("style", "font-size: 0; user-select: none;");    

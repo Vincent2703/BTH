@@ -32,19 +32,17 @@ class editAgent {
                 update_post_meta($agentId, "agentEmail", sanitize_text_field($_POST["email"]));
             }
             
-            if(isset($_POST["agency"]) && is_int($_POST["agency"])) {
+            if(isset($_POST["agency"]) && is_numeric($_POST["agency"])) {
                 //wp_update_post(array("ID" => $agentId, "post_parent" => sanitize_text_field($_POST["agency"])));
                 //$agent->post_parent = sanitize_text_field($_POST["agency"]);
                 remove_action("save_post_agent", array($this, "savePost"));
 
-                wp_update_post( array(
+                wp_update_post(array(
                     "ID" => $agentId,
                     "post_parent" => sanitize_text_field($_POST["agency"])
-                ) );
-                
+                ));             
             }
-            
-            
+   
         }       
     }
     

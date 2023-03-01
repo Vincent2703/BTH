@@ -328,20 +328,20 @@ class EditAd {
                 <a target="_blank" href="post-new.php?post_type=agent"><?php _e("Add an agent", "retxtdom");?></a>
             </div>
         </div>
-        <div id="addPictures" class="radio">
+        <div id="addPictures">
             <a href="#" id="insertAdPictures" class="button"><?php _e("Add pictures", "retxtdom");?></a>
             <input type="hidden" name="images" id="images" value="<?= $images; ?>">
         </div>
-        <div id="showPictures" class="radio">
+        <div id="showPictures">
             <?php if(!is_null($images)) {
                 $ids = explode(';', $images);
                 foreach ($ids as $id) { ?>
-                    <div class="aPicture">
+                    <div class="aPicture" data-imgId="<?=$id;?>">
                         <?= wp_get_attachment_image($id, array(150, 150), false, array("class" => "imgAd")); ?>
                         <div class="controlPicture">
-                            <span class="moveToLeft">←</span>
-                            <span class="deletePicture"><?php _e("delete", "retxtdom"); ?></span>
-                            <span class="moveToRight">→</span></div>
+                            <span class="moveToLeft" onclick="movePicture(this, 'left');">←</span>
+                            <span class="deletePicture" onclick="deletePicture(this);"><?php _e("Delete", "retxtdom"); ?></span>
+                            <span class="moveToRight" onclick="movePicture(this, 'right');">→</span></div>
                     </div>
                 <?php }
             }?>

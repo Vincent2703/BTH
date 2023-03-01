@@ -5,32 +5,78 @@ jQuery(function($) {
         });
 
     function open_media_window() {
-         if (this.window === undefined) {
-        this.window = wp.media({
-                title: "Choisissez les images à afficher",
-                library: {type: "image"},
-                multiple: true
-            });
+        if (this.window === undefined) {
+            this.window = wp.media({
+                    title: "Choisissez les images à afficher",
+                    library: {type: "image"},
+                    multiple: true
+                });
 
-        var self = this; 
-        inputImages = document.getElementById("images");
-        this.window.on("select", function() {
+            var self = this; 
+            inputImages = document.getElementById("images");
+            this.window.on("select", function() {
                 let showPictures = document.getElementById("showPictures");
                 inputImages.value = null;
                 showPictures.innerHTML = null;
                 let attachments = self.window.state().get("selection").toJSON();
-                if(attachments.length > 4) {
-                    console.log(attachments);
-                }
                 attachments.forEach(elem => {
                     inputImages.value += elem.id+";";
-                    showPictures.innerHTML += '<img src="'+elem.sizes.thumbnail.url+'" class="imgAd">';
+                    showPictures.innerHTML += '<div class="aPicture" data-imgId='+elem.id+'>'+
+                        '<img src="'+elem.sizes.thumbnail.url+'" class="imgAd">'+
+                        '<div class="controlPicture">'+
+                            '<span class="moveToLeft" onclick="movePicture(this, \'left\');">←</span>'+
+                            '<span class="deletePicture" onclick="deletePicture(this);">'+translations.delete+'</span>'+
+                            '<span class="moveToRight" onclick="movePicture(this, \'right\');">→</span></div>'+
+                        '</div>'+
+                    '</div>';
+
                 });
                 inputImages.value = inputImages.value.slice(0, -1);
             });
-    }
+        }
 
     this.window.open();
     return false;
     }
 });
+
+
+function deletePicture(elem) {
+    var pictureElem = jQuery(elem).parents()[1];
+    var pictureId = jQuery(pictureElem).attr("data-imgId");
+    var picturesElem = jQuery("#images");
+    var picturesArray = jQuery(picturesElem).val().split(';');
+    picturesArray.splice(picturesArray.findIndex(item=>item.toString()===pictureId), 1);
+    pictureElem.remove();
+    picturesElem.val(picturesArray.join(';'));
+}
+
+function movePicture(elem, dir) {
+    var pictureElem = jQuery(elem).parents()[1];
+    var pictureId = jQuery(pictureElem).attr("data-imgId");
+    var picturesElem = jQuery("#images");
+    var picturesArray = jQuery(picturesElem).val().split(';');
+    if(dir==="left") {
+        var previous = jQuery(pictureElem).prev();
+        if(previous.length >= 1) {
+            jQuery(pictureElem).insertBefore(jQuery(previous));
+            var previousPictureId = jQuery(previous).attr("data-imgId");
+            var indexCurrent = picturesArray.findIndex(item=>item.toString()===pictureId);
+            var indexPrevious = picturesArray.findIndex(item=>item.toString()===previousPictureId);
+            picturesArray[indexCurrent] = previousPictureId;
+            picturesArray[indexPrevious] = pictureId;
+            picturesElem.val(picturesArray.join(';'));
+        }
+    }else{
+        var next = jQuery(pictureElem).next();
+        if(next.length >= 1) {
+            jQuery(pictureElem).insertAfter(jQuery(next));
+            var nextPictureId = jQuery(next).attr("data-imgId");
+            var indexCurrent = picturesArray.findIndex(item=>item.toString()===pictureId);
+            var indexNext = picturesArray.findIndex(item=>item.toString()===nextPictureId);
+            picturesArray[indexCurrent] = nextPictureId;
+            picturesArray[indexNext] = pictureId;
+            picturesElem.val(picturesArray.join(';'));
+        }     
+    }
+}

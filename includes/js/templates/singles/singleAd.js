@@ -41,7 +41,7 @@ jQuery(document).ready(function ($) {
 
     $("#miniSlider ul").css({ width: "100vw" });
 	
-    $("#miniSlider ul li:last-child").prependTo("#miniSlider ul");
+    //$("#miniSlider ul li:last-child").prependTo("#miniSlider ul");
     
     $(".pagingImg").text("1/" + maxImg);
 
