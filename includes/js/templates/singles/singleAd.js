@@ -40,9 +40,7 @@ jQuery(document).ready(function ($) {
     $("#miniSlider").css({ maxWidth: slideWidth, height: slideHeight });
 
     $("#miniSlider ul").css({ width: "100vw" });
-	
-    //$("#miniSlider ul li:last-child").prependTo("#miniSlider ul");
-    
+	    
     $(".pagingImg").text("1/" + maxImg);
 
     function moveSlide(direction) {
@@ -55,7 +53,7 @@ jQuery(document).ready(function ($) {
             });
             
         if($("#fullscreenSlider").is(":visible")) {
-            var largeImage = $("#miniSlider ul li:first-child img").attr("src")/*.attr("srcset").split(", ").find(e => e.includes("1024w")).replace(/ \d+w$/, '')*/;
+            var largeImage = $("#miniSlider ul li:last-child img").attr("src").replace(/-[0-9]+x[0-9]+/, '');
             $("#fullscreenSlider .displayFullscreen").fadeOut("400", function() {
                 $("#fullscreenSlider .displayFullscreen").css("background-image", "url("+largeImage+")");
             })
@@ -70,7 +68,7 @@ jQuery(document).ready(function ($) {
             });
             
             if($("#fullscreenSlider").is(":visible")) {
-                var largeImage = $("#miniSlider ul li:nth-child(3) img").attr("src");
+                var largeImage = $("#miniSlider ul li:nth-child(2) img").attr("src").replace(/-[0-9]+x[0-9]+/, '');
                 $("#fullscreenSlider .displayFullscreen").fadeOut("400", function() {
                     $("#fullscreenSlider .displayFullscreen").css("background-image", "url("+largeImage+")");
                 })
@@ -125,7 +123,7 @@ jQuery(document).ready(function ($) {
     var imgs = $("#miniSlider ul li img");
     $(imgs).click(function() {
         autoplay = false;
-        var largeImage = $(this).attr("src");
+        var largeImage = $(this).attr("src").replace(/-[0-9]+x[0-9]+/, '');
         $("#fullscreenSlider .displayFullscreen").css("background-image", "url("+largeImage+")");
         $("#fullscreenSlider").show("slow"); //Remplacer par quelque chose qui permet de personnaliser l'effet
         setTimeout(function() { //Pour éviter que la page soit redimensionnée avant que l'image s'affiche en plein écran. On peut peut-être trouver mieux ?

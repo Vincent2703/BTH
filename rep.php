@@ -40,6 +40,7 @@ class Rep {
     private function defineGlobalConsts() {
         define("PLUGIN_RE_NAME", "REP");
         define("PLUGIN_RE_VERSION", "dev");
+        define("PLUGIN_RE_PATH", WP_PLUGIN_DIR.'/'.PLUGIN_RE_NAME.'/');
     }
     
     /*
@@ -384,7 +385,7 @@ class Rep {
      * Register custom API route
      */
     public function registerRouteCustomAPI() {
-        require_once("includes/php/getAddressData.php");
+        require_once("models/ajax/getAddressData.php");
         register_rest_route(PLUGIN_RE_NAME."/v1", "address", array( 
             "methods" => "GET",
             "callback" => "getAddressData",

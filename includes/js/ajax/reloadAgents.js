@@ -1,7 +1,7 @@
 function reloadAgents() {
     agentSelected = parseInt(jQuery("#agents :selected").val());
     jQuery.ajax({
-        url: "../wp-content/plugins/"+pluginName+"/includes/php/getAgents.php",
+        url: "../wp-content/plugins/"+pluginName+"/models/ajax/getAgents.php",
         type: "GET"                 
     }).done(function(response) {
         jQuery("#agents").empty();

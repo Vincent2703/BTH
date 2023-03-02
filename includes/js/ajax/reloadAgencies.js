@@ -1,7 +1,7 @@
 function reloadAgencies() {
     agencySelected = parseInt(jQuery("#agencies :selected").val());
     jQuery.ajax({
-        url: "../wp-content/plugins/"+pluginName+"/includes/php/getAgencies.php",
+        url: "../wp-content/plugins/"+pluginName+"/models/ajax/getAgencies.php",
         type: "GET"                 
     }).done(function(response) {
         jQuery("#agencies").empty();

@@ -142,14 +142,16 @@
 
 .contentAd .listFeatures div .nameFeature, .contentAd .listFeatures div .valueFeature {
     display: flex;
-    align-self: center;
+    align-items: center;
 }
 
 .contentAd .nameFeature {
     font-weight: bold;
 }
 
-.contentAd .valueFeature {
+.contentAd #linkGMaps {
+    text-decoration: none;
+    color: #d20000;
 }
 
 .contentAd #DPEValueSmall, .contentAd #GESValueSmall {
@@ -323,6 +325,8 @@
 .contentAd #fullscreenSlider .controlClose {
     font-size: 4rem;
     color: white;
+    text-shadow: 2px 0 grey, -2px 0 grey, 0 2px grey, 0 -2px grey,
+               1px 1px grey, -1px -1px grey, 1px -1px grey, -1px 1px grey;
     position: absolute;
     right: 2%;
     top: 2%;
@@ -331,8 +335,9 @@
 }
 
 .contentAd #fullscreenSlider .controlNext, .contentAd #fullscreenSlider .controlPrev {
-    background-color: rgba(128,128,128,0.5);
     font-size: 4rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
 }
 
 .contentAd .pagingImg {
@@ -342,6 +347,8 @@
     position: absolute;
     right: 2%;
     user-select: none;
+    text-shadow: 2px 0 grey, -2px 0 grey, 0 2px grey, 0 -2px grey,
+               1px 1px grey, -1px -1px grey, 1px -1px grey, -1px 1px grey;
 }
 
 .contentAd #miniSlider .pagingImg {

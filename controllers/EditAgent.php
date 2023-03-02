@@ -33,8 +33,6 @@ class editAgent {
             }
             
             if(isset($_POST["agency"]) && is_numeric($_POST["agency"])) {
-                //wp_update_post(array("ID" => $agentId, "post_parent" => sanitize_text_field($_POST["agency"])));
-                //$agent->post_parent = sanitize_text_field($_POST["agency"]);
                 remove_action("save_post_agent", array($this, "savePost"));
 
                 wp_update_post(array(
@@ -47,22 +45,21 @@ class editAgent {
     }
     
     public function displayAgentMetaBox($agent) {
-        $phone = esc_html(get_post_meta($agent->ID, "agentPhone", true));
-        $mobilePhone = esc_html(get_post_meta($agent->ID, "agentMobilePhone", true));
-        $email = esc_html(get_post_meta($agent->ID, "agentEmail", true));
+        require_once(PLUGIN_RE_PATH."models/admin/AgentAdmin.php");
+        AgencyAdmin::getData($agent->ID);
         ?>
             <div id="agentDetails">
                 <div class="text">
                     <label><?php _e("Phone"); ?></label>
-                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "Home phone", "retxtdom"); ?>" value="<?= $phone; ?>">
+                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "Home phone", "retxtdom"); ?>" value="<?= AgencyAdmin::$phone; ?>">
                 </div>
                 <div class="text">
                     <label><?php _e("Mobile phone"); ?></label>
-                    <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("0600000000", "retxtdom"); ?>" value="<?= $mobilePhone; ?>">
+                    <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("0600000000", "retxtdom"); ?>" value="<?= AgencyAdmin::$mobilePhone; ?>">
                 </div>
                 <div class="text">
                     <label><?php _e("Email address"); ?></label>
-                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= $email; ?>">
+                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= AgencyAdmin::$email; ?>">
                 </div>
             </div>
         <?php
