@@ -20,46 +20,36 @@ class editAgent {
         );
     }
     
-    function savePost($agentId, $agent) {
+    public function savePost($agentId, $agent) {
         if($agent->post_type == "agent") {
-            if(isset($_POST["phone"]) && !ctype_space($_POST["phone"])) {
-                update_post_meta($agentId, "agentPhone", sanitize_text_field($_POST["phone"]));
-            }
-            if(isset($_POST["mobilePhone"]) && !ctype_space($_POST["mobilePhone"])) {
-                update_post_meta($agentId, "agentMobilePhone", sanitize_text_field($_POST["mobilePhone"]));
-            }
-            if(isset($_POST["email"]) && is_email($_POST["email"])) {
-                update_post_meta($agentId, "agentEmail", sanitize_text_field($_POST["email"]));
-            }
-            
-            if(isset($_POST["agency"]) && is_numeric($_POST["agency"])) {
+            if(isset($_POST["nonceSecurity"]) || wp_verify_nonce($_POST["nonceSecurity"], "formEditAgent")) {
+                if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+                    return;
+                }
+                require_once(PLUGIN_RE_PATH."models/admin/AgentAdmin.php");
                 remove_action("save_post_agent", array($this, "savePost"));
-
-                wp_update_post(array(
-                    "ID" => $agentId,
-                    "post_parent" => sanitize_text_field($_POST["agency"])
-                ));             
+                AgentAdmin::setData($agentId);
             }
-   
         }       
     }
     
     public function displayAgentMetaBox($agent) {
         require_once(PLUGIN_RE_PATH."models/admin/AgentAdmin.php");
-        AgencyAdmin::getData($agent->ID);
+        AgentAdmin::getData($agent->ID);
+        wp_nonce_field("formEditAgent", "nonceSecurity");
         ?>
             <div id="agentDetails">
                 <div class="text">
                     <label><?php _e("Phone"); ?></label>
-                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "Home phone", "retxtdom"); ?>" value="<?= AgencyAdmin::$phone; ?>">
+                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "Home phone", "retxtdom"); ?>" value="<?= AgentAdmin::$phone; ?>">
                 </div>
                 <div class="text">
                     <label><?php _e("Mobile phone"); ?></label>
-                    <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("0600000000", "retxtdom"); ?>" value="<?= AgencyAdmin::$mobilePhone; ?>">
+                    <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("0600000000", "retxtdom"); ?>" value="<?= AgentAdmin::$mobilePhone; ?>">
                 </div>
                 <div class="text">
                     <label><?php _e("Email address"); ?></label>
-                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= AgencyAdmin::$email; ?>">
+                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= AgentAdmin::$email; ?>">
                 </div>
             </div>
         <?php

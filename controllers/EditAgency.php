@@ -12,23 +12,22 @@ class editAgency {
         );
     }
     
-    function savePost($agencyId, $agency) {
+    public function savePost($agencyId, $agency) {
         if($agency->post_type == "agency") {
-            if(isset($_POST["phone"]) && !ctype_space($_POST["phone"])) {
-                update_post_meta($agencyId, "agencyPhone", sanitize_text_field($_POST["phone"]));
+            if(isset($_POST["nonceSecurity"]) || wp_verify_nonce($_POST["nonceSecurity"], "formEditAgency")) {
+                if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+                    return;
+                }
+                require_once(PLUGIN_RE_PATH."models/admin/AgencyAdmin.php");
+                AgencyAdmin::setData($agencyId);         
             }
-            if(isset($_POST["email"]) && !ctype_space($_POST["email"])) {
-                update_post_meta($agencyId, "agencyEmail", sanitize_text_field($_POST["email"]));
-            }
-            if(isset($_POST["address"]) && !ctype_space($_POST["address"])) {
-                update_post_meta($agencyId, "agencyAddress", sanitize_text_field($_POST["address"]));
-            }         
         }    
     }
         
     public function displayAgencyMetaBox($agency) {
         require_once(PLUGIN_RE_PATH."models/admin/AgencyAdmin.php");
         AgencyAdmin::getData($agency->ID);
+        wp_nonce_field("formEditAgency", "nonceSecurity");
         ?>
             <div id="agencyDetails">
                 <div class="text">

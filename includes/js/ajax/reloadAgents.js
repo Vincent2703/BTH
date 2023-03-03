@@ -1,12 +1,11 @@
 function reloadAgents() {
     agentSelected = parseInt(jQuery("#agents :selected").val());
     jQuery.ajax({
-        url: "../wp-content/plugins/"+pluginName+"/models/ajax/getAgents.php",
+        url: variables.getAgentsURL,
         type: "GET"                 
     }).done(function(response) {
         jQuery("#agents").empty();
-        let json = JSON.parse(response);
-        json.forEach(function(val) {
+        response.forEach(function(val) {
             jQuery("<option/>")
                 .val(val.ID)
                 .text(val.post_title)

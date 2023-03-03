@@ -127,7 +127,7 @@ class Rep {
         add_action("wp_ajax_nopriv_import", array($this->Import, "startImport"));
 
         //Register custom API route
-        add_action("rest_api_init", array($this, "registerRouteCustomAPI"));
+        add_action("rest_api_init", array($this, "registerRouteCustomAPIs"));
         
         //Add actions (links) to the plugin row in plugins.php
         add_action("plugin_action_links_" . plugin_basename( __FILE__ ), array($this, "addActionsPluginRow"));
@@ -341,15 +341,17 @@ class Rep {
                 wp_enqueue_script("editAd");
                 
                 wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
-                wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
-
-                $variables = array(
+                $variablesAddress = array(
                     "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
                 );
-                wp_localize_script("autocompleteAddress", "variables", $variables);
+                wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                $variablesAgents = array(
+                    "getAgentsURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents"),
+                );
+                wp_localize_script("autocompleteAddress", "variables", $variablesAddress);
+                wp_localize_script("reloadAgents", "variables", $variablesAgents);
                 wp_enqueue_script("autocompleteAddress");
                 wp_enqueue_script("reloadAgents");
-                wp_add_inline_script("reloadAgents", 'var pluginName="'.PLUGIN_RE_NAME.'";');
             }else if($postType === "agency") {
                 wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("mediaButton");
@@ -360,8 +362,11 @@ class Rep {
                 wp_enqueue_script("autocompleteAddress");
             }else if($postType === "agent") {
                 wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgencies.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+                $variables = array(
+                    "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies"),
+                );
+                wp_localize_script("reloadAgencies", "variables", $variables);
                 wp_enqueue_script("reloadAgencies");
-                wp_add_inline_script("reloadAgencies", 'var pluginName="'.PLUGIN_RE_NAME.'";');
             }
         }else if($base === "re-ad_page_repoptions") {
             wp_register_script("options", plugins_url(PLUGIN_RE_NAME."/includes/js/others/options.js"), array("jquery"), PLUGIN_RE_VERSION, true);
@@ -384,13 +389,71 @@ class Rep {
     /*
      * Register custom API route
      */
-    public function registerRouteCustomAPI() {
+    public function registerRouteCustomAPIs() {
         require_once("models/ajax/getAddressData.php");
         register_rest_route(PLUGIN_RE_NAME."/v1", "address", array( 
             "methods" => "GET",
             "callback" => "getAddressData",
-            //check get params
+            "permission_callback" => array($this, "permissionCallbackGetAddressData")
         ));
+        
+        require_once("models/ajax/getAgencies.php");
+        register_rest_route(PLUGIN_RE_NAME."/v1", "agencies", array( 
+            "methods" => "GET",
+            "callback" => "getAgencies",
+            "permission_callback" => function() {
+                $idUser = apply_filters("determine_current_user", false);
+                wp_set_current_user($idUser);
+                return current_user_can("edit_others_posts");
+            }
+        ));
+        
+        require_once("models/ajax/getAgents.php");
+        register_rest_route(PLUGIN_RE_NAME."/v1", "agents", array( 
+            "methods" => "GET",
+            "callback" => "getAgents",
+            "permission_callback" => function() {
+                $idUser = apply_filters("determine_current_user", false);
+                wp_set_current_user($idUser);
+                return current_user_can("edit_others_posts");
+            }
+        ));
+    }
+    
+    /*
+     * Check if the client can use the getAddress API
+     * Update the logs
+     */
+    public function permissionCallbackGetAddressData() {
+        $idUser = apply_filters("determine_current_user", false);
+        wp_set_current_user($idUser);
+        $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
+        if(current_user_can("edit_others_posts") || !boolval($apisOptions["apiLimitNbRequests"])) {
+            $clientAllowed = true;
+        }else{
+            $logsAPI = get_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests");
+            $date = date("m-d-Y");
+            $maxRequests = intval($apisOptions["apiMaxNbRequests"]);
+            $clientIP = $_SERVER["REMOTE_ADDR"]; 
+
+            if($logsAPI !== false) {
+                $newLogsAPI = array($date=>$logsAPI[$date]);
+                $IPs = $newLogsAPI[$date];
+                $clientAllowed = !isset($IPs[$clientIP]) || isset($IPs[$clientIP]) && $IPs[$clientIP] < $maxRequests;
+                if($clientAllowed) {
+                    if(!isset($IPs[$clientIP])) {
+                        $newLogsAPI[$date][$clientIP] = 1;
+                    }else{
+                        $newLogsAPI[$date][$clientIP]++;
+                    }
+                }      
+            }else{
+                $newLogsAPI = array($date=>array($clientIP=>1));
+                $clientAllowed = true;
+            }
+            update_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests", $newLogsAPI);
+        }
+        return $clientAllowed;
     }
     
     /*

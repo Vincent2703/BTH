@@ -10,18 +10,12 @@
             var context = "searchBar";
             var minLength = 3;
         }
-        
-        if(typeof URLGetAddressDataFile === "undefined") {
-            URLGetAddressDataFile = variables.getAddressDataURL;
-        }
-        if(typeof nonce === "undefined") {
-            nonce = variables.nonce;
-        }
+ 
         
         input.autocomplete({
             source: function(request, response) {
                 $.ajax({
-                    url: URLGetAddressDataFile,
+                    url: variables.getAddressDataURL,
                     data: {
                         "query": input.val(),
                         "context": context
