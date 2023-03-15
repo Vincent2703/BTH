@@ -53,6 +53,13 @@ class AdTemplate {
         return get_option(PLUGIN_RE_NAME."OptionsLanguage")["currency"];
     }
     
+    public static function getFeesURL() {
+        if(isset(get_option(PLUGIN_RE_NAME."OptionsFees")["feesUrl"])) {
+            return get_option(PLUGIN_RE_NAME."OptionsFees")["feesUrl"];
+        }
+        return false;
+    }
+    
     public static function getDataAd($id) {
             self::$metas = get_post_custom($id);
 

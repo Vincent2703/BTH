@@ -2,6 +2,7 @@
     if(have_posts()) {
         require_once(PLUGIN_RE_PATH."models/templates/AdTemplate.php");
         $currency = AdTemplate::getCurrency();
+        $feesURL = AdTemplate::getFeesURL();
         while(have_posts()) {
             if (is_active_sidebar("before_content-side-bar") ) {
                dynamic_sidebar("before_content-side-bar");
@@ -210,6 +211,9 @@
                             } ?>
                         </div>
                     </div>
+                    <?php if($feesURL !== false) { // If there is a fees schedule specified in the options ?> 
+                        <span id="feesSchedule"><a target="_blank" href="<?=$feesURL;?>"><?php _e("Fees schedule", "retxtdom") ;?></a></span>
+                    <?php } ?>
                 </div>
                 <div class="contentRightAd">
                     <?php if(AdTemplate::$getCoords) {  

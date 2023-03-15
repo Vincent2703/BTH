@@ -47,9 +47,12 @@ class Rep {
      * Fetch the classes and instantiate them
      */
     public function requireClasses() {
+        //Custom posts
         require_once("customPosts/Ad.php");
         require_once("customPosts/Agent.php");
         require_once("customPosts/Agency.php");
+        
+        //Controllers
         require_once("controllers/Options.php");
         require_once("controllers/EditAd.php");
         require_once("controllers/EditAgent.php");
@@ -57,15 +60,22 @@ class Rep {
         require_once("controllers/Export.php");
         require_once("controllers/Import.php");
         
+        //Models
+        require_once("models/searches/GetAds.php");
+        
+        
         $this->Ad           = new Ad;
         $this->Agent        = new Agent;
         $this->Agency       = new Agency;
+        
         $this->Options      = new Options;
         $this->EditAd       = new EditAd;
         $this->EditAgent    = new EditAgent;
         $this->EditAgency   = new EditAgency;
         $this->Export       = new Export;
         $this->Import       = new Import;
+        
+        $this->GetAds       = new GetAds;   
     }
     
     /*
@@ -92,6 +102,8 @@ class Rep {
 
         //Remove the default search widget
         add_action("widgets_init", array($this, "removeSearchWidget"));
+        
+        //add_action("widgets_init", array($this->SearchBar, "searchBarWidget"));
 
         //Add tabs to the admin notice area
         add_action("all_admin_notices", array($this->Options, "tabsOption"));
@@ -144,7 +156,7 @@ class Rep {
         add_filter("pre_get_posts", array($this, "convertIdToTermInQuery")); 
         
         //Modify the query before it is executed, in order to include custom search functionality for the ads
-        add_filter("pre_get_posts", array($this->Ad, "searchAds")); 
+        add_filter("pre_get_posts", array($this->GetAds, "getAds")); 
         
         //Add custom styles or scripts to the WordPress header section
         add_filter("wp_enqueue_scripts", array($this, "updateHeader"));
@@ -383,21 +395,21 @@ class Rep {
      * Remove the default search widget
      */
     public function removeSearchWidget() {
-	unregister_widget("WP_Widget_Search");
+        unregister_widget("WP_Widget_Search");
     }   
     
     /*
      * Register custom API route
      */
     public function registerRouteCustomAPIs() {
-        require_once("models/ajax/getAddressData.php");
+        require_once("models/searches/getAddressData.php");
         register_rest_route(PLUGIN_RE_NAME."/v1", "address", array( 
             "methods" => "GET",
             "callback" => "getAddressData",
             "permission_callback" => array($this, "permissionCallbackGetAddressData")
         ));
         
-        require_once("models/ajax/getAgencies.php");
+        require_once("models/searches/getAgencies.php");
         register_rest_route(PLUGIN_RE_NAME."/v1", "agencies", array( 
             "methods" => "GET",
             "callback" => "getAgencies",
@@ -408,7 +420,7 @@ class Rep {
             }
         ));
         
-        require_once("models/ajax/getAgents.php");
+        require_once("models/searches/getAgents.php");
         register_rest_route(PLUGIN_RE_NAME."/v1", "agents", array( 
             "methods" => "GET",
             "callback" => "getAgents",
@@ -422,7 +434,7 @@ class Rep {
     
     /*
      * Check if the client can use the getAddress API
-     * Update the logs
+     * Update the logs TODO : Put that part elsewhere
      */
     public function permissionCallbackGetAddressData() {
         $idUser = apply_filters("determine_current_user", false);
@@ -502,7 +514,7 @@ class Rep {
         global $post_type;
         global $pagenow;
         if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {         
-            wp_register_script("addSearchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/searchBars/addSearchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
+            wp_register_script("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
             $variables = array(
                 "filters" => __("FILTERS", "retxtdom"),
                 "searchBarURL" => plugin_dir_url(__FILE__)."templates/searchBars/searchBarAd.php",
@@ -510,8 +522,8 @@ class Rep {
                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
                 "nonce" => wp_create_nonce("searchNonce")
             );
-            wp_localize_script("addSearchBarAd", "variables", $variables);
-            wp_enqueue_script("addSearchBarAd");
+            wp_localize_script("searchBarAd", "variables", $variables);
+            wp_enqueue_script("searchBarAd");
 
             wp_register_style("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
             wp_enqueue_style("searchBarAd");

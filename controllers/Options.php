@@ -28,15 +28,15 @@ class Options {
                 if(isset($_GET["tab"])) { //S'il y a un $_GET tab
                     $tab = $_GET["tab"]; //On le prend
                 }else{
-                    $tab = "displayads"; //Sinon par défaut
+                    $tab = "language"; //Sinon par défaut
                 }
             }else{ //Sinon on est sur la page edit-tags
-                $tab = "displayads";
+                $tab = "language";
             }?>
             <h2><?= PLUGIN_RE_NAME; ?></h2>
             <p>Interface de configuration - <?= PLUGIN_RE_NAME; ?></p>
             <h2 class="nav-tab-wrapper">
-                <a href="edit.php?post_type=re-ad&page=repoptions&tab=displayads" class="nav-tab <?= $tab === "displayads" ? "nav-tab-active" : ''; ?>"><?php _e("Ads", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=repoptions&tab=language" class="nav-tab <?= $tab === "language" ? "nav-tab-active" : ''; ?>"><?php _e("Ads", "retxtdom"); ?></a>
                 <a href="edit.php?post_type=re-ad&page=repoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>"><?php _e("Imports", "retxtdom"); ?></a>
                 <a href="edit.php?post_type=re-ad&page=repoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>"><?php _e("Exports", "retxtdom"); ?></a>
                 <a href="edit.php?post_type=re-ad&page=repoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>"><?php _e("Email", "retxtdom"); ?></a>
@@ -51,7 +51,7 @@ class Options {
     }
 
     public function optionsPageInit() {
-        $this->optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsLanguage"); //TODO : Enlever this ?
+        $this->optionsLanguage = get_option(PLUGIN_RE_NAME."OptionsLanguage");
         $this->optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");
         $this->optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
         $this->optionsAds = get_option(PLUGIN_RE_NAME."OptionsAds");
@@ -107,7 +107,6 @@ class Options {
             PLUGIN_RE_NAME."optionsSection", // id
             __("Ads", "retxtdom"), // title
             array($this, "infoAds"), // callback
-            //null,
             PLUGIN_RE_NAME."OptionsLanguagePage" // page
         );
         
@@ -161,7 +160,7 @@ class Options {
         
         add_settings_field(
             "currency", // id
-            __("Currency", "retxtdom"), // title
+            __("Currency", "retxtdom").SELF::fieldPurpose("Currency's symbol."), // title
             array($this, "currencyCallback"), // callback
             PLUGIN_RE_NAME."OptionsLanguagePage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -169,7 +168,7 @@ class Options {
         
         add_settings_field(
             "customFields", // id
-            __("Customs fields", "retxtdom"), // title
+            __("Customs fields", "retxtdom").SELF::fieldPurpose("Allow to add custom fields for the ads."), // title
             array($this, "customFieldsCallback"), // callback
             PLUGIN_RE_NAME."OptionsLanguagePage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -179,7 +178,7 @@ class Options {
      
         add_settings_field(
             "templateUsedImport", // id
-            __("Import template", "retxtdom")." <abbr title=\"".__("Template to use for imports", "retxtdom")."\"><sup>?</sup></abbr>",
+            __("Import template", "retxtdom").SELF::fieldPurpose("Template to use for imports."),
             array($this, "templateUsedImportCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -187,7 +186,7 @@ class Options {
              
         add_settings_field(
             "maxSavesImports", // id
-            __("Backups number", "retxtdom")." <abbr title=\"".__("Number of copies of files containing imported ads to keep", "retxtdom")."\"><sup>?</sup></abbr>",
+            __("Backups number", "retxtdom").SELF::fieldPurpose("Number of copies of files containing imported ads to keep."),
             array($this, "maxSavesImportsCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -195,7 +194,7 @@ class Options {
         
         add_settings_field(
             "maxDim", // id
-            __("Pictures size", "retxtdom")." <abbr title=\"".__("Maximum size of imported pictures", "retxtdom")."\"><sup>?</sup></abbr>",
+            __("Pictures size", "retxtdom").SELF::fieldPurpose("Maximum size of imported pictures."),
             array($this, "maxDimCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -203,7 +202,7 @@ class Options {
         
         add_settings_field(
             "qualityPictures", // id
-            __("Pictures quality", "retxtdom")." <abbr title=\"".__("The higher the value, the more the quality is faithful to the original, at the expense of the weight of the image", "retxtdom")."\"><sup>?</sup></abbr>",
+            __("Pictures quality", "retxtdom").SELF::fieldPurpose("The higher the value, the more the quality is faithful to the original, at the expense of the weight of the image."),
             array($this, "qualityPicturesCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -211,7 +210,7 @@ class Options {
         
         add_settings_field(
             "allowAutoImport", // id
-            __("Automatic ads import", "retxtdom")." <abbr title=\""."\"><sup>?</sup></abbr>",
+            __("Automatic ads import", "retxtdom").SELF::fieldPurpose("When this option is activated, a cronjob can be run to import the ads from the most recent file located in the plugin's import directory."),
             array($this, "allowAutoImportCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -222,7 +221,7 @@ class Options {
         
         add_settings_field(
             "templateUsedExport", // id
-            __("Export template", "retxtdom")." <abbr title=\"".__("Template to use for exports", "retxtdom")."\"><sup>?</sup></abbr>",
+            __("Export template", "retxtdom").SELF::fieldPurpose("Template to use for exports."),
             array($this, "templateUsedExportCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -230,7 +229,7 @@ class Options {
         
         add_settings_field(
             "maxSavesExports", // id
-            __("Backups number", "retxtdom")." <abbr title=\"".__("Number of copies of files containing exported ads to keep", "retxtdom")."\"><sup>?</sup></abbr>",
+            __("Backups number", "retxtdom").SELF::fieldPurpose("Number of copies of files containing exported ads to keep."),
             array($this, "maxSavesExportsCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -238,7 +237,7 @@ class Options {
         
         add_settings_field(
             "allowAutoExport", // id
-            __("Automatic ads export", "retxtdom")." <abbr title=\""."\"><sup>?</sup></abbr>",
+            __("Automatic ads export", "retxtdom").SELF::fieldPurpose("When this option is activated, a cronjob can be run to export the ads that feature an available property to the plugin's export directory."),
             array($this, "allowAutoExportCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -248,7 +247,7 @@ class Options {
 
         add_settings_field(
             "sendMail", // id
-            __("Send email in case of error", "retxtdom")." <abbr title=\"".__("An email will be sent to the following email address if the plugin detects an error during an export or import", "retxtdom")."\"><sup>?</sup></abbr>",
+            __("Send email in case of error", "retxtdom").SELF::fieldPurpose("An email will be sent to the following email address if the plugin detects an error during an export or import."),
             array($this, "sendMailCallback"), // callback
             PLUGIN_RE_NAME."OptionsEmailPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -264,7 +263,7 @@ class Options {
         
         add_settings_field(
             "emailAd", // id
-            __("Email address to contact by default for ads", "retxtdom")." <abbr title=\"".__("Email address to contact if it is not possible to contact an agent or agency about an ad", "retxtdom")."\"><sup>?</sup></abbr>",
+            __("Email address to contact by default for ads", "retxtdom").SELF::fieldPurpose("Email address to contact if it is not possible to contact an agent or agency about an ad."),
             array($this, "emailAdCallback"), // callback
             PLUGIN_RE_NAME."OptionsEmailPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -274,7 +273,7 @@ class Options {
         
         add_settings_field(
             "feesUrl", // id
-            __("URL address to the fees schedule", "retxtdom"), // title
+            __("URL address to the fees schedule", "retxtdom").SELF::fieldPurpose("URL to the file presenting the fees schedule. It will be displayed on each ad. You can also directly upload the file with the button below."), // title
             array($this, "feesUrlCallback"), // callback
             PLUGIN_RE_NAME."OptionsFeesPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -293,7 +292,7 @@ class Options {
         
         add_settings_field(
             "apiUsed", // id
-            __("API to use", "retxtdom"), // title
+            __("API to use", "retxtdom").SELF::fieldPurpose("API to use to retrieve address data."), // title
             array($this, "apiUsedCallback"), // callback
             PLUGIN_RE_NAME."OptionsApisPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -301,7 +300,7 @@ class Options {
         
         add_settings_field(
             "apiKeyGoogle", // id
-            __("Google API key", "retxtdom"), // title, // title
+            __("Google API key", "retxtdom"), // title,
             array($this, "apiKeyGoogleCallback"), // callback
             PLUGIN_RE_NAME."OptionsApisPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -309,7 +308,7 @@ class Options {
         
         add_settings_field(
             "apiLimitNbRequests",
-            __("Limit number of requests per day and user", "retxtdom"),
+            __("Limit number of requests per day and user", "retxtdom").SELF::fieldPurpose("Limiting the number of requests makes abuse less likely."),
             array($this, "apiLimitNbRequestsCallback"),
             PLUGIN_RE_NAME."OptionsApisPage",
             PLUGIN_RE_NAME."optionsSection"
@@ -333,7 +332,7 @@ class Options {
         
         add_settings_field(
             "apiAdminAreaLvl1", // id
-            __("Display addresses with the administration area level 1 (generally state or prefecture)", "retxtdom"), // title
+            __("Display addresses with the administration area level 1", "retxtdom").SELF::fieldPurpose("Generally state or prefecture."), // title
             array($this, "apiAdminAreaLvl1Callback"), // callback
             PLUGIN_RE_NAME."OptionsApisPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -341,7 +340,7 @@ class Options {
         
         add_settings_field(
             "apiAdminAreaLvl2", // id
-            __("Display addresses with the administration area level 2 (generally countries or districts)", "retxtdom"), // title
+            __("Display addresses with the administration area level 2", "retxtdom").SELF::fieldPurpose("Generally countries or districts."), // title
             array($this, "apiAdminAreaLvl2Callback"), // callback
             PLUGIN_RE_NAME."OptionsApisPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -351,7 +350,7 @@ class Options {
         
         add_settings_field(
             "versionSeLoger", // id
-            __("Version", "retxtdom").' SeLoger <abbr title="'.__("Version and revision of the template used", "retxtdom").'"><sup>?</sup></abbr>', // title
+            __("Version", "retxtdom")." SeLoger".SELF::fieldPurpose("Version and revision of the template used"), // title
             array($this, "versionSeLogerCallback"), // callback
             PLUGIN_RE_NAME."OptionsSelogerPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -359,7 +358,7 @@ class Options {
         
         add_settings_field(
             "idAgency", // id
-            __("Agency ID ", "retxtdom").' <abbr title="'.__("ID for using the template", "retxtdom").'"><sup>?</sup></abbr>', // title    
+            __("Agency ID ", "retxtdom").SELF::fieldPurpose("ID for using the template"), // title    
             array($this, "idAgencyCallback"), // callback
             PLUGIN_RE_NAME."OptionsSelogerPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
@@ -515,11 +514,11 @@ class Options {
     /* AFFICHAGE ANNONCES */
     
     public function currencyCallback() { 
-        isset($this->optionsDisplayads["currency"]) ? absint($this->optionsDisplayads["currency"]) : '1'; ?>
+        isset($this->optionsLanguage["currency"]) ? absint($this->optionsLanguage["currency"]) : '1'; ?>
             <input type="text" id="currency" class="regular-text" 
                name="<?=PLUGIN_RE_NAME."OptionsLanguage[currency]";?>" 
                placeholder='€' 
-               value="<?=isset($this->optionsDisplayads["currency"]) ? esc_attr($this->optionsDisplayads["currency"]) : '$';?>">
+               value="<?=isset($this->optionsLanguage["currency"]) ? esc_attr($this->optionsLanguage["currency"]) : '$';?>">
     <?php }
     
     public function customFieldsCallback() { ?>
@@ -550,8 +549,8 @@ class Options {
                         </td>
                     </tr>
                     <?php 
-                    if(isset($this->optionsDisplayads["customFields"])) {
-                        $customFields = json_decode($this->optionsDisplayads["customFields"], true);
+                    if(isset($this->OptionsLanguage["customFields"])) {
+                        $customFields = json_decode($this->OptionsLanguage["customFields"], true);
                         foreach($customFields as $field) { ?>
                             <tr>
                                 <td class="fieldName"><input type="text" oninput="removeDemo();" value="<?=$field["name"];?>"></td>
@@ -746,5 +745,10 @@ class Options {
                    name="<?=PLUGIN_RE_NAME."OptionsSeLoger[versionSeLoger]";?>" id="versionSeLoger" placeholder="4.08-007" 
                    value="<?=$value;?>">         
     <?php }
+    
+    /* Display an explanation about the field's purpose */
+    private function fieldPurpose($text) {
+        return '&nbsp;<abbr title="'.__($text, "retxtdom").'"><sup>?</sup></abbr>';
+    }
     
 }

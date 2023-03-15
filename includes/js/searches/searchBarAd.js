@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-
+    /* Only way I see. I can't add a custom sidebar after the header but before the content for each theme */
     $.ajax({
         url: variables.searchBarURL+window.location.search,
         type: "GET"                 
