@@ -78,9 +78,6 @@
     user-select: none;
 }
 
-.contentAd .moreThumbnailAd {
-}
-
 .contentAd .moreTitleAd {
     font-size: 13px;
     white-space: nowrap;
@@ -168,9 +165,6 @@
     font-size: 10px;
 }
 
-.contentAd .contact {
-}
-
 .contentAd .headerContact {
     display: flex;
     align-items: center;
@@ -227,6 +221,11 @@
 .contentAd #thumbnailContact {
     width: 70%;
     border-radius: 50%;
+}
+
+.contentAd #feesSchedule a {
+    text-decoration: none;
+    color: #252525;
 }
 
 

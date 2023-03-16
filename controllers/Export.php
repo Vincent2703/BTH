@@ -11,6 +11,7 @@ class Export {
                 <h2>Exportez les annonces</h2>
             <?php } ?>
                 <form action="" method="post">
+                    <?php wp_nonce_field("formExportAds", "nonceSecurity"); ?>
                     <p>
                         <input type="submit" name="submitExport" class="button button-primary" value="Exporter">                
                         <input type="checkbox" id="onlyAvailable" name="onlyAvailable" checked>
@@ -20,7 +21,7 @@ class Export {
             <p><a href="?downloadSave" class="button button-primary">Télécharger une sauvegarde</a></p>
         </div>
         <?php
-        if(isset($_POST["submitExport"])) {
+        if(isset($_POST["submitExport"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formExportAds")) {
             SELF::startExport();
         }
     }
@@ -30,8 +31,12 @@ class Export {
     }
 
     private static function getArrayAds() {
-        //$optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
         $optionsFees = get_option(PLUGIN_RE_NAME."OptionsFees");
+        if(isset($optionsFees["feesUrl"])) {
+            $feesUrl = $optionsFees["feesUrl"];
+        }else{
+            $feesUrl = '';
+        }
 
         $args = array(
             "numberposts" => -1,
@@ -87,7 +92,7 @@ class Export {
                     "thumbnail"     =>  get_the_post_thumbnail_url($adID, "large")
                 );
                 
-                $uselessKeys = array("adShowAgent", "adShowMap", "adDataMap", "adImages");
+                $uselessKeys = array("adDataMap", "adImages");
                 
                 foreach($metas as $metaKey=>$metaValue) {
                     if(!in_array($metaKey, $uselessKeys)) {
@@ -101,7 +106,7 @@ class Export {
                 if(!is_null($picturesIds)) {
                     $ids = explode(';', $picturesIds); //Les IDs sont séparés par un ;
                     foreach ($ids as $id) {
-                        $pictures["img$id"] =  wp_get_attachment_image_url($id, "large"); //Pour chaque image on récupère leur URL
+                        $pictures["img$id"] = wp_get_attachment_image_url($id, "large"); //Pour chaque image on récupère leur URL
                     }
                 }
                 $adData["pictures"] = $pictures;
@@ -128,10 +133,16 @@ class Export {
                 $subNode = $xml->addChild($key);
                 SELF::generateXML($value, $subNode);
             }else{
-                $xml->addChild("$key", htmlspecialchars("$value"));
+                $xml->addChild("$key", "$value");
             }
-         }
-         return html_entity_decode($xml->asXML());
+        }
+        $xmlString = $xml->asXML();
+        $xmlDocument = new DOMDocument("1.0", "UTF-8");
+        $xmlDocument->preserveWhiteSpace = false;
+        $xmlDocument->formatOutput = true;
+        $xmlDocument->loadXML($xmlString);
+        $xmlDocument->encoding = "utf-8";
+        return $xmlDocument->saveXML();
     }
    
     
@@ -198,20 +209,19 @@ class Export {
     }*/
     
     private static function startExport() {
-        $optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
-        $dirSaves = ABSPATH.$optionsExports["dirExportPath"];
+        $dirExport = PLUGIN_RE_PATH."export";
         
-        if(!is_dir($dirSaves)) {
-            mkdir($dirSaves);
+        if(!is_dir($dirExport)) {
+            mkdir($dirExport);
         }
         
         $ads = SELF::getArrayAds();
 
-        $xml = new SimpleXMLElement('<?xml version="1.0"?><ads></ads>');
+        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><ads></ads>');
         $XMLContent = "\xEF\xBB\xBF".SELF::generateXML($ads, $xml).PHP_EOL;
         
         $datetime = date("d-m-Y");
-        $XMLFile = fopen($dirSaves."Annonces-$datetime.xml", "w+");
+        $XMLFile = fopen($dirExport."/Annonces-$datetime.xml", "w+");
         
         fwrite($XMLFile, $XMLContent);
         fclose($XMLFile);        
@@ -219,9 +229,7 @@ class Export {
         /*SELF::createCSV(SELF::getArrayAds());
         SELF::createConfigFile();
         SELF::createPhotosFile();
-        SELF::createZIP();*/
-        
-        
+        SELF::createZIP();*/ 
     }
     
     

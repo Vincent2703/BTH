@@ -59,8 +59,8 @@
 
 .searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas {
     display: flex;
-    margin-left: 80px;
-    gap: 50px;
+    margin-left: 8vw;
+    gap: 3vw;
 }
 
 .searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas div {

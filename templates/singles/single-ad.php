@@ -241,10 +241,10 @@
                                     <tbody>
                                         <tr>
                                             <td id="phoneIcon" rowspan="2"><span class="material-symbols-outlined">call</span></td>
-                                            <?php if(isset(AdTemplate::$phone)) { ?><td id="phoneContact"><a href="tel:<?= AdTemplate::$phone; ?>"><?= AdTemplate::$phone ?></a></td><?php } ?>
+                                            <?php if(isset(AdTemplate::$phone)) { ?><td id="phoneContact"><a href="tel:<?= AdTemplate::$phone; ?>"><?= implode(' ', str_split(AdTemplate::$phone, 2)); ?></a></td><?php } ?>
                                         </tr>
                                         <tr>
-                                            <?php if(isset(AdTemplate::$mobilePhone)) { ?><td><span id="mobilePhoneContact"><a href="tel:<?= AdTemplate::$mobilePhone; ?>"><?= AdTemplate::$mobilePhone; ?></a></span></td><?php } ?>
+                                            <?php if(isset(AdTemplate::$mobilePhone)) { ?><td><span id="mobilePhoneContact"><a href="tel:<?= AdTemplate::$mobilePhone; ?>"><?= implode(' ', str_split(AdTemplate::$mobilePhone, 2)); ?></a></span></td><?php } ?>
                                         </tr>
                                     </tbody>
                                 </table>

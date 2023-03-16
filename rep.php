@@ -352,11 +352,11 @@ class Rep {
                 wp_localize_script("editAd", "translations", $translations);
                 wp_enqueue_script("editAd");
                 
-                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 $variablesAddress = array(
                     "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
                 );
-                wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 $variablesAgents = array(
                     "getAgentsURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents"),
                 );
@@ -365,7 +365,7 @@ class Rep {
                 wp_enqueue_script("autocompleteAddress");
                 wp_enqueue_script("reloadAgents");
             }else if($postType === "agency") {
-                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
+                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("mediaButton");
                 $variables = array(
                     "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
@@ -373,7 +373,7 @@ class Rep {
                 wp_localize_script("autocompleteAddress", "variables", $variables);
                 wp_enqueue_script("autocompleteAddress");
             }else if($postType === "agent") {
-                wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/ajax/reloadAgencies.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+                wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/reloadAgencies.js"), array("jquery"), PLUGIN_RE_VERSION, true);
                 $variables = array(
                     "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies"),
                 );
@@ -518,7 +518,7 @@ class Rep {
             $variables = array(
                 "filters" => __("FILTERS", "retxtdom"),
                 "searchBarURL" => plugin_dir_url(__FILE__)."templates/searchBars/searchBarAd.php",
-                "autocompleteURL" => plugin_dir_url(__FILE__)."includes/js/ajax/autocompleteAddress.js",
+                "autocompleteURL" => plugin_dir_url(__FILE__)."includes/js/searches/autocompleteAddress.js",
                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
                 "nonce" => wp_create_nonce("searchNonce")
             );

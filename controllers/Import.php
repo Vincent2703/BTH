@@ -10,6 +10,7 @@ class Import {
         ?>
         <div class="wrap">
             <form action="" method="post" enctype="multipart/form-data">
+                <?php wp_nonce_field("formImportAds", "nonceSecurity"); ?>
                 <input type="file" name="file" accept="<?=implode(', ',$extAccepted);?>">
                 <p>
                     <input type="submit" name="submitImport" class="button button-primary" value="Importer les annonces">
@@ -52,12 +53,9 @@ class Import {
                 return json_decode(json_encode($xml), true);
             }
         }
-       
     }
     
     private static function arrayToAds($arrayAds) {
-        $optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");        
-        $addressePrecision = $optionsImports["addressPrecision"];
         foreach($arrayAds as $ad) {
             $adData = $ad["adData"];
             $agentData = $ad["agentData"];
@@ -98,19 +96,15 @@ class Import {
             update_post_meta($adWPId, "adNbBathrooms", intval($adData["nbbathrooms"]));
             update_post_meta($adWPId, "adNbWaterRooms", intval($adData["nbwaterrooms"]));
             update_post_meta($adWPId, "adNbWC", intval($adData["nbwc"]));
-            /*$url = plugin_dir_url(__DIR__)."includes/php/getAddressData.php?query=".$adData["address"]."&import";
-            $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true)[0];
-            update_post_meta($adWPId, "adAddress", sanitize_text_field($addressData["address"]));
-            update_post_meta($adWPId, "adLatitude", sanitize_text_field($addressData["coordinates"][1]));
-            update_post_meta($adWPId, "adLongitude", sanitize_text_field($addressData["coordinates"][0]));*/
                         
-            update_post_meta($adWPId, "adAddress", $adData["address"]);
-            update_post_meta($adWPId, "adLatitude", $adData["latitude"]);
-            update_post_meta($adWPId, "adLongitude", $adData["longitude"]);
-            update_post_meta($adWPId, "adPostCode", $adData["pc"]);
-            update_post_meta($adWPId, "adCity", $adData["city"]);
-            update_post_meta($adWPId, "adDataMap", array("lat" => $adData["latitude"], "long" => $adData["longitude"], "zoom" => 16, "circ" => 10)); //Pas de verif pour savoir si ville ou non
+            update_post_meta($adWPId, "adAddress", sanitize_text_field($adData["address"]));
+            update_post_meta($adWPId, "adLatitude", sanitize_text_field($adData["latitude"]));
+            update_post_meta($adWPId, "adLongitude", sanitize_text_field($adData["longitude"]));
+            update_post_meta($adWPId, "adPostCode", sanitize_text_field($adData["postcode"]));
+            update_post_meta($adWPId, "adCity", sanitize_text_field($adData["city"]));
+            update_post_meta($adWPId, "adDataMap", array("lat" => $adData["latitude"], "long" => $adData["longitude"], "zoom" => 16, "circ" => 10));
 
+            update_post_meta($adWPId, "adShowAgent", 1);
             update_post_meta($adWPId, "adIdAgent", intval($adData["idagent"]));
             update_post_meta($adWPId, "adFloor", intval($adData["floor"]));
             update_post_meta($adWPId, "adNbFloors", intval($adData["nbfloors"]));
@@ -121,11 +115,13 @@ class Import {
             update_post_meta($adWPId, "adDPE", intval($adData["dpe"]));
             update_post_meta($adWPId, "adGES", intval($adData["ges"]));
             
-            update_post_meta($adWPId, "adShowMap", sanitize_text_field($addressePrecision));
+            update_post_meta($adWPId, "adShowMap", sanitize_text_field($adData["showmap"]));
             
             
             /* PICTURES */
-            SELF::setPictureProperty($adWPId, $adData["thumbnail"], true); //Pour la miniature
+            if(!is_array($adData)) {
+                SELF::setPictureProperty($adWPId, $adData["thumbnail"], true); //Pour la miniature
+            }
             foreach($adData["pictures"] as $URLPicture) {
                 SELF::setPictureProperty($adWPId, $URLPicture);
             }
@@ -138,8 +134,8 @@ class Import {
     
     
     private static function setPictureProperty($adWPId, $imgURL, $thumbnail=false) {
-       $optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");
-       $dirSavesPath = ABSPATH.$optionsImports["dirSavesPath"];
+       $dirImport = PLUGIN_RE_PATH."import";
+       
        $propertyImagesEmpty = true;
        $propertyImages = get_post_meta($adWPId, "adImages", true);
        $alreadyThisImage = false;
@@ -179,8 +175,8 @@ class Import {
                $dst = imagecreatetruecolor($newWidth, $newHeighteight);
                imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeighteight, $widthP, $heightP);
                imagedestroy($src);
-               $fileName = wp_unique_filename($dirSavesPath, "propertyPicture$adWPId.jpg");
-               $pathImg = $dirSavesPath.$fileName;
+               $fileName = wp_unique_filename($dirImport, "propertyPicture$adWPId.jpg");
+               $pathImg = $dirImport.$fileName;
                imagejpeg($dst, $pathImg, 85); //Quality à rajouter en param ?
                imagedestroy($dst);
 

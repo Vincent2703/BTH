@@ -10,7 +10,7 @@
     ));
 ?>
 <div class="searchBar">
-    <form role="search" action="" method="get">
+    <form role="search" action="<?= get_post_type_archive_link("re-ad"); ?>" method="get">
         <input type="hidden" name="s">
         <input type="hidden" name="post_type" value="re-ad">
 

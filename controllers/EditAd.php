@@ -22,7 +22,9 @@ class EditAd {
     
     public function savePost($adId, $ad) {
         if($ad->post_type == "re-ad") {
-            if(isset($_POST["nonceSecurity"]) || wp_verify_nonce($_POST["nonceSecurity"], "formEditAd")) {
+            if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formImportAds")) {
+                return;
+            }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAd")) {
                 if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
                     return;
                 }
