@@ -192,11 +192,11 @@
                                 <span class="valueFeature"><?= AdTemplate::$typeKitchen; ?></span>
                             </div>
                             <div>
-                                <span id="DPEName" class="nameFeature"><?php _e("EPD in kWhPE/m²/year", "retxtdom"); ?></span>
+                                <span id="DPEName" class="nameFeature"><?php _e("EPD", "retxtdom"); ?>&nbsp;<abbr title="<?php _e("in kWhPE/m²/year", "retxtdom"); ?>"><sup>?</sup></abbr></span>
                                 <span id="DPEValue" class="valueFeature"><?= AdTemplate::$DPE; ?>&nbsp;</span>
                             </div>
                             <div>
-                                <span id="GESName" class="nameFeature"><?php _e("Greenhouse gas in kg eqCO2/m²/year", "retxtdom"); ?></span>
+                                <span id="GESName" class="nameFeature"><?php _e("Greenhouse gas", "retxtdom"); ?>&nbsp;<abbr title="<?php _e("in kg eqCO2/m²/year", "retxtdom"); ?>"><sup>?</sup></abbr></span>
                                 <span id="GESValue" class="valueFeature"><?= AdTemplate::$GES; ?>&nbsp;</span>
                             </div>
                             <?php if(!empty($customComplementaryFields)) {

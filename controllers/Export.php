@@ -5,24 +5,46 @@ class Export {
     public function showPage() {     
         $postType = get_current_screen()->post_type;
         $base = get_current_screen()->base;
+        $files = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
+        usort($files, function($a, $b) {
+            return filemtime(PLUGIN_RE_PATH."exports/$b") - filemtime(PLUGIN_RE_PATH."exports/$a");
+        });
         ?>
         <div class="wrap">
-            <?php if($postType==="re-ad" && $base="repexport") { ?>
-                <h2>Exportez les annonces</h2>
-            <?php } ?>
-                <form action="" method="post">
-                    <?php wp_nonce_field("formExportAds", "nonceSecurity"); ?>
-                    <p>
-                        <input type="submit" name="submitExport" class="button button-primary" value="Exporter">                
-                        <input type="checkbox" id="onlyAvailable" name="onlyAvailable" checked>
-                        <label for="onlyAvailable">Exporter uniquement les biens disponibles</label>
-                    </p>
+            <h2>Exportez les annonces</h2>
+            <form action="" method="post">
+                <?php wp_nonce_field("formExportAds", "nonceSecurity"); ?>
+                <p>
+                    <input type="submit" name="submitExport" class="button button-primary" value="Exporter">                
+                    <input type="checkbox" id="onlyAvailable" name="onlyAvailable" checked>
+                    <label for="onlyAvailable">Exporter uniquement les biens disponibles</label>
+                </p>
             </form>
-            <p><a href="?downloadSave" class="button button-primary">Télécharger une sauvegarde</a></p>
+            <?php if($postType==="re-ad" && $base="repexport") { ?>
+            <table>
+                <thead>
+                    <tr>
+                        <th><?php _e("Date", "retxtdom"); ?></th>
+                        <th><?php _e("Size", "retxtdom"); ?></th>
+                        <th><?php _e("Download", "retxtdom"); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($files as $file) { ?>
+                    <tr>
+                        <td><?= date("Y-m-d h:i:s", filemtime(PLUGIN_RE_PATH."exports/$file")); ?></td>
+                        <td><?= round(filesize(PLUGIN_RE_PATH."exports/$file")/1024, 2); ?>&nbsp;kb</td>
+                        <td><a href="<?=plugin_dir_url(__DIR__)."exports/$file";?>" download><?php _e("Download", "retxtdom"); ?></a></td>
+                    </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+            <?php } ?>
         </div>
         <?php
         if(isset($_POST["submitExport"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formExportAds")) {
             SELF::startExport();
+            echo "Exportation effectuée avec succès";
         }
     }
     
@@ -47,9 +69,8 @@ class Export {
             $args["tax_query"] = array(
                 array(
                     "taxonomy" => "adAvailable",
-                    "term" => "name",
-                    "terms" => array("Disponible"),
-                    "operator" => "EXISTS"
+                    "field" => "slug",
+                    "terms" => array("available")
                 )
             );
         }
@@ -209,7 +230,7 @@ class Export {
     }*/
     
     private static function startExport() {
-        $dirExport = PLUGIN_RE_PATH."export";
+        $dirExport = PLUGIN_RE_PATH."exports";
         
         if(!is_dir($dirExport)) {
             mkdir($dirExport);
@@ -220,11 +241,13 @@ class Export {
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><ads></ads>');
         $XMLContent = "\xEF\xBB\xBF".SELF::generateXML($ads, $xml).PHP_EOL;
         
-        $datetime = date("d-m-Y");
-        $XMLFile = fopen($dirExport."/Annonces-$datetime.xml", "w+");
+        $path = $dirExport.'/'. uniqid(__("ads_", "retxtdom")).".xml";
+        $XMLFile = fopen($path, "w+");
         
         fwrite($XMLFile, $XMLContent);
         fclose($XMLFile);        
+        
+        return $path;
         
         /*SELF::createCSV(SELF::getArrayAds());
         SELF::createConfigFile();
@@ -232,7 +255,18 @@ class Export {
         SELF::createZIP();*/ 
     }
     
+    private static function download($path) {
+        //$filename = get_bloginfo("name").' '.__("Ads exports", "retxtdom").' '.date("Y-m-d");
+
+        /*header("Content-type: application/xml");
+        header('Content-Disposition: inline; filename="'.$filename.'"');
+        header("Content-Transfer-Encoding: binary");
+        header("Content-Length: ".filesize($path));
+        header("Accept-Ranges: bytes");*/
+        @readfile($path);
+    } 
     
-    
-    
+    private static function deleteLastExport($path) {
+        unset($path);
+    }
 }

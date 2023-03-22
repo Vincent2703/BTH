@@ -124,7 +124,7 @@ class EditAd {
             <input type="hidden" name="images" id="images" value="<?= adAdmin::$images; ?>">
         </div>
         <div id="showPictures">
-            <?php if(!is_null(adAdmin::$images)) {
+            <?php if(!empty(adAdmin::$images)) {
                 $ids = explode(';', adAdmin::$images);
                 foreach ($ids as $id) { ?>
                     <div class="aPicture" data-imgId="<?=$id;?>">

@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ads>
+  <ad39>
+    <adData>
+      <title>test</title>
+      <typeAd>Location</typeAd>
+      <typeProperty>Appartement</typeProperty>
+      <description/>
+      <thumbnail/>
+      <nbbathwaterrooms>0</nbbathwaterrooms>
+      <showagent>0</showagent>
+      <furnished>0</furnished>
+      <elevator>0</elevator>
+      <cellar>0</cellar>
+      <terrace>0</terrace>
+      <refagency/>
+      <price>0</price>
+      <fees>0</fees>
+      <surface>90</surface>
+      <landsurface>0</landsurface>
+      <nbrooms>0</nbrooms>
+      <nbbedrooms>0</nbbedrooms>
+      <nbbathrooms>0</nbbathrooms>
+      <nbwaterrooms>0</nbwaterrooms>
+      <nbwc>0</nbwc>
+      <showmap>no</showmap>
+      <latitude>45.1864</latitude>
+      <longitude>5.7364</longitude>
+      <address>12 Rue du Vercors 38000 Grenoble</address>
+      <postcode>38000</postcode>
+      <city>Grenoble</city>
+      <idagent>33</idagent>
+      <floor>0</floor>
+      <nbfloors>0</nbfloors>
+      <year>0</year>
+      <typeheating>unknown</typeheating>
+      <typekitchen>unknown</typekitchen>
+      <nbbalconies>0</nbbalconies>
+      <dpe>0</dpe>
+      <ges>0</ges>
+      <pictures>
+        <img/>
+      </pictures>
+    </adData>
+    <agentData>
+      <name>Bob Max</name>
+      <phone>0101010102</phone>
+      <mobilePhone>0606060607</mobilePhone>
+      <email>bobmax@mail.com</email>
+    </agentData>
+    <agencyData>
+      <name>Agence 1</name>
+      <phone>0101010101</phone>
+      <email>agence@mail.fr</email>
+      <feesUrl>http://localhost/BTH/wp-content/uploads/2023/03/AmazonGiftReceipt.pdf</feesUrl>
+    </agencyData>
+  </ad39>
+  <ad15>
+    <adData>
+      <title>Incroyable maison à Fontaine</title>
+      <typeAd>Vente</typeAd>
+      <typeProperty>Maison</typeProperty>
+      <description>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lectus nisi, efficitur vel neque sed, aliquet facilisis mi. Sed lobortis tortor nec nisl porta euismod. Vivamus et vulputate leo. Ut ut viverra odio. Integer ex enim, ultrices fermentum augue quis, finibus rutrum magna. Quisque faucibus quis nulla ut imperdiet. Sed tincidunt hendrerit pulvinar. Nullam tempor quis nisl non lobortis. Phasellus non nulla maximus, porttitor massa vel, pretium velit. Morbi dictum risus felis, ac tincidunt neque tincidunt nec.&#13;
+&#13;
+Aliquam neque mi, sodales at velit sed, consectetur efficitur ex. In euismod nisi ac nisi consequat hendrerit. Etiam eros odio, placerat et efficitur vitae, congue molestie metus. Sed lacinia auctor mauris, nec tincidunt risus. Nam ultricies lectus nec quam iaculis, vitae imperdiet elit lobortis.</description>
+      <thumbnail>http://localhost/BTH/wp-content/uploads/2023/02/Ces-plus-belles-villas-de-France-vont-vous-faire-rever.webp</thumbnail>
+      <nbbathwaterrooms>1</nbbathwaterrooms>
+      <showagent>1</showagent>
+      <furnished>0</furnished>
+      <elevator>0</elevator>
+      <cellar>1</cellar>
+      <terrace>1</terrace>
+      <refagency>A-1</refagency>
+      <price>200000</price>
+      <fees>6000</fees>
+      <surface>250</surface>
+      <landsurface>450</landsurface>
+      <nbrooms>8</nbrooms>
+      <nbbedrooms>4</nbbedrooms>
+      <nbbathrooms>1</nbbathrooms>
+      <nbwaterrooms>0</nbwaterrooms>
+      <nbwc>2</nbwc>
+      <showmap>onlyPC</showmap>
+      <latitude>45.1918</latitude>
+      <longitude>5.6882</longitude>
+      <address>51 Avenue du Vercors 38600 Fontaine</address>
+      <postcode>38600</postcode>
+      <city>Fontaine</city>
+      <idagent>33</idagent>
+      <floor>0</floor>
+      <nbfloors>1</nbfloors>
+      <year>1994</year>
+      <typeheating>individualElectric</typeheating>
+      <typekitchen>american</typekitchen>
+      <nbbalconies>0</nbbalconies>
+      <dpe>375</dpe>
+      <ges>89</ges>
+      <pictures>
+        <img38>http://localhost/BTH/wp-content/uploads/2023/02/Ces-plus-belles-villas-de-France-vont-vous-faire-rever.webp</img38>
+        <img37>http://localhost/BTH/wp-content/uploads/2023/02/Aménagement-décoration-villa-Sainte-Maxime-architecte-interieur-var1-1024x684.jpg</img37>
+        <img36>http://localhost/BTH/wp-content/uploads/2023/02/Aménagement-décoration-villa-Sainte-Maxime-architecte-interieur-var7-1024x684.jpg</img36>
+      </pictures>
+    </adData>
+    <agentData>
+      <name>Bob Max</name>
+      <phone>0101010102</phone>
+      <mobilePhone>0606060607</mobilePhone>
+      <email>bobmax@mail.com</email>
+    </agentData>
+    <agencyData>
+      <name>Agence 1</name>
+      <phone>0101010101</phone>
+      <email>agence@mail.fr</email>
+      <feesUrl>http://localhost/BTH/wp-content/uploads/2023/03/AmazonGiftReceipt.pdf</feesUrl>
+    </agencyData>
+  </ad15>
+</ads>
+
