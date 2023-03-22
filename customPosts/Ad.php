@@ -214,7 +214,11 @@ class Ad {
      */
     public function taxonomyAdAvailableCheckboxCB($post) {
         global $pagenow;
-        $available = wp_get_post_terms($post->ID, "adAvailable", array("fields"=>"slugs"))[0]==="available";
+        $availability = wp_get_post_terms($post->ID, "adAvailable", array("fields"=>"slugs"));
+        $available = false;
+        if(isset($availability[0])) {
+            $available = $availability==="available";
+        }
         ?>
         <label title='<?php _e("The property is available", "retxtdom");?>'>
             <input type="checkbox" name="adAvailable" value="available" <?php checked($pagenow==="post-new.php" || $available); ?>>
