@@ -17,7 +17,7 @@ class AdAdmin {
     public static $showMap;
     public static $images;
     public static $allAgents;
-    public static $agentSaved;
+    public static $idAgent;
     public static $showAgent;
     
     public static $floor;
@@ -51,7 +51,7 @@ class AdAdmin {
         self::$showMap = sanitize_text_field(self::getMeta("adShowMap"));
         self::$images = sanitize_text_field(self::getMeta("adImages"));
         self::$allAgents = get_posts(array("post_type" => "agent"));
-        self::$agentSaved = sanitize_text_field(self::getMeta("adAgent"));
+        self::$idAgent = sanitize_text_field(self::getMeta("adIdAgent"));
         self::$showAgent = sanitize_text_field(self::getMeta("adShowAgent"));
         
         $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
@@ -152,15 +152,16 @@ class AdAdmin {
             update_post_meta($adId, "adShowMap", sanitize_text_field($_POST["showMap"]));
             if(isset($_POST["address"]) && !ctype_space($_POST["address"])) {                   
                 $query = urlencode(addslashes(htmlentities(sanitize_text_field($_POST["address"]))));
+                $nonce = wp_create_nonce("apiAddress");
                 if($_POST["showMap"] !== "all") { 
                     $zoom = 14;
                     $radiusCircle = 0;
-                    $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=$query&context=saveAd&coordsApprox";
+                    $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=$query&context=saveAd&coordsApprox&nonce=$nonce";
                     $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                 }else{
                     $zoom = 16;
                     $radiusCircle = 0;
-                    $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=$query&context=saveAd";
+                    $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=$query&context=saveAd&nonce=$nonce";
                     $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                 }
                 $coordinates = $addressData["coordinates"];

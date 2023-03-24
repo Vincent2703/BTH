@@ -22,10 +22,9 @@ class editAgent {
     
     public function savePost($agentId, $agent) {
         if($agent->post_type == "agent") {
-            if(isset($_POST["nonceSecurity"]) || wp_verify_nonce($_POST["nonceSecurity"], "formEditAgent")) {
-                if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
-                    return;
-                }
+            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+                return;
+            }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAgent")) {
                 require_once(PLUGIN_RE_PATH."models/admin/AgentAdmin.php");
                 remove_action("save_post_agent", array($this, "savePost"));
                 AgentAdmin::setData($agentId);

@@ -84,11 +84,11 @@
                             </div>
                             <div>
                                 <span class="nameFeature"><?php _e("Price", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= AdTemplate::$price; ?>€</span>
+                                <span class="valueFeature"><?= AdTemplate::$price.$currency; ?></span>
                             </div>
                             <div>
                                 <span class="nameFeature"><?php _e("Fees", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= AdTemplate::$fees; ?>€</span>
+                                <span class="valueFeature"><?= AdTemplate::$fees.$currency; ?></span>
                             </div>
                             <div>
                                 <span class="nameFeature"><?php _e("Address", "retxtdom"); ?></span>
@@ -185,18 +185,18 @@
                             <?php } ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Type heating", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= AdTemplate::$typeHeating; ?></span>
+                                <span class="valueFeature"><?php _e(AdTemplate::$typeHeating, "retxtdom"); ?></span>
                             </div>
                             <div>
                                 <span class="nameFeature"><?php _e("Type kitchen", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= AdTemplate::$typeKitchen; ?></span>
+                                <span class="valueFeature"><?php _e(AdTemplate::$typeKitchen, "retxtdom"); ?></span>
                             </div>
                             <div>
-                                <span id="DPEName" class="nameFeature"><?php _e("EPD", "retxtdom"); ?>&nbsp;<abbr title="<?php _e("in kWhPE/m²/year", "retxtdom"); ?>"><sup>?</sup></abbr></span>
+                                <span id="DPEName" class="nameFeature"><?php _e("EPD", "retxtdom"); ?>&nbsp;<abbr data-title="<?php _e("In kWhPE/m²/year", "retxtdom"); ?>"><sup>?</sup></abbr></span>
                                 <span id="DPEValue" class="valueFeature"><?= AdTemplate::$DPE; ?>&nbsp;</span>
                             </div>
                             <div>
-                                <span id="GESName" class="nameFeature"><?php _e("Greenhouse gas", "retxtdom"); ?>&nbsp;<abbr title="<?php _e("in kg eqCO2/m²/year", "retxtdom"); ?>"><sup>?</sup></abbr></span>
+                                <span id="GESName" class="nameFeature"><?php _e("Greenhouse gas", "retxtdom"); ?>&nbsp;<abbr data-title="<?php _e("In kg eqCO2/m²/year", "retxtdom"); ?>"><sup>?</sup></abbr></span>
                                 <span id="GESValue" class="valueFeature"><?= AdTemplate::$GES; ?>&nbsp;</span>
                             </div>
                             <?php if(!empty($customComplementaryFields)) {
@@ -226,13 +226,15 @@
                         <div class="headerContact">
                             <?php if(AdTemplate::$getContact) { ?>
                             <div class="headerContactLeft">
-                                <?php if(isset(AdTemplate::$linkAgency)&&AdTemplate::$linkAgency!==false) { ?>
+                            <?php if(!empty(AdTemplate::$thumbnailContact)) {
+                                if(isset(AdTemplate::$linkAgency)&&AdTemplate::$linkAgency!==false) { ?>
                                 <a href="<?=AdTemplate::$linkAgency;?>">
                                     <img src="<?= AdTemplate::$thumbnailContact; ?>" alt="<?php _e("Contact thumbnail", "retxtdom"); ?>" id="thumbnailContact">
                                 </a>
                                 <?php }else{ ?>
                                     <img src="<?= AdTemplate::$thumbnailContact; ?>" alt="<?php _e("Contact thumbnail", "retxtdom"); ?>" id="thumbnailContact">
-                                <?php } ?>
+                                <?php }
+                            }?>
                             </div>
                             <div class="headerContactRight">
                                 <span id="nameContact"><?= AdTemplate::$nameContact; ?></span>

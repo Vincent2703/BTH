@@ -126,17 +126,18 @@ class AdTemplate {
             if(!empty($idContact = self::getMeta("adIdAgent"))) {
                 self::$getContact = true;
                 if(self::getMeta("adShowAgent") == '1') {
+                    self::$idContact = $idContact;
                     self::$email = get_post_meta($idContact, "agentEmail", true);
                     self::$phone = get_post_meta($idContact, "agentPhone", true);
                     self::$mobilePhone = get_post_meta($idContact, "agentMobilePhone", true);
                 }else{
                     self::$idContact = wp_get_post_parent_id($idContact);
-                    self::$email = get_post_meta($idContact, "agencyEmail", true);
-                    self::$phone = get_post_meta($idContact, "agencyPhone", true);
-                    self::$linkAgency = get_post_permalink($idContact);
+                    self::$email = get_post_meta(self::$idContact, "agencyEmail", true);
+                    self::$phone = get_post_meta(self::$idContact, "agencyPhone", true);
+                    self::$linkAgency = get_post_permalink(self::$idContact);
                 }
-                self::$thumbnailContact = get_the_post_thumbnail_url($idContact, "thumbnail");
-                self::$nameContact = get_the_title($idContact);
+                self::$thumbnailContact = get_the_post_thumbnail_url(self::$idContact, "thumbnail");
+                self::$nameContact = get_the_title(self::$idContact);
             }else{
                 self::$email = get_option(PLUGIN_RE_NAME."OptionsEmail")["emailAd"];
                 self::$getContact = false;

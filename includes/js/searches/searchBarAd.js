@@ -1,14 +1,13 @@
 jQuery(document).ready(function($) {
     /* Only way I see. I can't add a custom sidebar after the header but before the content for each theme */
     $.ajax({
-        url: variables.searchBarURL+window.location.search,
+        url: variablesSearchBar.searchBarURL+window.location.search,
         type: "GET"                 
     }).done(function(response) {
-        URLGetAddressDataFile = variables.getAddressDataURL;
-        nonce = variables.nonce;
+        nonce = variablesSearchBar.nonce;
         $("header:first").after(response);
         $.ajax({
-           url: variables.autocompleteURL,
+           url: variablesSearchBar.autocompleteURL,
            dataType: "script"
         });
     });
@@ -19,10 +18,10 @@ function addFilters(button) {
     var complementaryFilters = jQuery(".compSearchBarInputs");
     if(complementaryFilters.is(":hidden")) {
         complementaryFilters.show("slow");
-        jQuery(button).text(variables.filters+" -");
+        jQuery(button).text(variablesSearchBar.filters+" -");
     }else{
         complementaryFilters.hide("slow");
-        jQuery(button).text(variables.filters+" +");
+        jQuery(button).text(variablesSearchBar.filters+" +");
     }
     
 }

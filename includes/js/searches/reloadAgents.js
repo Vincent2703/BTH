@@ -1,7 +1,7 @@
 function reloadAgents() {
     agentSelected = parseInt(jQuery("#agents :selected").val());
     jQuery.ajax({
-        url: variables.getAgentsURL,
+        url: variablesAgents.getAgentsURL,
         type: "GET"                 
     }).done(function(response) {
         jQuery("#agents").empty();

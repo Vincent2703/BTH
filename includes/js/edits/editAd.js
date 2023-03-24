@@ -13,7 +13,7 @@ jQuery(function($) {
                 });
 
             var self = this; 
-            inputImages = document.getElementById("images");
+            inputImages = $("#images");
             this.window.on("select", function() {
                 let showPictures = document.getElementById("showPictures");
                 inputImages.value = null;
@@ -32,6 +32,7 @@ jQuery(function($) {
 
                 });
                 inputImages.value = inputImages.value.slice(0, -1);
+                $("#insertAdPictures").text(translations.replace);
             });
         }
 

@@ -22,12 +22,9 @@ class EditAd {
     
     public function savePost($adId, $ad) {
         if($ad->post_type == "re-ad") {
-            if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formImportAds")) {
+            if((defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) || (isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formImportAds"))) {
                 return;
             }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAd")) {
-                if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
-                    return;
-                }
                 require_once(PLUGIN_RE_PATH."models/admin/AdAdmin.php");
                 AdAdmin::setData($adId, $ad);           
             }
@@ -107,7 +104,7 @@ class EditAd {
                             $nameAgent = get_the_title($agent);
                             $idAgent = $agent->ID;
                             ?>
-                            <option value="<?= $idAgent; ?>" <?=($idAgent==adAdmin::$agentSaved)?"selected":NULL;?>><?= $nameAgent; ?></option>
+                            <option value="<?= $idAgent; ?>" <?=($idAgent==adAdmin::$idAgent)?"selected":NULL;?>><?= $nameAgent; ?></option>
                             <?php
                         }
                     ?>
@@ -120,7 +117,7 @@ class EditAd {
             </div>
         </div>
         <div id="addPictures">
-            <a href="#" id="insertAdPictures" class="button"><?php _e("Add pictures", "retxtdom");?></a>
+            <a href="#" id="insertAdPictures" class="button"><?php empty(AdAdmin::$images)?_e("Add pictures", "retxtdom"):_e("Replace pictures", "retxtdom");?></a>
             <input type="hidden" name="images" id="images" value="<?= adAdmin::$images; ?>">
         </div>
         <div id="showPictures">
@@ -170,25 +167,25 @@ class EditAd {
             <div class="select">
             <label><?php _e("Type heating", "retxtdom");?></label>&nbsp;
             <select name="typeHeating">
-                <option value="unknown" <?php selected(AdAdmin::$typeHeating, "unknown"); ?>>
+                <option value="Unknown" <?php selected(AdAdmin::$typeHeating, "Unknown"); ?>>
                     <?php _e("Do not fill", "retxtdom");?>
                 </option>
-                <option value="individualGas" <?php selected(AdAdmin::$typeHeating, "individualGas"); ?>>
+                <option value="Individual gas" <?php selected(AdAdmin::$typeHeating, "Individual gas"); ?>>
                     <?php _e("Invidual gas", "retxtdom");?>
                 </option>
-                <option value="collectiveGas" <?php selected(AdAdmin::$typeHeating, "collectiveGas"); ?>>
+                <option value="Collective gas" <?php selected(AdAdmin::$typeHeating, "CollectiveGas"); ?>>
                     <?php _e("Collective gas", "retxtdom");?>
                 </option>
-                <option value="individualFuel" <?php selected(AdAdmin::$typeHeating, "individualFuel"); ?>>
+                <option value="Individual fuel" <?php selected(AdAdmin::$typeHeating, "Individual fuel"); ?>>
                     <?php _e("Individual fuel", "retxtdom");?>
                 </option>
-                <option value="collectiveFuel" <?php selected(AdAdmin::$typeHeating, "collectiveFuel"); ?>>
+                <option value="Collective fuel" <?php selected(AdAdmin::$typeHeating, "Collective fuel"); ?>>
                     <?php _e("Collective fuel", "retxtdom");?>
                 </option>
-                <option value="individualElectric" <?php selected(AdAdmin::$typeHeating, "individualElectric"); ?>>
+                <option value="Individual electric" <?php selected(AdAdmin::$typeHeating, "Individual electric"); ?>>
                     <?php _e("Individual electric", "retxtdom");?>
                 </option>
-                <option value="collectiveElectric" <?php selected(AdAdmin::$typeHeating, "collectiveElectric"); ?>>
+                <option value="Collective electric" <?php selected(AdAdmin::$typeHeating, "Collective electric"); ?>>
                     <?php _e("Collective electric", "retxtdom");?>
                 </option>
             </select>
@@ -199,10 +196,10 @@ class EditAd {
                     <option value="unknown" <?=(AdAdmin::$typeKitchen==="unknown")?"selected":NULL;?>>
                         <?php _e("Do not fill", "retxtdom");?>
                     </option>
-                    <option value="notEquipped" <?php selected(AdAdmin::$typeKitchen, "notEquipped"); ?>><?php _e("Not equipped", "retxtdom");?></option>
-                    <option value="kitchenette" <?php selected(AdAdmin::$typeKitchen, "kitchenette"); ?>><?php _e("Kitchenette", "retxtdom");?></option>
-                    <option value="american" <?php selected(AdAdmin::$typeKitchen, "american"); ?>><?php _e("American", "retxtdom");?></option>
-                    <option value="industrial" <?php selected(AdAdmin::$typeKitchen, "industrial"); ?>><?php _e("Industrial", "retxtdom");?></option>
+                    <option value="Not equipped" <?php selected(AdAdmin::$typeKitchen, "Not equipped"); ?>><?php _e("Not equipped", "retxtdom");?></option>
+                    <option value="Kitchenette" <?php selected(AdAdmin::$typeKitchen, "Kitchenette"); ?>><?php _e("Kitchenette", "retxtdom");?></option>
+                    <option value="American" <?php selected(AdAdmin::$typeKitchen, "American"); ?>><?php _e("American", "retxtdom");?></option>
+                    <option value="Industrial" <?php selected(AdAdmin::$typeKitchen, "Industrial"); ?>><?php _e("Industrial", "retxtdom");?></option>
                 </select>
             </div>
         </div>

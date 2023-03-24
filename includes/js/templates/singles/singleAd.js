@@ -153,7 +153,57 @@ jQuery(document).ready(function ($) {
         }
     });
     
-    //Doit convertir et rajouter dpeges ici
+    function DPEGES(diag, domID) {
+        var smallDiag = $("<div>")
+          .attr("id", domID+"Small")
+          .css({"font-size": 0, "user-select": "none"});
+
+        var valueDiag = $("#" + domID).text();
+
+        var diagRanks = [];
+        if(diag === "DPE") {
+          diagRanks = [
+            { min: 0, max: 50, color: "#319834", textColor: "#000000", label: 'A' },
+            { min: 51, max: 90, color: "#33cc31", textColor: "#000000", label: 'B' },
+            { min: 91, max: 150, color: "#cbfc34", textColor: "#000000", label: 'C' },
+            { min: 151, max: 230, color: "#fbfe06", textColor: "#000000", label: 'D' },
+            { min: 231, max: 330, color: "#fbcc05", textColor: "#000000", label: 'E' },
+            { min: 331, max: 450, color: "#fc9935", textColor: "#000000", label: 'F' },
+            { min: 451, max: 500, color: "#fc0205", textColor: "#ffffff", label: 'G' }
+          ];
+        } else {
+          diagRanks = [
+            { min: 0, max: 5, color: "#f2eff4", textColor: "#000000", label: 'A' },
+            { min: 6, max: 10, color: "#dfc1f7", textColor: "#000000", label: 'B' },
+            { min: 11, max: 20, color: "#d6aaf4", textColor: "#000000", label: 'C' },
+            { min: 21, max: 35, color: "#cc93f4", textColor: "#000000", label: 'D' },
+            { min: 36, max: 55, color: "#bb72f3", textColor: "#ffffff", label: 'E' },
+            { min: 56, max: 80, color: "#a94cee", textColor: "#ffffff", label: 'F' },
+            { min: 81, max: 100, color: "#8b1ae1", textColor: "#ffffff", label: 'G' }
+          ];
+        }
+
+        $.each(diagRanks, function(index, rank) {
+          var span = $("<span>")
+            .text(rank.label)
+            .css({"padding": "5px 7px 7px 5px", "font-size": "10px", "color": rank.textColor, "background-color": rank.color});
+
+          if(valueDiag >= rank.min && valueDiag <= rank.max) {
+            span.css({fontWeight: "bold", border: "white solid", fontSize: "15px"});
+          } 
+
+          smallDiag.append(span);              
+        });
+
+        $("#" + domID).append(smallDiag);
+      }
+
+      if($("#DPEValue").length) {
+        DPEGES("DPE", "DPEValue");
+      }
+      if($("#GESValue").length) {
+        DPEGES("GES", "GESValue");
+      }
     
 
 });    

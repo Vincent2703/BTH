@@ -27,7 +27,6 @@ class Ad {
             wp_register_script("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leaflet.min.js"), array(), "1.8.0", true);
             wp_register_script("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leafletFullscreen.min.js"), array(), "2.3.0", true);
             wp_register_script("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/singles/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
-            wp_register_script("dpeges", plugins_url(PLUGIN_RE_NAME."/includes/js/others/dpeges.js"), array(), PLUGIN_RE_VERSION, true);
             wp_enqueue_script("leaflet");
             wp_enqueue_script("leafletFullscreen");
             wp_enqueue_script("singleAd");
@@ -217,10 +216,10 @@ class Ad {
         $availability = wp_get_post_terms($post->ID, "adAvailable", array("fields"=>"slugs"));
         $available = false;
         if(isset($availability[0])) {
-            $available = $availability==="available";
+            $available = $availability[0]==="available";
         }
         ?>
-        <label title='<?php _e("The property is available", "retxtdom");?>'>
+        <label title="<?php _e("The property is available", "retxtdom");?>">
             <input type="checkbox" name="adAvailable" value="available" <?php checked($pagenow==="post-new.php" || $available); ?>>
             <span><?php _e("The property is available", "retxtdom");?></span>
         </label>

@@ -347,6 +347,7 @@ class Rep {
                 wp_enqueue_media();
                 wp_register_script("editAd", plugins_url(PLUGIN_RE_NAME."/includes/js/edits/editAd.js"), array('jquery'), PLUGIN_RE_VERSION);
                 $translations = array(
+                    "replace" => __("Replace pictures", "retxtdom"),
                     "delete" => __("Delete", "retxtdom")
                 );
                 wp_localize_script("editAd", "translations", $translations);
@@ -356,28 +357,29 @@ class Rep {
                 $variablesAddress = array(
                     "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
                 );
+                wp_localize_script("autocompleteAddress", "variablesAddress", $variablesAddress);
+                wp_enqueue_script("autocompleteAddress");
+                
                 wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 $variablesAgents = array(
                     "getAgentsURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents"),
                 );
-                wp_localize_script("autocompleteAddress", "variables", $variablesAddress);
-                wp_localize_script("reloadAgents", "variables", $variablesAgents);
-                wp_enqueue_script("autocompleteAddress");
+                wp_localize_script("reloadAgents", "variablesAgents", $variablesAgents);               
                 wp_enqueue_script("reloadAgents");
             }else if($postType === "agency") {
                 wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("mediaButton");
-                $variables = array(
+                $variablesAddress = array(
                     "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
                 );
-                wp_localize_script("autocompleteAddress", "variables", $variables);
+                wp_localize_script("autocompleteAddress", "variables", $variablesAddress);
                 wp_enqueue_script("autocompleteAddress");
             }else if($postType === "agent") {
                 wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/reloadAgencies.js"), array("jquery"), PLUGIN_RE_VERSION, true);
-                $variables = array(
+                $variablesAgencies = array(
                     "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies"),
                 );
-                wp_localize_script("reloadAgencies", "variables", $variables);
+                wp_localize_script("reloadAgencies", "variablesAgencies", $variablesAgencies);
                 wp_enqueue_script("reloadAgencies");
             }
         }else if($base === "re-ad_page_repoptions") {
@@ -436,11 +438,15 @@ class Rep {
      * Check if the client can use the getAddress API
      * Update the logs TODO : Put that part elsewhere
      */
-    public function permissionCallbackGetAddressData() {
+    public function permissionCallbackGetAddressData($request) {
         $idUser = apply_filters("determine_current_user", false);
         wp_set_current_user($idUser);
         $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
-        if(current_user_can("edit_others_posts") || !boolval($apisOptions["apiLimitNbRequests"])) {
+        $userCanEdit = current_user_can("edit_others_posts");
+        $nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && wp_verify_nonce($request->get_param("nonce"), "apiAddress");
+        $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";
+        $noLimit = !boolval($apisOptions["apiLimitNbRequests"]);
+        if($userCanEdit || ($nonceExistsAndIsValid || $isAjax) || $noLimit) {
             $clientAllowed = true;
         }else{
             $logsAPI = get_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests");
@@ -448,7 +454,7 @@ class Rep {
             $maxRequests = intval($apisOptions["apiMaxNbRequests"]);
             $clientIP = $_SERVER["REMOTE_ADDR"]; 
 
-            if($logsAPI !== false) {
+            if($logsAPI !== false && isset($logsAPI[$date])) {
                 $newLogsAPI = array($date=>$logsAPI[$date]);
                 $IPs = $newLogsAPI[$date];
                 $clientAllowed = !isset($IPs[$clientIP]) || isset($IPs[$clientIP]) && $IPs[$clientIP] < $maxRequests;
@@ -515,14 +521,14 @@ class Rep {
         global $pagenow;
         if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {         
             wp_register_script("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
-            $variables = array(
+            $variablesSearchBar = array(
                 "filters" => __("FILTERS", "retxtdom"),
                 "searchBarURL" => plugin_dir_url(__FILE__)."templates/searchBars/searchBarAd.php",
                 "autocompleteURL" => plugin_dir_url(__FILE__)."includes/js/searches/autocompleteAddress.js",
                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
                 "nonce" => wp_create_nonce("searchNonce")
             );
-            wp_localize_script("searchBarAd", "variables", $variables);
+            wp_localize_script("searchBarAd", "variablesSearchBar", $variablesSearchBar);
             wp_enqueue_script("searchBarAd");
 
             wp_register_style("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);

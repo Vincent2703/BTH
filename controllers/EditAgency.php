@@ -14,10 +14,9 @@ class editAgency {
     
     public function savePost($agencyId, $agency) {
         if($agency->post_type == "agency") {
-            if(isset($_POST["nonceSecurity"]) || wp_verify_nonce($_POST["nonceSecurity"], "formEditAgency")) {
-                if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
-                    return;
-                }
+            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+                return;
+            }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAgency")) {
                 require_once(PLUGIN_RE_PATH."models/admin/AgencyAdmin.php");
                 AgencyAdmin::setData($agencyId);         
             }
