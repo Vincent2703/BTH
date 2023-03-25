@@ -1,6 +1,6 @@
 <?php
-require_once(ABSPATH . "wp-includes/pluggable.php"); //Sinon erreur cannot modify header. A vérifier si toujours utile
-require_once(ABSPATH . "wp-admin/includes/image.php"); //Pour importer des images
+//require_once(ABSPATH . "wp-includes/pluggable.php"); //Sinon erreur cannot modify header. A vérifier si toujours utile
+//require_once(ABSPATH . "wp-admin/includes/image.php"); //Pour importer des images
 
 class Import {
 
@@ -9,13 +9,17 @@ class Import {
         $extAccepted = array(".zip", ".xml");
         ?>
         <div class="wrap">
+            <h2><?php _e("Import the ads", "retxtdom"); ?></h2>
             <form action="" method="post" enctype="multipart/form-data">
                 <?php wp_nonce_field("formImportAds", "nonceSecurity"); ?>
                 <input type="file" name="file" accept="<?=implode(', ',$extAccepted);?>">
                 <p>
                     <input type="submit" name="submitImport" class="button button-primary" value="Importer les annonces">
+                    <br />
                     <input type="checkbox" id="publishAds" name="publishAds" checked>
-                    <label for="publishAds">Publier directement les annonces</label>                    
+                    <label for="publishAds"><?php _e("Directly publish the ads", "retxtdom"); ?></label><br />        
+                    <input type="checkbox" id="replaceAds" name="replaceAds" checked>
+                    <label for="replaceAds"><?php _e("Replace the ads with the same reference", "retxtdom"); ?></label>          
                 </p>      
             </form>
         </div>

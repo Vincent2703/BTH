@@ -2,22 +2,33 @@
 
 class Export {    
     
-    public function showPage() {     
-        $postType = get_current_screen()->post_type;
-        $base = get_current_screen()->base;
-        $files = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
-        usort($files, function($a, $b) {
-            return filemtime(PLUGIN_RE_PATH."exports/$b") - filemtime(PLUGIN_RE_PATH."exports/$a");
-        });
-        ?>
+    public function showPage() { ?>
         <div class="wrap">
-            <h2>Exportez les annonces</h2>
+            <h2><?php _e("Exports the ads", "retxtdom"); ?></h2>
+            <?php 
+                if(isset($_POST["submitExport"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formExportAds")) {
+                    SELF::startExport();
+                    _e("Export completed successfully", "retxtdom");
+                }else if(isset($_GET["exportToDelete"]) && preg_match("/.+\.xml$/", $_GET["exportToDelete"]) && isset($_GET["nonceSecurity"]) && wp_verify_nonce($_GET["nonceSecurity"], "deleteExport")) {
+                    if(@unlink(PLUGIN_RE_PATH."exports/".$_GET["exportToDelete"])) {
+                        _e("File deleted with success", "retxtdom");
+                    }else{
+                        _e("File was not deleted due to an error", "retxtdom");
+                    }
+                }
+                $postType = get_current_screen()->post_type;
+                $base = get_current_screen()->base;
+                $files = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
+                usort($files, function($a, $b) {
+                    return filemtime(PLUGIN_RE_PATH."exports/$b") - filemtime(PLUGIN_RE_PATH."exports/$a");
+                });
+            ?>
             <form action="" method="post">
                 <?php wp_nonce_field("formExportAds", "nonceSecurity"); ?>
                 <p>
-                    <input type="submit" name="submitExport" class="button button-primary" value="Exporter">                
+                    <input type="submit" name="submitExport" class="button button-primary" value="<?php _e("Export", "retxtdom"); ?>>                
                     <input type="checkbox" id="onlyAvailable" name="onlyAvailable" checked>
-                    <label for="onlyAvailable">Exporter uniquement les biens disponibles</label>
+                    <label for="onlyAvailable"><?php _e("Export only available properties", "retxtdom"); ?></label>
                 </p>
             </form>
             <?php if($postType==="re-ad" && $base="repexport") { ?>
@@ -27,6 +38,7 @@ class Export {
                         <th><?php _e("Date", "retxtdom"); ?></th>
                         <th><?php _e("Size", "retxtdom"); ?></th>
                         <th><?php _e("Download", "retxtdom"); ?></th>
+                        <th><?php _e("Delete", "retxtdom"); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -35,6 +47,7 @@ class Export {
                         <td><?= date("Y-m-d h:i:s", filemtime(PLUGIN_RE_PATH."exports/$file")); ?></td>
                         <td><?= round(filesize(PLUGIN_RE_PATH."exports/$file")/1024, 2); ?>&nbsp;kb</td>
                         <td><a href="<?=plugin_dir_url(__DIR__)."exports/$file";?>" download><?php _e("Download", "retxtdom"); ?></a></td>
+                        <td><a href="<?= wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=repexport&exportToDelete=$file"), "deleteExport", "nonceSecurity");?>"><?php _e("Delete", "retxtdom"); ?></a></td>
                     </tr>
                     <?php } ?>
                 </tbody>
@@ -42,10 +55,6 @@ class Export {
             <?php } ?>
         </div>
         <?php
-        if(isset($_POST["submitExport"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formExportAds")) {
-            SELF::startExport();
-            echo "Exportation effectuée avec succès";
-        }
     }
     
     public function widgetExport() {
@@ -254,17 +263,6 @@ class Export {
         SELF::createPhotosFile();
         SELF::createZIP();*/ 
     }
-    
-    private static function download($path) {
-        //$filename = get_bloginfo("name").' '.__("Ads exports", "retxtdom").' '.date("Y-m-d");
-
-        /*header("Content-type: application/xml");
-        header('Content-Disposition: inline; filename="'.$filename.'"');
-        header("Content-Transfer-Encoding: binary");
-        header("Content-Length: ".filesize($path));
-        header("Accept-Ranges: bytes");*/
-        @readfile($path);
-    } 
     
     private static function deleteLastExport($path) {
         unset($path);

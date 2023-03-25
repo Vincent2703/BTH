@@ -15,23 +15,24 @@ jQuery(function($) {
             var self = this; 
             inputImages = $("#images");
             this.window.on("select", function() {
-                let showPictures = document.getElementById("showPictures");
-                inputImages.value = null;
-                showPictures.innerHTML = null;
+                let showPictures = $("#showPictures");
+                inputImages.val(null);
+                showPictures.html(null);
                 let attachments = self.window.state().get("selection").toJSON();
                 attachments.forEach(elem => {
-                    inputImages.value += elem.id+";";
-                    showPictures.innerHTML += '<div class="aPicture" data-imgId='+elem.id+'>'+
+                    inputImages.val(inputImages.val()+elem.id+';');
+                    showPictures.html(showPictures.html()+
+                    '<div class="aPicture" data-imgId='+elem.id+'>'+
                         '<img src="'+elem.sizes.thumbnail.url+'" class="imgAd">'+
                         '<div class="controlPicture">'+
                             '<span class="moveToLeft" onclick="movePicture(this, \'left\');">←</span>'+
                             '<span class="deletePicture" onclick="deletePicture(this);">'+translations.delete+'</span>'+
                             '<span class="moveToRight" onclick="movePicture(this, \'right\');">→</span></div>'+
                         '</div>'+
-                    '</div>';
+                    '</div>');
 
                 });
-                inputImages.value = inputImages.value.slice(0, -1);
+                inputImages.val(inputImages.val().slice(0, -1));
                 $("#insertAdPictures").text(translations.replace);
             });
         }

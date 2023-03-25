@@ -446,6 +446,7 @@ class Rep {
         $nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && wp_verify_nonce($request->get_param("nonce"), "apiAddress");
         $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";
         $noLimit = !boolval($apisOptions["apiLimitNbRequests"]);
+        
         if($userCanEdit || ($nonceExistsAndIsValid || $isAjax) || $noLimit) {
             $clientAllowed = true;
         }else{

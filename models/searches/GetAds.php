@@ -145,8 +145,9 @@ class GetAds {
             }
             
             if(isset($_GET["city"]) && !empty($_GET["city"])) {
+                $nonce = wp_create_nonce("apiAddress"); //Would be probably MUCH better in a hidden field, TODO ?
                 if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
-                    $url = urlencode(get_rest_url(null, PLUGIN_RE_NAME."/v1/address") ."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=city");
+                    $url = urlencode(get_rest_url(null, PLUGIN_RE_NAME."/v1/address") ."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=city&nonce=$nonce");
                     $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
                     
                     if(isset($addressData["city"])) {
@@ -176,10 +177,8 @@ class GetAds {
                         );
                     }
                 }else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"){ 
-                    $url = urlencode(get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=radius&radius=".intval($_GET["radius"]));
-                    echo urldecode($url);
+                    $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=radius&radius=".intval($_GET["radius"])."&nonce=$nonce";
                     $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                    print_r($addressData);
                     array_push($metas,
                         array(
                             "key" => "adLatitude",
