@@ -2,15 +2,29 @@
 
 class Export {    
     
+    private static $dirPath;
+    private static $errors;
+    private static $files;
+    
+    public function __construct() {
+        SELF::$dirPath = PLUGIN_RE_PATH."exports/";
+        SELF::$errors = array();
+        SELF::$files = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
+        usort(SELF::$files, function($a, $b) {    
+            return filemtime(PLUGIN_RE_PATH."exports/$b") - filemtime(PLUGIN_RE_PATH."exports/$a");
+        });
+    }
+    
     public function showPage() { ?>
         <div class="wrap">
             <h2><?php _e("Exports the ads", "retxtdom"); ?></h2>
             <?php 
                 if(isset($_POST["submitExport"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formExportAds")) {
                     SELF::startExport();
+                    SELF::checkQuotaExports();
                     _e("Export completed successfully", "retxtdom");
                 }else if(isset($_GET["exportToDelete"]) && preg_match("/.+\.xml$/", $_GET["exportToDelete"]) && isset($_GET["nonceSecurity"]) && wp_verify_nonce($_GET["nonceSecurity"], "deleteExport")) {
-                    if(@unlink(PLUGIN_RE_PATH."exports/".$_GET["exportToDelete"])) {
+                    if(@unlink(SELF::$dirPath.$_GET["exportToDelete"])) {
                         _e("File deleted with success", "retxtdom");
                     }else{
                         _e("File was not deleted due to an error", "retxtdom");
@@ -18,17 +32,13 @@ class Export {
                 }
                 $postType = get_current_screen()->post_type;
                 $base = get_current_screen()->base;
-                $files = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
-                usort($files, function($a, $b) {
-                    return filemtime(PLUGIN_RE_PATH."exports/$b") - filemtime(PLUGIN_RE_PATH."exports/$a");
-                });
             ?>
             <form action="" method="post">
                 <?php wp_nonce_field("formExportAds", "nonceSecurity"); ?>
                 <p>
-                    <input type="submit" name="submitExport" class="button button-primary" value="<?php _e("Export", "retxtdom"); ?>>                
+                    <input type="submit" name="submitExport" class="button button-primary" value="<?php _e("Export", "retxtdom"); ?>">                
                     <input type="checkbox" id="onlyAvailable" name="onlyAvailable" checked>
-                    <label for="onlyAvailable"><?php _e("Export only available properties", "retxtdom"); ?></label>
+                    <label for="onlyAvailable"><?php _e("Export only available properties", "retxtdom"); ?></label>               
                 </p>
             </form>
             <?php if($postType==="re-ad" && $base="repexport") { ?>
@@ -42,11 +52,11 @@ class Export {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach($files as $file) { ?>
+                    <?php foreach(SELF::$files as $file) { ?>
                     <tr>
-                        <td><?= date("Y-m-d h:i:s", filemtime(PLUGIN_RE_PATH."exports/$file")); ?></td>
-                        <td><?= round(filesize(PLUGIN_RE_PATH."exports/$file")/1024, 2); ?>&nbsp;kb</td>
-                        <td><a href="<?=plugin_dir_url(__DIR__)."exports/$file";?>" download><?php _e("Download", "retxtdom"); ?></a></td>
+                        <td><?= date("Y-m-d h:i:s", filemtime(SELF::$dirPath.$file)); ?></td>
+                        <td><?= round(filesize(SELF::$dirPath.''.$file)/1024, 2); ?>&nbsp;kb</td>
+                        <td><a href="<?= SELF::$dirPath.$file;?>" download><?php _e("Download", "retxtdom"); ?></a></td>
                         <td><a href="<?= wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=repexport&exportToDelete=$file"), "deleteExport", "nonceSecurity");?>"><?php _e("Delete", "retxtdom"); ?></a></td>
                     </tr>
                     <?php } ?>
@@ -126,7 +136,7 @@ class Export {
                 
                 foreach($metas as $metaKey=>$metaValue) {
                     if(!in_array($metaKey, $uselessKeys)) {
-                        $metaKey = strtolower(str_replace("ad", '', $metaKey));
+                        $metaKey = lcfirst(str_replace("ad", '', $metaKey));
                         $adData[$metaKey] = $metaValue;
                     }
                 }
@@ -250,7 +260,7 @@ class Export {
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><ads></ads>');
         $XMLContent = "\xEF\xBB\xBF".SELF::generateXML($ads, $xml).PHP_EOL;
         
-        $path = $dirExport.'/'. uniqid(__("ads_", "retxtdom")).".xml";
+        $path = $dirExport.'/'. uniqid(__("ads_".get_bloginfo("name").'_'.date("Y-m-d_H-i-s").'_', "retxtdom")).".xml";
         $XMLFile = fopen($path, "w+");
         
         fwrite($XMLFile, $XMLContent);
@@ -264,7 +274,42 @@ class Export {
         SELF::createZIP();*/ 
     }
     
-    private static function deleteLastExport($path) {
-        unset($path);
+    private static function checkQuotaExports() {
+        $optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
+        $maxSavesExports = intval($optionsExports["maxSavesExports"]);
+        $filesToDelete = array_slice(SELF::$files, $maxSavesExports-1);
+        foreach($filesToDelete as $file) {
+            SELF::deleteExport($file);
+        }
+        
+        SELF::$files = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
+        usort(SELF::$files, function($a, $b) {    
+            return filemtime(PLUGIN_RE_PATH."exports/$b") - filemtime(PLUGIN_RE_PATH."exports/$a");
+        });
+        
     }
+    
+    private static function deleteExport($filePath) {
+        unlink(SELF::$dirPath.$filePath); //Add check
+    }
+    
+    /*private static function logError($error) {
+        $msg = date("Y-m-d H:i:s").' ';
+        switch($error) {
+            case "":
+                
+
+            break;
+
+            default:
+                $msg .= __("An unknown error has occured", "retxtdom");
+            break;
+        }
+        
+        array_push(SELF::errors, $msg);
+    }
+    
+    private static function sendMail() {
+        
+    }*/
 }

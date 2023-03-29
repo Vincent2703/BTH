@@ -3,16 +3,32 @@
 //require_once(ABSPATH . "wp-admin/includes/image.php"); //Pour importer des images
 
 class Import {
+    private static $importOptions; //RAJOUTER TABLEAU EXPORTS A IMPORTER
+    private static $dirPathImports;
+    private static $dirPathExports;
+    private static $extAccepted;
+    private static $files;
+    
+    public function __construct() {
+        SELF::$importOptions = get_option(PLUGIN_RE_NAME."OptionsImports");
+        SELF::$dirPathImports = PLUGIN_RE_PATH."imports/";
+        SELF::$dirPathExports = PLUGIN_RE_PATH."exports/";
+        SELF::$extAccepted = array(".zip", ".xml");
+        SELF::$files = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
+        usort(SELF::$files, function($a, $b) {    
+            return filemtime(PLUGIN_RE_PATH."exports/$b") - filemtime(PLUGIN_RE_PATH."exports/$a");
+        });
+    }
 
-    public function showPage() {
-        $dirPath = plugin_dir_path(__DIR__)."import";
-        $extAccepted = array(".zip", ".xml");
+    public function showPage() { 
+        $postType = get_current_screen()->post_type;
+        $base = get_current_screen()->base;
         ?>
         <div class="wrap">
             <h2><?php _e("Import the ads", "retxtdom"); ?></h2>
             <form action="" method="post" enctype="multipart/form-data">
                 <?php wp_nonce_field("formImportAds", "nonceSecurity"); ?>
-                <input type="file" name="file" accept="<?=implode(', ',$extAccepted);?>">
+                <input type="file" name="file" accept="<?=implode(", ", SELF::$extAccepted);?>">
                 <p>
                     <input type="submit" name="submitImport" class="button button-primary" value="Importer les annonces">
                     <br />
@@ -22,20 +38,39 @@ class Import {
                     <label for="replaceAds"><?php _e("Replace the ads with the same reference", "retxtdom"); ?></label>          
                 </p>      
             </form>
+            <?php if($postType==="re-ad" && $base="repimport") { ?>
+            <table>
+                <thead>
+                    <tr>
+                        <th><?php _e("Date", "retxtdom"); ?></th>
+                        <th><?php _e("Number of ads", "retxtdom"); ?></th>
+                        <th><?php _e("Import", "retxtdom"); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach(SELF::$files as $file) { ?>
+                    <tr>
+                        <td><?= date("Y-m-d h:i:s", filemtime(SELF::$dirPathExports.$file)); ?></td>
+                        <td>?</td>
+                        <td><a href="<?= SELF::$dirPathExports.$file;?>" download><?php _e("Import", "retxtdom"); ?></a></td>
+                    </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+            <?php } ?>
         </div>
         <?php
         if(is_admin()) {
             if(isset($_POST["submitImport"])) {
-                if(!is_dir($dirPath)) {
-                    echo $dirPath;
-                    mkdir($dirPath);
+                if(!is_dir(SELF::$dirPathImports)) {
+                    mkdir(SELF::$dirPathImports);
                 }
-                $filePath = $dirPath.basename(sanitize_file_name($_FILES["file"]["name"]));
+                $filePath = SELF::$dirPathImports.basename(sanitize_file_name($_FILES["file"]["name"]));
                 $uploadOk = true;
                 $imageFileType = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 
-                if(!in_array(".$imageFileType", $extAccepted)) { 
-                    echo "Seulement les fichiers ".implode(', ',$extAccepted)." sont autorisés.";
+                if(!in_array(".$imageFileType", SELF::$extAccepted)) { 
+                    echo "Seulement les fichiers ".implode(", ", SELF::$extAccepted)." sont autorisés.";
                     $uploadOk = false;
                 }
 
@@ -44,7 +79,8 @@ class Import {
                     SELF::arrayToAds($arrayAds);
                 }else{
                     echo "<br/>Une erreur est survenue lors de l'envoi.";
-                }                          
+                }
+                _e("Import completed successfully", "retxtdom");
             }
         }
                 
@@ -62,8 +98,8 @@ class Import {
     private static function arrayToAds($arrayAds) {
         foreach($arrayAds as $ad) {
             $adData = $ad["adData"];
-            $agentData = $ad["agentData"];
-            $agencyData = $ad["agencyData"];
+            //$agentData = $ad["agentData"];
+            //$agencyData = $ad["agencyData"];
             //Verifier si l'annonce n'existe pas déjà
             $post = array( //Array création du post
                 "post_title" 	=> $adData["title"],
@@ -86,48 +122,22 @@ class Import {
             wp_set_post_terms($adWPId, "Disponible", "adAvailable"); //check ?
             
             /* METAS */
-            update_post_meta($adWPId, "adFurnished", intval($adData["furnished"]));
-            update_post_meta($adWPId, "adElevator", intval($adData["elevator"]));
-            update_post_meta($adWPId, "adCellar", intval($adData["cellar"]));
-            update_post_meta($adWPId, "adTerrace", intval($adData["terrace"]));
-            update_post_meta($adWPId, "adRefAgency", sanitize_text_field($adData["refagency"]));
-            update_post_meta($adWPId, "adPrice", floatval($adData["price"]));
-            update_post_meta($adWPId, "adFees", floatval($adData["fees"]));
-            update_post_meta($adWPId, "adSurface", floatval($adData["surface"]));
-            update_post_meta($adWPId, "adLandSurface", floatval($adData["landsurface"]));
-            update_post_meta($adWPId, "adNbRooms", intval($adData["nbrooms"]));
-            update_post_meta($adWPId, "adNbBedrooms", intval($adData["nbbedrooms"]));
-            update_post_meta($adWPId, "adNbBathrooms", intval($adData["nbbathrooms"]));
-            update_post_meta($adWPId, "adNbWaterRooms", intval($adData["nbwaterrooms"]));
-            update_post_meta($adWPId, "adNbWC", intval($adData["nbwc"]));
-                        
-            update_post_meta($adWPId, "adAddress", sanitize_text_field($adData["address"]));
-            update_post_meta($adWPId, "adLatitude", sanitize_text_field($adData["latitude"]));
-            update_post_meta($adWPId, "adLongitude", sanitize_text_field($adData["longitude"]));
-            update_post_meta($adWPId, "adPostCode", sanitize_text_field($adData["postcode"]));
-            update_post_meta($adWPId, "adCity", sanitize_text_field($adData["city"]));
-            update_post_meta($adWPId, "adDataMap", array("lat" => $adData["latitude"], "long" => $adData["longitude"], "zoom" => 16, "circ" => 10));
-
-            update_post_meta($adWPId, "adShowAgent", 1);
-            update_post_meta($adWPId, "adIdAgent", intval($adData["idagent"]));
-            update_post_meta($adWPId, "adFloor", intval($adData["floor"]));
-            update_post_meta($adWPId, "adNbFloors", intval($adData["nbfloors"]));
-            update_post_meta($adWPId, "adYear", intval($adData["year"]));
-            update_post_meta($adWPId, "adTypeHeating", sanitize_text_field($adData["typeheating"]));
-            update_post_meta($adWPId, "adTypeKitchen", sanitize_text_field($adData["typekitchen"]));
-            update_post_meta($adWPId, "adNbBalconies", sanitize_text_field($adData["nbbalconies"]));
-            update_post_meta($adWPId, "adDPE", intval($adData["dpe"]));
-            update_post_meta($adWPId, "adGES", intval($adData["ges"]));
+            $arraykeysParsing = array_diff(array_keys($adData), ["agentData", "agencyData", "title", "description", "typeProperty", "typeAd", "adAvailable", "latitude", "longitude", "agentData"]);
+            foreach($arraykeysParsing as $keyXML) {
+                $keyMeta = "ad".ucfirst($keyXML);
+                update_post_meta($adWPId, $keyMeta, sanitize_text_field($adData[$keyXML]));
+            }
             
-            update_post_meta($adWPId, "adShowMap", sanitize_text_field($adData["showmap"]));
-            
+            update_post_meta($adWPId, "adDataMap", array("lat" => $adData["latitude"], "long" => $adData["longitude"], "zoom" => 16, "circ" => 1));
             
             /* PICTURES */
-            if(!is_array($adData)) {
+            if(!empty($adData["thumbnail"])) {
                 SELF::setPictureProperty($adWPId, $adData["thumbnail"], true); //Pour la miniature
             }
-            foreach($adData["pictures"] as $URLPicture) {
-                SELF::setPictureProperty($adWPId, $URLPicture);
+            if(!empty($adData["pictures"][key($adData["pictures"])])) {
+                foreach($adData["pictures"] as $URLPicture) {
+                    SELF::setPictureProperty($adWPId, $URLPicture);
+                }
             }
         }
     }
@@ -160,7 +170,7 @@ class Import {
            if(is_array($img) && !is_wp_error($img) && wp_remote_retrieve_response_code($img) === 200) { //si on a bien réussi à la récupérer
                $imgOrigin = $img["body"];
                list($widthP, $heightP) = getimagesizefromstring($imgOrigin); //On va la redimensionner et la convertir. Selon les paramètres définis
-               $maxDim = $optionsImports["maxDim"]; //Parametrable
+               $maxDim = SELF::$importOptions["maxDim"]; //Parametrable
                if($widthP > $maxDim || $heightP > $maxDim) { //Si l'image est plus petit que $maxDim (px)
                    $ratio = $widthP/$heightP;
                    if($ratio > 1) {
@@ -181,7 +191,7 @@ class Import {
                imagedestroy($src);
                $fileName = wp_unique_filename($dirImport, "propertyPicture$adWPId.jpg");
                $pathImg = $dirImport.$fileName;
-               imagejpeg($dst, $pathImg, 85); //Quality à rajouter en param ?
+               imagejpeg($dst, $pathImg, SELF::$importOptions["qualityPictures"]); //Quality à rajouter en param ?
                imagedestroy($dst);
 
                $uploadThumbnail = wp_upload_bits($fileName, null, @file_get_contents($pathImg)); //On l'enregistre dans la BDD
@@ -198,45 +208,20 @@ class Import {
                    $attachmentId = wp_insert_attachment($attachment, $uploadThumbnail["file"], $adWPId, true);
 
                    if(is_numeric($attachmentId)) {
-                       if($attachmentData = wp_generate_attachment_metadata($attachmentId, $uploadThumbnail["file"])) {
-                           wp_update_attachment_metadata($attachmentId, $attachmentData);
-                       }else{
-                           /*SELF::addLog("Impossible de mettre à jour les metadonnées de l'image $imgURL");
-                           SELF::$errorAds++;*/
-                       }
-
                        if($thumbnail) {
-                           if(!set_post_thumbnail($adWPId, $attachmentId)) {
-                               /*SELF::addLog("Impossible d'ajouter la miniature à l'annonce $adWPId (id BDD)");
-                               SELF::$errorAds++;*/
-                           }
-                       }
-                       if($propertyImagesEmpty === false) {
-                           $attachmentId = $propertyImages.";".$attachmentId;
-                       }
-                       if(!update_post_meta($adWPId, "adImages", $attachmentId)) { //Important de mettre les ids dans un meta car sinon on peut retrouver seulement les photos uploadées AVEC le post. Ca ne marche pas si elles sont choisies dans la galerie.
-                           /*SELF::addLog("Impossible d'ajouter l'image $imgURL à la galerie d'images de la propriété");
-                           SELF::$errorAds++;*/
-                           return false;
-                       }
-
-                   }else{
-                       return false;
+                           set_post_thumbnail($adWPId, $attachmentId);
+                       }else{
+                            $attachmentData = wp_generate_attachment_metadata($attachmentId, $uploadThumbnail["file"]);
+                            wp_update_attachment_metadata($attachmentId, $attachmentData);
+                            if($propertyImagesEmpty === false) {
+                                $attachmentId = $propertyImages.";".$attachmentId;
+                            }
+                            update_post_meta($adWPId, "adImages", $attachmentId); //Important de mettre les ids dans un meta car sinon on peut retrouver seulement les photos uploadées AVEC le post. Ca ne marche pas si elles sont choisies dans la galerie.
+                        }
                    }
-
-               }else{
-                   /*SELF::addLog("Impossible d'enregistrer l'image $imgURL dans le dossier 'uploads' pour l'annonce $adWPId (id BDD) erreur : ".$uploadThumbnail["error"]);
-                   SELF::$errorAds++;*/
-                   return false;
                }
-           }else{
-               /*SELF::addLog("Impossible de récupérer l'image à l'adresse $imgURL erreur : ".wp_remote_retrieve_response_code($img));
-               SELF::$errorAds++;*/
-               return false;
            }
        }
-
     }
-   
    
 }

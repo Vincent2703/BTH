@@ -51,6 +51,7 @@
             <main id="main" class="site-main">
                 <span class="titleAd"><h1><?php the_title(); ?></h1></span>
                 <span class="subtitleAd"><?= ucfirst(AdTemplate::$city)." - ".AdTemplate::$price.AdTemplate::$afterPrice; ?></span>
+                <?php if(!empty(AdTemplate::$imagesIds[0])) { ?>
                 <div class="sliders">
                     <div id="miniSlider">
                         <span class="controlNext">></span>
@@ -70,6 +71,9 @@
                         <span class="pagingImg"></span>
                     </div>
                 </div>
+                <?php }else{ //TODO : CSS?>
+                <br /><br /> 
+                <?php } ?>
                 <div class="contentLeftAd">
                     <div class="description">
                         <h4>Description</h4>
@@ -282,8 +286,8 @@
                                     <span class="prevMorePosts" <?= $nbPanels<$adByPanel ? 'style="display: none;"':'';?>><</span>
                                     <?php for($y=0; $y<$adByPanel; $y++) {
                                         $currentNbPost = $i*5+$y;
-                                        if(isset(AdTemplate::$morePosts[$currentNbPost]) && get_the_post_thumbnail_url($morePosts[$currentNbPost]) !== false) { 
-                                            $morePost = $morePosts[$currentNbPost];?>
+                                        if(isset(AdTemplate::$morePosts[$currentNbPost]) && get_the_post_thumbnail_url(AdTemplate::$morePosts[$currentNbPost]) !== false) { 
+                                            $morePost = AdTemplate::$morePosts[$currentNbPost];?>
                                             <div class="moreAd">
                                                 <div class="moreThumbnailAd">
                                                     <?= '<a href="'.get_post_permalink($morePost).'">'.get_the_post_thumbnail($morePost, "thumbnail").'</a>' ;?>

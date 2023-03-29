@@ -412,6 +412,8 @@ class Options {
             $sanitaryValues["templateUsedExport"] = sanitize_text_field($input["templateUsedExport"]);
         }
         
+        $sanitaryValues["maxSavesExports"] = absint($input["maxSavesExports"]);
+        
         $sanitaryValues["allowAutoExport"] = isset($input["allowAutoExport"]);
 
         
