@@ -23,6 +23,9 @@ class Import {
     public function showPage() { 
         $postType = get_current_screen()->post_type;
         $base = get_current_screen()->base;
+        if(isset($_GET["import"]) && preg_match("/.+\.xml$/", $_GET["import"]) && isset($_GET["nonceSecurity"]) && wp_verify_nonce($_GET["nonceSecurity"], "importAds")) {
+            SELF::startImport(SELF::$dirPathExports.$_GET["import"]);
+        }
         ?>
         <div class="wrap">
             <h2><?php _e("Import the ads", "retxtdom"); ?></h2>
@@ -48,11 +51,12 @@ class Import {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach(SELF::$files as $file) { ?>
+                    <?php foreach(SELF::$files as $file) { 
+                        $filePath = SELF::$dirPathExports.$file; ?>
                     <tr>
-                        <td><?= date("Y-m-d h:i:s", filemtime(SELF::$dirPathExports.$file)); ?></td>
-                        <td>?</td>
-                        <td><a href="<?= SELF::$dirPathExports.$file;?>" download><?php _e("Import", "retxtdom"); ?></a></td>
+                        <td><?= date("Y-m-d h:i:s", filemtime($filePath)); ?></td>
+                        <td><?= SELF::countAds($filePath); ?></td>
+                        <td><span class="importLink" data-file="<?=$file;?>"><?php _e("Import", "retxtdom"); ?></span></td>
                     </tr>
                     <?php } ?>
                 </tbody>
@@ -75,8 +79,8 @@ class Import {
                 }
 
                 if($uploadOk && move_uploaded_file($_FILES["file"]["tmp_name"], $filePath)) {
-                    $arrayAds = SELF::XMLToArray($filePath);
-                    SELF::arrayToAds($arrayAds);
+                    self::startImport($filePath);
+                    @unlink($filePath);
                 }else{
                     echo "<br/>Une erreur est survenue lors de l'envoi.";
                 }
@@ -91,6 +95,8 @@ class Import {
             $xml = simplexml_load_file($filePath);
             if($xml != false) {
                 return json_decode(json_encode($xml), true);
+            }else{
+                return false;
             }
         }
     }
@@ -101,19 +107,45 @@ class Import {
             //$agentData = $ad["agentData"];
             //$agencyData = $ad["agencyData"];
             //Verifier si l'annonce n'existe pas déjà
-            $post = array( //Array création du post
-                "post_title" 	=> $adData["title"],
-                "post_author" 	=> 1, //admin
-                "post_content" 	=> $adData["description"],
-                "post_type" 	=> "re-ad",
-            );
-            if(isset($_POST["publishAds"])) {//Si l'utilisateur a décidé publier directement les annonces
-                $post["post_status"] = "publish";
+            if(isset($_POST["replaceAds"]) || isset($_GET["replaceAds"])) {
+                $post = get_posts(array(
+                        "post_type" => "re-ad",
+                        "fields" => "ids",
+                        "numberposts" => -1,
+                        "meta_query" => array(
+                            array(
+                                "key" => "adRefAgency",
+                                "value" => $adData["refAgency"]
+                            )
+                        )
+                    )
+                );
+            }        
+            if(!empty($post)) {
+                $adWPId = $post[0];
+                $data = array(
+                    "ID" => $adWPId,
+                    "post_title" => $adData["title"],
+                    "post_content" => $adData["description"],
+                );
+
+                wp_update_post($data);
             }else{
-                $post["post_status"] = "private";
-            }
-            $adWPId = wp_insert_post($post, true); //On crée l'annonce et on obtient l'ID
-            
+                $post = array( //Array création du post
+                    "post_title" 	=> $adData["title"],
+                    "post_author" 	=> 1, //admin
+                    "post_content" 	=> $adData["description"],
+                    "post_type" 	=> "re-ad",
+                );
+                if(isset($_POST["publishAds"]) || isset($_GET["publishAds"])) {//Si l'utilisateur a décidé publier directement les annonces
+                    $post["post_status"] = "publish";
+                }else{
+                    $post["post_status"] = "private";
+                }
+
+                $adWPId = wp_insert_post($post, true); //On crée l'annonce et on obtient l'ID            
+            }          
+                        
             /* TERMS */
             wp_set_post_terms($adWPId, sanitize_text_field($adData["typeProperty"]), "adTypeProperty");
 
@@ -144,6 +176,15 @@ class Import {
     
     public function widgetImport() {
         wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetImport", "Importer les annonces", array($this, "showPage"));
+    }
+    
+    private static function countAds($filePath) {
+        $handle = fopen($filePath, "r");
+        $adsXML = fread($handle, filesize($filePath));
+        fclose($handle);
+
+        $ads = new SimpleXMLElement($adsXML);
+        return $ads->count();
     }
     
     
@@ -222,6 +263,15 @@ class Import {
                }
            }
        }
+    }
+    
+    private static function startImport($filePath) {
+        $arrayAds = SELF::XMLToArray($filePath);
+        if($arrayAds != false) {
+            SELF::arrayToAds($arrayAds);
+        }else{
+            _e("The file is not valid", "retxtdom");
+        }
     }
    
 }

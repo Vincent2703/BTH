@@ -390,6 +390,14 @@ class Rep {
             );
             wp_localize_script("options", "translations", $translations);
             wp_enqueue_script("options");
+        }else if($postType==="re-ad" && $base="repimport") {
+            wp_register_script("import", plugins_url(PLUGIN_RE_NAME."/includes/js/others/import.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+            $variablesImport = array(
+                "confirmation" => __("Are you sure that you want to import this file ?", "retxtdom"),
+                "url" => wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".strtolower(PLUGIN_RE_NAME)."import"), "importAds", "nonceSecurity"),
+            );
+            wp_localize_script("import", "variablesImport", $variablesImport);
+            wp_enqueue_script("import");
         }    
     }
     

@@ -57,7 +57,7 @@ class Export {
                         <td><?= date("Y-m-d h:i:s", filemtime(SELF::$dirPath.$file)); ?></td>
                         <td><?= round(filesize(SELF::$dirPath.''.$file)/1024, 2); ?>&nbsp;kb</td>
                         <td><a href="<?= SELF::$dirPath.$file;?>" download><?php _e("Download", "retxtdom"); ?></a></td>
-                        <td><a href="<?= wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=repexport&exportToDelete=$file"), "deleteExport", "nonceSecurity");?>"><?php _e("Delete", "retxtdom"); ?></a></td>
+                        <td><a href="<?= wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".strtolower(PLUGIN_RE_NAME)."export&exportToDelete=$file"), "deleteExport", "nonceSecurity");?>"><?php _e("Delete", "retxtdom"); ?></a></td>
                     </tr>
                     <?php } ?>
                 </tbody>
