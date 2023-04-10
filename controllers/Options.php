@@ -386,13 +386,13 @@ class Options {
         if(isset($input["templateUsedImport"]) && !ctype_space($input["templateUsedImport"])) {
             $sanitaryValues["templateUsedImport"] = sanitize_text_field($input["templateUsedImport"]);
         }
+                
+        if(isset($input["maxSavesImports"]) && is_numeric($input["maxSavesImports"])) {
+            $sanitaryValues["maxSavesImports"] = absint($input["maxSavesImports"]);
+        }
 
         if(isset($input["maxDim"]) && is_numeric($input["maxDim"])) {
             $sanitaryValues["maxDim"] = absint($input["maxDim"]);
-        }
-        
-        if(isset($input["maxSaves"]) && is_numeric($input["maxSaves"])) {
-            $sanitaryValues["maxSaves"] = absint($input["maxSaves"]);
         }
         
         if(isset($input["qualityPictures"]) && is_numeric($input["qualityPictures"])) {

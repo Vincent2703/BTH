@@ -306,32 +306,43 @@ class Rep {
      * Register plugin styles for the admin area
      */
     public function registerPluginStylesAdmin() {
-        $postType = get_current_screen()->post_type;
-        $base = get_current_screen()->base;
-        if($postType === "re-ad" && $base === "post") {
-            wp_register_style("editAd", plugins_url(PLUGIN_RE_NAME."/includes/css/edits/editAd.css"), array(), PLUGIN_RE_VERSION);
-            wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
-
-            wp_enqueue_style("editAd");
-            wp_enqueue_style("autocompleteAddress");
-        }else if($postType === "re-ad" && $base === "re-ad_page_repoptions") {
-            wp_register_style("options", plugins_url(PLUGIN_RE_NAME."/includes/css/others/options.css"), array(), PLUGIN_RE_VERSION);
-            
-            wp_enqueue_style("options");
-        }else if($postType === "re-ad" && $base === "edit-tags") {
-            wp_register_style("editTagsAd", plugins_url(PLUGIN_RE_NAME."/includes/css/edits/editTagsAd.css"), array(), PLUGIN_RE_VERSION);
-            
-            wp_enqueue_style("editTagsAd");
-        }else if($postType === "agent" && $base === "post") {
-            wp_register_style("editAgent", plugins_url(PLUGIN_RE_NAME."/includes/css/edits/editAgent.css"), array(), PLUGIN_RE_VERSION);
-            
-            wp_enqueue_style("editAgent");
-        }else if($postType === "agency" && $base === "post") {
-            wp_register_style("editAgency", plugins_url(PLUGIN_RE_NAME."/includes/css/edits/editAgency.css"), array(), PLUGIN_RE_VERSION);
-            wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
-
-            wp_enqueue_style("editAgency");
-            wp_enqueue_style("autocompleteAddress");
+        $screen = get_current_screen();
+        $postType = $screen->post_type;
+        $base = $screen->base;
+        
+        $styleSheets = array(
+            "re-ad" => array(
+                "post" => array(
+                    "editAd" => "/includes/css/edits/editAd.css",
+                    "autocompleteAddress" => "/includes/css/others/autocompleteAddress.css"
+                ),
+                "re-ad_page_repoptions" => array(
+                    "options" => "/includes/css/others/options.css"
+                ),
+                "edit-tags" => array(
+                    "editTagsAd" => "/includes/css/edits/editTagsAd.css"
+                ),
+                "re-ad_page_repimport" => array(
+                    "import" => "/includes/css/others/import.css"
+                )
+            ),
+            "agent" => array(
+                "post" => array(
+                    "editAgent" => "/includes/css/edits/editAgent.css"
+                )
+            ),
+            "agency" => array(
+                "post" => array(
+                    "editAgency" => "/includes/css/edits/editAgency.css",
+                    "autocompleteAddress" => "/includes/css/others/autocompleteAddress.css"
+                )
+            )
+        );
+        
+        $stylesToRegister = isset($styleSheets[$postType][$base])?$styleSheets[$postType][$base]:array();
+        foreach($stylesToRegister as $name => $path) {
+            wp_register_style($name, plugins_url(PLUGIN_RE_NAME.$path), array(), PLUGIN_RE_VERSION);
+            wp_enqueue_style($name);
         }
     }
     
@@ -339,66 +350,91 @@ class Rep {
      * Register plugin scripts for the admin area
      */
     public function registerPluginScriptsAdmin() {
-        $postType = get_current_screen()->post_type;
-        $base = get_current_screen()->base;
-                
+        $screen = get_current_screen();
+        $postType = $screen->post_type;
+        $base = $screen->base;
+
+        $scripts = array(
+            "re-ad" => array(
+                "post" => array(
+                    "editAd" => array(
+                        "path" => "/includes/js/edits/editAd.js",
+                        "dependencies" => array("jquery"),
+                        "localize" => array(
+                            "translations" => array(
+                                "replace" => __("Replace pictures", "retxtdom"),
+                                "delete" => __("Delete", "retxtdom")
+                            )
+                        ),
+                    ),
+                    "autocompleteAddress" => array(
+                        "path" => "/includes/js/searches/autocompleteAddress.js",
+                        "dependencies" => array("jquery"),
+                        "localize" => array(
+                            "variablesAddress" => array(
+                                "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address")
+                            )
+                        )
+                    )
+                ),
+                "re-ad_page_repimport" => array(
+                    "import" => array(
+                        "path" => "/includes/js/others/import.js",
+                        "dependencies" => array("jquery"),
+                        "localize" => array(
+                            "variablesImport" => array(
+                                "confirmation" => __("Are you sure that you want to import this file ?", "retxtdom"),
+                                "url" => wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".strtolower(PLUGIN_RE_NAME)."import"), "importAds", "nonceSecurity")
+                            )
+                        )
+                    )
+                )
+            ),
+            "agent" => array(
+                "post" => array(
+                    "editAgent" => array(
+                        "path" => "/includes/js/edits/editAgent.js",
+                        "dependencies" => array("jquery")
+                    )
+                )
+            ),
+            "agency" => array(
+                "post" => array(
+                    "editAgency" => array(
+                        "path" => "/includes/js/edits/editAgency.js",
+                        "dependencies" => array("jquery")
+                    ),
+                    "autocompleteAddress" => array(
+                        "path" => "/includes/js/searches/autocompleteAddress.js",
+                        "dependencies" => array("jquery"),
+                        "localize" => array(
+                            "variablesAddress" => array(
+                                "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address")
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+        $scriptsToRegister = isset($scripts[$postType][$base])?$scripts[$postType][$base]:array();
+        foreach($scriptsToRegister as $name => $script) {
+            wp_register_script($name, plugins_url(PLUGIN_RE_NAME.$script["path"]), $script["dependencies"], PLUGIN_RE_VERSION);
+            if(isset($script["localize"])) {
+                foreach($script["localize"] as $variableName => $localizeData) {
+                    wp_localize_script($name, $variableName, $localizeData);
+                }
+            }
+            wp_enqueue_script($name);
+        }
+
         if($base === "post") {
             if($postType === "re-ad") {
                 wp_enqueue_media();
-                wp_register_script("editAd", plugins_url(PLUGIN_RE_NAME."/includes/js/edits/editAd.js"), array('jquery'), PLUGIN_RE_VERSION);
-                $translations = array(
-                    "replace" => __("Replace pictures", "retxtdom"),
-                    "delete" => __("Delete", "retxtdom")
-                );
-                wp_localize_script("editAd", "translations", $translations);
-                wp_enqueue_script("editAd");
-                
-                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
-                $variablesAddress = array(
-                    "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
-                );
-                wp_localize_script("autocompleteAddress", "variablesAddress", $variablesAddress);
-                wp_enqueue_script("autocompleteAddress");
-                
-                wp_register_script("reloadAgents", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/reloadAgents.js"), array('jquery'), PLUGIN_RE_VERSION, true);
-                $variablesAgents = array(
-                    "getAgentsURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents"),
-                );
-                wp_localize_script("reloadAgents", "variablesAgents", $variablesAgents);               
-                wp_enqueue_script("reloadAgents");
             }else if($postType === "agency") {
-                wp_register_script("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/autocompleteAddress.js"), array('jquery'), PLUGIN_RE_VERSION, true);
                 wp_enqueue_script("mediaButton");
-                $variablesAddress = array(
-                    "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
-                );
-                wp_localize_script("autocompleteAddress", "variables", $variablesAddress);
-                wp_enqueue_script("autocompleteAddress");
-            }else if($postType === "agent") {
-                wp_register_script("reloadAgencies", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/reloadAgencies.js"), array("jquery"), PLUGIN_RE_VERSION, true);
-                $variablesAgencies = array(
-                    "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies"),
-                );
-                wp_localize_script("reloadAgencies", "variablesAgencies", $variablesAgencies);
-                wp_enqueue_script("reloadAgencies");
             }
-        }else if($base === "re-ad_page_repoptions") {
-            wp_register_script("options", plugins_url(PLUGIN_RE_NAME."/includes/js/others/options.js"), array("jquery"), PLUGIN_RE_VERSION, true);
-            $translations = array(
-                "mainFeatures" => __("Main characteristics", "retxtdom"),
-                "complementaryFeatures" => __("Complementary characteristics", "retxtdom")
-            );
-            wp_localize_script("options", "translations", $translations);
-            wp_enqueue_script("options");
-        }else if($postType==="re-ad" && $base="repimport") {
-            wp_register_script("import", plugins_url(PLUGIN_RE_NAME."/includes/js/others/import.js"), array("jquery"), PLUGIN_RE_VERSION, true);
-            $variablesImport = array(
-                "confirmation" => __("Are you sure that you want to import this file ?", "retxtdom"),
-                "url" => wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".strtolower(PLUGIN_RE_NAME)."import"), "importAds", "nonceSecurity"),
-            );
-            wp_localize_script("import", "variablesImport", $variablesImport);
-            wp_enqueue_script("import");
-        }    
+        }
     }
     
     /*

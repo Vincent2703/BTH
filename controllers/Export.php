@@ -284,7 +284,7 @@ class Export {
         
         SELF::$files = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
         usort(SELF::$files, function($a, $b) {    
-            return filemtime(PLUGIN_RE_PATH."exports/$b") - filemtime(PLUGIN_RE_PATH."exports/$a");
+            return filemtime(SELF::$dirPath.$b) - filemtime(SELF::$dirPath.$a);
         });
         
     }

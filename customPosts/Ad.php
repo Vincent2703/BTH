@@ -165,22 +165,26 @@ class Ad {
      * Fetch the single or archive custom post Ad template
      */
     public function templatePostAd($path) {
-	if(get_post_type() == "re-ad") {
+        if(get_post_type() == "re-ad") {
             if(is_single()) {
                 if(!locate_template(array("single-ad.php"))) {
-                    $path = plugin_dir_path(__DIR__)."templates/singles/single-ad.php";
+                    $path = PLUGIN_RE_PATH."templates/singles/single-ad.php";
                     $this->registerPluginScriptsSingleAd();
                     $this->registerPluginStylesSingleAd();
                 }
-            }else if(is_post_type_archive("re-ad")) { 
+            } else if(is_post_type_archive("re-ad")) {
                 if(!locate_template(array("archive-ad.php"))) {
-                    $path = plugin_dir_path(__DIR__)."templates/archives/archive-ad.php";
+                    $path = PLUGIN_RE_PATH."templates/archives/archive-ad.php";
                     wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
                     wp_enqueue_style("archiveAd");
                 }
             }
-	}
-	return $path;
+        }else if(is_search() && !have_posts()) {
+            if(!locate_template(array("no-results.php"))) {
+                $path = PLUGIN_RE_PATH."templates/archives/no-results.php";
+            }         
+        }
+        return $path;
     }
     
     /*

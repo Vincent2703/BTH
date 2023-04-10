@@ -1,0 +1,9 @@
+table span.importLink {
+    color: #2271b1;
+    text-decoration: #2271b1 underline;
+    cursor: pointer;
+}
+
+table span.importLink:hover {
+    color: #135e96;
+}

@@ -107,6 +107,7 @@ class Import {
             //$agentData = $ad["agentData"];
             //$agencyData = $ad["agencyData"];
             //Verifier si l'annonce n'existe pas déjà
+            $createPost = true;
             if(isset($_POST["replaceAds"]) || isset($_GET["replaceAds"])) {
                 $post = get_posts(array(
                         "post_type" => "re-ad",
@@ -120,17 +121,20 @@ class Import {
                         )
                     )
                 );
-            }        
-            if(!empty($post)) {
-                $adWPId = $post[0];
-                $data = array(
-                    "ID" => $adWPId,
-                    "post_title" => $adData["title"],
-                    "post_content" => $adData["description"],
-                );
+                  
+                if(!empty($post)) {
+                    $createPost = false;
+                    $adWPId = $post[0];
+                    $data = array(
+                        "ID" => $adWPId,
+                        "post_title" => $adData["title"],
+                        "post_content" => $adData["description"],
+                    );
 
-                wp_update_post($data);
-            }else{
+                    wp_update_post($data);
+                }
+            }
+            if($createPost) {
                 $post = array( //Array création du post
                     "post_title" 	=> $adData["title"],
                     "post_author" 	=> 1, //admin
@@ -232,7 +236,7 @@ class Import {
                imagedestroy($src);
                $fileName = wp_unique_filename($dirImport, "propertyPicture$adWPId.jpg");
                $pathImg = $dirImport.$fileName;
-               imagejpeg($dst, $pathImg, SELF::$importOptions["qualityPictures"]); //Quality à rajouter en param ?
+               imagejpeg($dst, $pathImg, SELF::$importOptions["qualityPictures"]);
                imagedestroy($dst);
 
                $uploadThumbnail = wp_upload_bits($fileName, null, @file_get_contents($pathImg)); //On l'enregistre dans la BDD
@@ -247,6 +251,8 @@ class Import {
                        "post_status"    => "inherit"
                    );
                    $attachmentId = wp_insert_attachment($attachment, $uploadThumbnail["file"], $adWPId, true);
+                   $attachmentData = wp_generate_attachment_metadata($attachmentId, $uploadThumbnail["file"]);
+                   wp_update_attachment_metadata($attachmentId, $attachmentData);
 
                    if(is_numeric($attachmentId)) {
                        if($thumbnail) {
@@ -273,5 +279,23 @@ class Import {
             _e("The file is not valid", "retxtdom");
         }
     }
+    private static function checkQuotaImports() {
+        $optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");
+        $maxSavesImports = intval($optionsImports["maxSavesImports"]);
+        $filesToDelete = array_slice(SELF::$files, $maxSavesImports-1);
+        foreach($filesToDelete as $file) {
+            SELF::deleteExport($file);
+        }
+        
+        SELF::$files = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
+        usort(SELF::$files, function($a, $b) {    
+            return filemtime(SELF::$dirPathImports.$b) - filemtime(SELF::$dirPathImports.$a);
+        });
+    }
+    
+    private static function deleteExport($filePath) {
+        unlink(SELF::$dirPathImports.$filePath); //Add check
+    }
+    
    
 }
