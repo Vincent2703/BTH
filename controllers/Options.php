@@ -1,7 +1,6 @@
 <?php
 
 class Options {
-    //private $options;
     public function showPage() {
         settings_errors();
         ?>
@@ -176,13 +175,13 @@ class Options {
         
         /* Imports */
      
-        add_settings_field(
+        /*add_settings_field(
             "templateUsedImport", // id
             __("Import template", "retxtdom").SELF::fieldPurpose("Template to use for imports."),
             array($this, "templateUsedImportCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
-        );
+        );*/
              
         add_settings_field(
             "maxSavesImports", // id
@@ -208,24 +207,24 @@ class Options {
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
-        add_settings_field(
+        /*add_settings_field(
             "allowAutoImport", // id
             __("Automatic ads import", "retxtdom").SELF::fieldPurpose("When this option is activated, a cronjob can be run to import the ads from the most recent file located in the plugin's import directory."),
             array($this, "allowAutoImportCallback"), // callback
             PLUGIN_RE_NAME."OptionsImportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
-        );
+        );*/
         
 
         /* Exports */
         
-        add_settings_field(
+        /*add_settings_field(
             "templateUsedExport", // id
             __("Export template", "retxtdom").SELF::fieldPurpose("Template to use for exports."),
             array($this, "templateUsedExportCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
-        );
+        );*/
         
         add_settings_field(
             "maxSavesExports", // id
@@ -235,17 +234,17 @@ class Options {
             PLUGIN_RE_NAME."optionsSection" // section
         );
         
-        add_settings_field(
+        /*add_settings_field(
             "allowAutoExport", // id
             __("Automatic ads export", "retxtdom").SELF::fieldPurpose("When this option is activated, a cronjob can be run to export the ads that feature an available property to the plugin's export directory."),
             array($this, "allowAutoExportCallback"), // callback
             PLUGIN_RE_NAME."OptionsExportsPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
-        );
+        );*/
        
         /* Mail */
 
-        add_settings_field(
+        /*add_settings_field(
             "sendMail", // id
             __("Send email in case of error", "retxtdom").SELF::fieldPurpose("An email will be sent to the following email address if the plugin detects an error during an export or import."),
             array($this, "sendMailCallback"), // callback
@@ -259,7 +258,7 @@ class Options {
             array($this, "emailErrorCallback"), // callback
             PLUGIN_RE_NAME."OptionsEmailPage", // page
             PLUGIN_RE_NAME."optionsSection" // section
-        );
+        );*/
         
         add_settings_field(
             "emailAd", // id

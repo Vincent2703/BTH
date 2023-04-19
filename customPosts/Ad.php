@@ -9,10 +9,10 @@ class Ad {
         /*
          * Register plugin styles for the singleAd template
          */
-        private function registerPluginStylesSingleAd() {
+        private function registerPluginStylesSingleAd($CSSDirName) {
             wp_register_style("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leaflet.min.css"), array(), "1.8.0");
             wp_register_style("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leafletFullscreen.min.css"), array(), "2.3.0");
-            wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/singles/singleAd.css"));
+            wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$CSSDirName/singles/singleAd.css"));
             wp_register_style("googleIcons", "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0");
             wp_enqueue_style("leaflet");
             wp_enqueue_style("leafletFullscreen");
@@ -165,24 +165,31 @@ class Ad {
      * Fetch the single or archive custom post Ad template
      */
     public function templatePostAd($path) {
-        if(get_post_type() == "re-ad") {
-            if(is_single()) {
-                if(!locate_template(array("single-ad.php"))) {
-                    $path = PLUGIN_RE_PATH."templates/singles/single-ad.php";
-                    $this->registerPluginScriptsSingleAd();
-                    $this->registerPluginStylesSingleAd();
+        $currentTheme = wp_get_theme();
+        $dirName = str_replace(' ', '', strtolower($currentTheme->name)).$currentTheme->version;
+        $dirPath = PLUGIN_RE_PATH."templates/$dirName";
+        if(is_dir($dirPath)) {
+            if(get_post_type() === "re-ad") {
+                if(is_single()) {
+                    if(!locate_template(array("single-ad.php"))) {
+                        $path = "$dirPath/singles/single-ad.php";
+                        $this->registerPluginScriptsSingleAd();
+                        $this->registerPluginStylesSingleAd($dirName);
+                    }
+                }else if(is_post_type_archive("re-ad")) {
+                    if(!locate_template(array("archive-ad.php"))) {
+                        $path =  "$dirPath/archives/archive-ad.php";
+                        wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$dirName/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
+                        wp_enqueue_style("archiveAd");
+                    }
                 }
-            } else if(is_post_type_archive("re-ad")) {
-                if(!locate_template(array("archive-ad.php"))) {
-                    $path = PLUGIN_RE_PATH."templates/archives/archive-ad.php";
-                    wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
-                    wp_enqueue_style("archiveAd");
-                }
+            }else if(is_search() && !have_posts()) {
+                if(!locate_template(array("no-results.php"))) {
+                    $path =  "$dirPath/archives/no-results.php";
+                    wp_register_style("noResults", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$dirName/archives/noResults.css"), array(), PLUGIN_RE_VERSION);
+                    wp_enqueue_style("noResults");
+                }         
             }
-        }else if(is_search() && !have_posts()) {
-            if(!locate_template(array("no-results.php"))) {
-                $path = PLUGIN_RE_PATH."templates/archives/no-results.php";
-            }         
         }
         return $path;
     }

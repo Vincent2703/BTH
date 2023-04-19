@@ -123,6 +123,9 @@ class Rep {
 
         //Set up public query vars for agent post type
         add_action("admin_init", array($this->Agent, "publicQueryAgentPostParent"));
+        
+        //Display notices
+        add_action("admin_notices", array($this, "displayNotices"));
 
         //Select custom columns for the agent post type
         add_action("manage_agent_posts_custom_column" , array($this->Agent, "selectCustomAgentColumn"), 10, 2);
@@ -592,6 +595,62 @@ class Rep {
             '<a href="'.esc_url(admin_url("/edit.php?post_type=re-ad&page=".strtolower(PLUGIN_RE_NAME)."options")).'">'.__("Options", "retxtdom")."</a>"
         ));
 	return $links;
+    }
+    
+    public function displayNotices() {
+        $errors = array();
+        $warnings = array();
+        $informations = array();
+        
+        //Check theme
+        
+        $currentTheme = wp_get_theme();
+        $themeName = str_replace(' ', '', strtolower($currentTheme->name));
+        $themeVersion = $currentTheme->version;
+        $listThemes = array_diff(scandir(PLUGIN_RE_PATH."templates/"), array("..", '.', "searchBars"));
+        
+        foreach($listThemes as $theme) {
+            if(strpos($theme, $themeName) === 0) {
+                $themePluginVersion = substr($theme, strlen($themeName));
+                if($themePluginVersion === $themeVersion) {
+                    $checkTheme = "ok";
+                    break;
+                }else {
+                    $checkTheme = "badVersion";
+                    break;
+                }
+            }else{
+                $checkTheme = "noTheme";
+            }
+        }
+        
+        if($checkTheme === "noTheme") {
+            array_push($errors, __("The theme that you are using is not compatible with the plugin. Please use one of the following themes :", "retxtdom")."<br />"
+                . "<ul><li><a target='_blank' href='https://wordpress.org/themes/twentytwenty/'>Twenty twenty 2.1</a></li></ul><br />"
+                . __("For more information, please read the", "retxtdom").'&nbsp;<a target="_blank" href="#">'.__("documentation", "retxtdom")."</a>");
+        }else if($checkTheme === "badVersion") {
+            array_push($warnings, sprintf(__('The version of the theme you are using (%1$s) is different from the one the plugin templates were built with (%2$s). Expect potential bugs.', "retxtdom"), $themeVersion, $themePluginVersion)."<br />"
+                . __("For more information, please read the", "retxtdom").'&nbsp;<a target="_blank" href="#">'.__("documentation", "retxtdom")."</a>");
+        }
+        
+        foreach($errors as $error) { ?>
+            <div class="notice notice-error is-dismissible">
+                <h3><?= PLUGIN_RE_NAME; ?></h3>
+                <p><?= $error; ?></p>   
+            </div>
+        <?php }
+        foreach($warnings as $warning) { ?>
+            <div class="notice notice-warning is-dismissible">
+                <h3><?= PLUGIN_RE_NAME; ?></h3>
+                <p><?= $warning; ?></p>   
+            </div>
+        <?php }
+        foreach($informations as $info) { ?>
+            <div class="notice notice-info is-dismissible">
+                <h3><?= PLUGIN_RE_NAME; ?></h3>
+                <p><?= $info; ?></p>   
+            </div>
+        <?php }
     }
     
 }

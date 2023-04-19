@@ -45,15 +45,20 @@ class Agency {
      * Fetch the single custom post Agency template
      */
     function templatePostAgency($path) {
-	if(get_post_type() == "agency") {
-            if(is_single()) {
-                if(!locate_template(array("single-agency.php"))) {
-                    $path = plugin_dir_path(__DIR__)."templates/singles/single-agency.php";
-                    wp_register_style("singleAgency", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/singles/singleAgency.css"), array(), PLUGIN_RE_VERSION);
-                    wp_enqueue_style("singleAgency");
+        $currentTheme = wp_get_theme();
+        $dirName = str_replace(' ', '', strtolower($currentTheme->name)).$currentTheme->version;
+        $dirPath = PLUGIN_RE_PATH."templates/$dirName";
+        if(is_dir($dirPath)) {
+            if(get_post_type() === "agency") {
+                if(is_single()) {
+                    if(!locate_template(array("single-agency.php"))) {
+                        $path = "$dirPath/singles/single-agency.php";
+                        wp_register_style("singleAgency", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$dirName/singles/singleAgency.css"), array(), PLUGIN_RE_VERSION);
+                        wp_enqueue_style("singleAgency");
+                    }
                 }
             }
-	}
+        }
 	return $path;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-class AdTemplate {
+class AdSingle {
     private static $metas;
     
     public static $refAd;
@@ -29,6 +29,7 @@ class AdTemplate {
     
     public static $typeAd;
     public static $typeAdSlug;
+    public static $typeProperty;
     public static $afterPrice;
     public static $imagesIds;
     public static $showMap;
@@ -60,7 +61,7 @@ class AdTemplate {
         return false;
     }
     
-    public static function getDataAd($id) {
+    public static function getData($id) {
             self::$metas = get_post_custom($id);
 
             self::$refAd = sanitize_text_field(self::getMeta("adRefAgency"));
@@ -90,6 +91,7 @@ class AdTemplate {
             $images = self::getMeta("adImages");
             self::$typeAd = get_the_terms($id, "adTypeAd")[0]->name;
             self::$typeAdSlug = get_the_terms($id, "adTypeAd")[0]->slug;
+            self::$typeProperty = get_the_terms($id, "adTypeProperty")[0]->slug;
             self::$afterPrice = self::getCurrency();
             if(self::$typeAdSlug === "rental") {
                 self::$afterPrice .= '/'.__("month", "retxtdom");

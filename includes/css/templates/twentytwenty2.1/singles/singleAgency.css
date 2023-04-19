@@ -1,0 +1,203 @@
+/* Mise en page générale */
+
+.site-main {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.site-main #title {
+    flex: 0 1 100%;
+    text-align: center;
+    font-size: 32px;
+}
+    
+.site-main #details {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 10vh 5vh;
+}
+
+.site-main #details #contact {
+    display: flex;
+    flex-direction: column;
+}
+
+.site-main #details #contact ul {
+    margin-bottom: 0;
+}
+
+.site-main #details #thumbnail img {
+    border-radius: 15%;
+}
+
+.site-main #details ul {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+}
+
+.site-main #description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.site-main #description p {
+    width: 75%;
+}
+
+.site-main #lastAds {
+    width: 100%;
+    text-align: center;
+}
+.site-main h3 {
+    text-align: center;
+    margin: 0 0 50px 0;
+}
+
+.rowAd {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 100px;
+}
+
+.inShortAd {
+    display: flex;
+    width: 70%;
+    gap: 0 30px;
+}
+
+.inShortAd .thumbnailAd {
+    position: relative;
+    width: 40%;
+}
+
+.inShortAd .thumbnailAd .typeAd {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 5px;
+    padding: 5px;
+    color: white;
+    font-size: 12px;
+    top: 5px;
+    left: 5px;
+}
+
+.inShortAd .thumbnailAd .typeProperty {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 5px;
+    padding: 5px;
+    color: white;
+    font-size: 12px;
+    top: 5px;
+    right: 5px;
+}
+
+.inShortAd .detailsAd {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+}
+
+.inShortAd .detailsAd>span {
+    display: block;
+}
+
+.inShortAd .detailsAd .titleAd {
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.inShortAd .detailsAd .titleAd a {
+    text-decoration: none;
+}
+
+.inShortAd .detailsAd .address {
+    font-size: 16px;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.inShortAd .detailsAd .shortDescription {
+    font-size: 14px;
+    height: 35%;
+}
+
+.inShortAd .detailsAd .price {
+    margin-bottom: 25px;
+}
+
+.inShortAd .detailsAd .price .includingFees {
+    font-weight: bold;
+}
+
+.inShortAd .detailsAd .price .fees {
+    font-size: 12px;
+}
+
+.inShortAd .detailsAd .iconsDate {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 13px;
+    margin-top: auto;
+}
+
+.inShortAd .detailsAd .iconsDate .icons {
+    display: flex;
+    align-items: flex-end;
+    gap: 0 15px;
+}
+
+.inShortAd .detailsAd .iconsDate .icons span {
+    display: flex;
+    align-items: center;
+}
+
+.inShortAd .detailsAd .iconsDate .icons span span {
+    margin-right: 5px;
+}
+
+.inShortAd .detailsAd .iconsDate .icons .nbBathrooms, .inShortAd .detailsAd .iconsDate .icons .nbBedrooms {
+    display: flex;
+    align-items: center;
+}
+
+.inShortAd .detailsAd .iconsDate .icons .nbBathrooms .bathIcon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: url("../../../images/bathIcon.svg") no-repeat bottom;
+}
+
+.inShortAd .detailsAd .iconsDate .icons .nbBedrooms .bedIcon {
+    display: inline-block;
+    width: 22px;
+    height: 20px;
+    background: url("../../../images/bedIcon.svg") no-repeat bottom;    
+}
+
+/* REPONSIVE */
+
+@media only screen and (max-width : 900px) {
+    .inShortAd {
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .inShortAd .thumbnailAd {
+        width: 90%;
+        margin-bottom: 20px;
+    }
+    
+    .inShortAd .detailsAd {
+        width: 90%;
+    }
+    
+    .inShortAd .detailsAd .shortDescription {
+        margin-bottom: 10px;
+    }
+}

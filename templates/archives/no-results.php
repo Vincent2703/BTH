@@ -1,1 +1,0 @@
-<h1><?php _e("There is no results for this search."); ?></h1>
