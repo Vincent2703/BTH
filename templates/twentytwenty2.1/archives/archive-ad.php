@@ -11,7 +11,7 @@
                     if(wp_get_post_terms($idPost, "adAvailable")[0]->slug === "available") {
    
                         $descriptionAd = get_the_content();
-                        $maxLengthDescriptionAd = 20;
+                        $maxLengthDescriptionAd = 35;
                         if(substr_count($descriptionAd, ' ') > $maxLengthDescriptionAd) {
                             $arrayDescriptionAd = explode(" ", $descriptionAd);
                             $shortDescriptionAd = implode(" ", array_splice($arrayDescriptionAd, 0, $maxLengthDescriptionAd)) . " [...]";

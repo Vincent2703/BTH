@@ -29,7 +29,7 @@
                             </li>
                             <?php }if(AgencySingle::$address) { ?>
                             <li>
-                                <span>Adresse postale</span>
+                                <span id="postalAddressLabel">Adresse postale</span>
                                 <span><?= AgencySingle::$address; ?>&nbsp;<a id="linkGMaps" target="_blank" href="https://www.google.fr/maps/place/<?=urlencode(AgencySingle::$address);?>"><span class="dashicons dashicons-location"></span></a></span>
                             </li>
                             <?php } ?>
@@ -43,8 +43,8 @@
                     <h3 class="color-accent"><?php _e("Last ads published by the agency", "retxtdom"); ?></h3>
                     <?php foreach(AgencySingle::$agencyAds as $ad) {
                         $id = $ad->ID;
-                        $descriptionAd = get_the_content($id);
-                        $maxLengthDescriptionAd = 20;
+                        $descriptionAd = get_the_content(null, false, $id);
+                        $maxLengthDescriptionAd = 35;
                         if(substr_count($descriptionAd, ' ') > $maxLengthDescriptionAd) {
                             $arrayDescriptionAd = explode(" ", $descriptionAd);
                             $shortDescriptionAd = implode(" ", array_splice($arrayDescriptionAd, 0, $maxLengthDescriptionAd)) . " [...]";
@@ -65,7 +65,7 @@
                                 <span class="titleAd"><a href="<?= get_post_permalink($id); ?>"><?= get_the_title($id); ?></a></span>
                                 <span class="address"><?= AdSingle::$address; ?></span>
                                 <span class="shortDescription"><?= $shortDescriptionAd; ?></span>
-                                <span class="price"><span class="includingFees"><?= AdSingle::$price.$currency; ?><?= AdSingle::$typeAd==="Location"?'/'.__("month", "retxtdom"):'';?></span>&nbsp;<span class="fees"><?= !empty(AdSingle::$fees)||AdSingle::$fees!=0?__("including", "retxtdom"). AdSingle::$fees.$currency."&nbsp;of fees":'';?></span></span>
+                                <span class="price"><span class="includingFees"><?= AdSingle::$price.$currency; ?><?= AdSingle::$typeAd==="Location"?'/'.__("month", "retxtdom"):'';?></span>&nbsp;<span class="fees"><?= !empty(AdSingle::$fees)||AdSingle::$fees!=0?__("including", "retxtdom")."&nbsp;".AdSingle::$fees.$currency."&nbsp;of fees":'';?></span></span>
                                 <span class="iconsDate">
                                     <span class="icons">
                                         <span class="surface"><span class="dashicons dashicons-fullscreen-alt"></span><span><?=intval(AdSingle::$surface)." m²";?></span></span>

@@ -5,6 +5,10 @@
     flex-flow: row wrap;
 }
 
+.site-main a {
+    text-decoration: none;
+}
+
 .site-main #title {
     flex: 0 1 100%;
     text-align: center;
@@ -49,11 +53,11 @@
 
 .site-main #lastAds {
     width: 100%;
-    text-align: center;
 }
+
 .site-main h3 {
     text-align: center;
-    margin: 0 0 50px 0;
+    margin: 40px 0 50px 0;
 }
 
 .rowAd {
@@ -70,7 +74,6 @@
 
 .inShortAd .thumbnailAd {
     position: relative;
-    width: 40%;
 }
 
 .inShortAd .thumbnailAd .typeAd {
@@ -110,9 +113,9 @@
     margin-bottom: 5px;
 }
 
-.inShortAd .detailsAd .titleAd a {
+/*.inShortAd .detailsAd .titleAd a {
     text-decoration: none;
-}
+}*/
 
 .inShortAd .detailsAd .address {
     font-size: 16px;
@@ -169,14 +172,14 @@
     display: inline-block;
     width: 20px;
     height: 20px;
-    background: url("../../../images/bathIcon.svg") no-repeat bottom;
+    background: url("../../../../images/bathIcon.svg") no-repeat bottom;
 }
 
 .inShortAd .detailsAd .iconsDate .icons .nbBedrooms .bedIcon {
     display: inline-block;
     width: 22px;
     height: 20px;
-    background: url("../../../images/bedIcon.svg") no-repeat bottom;    
+    background: url("../../../../images/bedIcon.svg") no-repeat bottom;    
 }
 
 /* REPONSIVE */
@@ -186,6 +189,45 @@
         width: 100%;
         flex-direction: column;
         align-items: center;
+    }
+    
+    .site-main #title {
+        margin-bottom: 15px;
+    }
+    
+    .site-main #details {
+        margin: 0;
+    }
+    
+    .site-main #details #contact {
+        margin-bottom: 20px;
+    }
+    
+    .site-main #details #contact ul {
+        text-align: center;
+    }
+    
+    .site-main #details #contact ul span {
+        font-size: 12px;
+    }
+    
+    .site-main #details #contact ul #postalAddressLabel {
+        display: block;
+        margin-top: 5px;
+    }
+    
+    .site-main #details #contact ul .dashicons {
+        text-align: left;
+        vertical-align: -webkit-baseline-middle;
+    }
+    
+    .site-main #details #thumbnail {
+        display: none;
+    }
+    
+    .site-main #description {
+        font-size: 16px;
+        text-align: justify;
     }
     
     .inShortAd .thumbnailAd {

@@ -91,7 +91,7 @@ class AdSingle {
             $images = self::getMeta("adImages");
             self::$typeAd = get_the_terms($id, "adTypeAd")[0]->name;
             self::$typeAdSlug = get_the_terms($id, "adTypeAd")[0]->slug;
-            self::$typeProperty = get_the_terms($id, "adTypeProperty")[0]->slug;
+            self::$typeProperty = get_the_terms($id, "adTypeProperty")[0]->name;
             self::$afterPrice = self::getCurrency();
             if(self::$typeAdSlug === "rental") {
                 self::$afterPrice .= '/'.__("month", "retxtdom");
