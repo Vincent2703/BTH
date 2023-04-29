@@ -195,7 +195,7 @@ class Rep {
     }
     
     public function onPluginDeactivation() {
-        //Ajouter option pour supprimer options ou non quand on désactive le plugin
+        //TODO : Ajouter option pour supprimer options ou non quand on désactive le plugin
         flush_rewrite_rules(); //Update the permalinks structure
     }
 
@@ -208,24 +208,24 @@ class Rep {
             "language" => "en",
             "currency" => "$"
         );
-        update_option(PLUGIN_RE_NAME."OptionsLanguage", $defaultValuesLanguage); 
+        update_option(PLUGIN_RE_NAME."OptionsGeneral", $defaultValuesLanguage); 
         
         $defaultValuesImports = array(
             "maxSavesImports"       => 2,
             "maxDim"                => 1024,
             "qualityPictures"       => 85,
-            "templateUsedImport"    => "stdxml"
+            //"templateUsedImport"    => "stdxml"
         );
         update_option(PLUGIN_RE_NAME."OptionsImports", $defaultValuesImports); 
         
         $defaultValuesExports = array(
-            "templateUsedExport"    => "stdxml",
+            //"templateUsedExport"    => "stdxml",
             "maxSavesExports"       => 1
         );
         update_option(PLUGIN_RE_NAME."OptionsExports", $defaultValuesExports); 
         
         $defaultValuesEmail = array(
-            "emailError"    => wp_get_current_user()->user_email,
+            //"emailError"    => wp_get_current_user()->user_email,
             "emailAd"       => wp_get_current_user()->user_email
         );
         update_option(PLUGIN_RE_NAME."OptionsEmail", $defaultValuesEmail); 
@@ -388,6 +388,18 @@ class Rep {
                             "variablesImport" => array(
                                 "confirmation" => __("Are you sure that you want to import this file ?", "retxtdom"),
                                 "url" => wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".strtolower(PLUGIN_RE_NAME)."import"), "importAds", "nonceSecurity")
+                            )
+                        )
+                    )
+                ),
+                "re-ad_page_repoptions" => array(
+                    "options" => array(
+                        "path" => "/includes/js/others/options.js",
+                        "dependencies" => array("jquery"),
+                        "localize" => array(
+                            "variablesOptions" => array(
+                                "mainFeatures" => __("main features", "retxtdom"),
+                                "additionalFeatures" => __("Additional features", "retxtdom")
                             )
                         )
                     )

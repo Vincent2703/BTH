@@ -1,14 +1,14 @@
-/* FlexBox - adBasicsMetaBox*/
+/* FlexBox - adMainFeaturesMetaBox*/
 
-#adBasicsMetaBox .inside div, #adComplementariesMetaBox .inside div{
+#adMainFeaturesMetaBox .inside div, #adAdditionalFeaturesMetaBox .inside div{
     display: flex;
 }
 
-#adBasicsMetaBox .inside>div, #adComplementariesMetaBox .inside>div{
+#adMainFeaturesMetaBox .inside>div, #adAdditionalFeaturesMetaBox .inside>div{
     border-bottom: rgba(0, 0, 0, 0.1) dashed 1px;
 }
 
-#adBasicsMetaBox .inside label, #adComplementariesMetaBox .inside label {
+#adMainFeaturesMetaBox .inside label, #adAdditionalFeaturesMetaBox .inside label {
     font-weight: 500;
     cursor: default;
 }

@@ -5,39 +5,39 @@
  * 
  */
 class Ad {
-    
-        /*
-         * Register plugin styles for the singleAd template
-         */
-        private function registerPluginStylesSingleAd($CSSDirName) {
-            wp_register_style("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leaflet.min.css"), array(), "1.8.0");
-            wp_register_style("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leafletFullscreen.min.css"), array(), "2.3.0");
-            wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$CSSDirName/singles/singleAd.css"));
-            wp_register_style("googleIcons", "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0");
-            wp_enqueue_style("leaflet");
-            wp_enqueue_style("leafletFullscreen");
-            wp_enqueue_style("singleAd");
-            wp_enqueue_style("googleIcons");
-        }
 
-        /*
-         * Register plugin scripts for the singleAd template
-         */
-        private function registerPluginScriptsSingleAd() {
-            wp_register_script("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leaflet.min.js"), array(), "1.8.0", true);
-            wp_register_script("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leafletFullscreen.min.js"), array(), "2.3.0", true);
-            wp_register_script("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/singles/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
-            wp_enqueue_script("leaflet");
-            wp_enqueue_script("leafletFullscreen");
-            wp_enqueue_script("singleAd");
-            wp_enqueue_script("dpeges");
-        }
-    
-        /*
-         * Create the custom post Ad
-         */
-        public function createAd() {
-        register_post_type("re-ad", //Just ad doesn't work for some reason
+    /*
+     * Register plugin styles for the singleAd template
+     */
+    private function registerPluginStylesSingleAd($CSSDirName) {
+        wp_register_style("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leaflet.min.css"), array(), "1.9.3");
+        wp_register_style("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leafletFullscreen.min.css"), array(), "2.3.0");
+        wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$CSSDirName/singles/singleAd.css"));
+        wp_register_style("googleIcons", "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0");
+        wp_enqueue_style("leaflet");
+        wp_enqueue_style("leafletFullscreen");
+        wp_enqueue_style("singleAd");
+        wp_enqueue_style("googleIcons");
+    }
+
+    /*
+     * Register plugin scripts for the singleAd template
+     */
+    private function registerPluginScriptsSingleAd() {
+        wp_register_script("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leaflet.min.js"), array(), "1.9.3", true);
+        wp_register_script("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leafletFullscreen.min.js"), array(), "2.3.0", true);
+        wp_register_script("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/singles/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+        wp_enqueue_script("leaflet");
+        wp_enqueue_script("leafletFullscreen");
+        wp_enqueue_script("singleAd");
+        wp_enqueue_script("dpeges");
+    }
+
+    /*
+     * Create the custom post Ad
+     */
+    public function createAd() {
+        register_post_type("re-ad", //Just "ad" doesn't work for some reason
             array(
                 "labels" => array(
                     "name"                  => __("Ads", "retxtdom"),
@@ -66,59 +66,58 @@ class Ad {
                 "has_archive" => true
             )
         );
-        
 
-            register_taxonomy("adTypeProperty", array("re-ad"), array(
-                "hierarchical"      => false, 
-                "description"       => __("Create a property type to categorize your ads", "retxtdom"), 
-                "label"             => __("Property types", "retxtdom"), 
-                "show_admin_column" => true, 
-                "show_in_menu"      => false,
-                "singular_label"    => __("Property type", "retxtdom"), 
-                "rewrite"           => false,
-                "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
-            ));
+        //Taxonomy property's type
+        register_taxonomy("adTypeProperty", array("re-ad"), array(
+            "hierarchical"      => false, 
+            "description"       => __("Create a property type to categorize your ads", "retxtdom"), 
+            "label"             => __("Property types", "retxtdom"), 
+            "show_admin_column" => true, 
+            "show_in_menu"      => false,
+            "singular_label"    => __("Property type", "retxtdom"), 
+            "rewrite"           => false,
+            "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
+        ));
 
-            if(get_option("REPluginActivation") != 1) { //If option not exists
-                $termIds = wp_insert_term(__("House", "retxtdom"), "adTypeProperty", array("slug"=>"house"));
-                if(!is_wp_error($termIds)) {
-                    update_term_meta($termIds["term_id"], "habitable", true);
-                }
-
-                $termIds = wp_insert_term(__("Apartment", "retxtdom"), "adTypeProperty", array("slug"=>"apartment"));
-                if(!is_wp_error($termIds)) {
-                    update_term_meta($termIds["term_id"], "habitable", true);
-                }
-
-                $termIds = wp_insert_term(__("Shop", "retxtdom"), "adTypeProperty", array("slug"=>"shop"));
-                if(!is_wp_error($termIds)) {
-                    update_term_meta($termIds["term_id"], "habitable", false);
-                }
-
-                $termIds = wp_insert_term(__("Office", "retxtdom"), "adTypeProperty", array("slug"=>"office"));
-                if(!is_wp_error($termIds)) {
-                    update_term_meta($termIds["term_id"], "habitable", false);
-                }
-
-                $termIds = wp_insert_term(__("Parking/garage", "retxtdom"), "adTypeProperty", array("slug"=>"parking-garage"));
-                if(!is_wp_error($termIds)) {
-                    update_term_meta($termIds["term_id"], "habitable", false);
-                }
-
-                $termIds = wp_insert_term(__("Building", "retxtdom"), "adTypeProperty", array("slug"=>"building"));
-                if(!is_wp_error($termIds)) {
-                    update_term_meta($termIds["term_id"], "habitable", false);
-                }
-
-                $termIds = wp_insert_term(__("Land", "retxtdom"), "adTypeProperty", array("slug"=>"land"));
-                if(!is_wp_error($termIds)) {
-                    update_term_meta($termIds["term_id"], "habitable", false);
-                }
-                add_option("REPluginActivation", 1, false);
+        if(get_option("REPluginActivation") != 1) { //If plugin actived for the first time, register terms
+            $termIds = wp_insert_term(__("House", "retxtdom"), "adTypeProperty", array("slug"=>"house"));
+            if(!is_wp_error($termIds)) {
+                update_term_meta($termIds["term_id"], "habitable", true);
             }
-            
 
-        
+            $termIds = wp_insert_term(__("Apartment", "retxtdom"), "adTypeProperty", array("slug"=>"apartment"));
+            if(!is_wp_error($termIds)) {
+                update_term_meta($termIds["term_id"], "habitable", true);
+            }
+
+            $termIds = wp_insert_term(__("Shop", "retxtdom"), "adTypeProperty", array("slug"=>"shop"));
+            if(!is_wp_error($termIds)) {
+                update_term_meta($termIds["term_id"], "habitable", false);
+            }
+
+            $termIds = wp_insert_term(__("Office", "retxtdom"), "adTypeProperty", array("slug"=>"office"));
+            if(!is_wp_error($termIds)) {
+                update_term_meta($termIds["term_id"], "habitable", false);
+            }
+
+            $termIds = wp_insert_term(__("Parking/garage", "retxtdom"), "adTypeProperty", array("slug"=>"parking-garage"));
+            if(!is_wp_error($termIds)) {
+                update_term_meta($termIds["term_id"], "habitable", false);
+            }
+
+            $termIds = wp_insert_term(__("Building", "retxtdom"), "adTypeProperty", array("slug"=>"building"));
+            if(!is_wp_error($termIds)) {
+                update_term_meta($termIds["term_id"], "habitable", false);
+            }
+
+            $termIds = wp_insert_term(__("Land", "retxtdom"), "adTypeProperty", array("slug"=>"land"));
+            if(!is_wp_error($termIds)) {
+                update_term_meta($termIds["term_id"], "habitable", false);
+            }
+            add_option("REPluginActivation", 1, false);
+        }
+
+        //Taxonomy ad's type
         register_taxonomy("adTypeAd", array("re-ad"), array(
             "hierarchical"      => false, 
             "description"       => __("Create an ad type to categorize your ads", "retxtdom"), 
@@ -149,17 +148,7 @@ class Ad {
         wp_insert_term(__("Unavailable", "retxtdom"), "adAvailable", array("slug"=>"unavailable"));
         
     }
-    
-    /*public function showPage() {
-    ?>
-
-    <div class="wrap">
-        <h2>rep Accueil</h2>
-        <p>Bien le bonjour</p>
-        <?php settings_errors(); ?>
-    </div>
-    <?php }*/
-    
+   
   
     /*
      * Fetch the single or archive custom post Ad template

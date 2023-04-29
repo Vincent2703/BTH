@@ -1,9 +1,10 @@
+//Manage the custom fields section in the general tab
 jQuery(document).ready(function($) {    
-    if($("input[name='option_page']").val() === "repOptionsDisplayadsGroup") { //If we are in the displayads tab
+    if($("input[name='option_page']").val() === "REPOptionsGeneralGroup") { //If we are in the general setting tab
             
         /* Add a row */
         $(".fieldPlus").click(function() {
-            $("#customFields tr:last").after('<tr><td class="fieldName"><input type="text" placeholder="Ex : Orientation"></td><td class="section"><select><option id="mainFeatures">'+translations.mainFeatures+'</option><option id="complementaryFeatures">'+translations.complementaryFeatures+'</option></select></td><td><span class="dashicons-before dashicons-arrow-up-alt fieldUp" onclick="moveRow(this, \'up\');"></span><span class="dashicons-before dashicons-arrow-down-alt fieldDown" onclick="moveRow(this, \'down\');"></span></td><td><span onclick="deleteRow(this);" class="dashicons-before dashicons-trash fieldTrash"></span></td></tr>');
+            $("#customFields tr:last").after('<tr><td class="fieldName"><input type="text" placeholder="Ex : Orientation"></td><td class="section"><select><option id="mainFeatures">'+variablesOptions.mainFeatures+'</option><option id="additionalFeatures">'+variablesOptions.additionalFeatures+'</option></select></td><td><span class="dashicons-before dashicons-arrow-up-alt fieldUp" onclick="moveRow(this, \'up\');"></span><span class="dashicons-before dashicons-arrow-down-alt fieldDown" onclick="moveRow(this, \'down\');"></span></td><td><span onclick="deleteRow(this);" class="dashicons-before dashicons-trash fieldTrash"></span></td></tr>');
         });
         
 
@@ -37,7 +38,7 @@ function updateCustomFieldsData() {
     var field = {};
     jQuery("#customFields tbody tr").each(function() {
         var fieldNameValue = jQuery(jQuery(this).find(".fieldName input")).val();
-        var sectionValue = jQuery(jQuery(this).find(".section select option:selected")).attr("id"); 
+        var sectionValue = jQuery(jQuery(this).find(".section select option:selected")).prop("id"); 
         if(fieldNameValue.length > 0 ) {
         field = {
             name: fieldNameValue,

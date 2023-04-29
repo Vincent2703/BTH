@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * 
+ * Create or edit agent
+ * 
+ */
 class editAgent {
     public function addMetaBoxes() {
         add_meta_box( 
@@ -22,12 +27,12 @@ class editAgent {
     
     public function savePost($agentId, $agent) {
         if($agent->post_type == "agent") {
-            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE || (isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAgent"))) { //Don't save if it's an autosave or if the nonce is inexistant/incorrect) {
                 return;
             }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAgent")) {
                 require_once(PLUGIN_RE_PATH."models/admin/AgentAdmin.php");
-                remove_action("save_post_agent", array($this, "savePost"));
-                AgentAdmin::setData($agentId);
+                remove_action("save_post_agent", array($this, "savePost")); //Avoid infinite loop
+                AgentAdmin::setData($agentId); //Save in BDD
             }
         }       
     }

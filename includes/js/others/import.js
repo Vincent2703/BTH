@@ -1,6 +1,7 @@
+//Redirect to an url depending on the options checked - Import ads 
 jQuery(document).ready(function($) {   
     $(".importLink").click(function() {
-        var confirmation = confirm(variablesImport.confirmation);
+        const confirmation = confirm(variablesImport.confirmation);
         if(confirmation) {
             var url = encodeURI(variablesImport.url);
             var file = $(this).attr("data-file");

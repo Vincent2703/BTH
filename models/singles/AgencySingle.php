@@ -11,7 +11,7 @@ class AgencySingle {
     public static $address;
 
     public static function getCurrency() {
-        return get_option(PLUGIN_RE_NAME."OptionsLanguage")["currency"];
+        return get_option(PLUGIN_RE_NAME."OptionsGeneral")["currency"];
     }
     
     public static function getData($id) {

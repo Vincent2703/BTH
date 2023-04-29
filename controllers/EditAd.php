@@ -1,40 +1,52 @@
 <?php
+
+/*
+ * 
+ * Create or edit ad
+ * 
+ */
 class EditAd {
+    
+    /*
+     * Add meta boxes 
+     */
     public function addMetaBoxes() {
-        add_meta_box( 
-            "adBasicsMetaBox", //ID HTML
-            __("Basic information", "retxtdom"), //Display
-            array($this, "displayAdMainFeaturesMetaBox"), //Callback
+        add_meta_box( //Main features
+            "adMainFeaturesMetaBox", //ID HTML
+            __("Main features", "retxtdom"), //Display
+            array($this, "mainFeaturesMetaBox"), //Callback
             "re-ad", //Custom type
             "normal", //Location on the page
             "high" //Priority
         );
              
-        add_meta_box( 
-            "adComplementariesMetaBox", //ID HTML
-            __("Complementary information", "retxtdom"), //Display
-            array($this, "displayAdComplementaryFeaturesMetaBox"), //Callback
+        add_meta_box( //Complementary features
+            "adAdditionalFeaturesMetaBox", //ID HTML
+            __("Additional features", "retxtdom"), //Display
+            array($this, "additionalFeaturesMetaBox"), //Callback
             "re-ad", //Custom type
             "advanced", //Location on the page
             "high" //Priority
         );
     }
     
+    /* Save the post */
     public function savePost($adId, $ad) {
         if($ad->post_type == "re-ad") {
-            if((defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) || (isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formImportAds"))) {
+            if((defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) || (isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formImportAds"))) { //Don't save if it's an autosave or if the nonce is inexistant/incorrect
                 return;
             }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAd")) {
                 require_once(PLUGIN_RE_PATH."models/admin/AdAdmin.php");
-                AdAdmin::setData($adId, $ad);           
+                remove_action("save_post_re-ad", array($this, "savePost")); //Avoid infinite loop
+                AdAdmin::setData($adId, $ad); //Save in BDD
             }
         }
     }
     
-    public function displayAdMainFeaturesMetaBox($ad) {
+    public function mainFeaturesMetaBox($ad) {
         require_once(PLUGIN_RE_PATH."models/admin/AdAdmin.php");
-        AdAdmin::getMainFeatures($ad->ID);
-        wp_nonce_field("formEditAd", "nonceSecurity");
+        AdAdmin::getMainFeatures($ad->ID); //Get values
+        wp_nonce_field("formEditAd", "nonceSecurity"); //Add nonce
         ?>
         <div id="refAgency">
             <div class="text">
@@ -149,9 +161,9 @@ class EditAd {
             }
     }
       
-    public function displayAdComplementaryFeaturesMetaBox($ad) {
+    public function additionalFeaturesMetaBox($ad) {
         require_once(PLUGIN_RE_PATH."models/admin/AdAdmin.php");
-        AdAdmin::getComplementaryFeatures($ad->ID);
+        AdAdmin::getComplementaryFeatures($ad->ID); //Get values
         ?>
         <div id="floors">
             <div class="text">

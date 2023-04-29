@@ -1,63 +1,74 @@
 jQuery(function($) {
     $(document).ready(function(){
-            $("#title").attr("maxLength", 64); //Pour limiter le titre à 64 caractères
-            $("#insertAdPictures").click(open_media_window);
+            $("#title").attr("maxLength", 64); //Limit ad's title to 64 characteres
+            $("#insertAdPictures").click(mediaManager); //Open the WP media manager
         });
 
-    function open_media_window() {
-        if (this.window === undefined) {
+    //Media manager - Add Id pictures to an hidden input
+    function mediaManager() {
+        if(this.window === undefined) {
+            const inputImages = $("#images");
+            const showPictures = $("#showPictures");
+
             this.window = wp.media({
-                    title: "Choisissez les images à afficher",
-                    library: {type: "image"},
-                    multiple: true
-                });
+                title: "Choisissez les images à afficher",
+                library: {type: "image"},
+                multiple: true
+            });
 
-            var self = this; 
-            inputImages = $("#images");
-            this.window.on("select", function() {
-                let showPictures = $("#showPictures");
-                inputImages.val(null);
-                showPictures.html(null);
-                let attachments = self.window.state().get("selection").toJSON();
-                attachments.forEach(elem => {
-                    inputImages.val(inputImages.val()+elem.id+';');
-                    showPictures.html(showPictures.html()+
-                    '<div class="aPicture" data-imgId='+elem.id+'>'+
-                        '<img src="'+elem.sizes.thumbnail.url+'" class="imgAd">'+
-                        '<div class="controlPicture">'+
-                            '<span class="moveToLeft" onclick="movePicture(this, \'left\');">←</span>'+
-                            '<span class="deletePicture" onclick="deletePicture(this);">'+translations.delete+'</span>'+
-                            '<span class="moveToRight" onclick="movePicture(this, \'right\');">→</span></div>'+
-                        '</div>'+
-                    '</div>');
+            this.window.on("select", () => {
+                const attachments = this.window.state().get("selection").toJSON();
 
-                });
-                inputImages.val(inputImages.val().slice(0, -1));
+                const picturesHtml = attachments
+                    .map((attachment) => {
+                    inputImages.val((i, val) => '${val}${attachment.id};');
+
+                    return `
+                        <div class="aPicture" data-imgId="${attachment.id}">
+                            <img src="${attachment.sizes.thumbnail.url}" class="imgAd">
+                            <div class="controlPicture">
+                                <span class="moveToLeft" onclick="movePicture(this, 'left');">←</span>
+                                <span class="deletePicture" onclick="deletePicture(this);">${translations.delete}</span>
+                                <span class="moveToRight" onclick="movePicture(this, 'right');">→</span>
+                            </div>
+                        </div>`;
+                    })
+                    .join("");
+
+                showPictures.html(picturesHtml);
+                inputImages.val((i, val) => val.slice(0, -1));
                 $("#insertAdPictures").text(translations.replace);
             });
         }
 
-    this.window.open();
-    return false;
+        this.window.open();
+        return false;
     }
 });
 
 
+//Delete a picture from the list
 function deletePicture(elem) {
-    var pictureElem = jQuery(elem).parents()[1];
-    var pictureId = jQuery(pictureElem).attr("data-imgId");
-    var picturesElem = jQuery("#images");
-    var picturesArray = jQuery(picturesElem).val().split(';');
-    picturesArray.splice(picturesArray.findIndex(item=>item.toString()===pictureId), 1);
+    const pictureElem = elem.closest('.aPicture');
+    const pictureId = pictureElem.dataset.imgid;
+    const picturesElem = jQuery('#images');
+    const picturesArray = picturesElem.val().split(';');
+    const pictureIndex = picturesArray.indexOf(pictureId);
+
+    if(pictureIndex > -1) {
+        picturesArray.splice(pictureIndex, 1);
+    }
     pictureElem.remove();
     picturesElem.val(picturesArray.join(';'));
 }
 
+//Move a picture in the list
 function movePicture(elem, dir) {
-    var pictureElem = jQuery(elem).parents()[1];
-    var pictureId = jQuery(pictureElem).attr("data-imgId");
-    var picturesElem = jQuery("#images");
-    var picturesArray = jQuery(picturesElem).val().split(';');
+    const pictureElem = jQuery(elem).parents()[1];
+    const pictureId = pictureElem.dataset.imgId;
+    const picturesElem = jQuery("#images");
+    const picturesArray = picturesElem.val().split(';');
+    
     if(dir==="left") {
         var previous = jQuery(pictureElem).prev();
         if(previous.length >= 1) {

@@ -1,10 +1,15 @@
 <?php
 
-class editAgency {
+/*
+ * 
+ * Create or edit agency
+ * 
+ */
+class EditAgency {
     public function addMetaBox() {
         add_meta_box( 
             "agencyMetaBox", //ID HTML
-            "Coordonnées de l'agence", //Display
+            __("Agency's coordinates", "retxtdom"), //Display
             array($this, "displayAgencyMetaBox"), //Callback
             "agency", //Custom type
             "normal", //Location on the page
@@ -14,18 +19,19 @@ class editAgency {
     
     public function savePost($agencyId, $agency) {
         if($agency->post_type == "agency") {
-            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE || (isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAgency"))) { //Don't save if it's an autosave or if the nonce is inexistant/incorrect) {
                 return;
             }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAgency")) {
                 require_once(PLUGIN_RE_PATH."models/admin/AgencyAdmin.php");
-                AgencyAdmin::setData($agencyId);         
+                remove_action("save_post_agency", array($this, "savePost")); //Avoid infinite loop
+                AgencyAdmin::setData($agencyId); //Save in BDD
             }
         }    
     }
         
     public function displayAgencyMetaBox($agency) {
         require_once(PLUGIN_RE_PATH."models/admin/AgencyAdmin.php");
-        AgencyAdmin::getData($agency->ID);
+        AgencyAdmin::getData($agency->ID); //Get values
         wp_nonce_field("formEditAgency", "nonceSecurity");
         ?>
             <div id="agencyDetails">
