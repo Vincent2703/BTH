@@ -60,7 +60,7 @@ class AdAdmin {
         
         //Custom fields
         $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
-        if($optionsGeneral !== false) {
+        if($optionsGeneral !== false && isset($optionsGeneral["customFields"])) {
             $customFields = $optionsGeneral["customFields"];
             self::$customFieldsMF = array();
             if(!empty($customFields) || $customFields !== "[]") {
@@ -90,7 +90,7 @@ class AdAdmin {
         self::$GES = intval(self::getMeta("adGES"));
         
         $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
-        if($optionsGeneral !== false) {
+        if($optionsGeneral !== false && isset($optionsGeneral["customFields"])) {
             $customFields = $optionsGeneral["customFields"];
             self::$customFieldsCF = array();
             if(!empty($customFields) || $customFields !== "[]") {

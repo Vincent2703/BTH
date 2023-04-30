@@ -34,8 +34,8 @@ class Options {
      */
     public function tabsOption() { 
         $base = get_current_screen()->base;
-        if($base === "edit-tags" || $base === "re-ad_page_repoptions") { //Either editing the tags or the custom options
-            if($base === "re-ad_page_repoptions") { //Custom options
+        if($base === "edit-tags" || $base === "re-ad_page_".PLUGIN_RE_NAME."options") { //Either editing the tags or the custom options
+            if($base === "re-ad_page_".PLUGIN_RE_NAME."options") { //Custom options
                 if(isset($_GET["tab"])) { //If in a tab
                     $tab = $_GET["tab"]; //We set it
                 }else{
@@ -43,18 +43,19 @@ class Options {
                 }
             }else{ //Edit-tags
                 $tab = "general"; //Set the default tab (it will appear as selected)
-            }?>
+            }
+            $pageOptions = PLUGIN_RE_NAME."options"; ?>
             <h2><?= PLUGIN_RE_NAME; ?></h2>
             <p>Interface de configuration - <?= PLUGIN_RE_NAME; ?></p>
             <h2 class="nav-tab-wrapper">
-                <a href="edit.php?post_type=re-ad&page=repoptions&tab=general" class="nav-tab <?= $tab === "general" ? "nav-tab-active" : ''; ?>"><?php _e("General", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=repoptions&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>"><?php _e("Imports", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=repoptions&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>"><?php _e("Exports", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=repoptions&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>"><?php _e("Email", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=repoptions&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>"><?php _e("Fees schedule", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=repoptions&tab=apis" class="nav-tab <?= $tab === "apis" ? "nav-tab-active" : ''; ?>">APIs</a>    
-                <?php if($this->optionsImports["templateUsedImport"] == "seloger" || $this->optionsExports["templateUsedExport"] == "seloger") { ?>
-                    <a href="edit.php?post_type=re-ad&page=repoptions&tab=seloger" class="nav-tab <?= $tab === "seloger" ? "nav-tab-active" : ''; ?>"><?php _e("Template", "retxtdom"); ?> SeLoger</a>  
+                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=general" class="nav-tab <?= $tab === "general" ? "nav-tab-active" : ''; ?>"><?php _e("General", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>"><?php _e("Imports", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>"><?php _e("Exports", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>"><?php _e("Email", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>"><?php _e("Fees schedule", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=apis" class="nav-tab <?= $tab === "apis" ? "nav-tab-active" : ''; ?>">APIs</a>    
+                <?php if(isset($this->optionsImports["templateUsedImport"]) && $this->optionsImports["templateUsedImport"] == "seloger" || isset($this->optionsImports["templateUsedExport"]) && $this->optionsExports["templateUsedExport"] == "seloger") { ?>
+                    <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=seloger" class="nav-tab <?= $tab === "seloger" ? "nav-tab-active" : ''; ?>"><?php _e("Template", "retxtdom"); ?> SeLoger</a>  
                 <?php } ?>
             </h2>
         <?php   

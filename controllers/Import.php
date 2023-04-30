@@ -39,7 +39,7 @@ class Import {
                     <label for="replaceAds"><?php _e("Replace the ads with the same reference", "retxtdom"); ?></label>          
                 </p>      
             </form>
-            <?php if($postType==="re-ad" && $base="repimport") { ?>
+            <?php if($postType==="re-ad" && $base=PLUGIN_RE_NAME."import") { ?>
             <table>
                 <thead>
                     <tr>

@@ -39,7 +39,7 @@ class Export {
                     <label for="onlyAvailable"><?php _e("Export only available properties", "retxtdom"); ?></label>               
                 </p>
             </form>
-            <?php if($postType==="re-ad" && $base="repexport") { //If we are on the page, not the widget ?>
+            <?php if($postType==="re-ad" && $base=PLUGIN_RE_NAME."export") { //If we are on the page, not the widget ?>
             <table>
                 <thead>
                     <tr>
