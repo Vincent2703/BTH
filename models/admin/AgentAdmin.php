@@ -1,5 +1,9 @@
 <?php
-
+/*
+ * 
+ * Get and set agent meta values for the admin front-end
+ * 
+ */
 class AgentAdmin {
     private static $metas;
     

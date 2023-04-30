@@ -1,5 +1,9 @@
 <?php
-
+/*
+ * 
+ * Get and set ad meta values for the admin front-end
+ * 
+ */
 class AdAdmin {
     private static $metas;
     
@@ -33,7 +37,7 @@ class AdAdmin {
     public static $DPE;
     public static $GES;
     
-    
+       
     public static function getMainFeatures($id) {
         self::$metas = get_post_custom($id);
         
@@ -54,9 +58,10 @@ class AdAdmin {
         self::$idAgent = sanitize_text_field(self::getMeta("adIdAgent"));
         self::$showAgent = sanitize_text_field(self::getMeta("adShowAgent"));
         
-        $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
-        if($optionsDisplayads !== false) {
-            $customFields = $optionsDisplayads["customFields"];
+        //Custom fields
+        $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
+        if($optionsGeneral !== false) {
+            $customFields = $optionsGeneral["customFields"];
             self::$customFieldsMF = array();
             if(!empty($customFields) || $customFields !== "[]") {
                 foreach(json_decode($customFields, true) as $field) {
@@ -68,7 +73,7 @@ class AdAdmin {
         }
     }
     
-    public static function getComplementaryFeatures($id) {
+    public static function getAdditionalFeatures($id) {
         self::$metas = get_post_custom($id);
         
         self::$floor = intval(self::getMeta("adFloor"));
@@ -84,9 +89,9 @@ class AdAdmin {
         self::$DPE = intval(self::getMeta("adDPE"));
         self::$GES = intval(self::getMeta("adGES"));
         
-        $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
-        if($optionsDisplayads !== false) {
-            $customFields = $optionsDisplayads["customFields"];
+        $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
+        if($optionsGeneral !== false) {
+            $customFields = $optionsGeneral["customFields"];
             self::$customFieldsCF = array();
             if(!empty($customFields) || $customFields !== "[]") {
                 foreach(json_decode($customFields, true) as $field) {
@@ -98,6 +103,7 @@ class AdAdmin {
         }
     }
     
+    //Save data in BDD
     public static function setData($adId, $ad) {
         $ad->post_title = substr(sanitize_text_field($ad->postTitle), 0, 64);
 
@@ -249,11 +255,12 @@ class AdAdmin {
             update_post_meta($adId, "adGES", intval($_POST["GES"]));
         }
 
-        $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
-        if($optionsDisplayads !== false) {
-        $customFields = $optionsDisplayads["customFields"];
+        //Custom fields
+        $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
+        if($optionsGeneral !== false) {
+        $customFields = $optionsGeneral["customFields"];
             if(!empty($customFields) || $customFields !== "[]") {
-                foreach(json_decode($optionsDisplayads, true) as $field) {
+                foreach(json_decode($optionsGeneral, true) as $field) {
                     if(isset($_POST["CF".$field["name"]]) && !ctype_space($_POST["CF".$field["name"]])) {
                         update_post_meta($adId, "adCF".$field["name"], sanitize_text_field($_POST["CF".$field["name"]]));
                     }

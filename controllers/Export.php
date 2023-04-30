@@ -2,30 +2,28 @@
 
 class Export {    
     
-    private static $dirPath;
-    private static $errors;
-    private static $files;
+    private static $dirPath; //Path where to save the export files
+    private static $errors; //Stock errors messages (not functional)
+    private static $files; //List the files in the $dirPath
     
-    public function __construct() {
+    public function __construct() { //Init these variables
         SELF::$dirPath = PLUGIN_RE_PATH."exports/";
         SELF::$errors = array();
-        SELF::$files = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
-        usort(SELF::$files, function($a, $b) {    
-            return filemtime(PLUGIN_RE_PATH."exports/$b") - filemtime(PLUGIN_RE_PATH."exports/$a");
-        });
+        SELF::$files = SELF::getListFiles();
     }
     
-    public function showPage() { ?>
+    public function showPage() { //Page content ?>
         <div class="wrap">
             <h2><?php _e("Exports the ads", "retxtdom"); ?></h2>
             <?php 
-                if(isset($_POST["submitExport"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formExportAds")) {
+                if(isset($_POST["submitExport"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formExportAds")) { //Export
                     SELF::startExport();
                     SELF::checkQuotaExports();
                     _e("Export completed successfully", "retxtdom");
-                }else if(isset($_GET["exportToDelete"]) && preg_match("/.+\.xml$/", $_GET["exportToDelete"]) && isset($_GET["nonceSecurity"]) && wp_verify_nonce($_GET["nonceSecurity"], "deleteExport")) {
+                }else if(isset($_GET["exportToDelete"]) && preg_match("/.+\.xml$/", $_GET["exportToDelete"]) && isset($_GET["nonceSecurity"]) && wp_verify_nonce($_GET["nonceSecurity"], "deleteExport")) { //Delete one export
                     if(@unlink(SELF::$dirPath.$_GET["exportToDelete"])) {
                         _e("File deleted with success", "retxtdom");
+                        SELF::$files = SELF::getListFiles();
                     }else{
                         _e("File was not deleted due to an error", "retxtdom");
                     }
@@ -41,7 +39,7 @@ class Export {
                     <label for="onlyAvailable"><?php _e("Export only available properties", "retxtdom"); ?></label>               
                 </p>
             </form>
-            <?php if($postType==="re-ad" && $base="repexport") { ?>
+            <?php if($postType==="re-ad" && $base="repexport") { //If we are on the page, not the widget ?>
             <table>
                 <thead>
                     <tr>
@@ -56,8 +54,8 @@ class Export {
                     <tr>
                         <td><?= date("Y-m-d h:i:s", filemtime(SELF::$dirPath.$file)); ?></td>
                         <td><?= round(filesize(SELF::$dirPath.''.$file)/1024, 2); ?>&nbsp;kb</td>
-                        <td><a href="<?= SELF::$dirPath.$file;?>" download><?php _e("Download", "retxtdom"); ?></a></td>
-                        <td><a href="<?= wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".strtolower(PLUGIN_RE_NAME)."export&exportToDelete=$file"), "deleteExport", "nonceSecurity");?>"><?php _e("Delete", "retxtdom"); ?></a></td>
+                        <td><a href="<?= plugin_dir_url(__DIR__)."exports/$file";?>" download><?php _e("Download", "retxtdom"); ?></a></td>
+                        <td><a href="<?= wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".PLUGIN_RE_NAME."export&exportToDelete=$file"), "deleteExport", "nonceSecurity");?>"><?php _e("Delete", "retxtdom"); ?></a></td>
                     </tr>
                     <?php } ?>
                 </tbody>
@@ -67,11 +65,11 @@ class Export {
         <?php
     }
     
-    public function widgetExport() {
+    public function widgetExport() { //Widget to show on the WP dashboard
         wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetExport", "Exporter les annonces", array($this, "showPage"));
     }
 
-    private static function getArrayAds() {
+    private static function getArrayAds() { //From the ads, get an array
         $optionsFees = get_option(PLUGIN_RE_NAME."OptionsFees");
         if(isset($optionsFees["feesUrl"])) {
             $feesUrl = $optionsFees["feesUrl"];
@@ -84,7 +82,7 @@ class Export {
             "post_type" => "re-ad",
             "post_status" => "publish"
         );
-        if(isset($_POST["onlyAvailable"])) { //Si on veut seulement les annonces qui sont dispos à la location/vente
+        if(isset($_POST["onlyAvailable"])) {
             $args["tax_query"] = array(
                 array(
                     "taxonomy" => "adAvailable",
@@ -101,12 +99,13 @@ class Export {
         if(!empty($ads)) {
             foreach($ads as $ad) {
                 $adID = $ad->ID;
-                $metas = array_map(function($n) {return $n[0];}, get_post_meta($adID));         
+                $metas = array_map(function($n) {return $n[0];}, get_post_meta($adID)); //Get all post's metas
+                //Don't need these metas
                 unset($metas["_thumbnail_id"]);
                 unset($metas["_edit_lock"]);
                 unset($metas["_edit_last"]);              
 
-                //Récupérer infos agent
+                //Get agent's data
                 $agentID = get_post($metas["adIdAgent"])->ID;
                 $agentData = array(
                     "name"          =>  html_entity_decode(get_the_title($agentID, ENT_COMPAT, "UTF-8")),
@@ -115,6 +114,7 @@ class Export {
                     "email"         =>  get_post_meta($agentID, "agentEmail", true)
                 );
                 
+                //Get agency's data
                 $agencyID = wp_get_post_parent_id($agentID);
                 $agencyData = array(
                     "name"      =>  html_entity_decode(get_the_title($agencyID, ENT_COMPAT, "UTF-8")),
@@ -123,7 +123,7 @@ class Export {
                     "feesUrl"   =>  sanitize_url($optionsFees["feesUrl"])
                 );
                 
-
+                //Get the other post's data
                 $adData = array(
                     "title"         =>  html_entity_decode(get_the_title($adID, ENT_COMPAT, "UTF-8")),
                     "typeAd"        =>  get_the_terms($adID, "adTypeAd")[0]->name,
@@ -136,35 +136,38 @@ class Export {
                 
                 foreach($metas as $metaKey=>$metaValue) {
                     if(!in_array($metaKey, $uselessKeys)) {
-                        $metaKey = lcfirst(str_replace("ad", '', $metaKey));
-                        $adData[$metaKey] = $metaValue;
+                        $metaKey = lcfirst(str_replace("ad", '', $metaKey)); //Remove the "ad" part of the meta keys
+                        $adData[$metaKey] = sanitize_text_field($metaValue);
                     }
-                }
+                }               
                 
-                $picturesIds = $metas["adImages"]; //On récupère les images
+                if(isset($metas["adImages"])) {
+                    $picturesIds = $metas["adImages"]; //Post's pictures
+                }
                 $pictures = array();
                 if(!is_null($picturesIds)) {
-                    $ids = explode(';', $picturesIds); //Les IDs sont séparés par un ;
+                    $ids = intval(explode(';', $picturesIds)); //IDs are separated by ;
                     foreach ($ids as $id) {
-                        $pictures["img$id"] = wp_get_attachment_image_url($id, "large"); //Pour chaque image on récupère leur URL
+                        $pictures["img$id"] = wp_get_attachment_image_url($id, "large"); //Get the corresponding URL
                     }
                 }
                 $adData["pictures"] = $pictures;
                 
+                //Merge the post's data (with agent and agency data) in one array
                 $allData = array(           
                     "adData"        => $adData,
                     "agentData"     => $agentData,
                     "agencyData"    => $agencyData,
                 );             
 
-                $arrayAds["ad$adID"] = $allData;
+                $arrayAds["ad$adID"] = $allData; //Add to the final array containing all posts
             }
         }
         return $arrayAds;
         
     }
     
-    private static function generateXML($data, &$xml) {             
+    private static function generateXML($data, &$xml) { //Convert the PHP array to a XML file     
         foreach($data as $key => $value ) {
             if(is_array($value)) {
                 if(is_numeric($key)){
@@ -248,7 +251,7 @@ class Export {
         }
     }*/
     
-    private static function startExport() {
+    private static function startExport() { //Main function for exporting
         $dirExport = PLUGIN_RE_PATH."exports";
         
         if(!is_dir($dirExport)) {
@@ -258,7 +261,7 @@ class Export {
         $ads = SELF::getArrayAds();
 
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><ads></ads>');
-        $XMLContent = "\xEF\xBB\xBF".SELF::generateXML($ads, $xml).PHP_EOL;
+        $XMLContent = "\xEF\xBB\xBF".SELF::generateXML($ads, $xml).PHP_EOL; //Need the first part for UTF8
         
         $path = $dirExport.'/'. uniqid(__("ads_".get_bloginfo("name").'_'.date("Y-m-d_H-i-s").'_', "retxtdom")).".xml";
         $XMLFile = fopen($path, "w+");
@@ -274,7 +277,7 @@ class Export {
         SELF::createZIP();*/ 
     }
     
-    private static function checkQuotaExports() {
+    private static function checkQuotaExports() { //If nbExports > maxNbExports : remove the old ones
         $optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
         $maxSavesExports = intval($optionsExports["maxSavesExports"]);
         $filesToDelete = array_slice(SELF::$files, $maxSavesExports-1);
@@ -290,7 +293,15 @@ class Export {
     }
     
     private static function deleteExport($filePath) {
-        unlink(SELF::$dirPath.$filePath); //Add check
+        unlink(SELF::$dirPath.$filePath); //TODO : Add check
+    }
+    
+    private static function getListFiles() {
+        $list = array_diff(scandir(PLUGIN_RE_PATH."exports"), array('.', ".."));
+        usort($list, function($a, $b) {    
+            return filemtime(PLUGIN_RE_PATH."exports/$b") - filemtime(PLUGIN_RE_PATH."exports/$a");
+        });
+        return $list;
     }
     
     /*private static function logError($error) {

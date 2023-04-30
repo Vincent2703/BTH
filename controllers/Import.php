@@ -1,6 +1,4 @@
 <?php
-//require_once(ABSPATH . "wp-includes/pluggable.php"); //Sinon erreur cannot modify header. A vérifier si toujours utile
-//require_once(ABSPATH . "wp-admin/includes/image.php"); //Pour importer des images
 
 class Import {
     private static $importOptions; //RAJOUTER TABLEAU EXPORTS A IMPORTER
@@ -164,7 +162,10 @@ class Import {
                 update_post_meta($adWPId, $keyMeta, sanitize_text_field($adData[$keyXML]));
             }
             
+            //GPS
             update_post_meta($adWPId, "adDataMap", array("lat" => $adData["latitude"], "long" => $adData["longitude"], "zoom" => 16, "circ" => 1));
+            update_post_meta($adWPId, "adLatitude", $adData["latitude"]);
+            update_post_meta($adWPId, "adLongitude", $adData["longitude"]);
             
             /* PICTURES */
             if(!empty($adData["thumbnail"])) {

@@ -163,7 +163,7 @@ class EditAd {
       
     public function additionalFeaturesMetaBox($ad) {
         require_once(PLUGIN_RE_PATH."models/admin/AdAdmin.php");
-        AdAdmin::getComplementaryFeatures($ad->ID); //Get values
+        AdAdmin::getAdditionalFeatures($ad->ID); //Get values
         ?>
         <div id="floors">
             <div class="text">

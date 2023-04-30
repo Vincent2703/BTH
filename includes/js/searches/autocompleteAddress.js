@@ -1,21 +1,12 @@
 (function($) {
     $(document).ready(function() {
 
-        var input = $("#addressInput");
+        const input = $("#addressInput");
 
-        if(input.attr("name") === "address") {
-            var context = "searchAddress";
-            var minLength = 5;
-        } else if(input.attr("name") === "city") {
-            var context = "searchBar";
-            var minLength = 3;
-        }
-        if(typeof(variablesAddress) !== "undefined") {
-            var url = variablesAddress.getAddressDataURL;
-        }else{
-            var url = variablesSearchBar.getAddressDataURL;
-        }
-
+        const context = input.attr("name") === "address" ? "searchAddress" : "searchBar";
+        const minLength = input.attr("name") === "address" ? 5 : 3;
+        const url = typeof(variablesAddress) !== "undefined" ? variablesAddress.getAddressDataURL : variablesSearchBar.getAddressDataURL
+        
         input.autocomplete({
             source: function(request, response) {
                 $.ajax({
@@ -54,7 +45,7 @@
             },
             minLength: minLength,
             mustMatch: false,
-            delay: 500
+            delay: 1000
         });
 
     });

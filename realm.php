@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: REP
+Plugin Name: REALM
 Description: Manage your real estate ads on WordPress
 Version: Dev
 Author: Vincent Bourdon
@@ -8,14 +8,14 @@ License:  GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
-require_once("rep.php"); //Install plugin from interface
+require_once("realm.php"); //Install plugin from interface
 
 /*
  * 
  * Main plugin's class
  * 
  */
-class Rep {
+class Realm {
     
     /*
      * When the class is instantiate
@@ -38,7 +38,7 @@ class Rep {
      * Initialize the constants
      */
     private function defineGlobalConsts() {
-        define("PLUGIN_RE_NAME", "REP");
+        define("PLUGIN_RE_NAME", "realm");
         define("PLUGIN_RE_VERSION", "dev");
         define("PLUGIN_RE_PATH", WP_PLUGIN_DIR.'/'.PLUGIN_RE_NAME.'/');
     }
@@ -281,7 +281,7 @@ class Rep {
             "Importez les annonces", //Page title
             "Importez les annonces", //Menu title
             "manage_options", //Capability
-            "repimport", //Menu slug
+            PLUGIN_RE_NAME."import", //Menu slug
             array($this->Import, "showPage"), //Callback
             2 //Position
         );
@@ -290,7 +290,7 @@ class Rep {
             "Exportez les annonces", //Page title
             "Exportez les annonces", //Menu title
             "manage_options", //Capability
-            "repexport", //Menu slug
+            PLUGIN_RE_NAME."export", //Menu slug
             array($this->Export, "showPage"), //Callback
             3 //Position
         );
@@ -299,7 +299,7 @@ class Rep {
             "Options", //Page title
             "Options", //Menu title
             "manage_options", //Capability
-            "repoptions", //Menu slug
+            PLUGIN_RE_NAME."options", //Menu slug
             array($this->Options, "showPage"), //Callback
             4 //Position
         );
@@ -319,13 +319,13 @@ class Rep {
                     "editAd" => "/includes/css/edits/editAd.css",
                     "autocompleteAddress" => "/includes/css/others/autocompleteAddress.css"
                 ),
-                "re-ad_page_repoptions" => array(
+                "re-ad_page_".PLUGIN_RE_NAME."options" => array(
                     "options" => "/includes/css/others/options.css"
                 ),
                 "edit-tags" => array(
                     "editTagsAd" => "/includes/css/edits/editTagsAd.css"
                 ),
-                "re-ad_page_repimport" => array(
+                "re-ad_page_".PLUGIN_RE_NAME."import" => array(
                     "import" => "/includes/css/others/import.css"
                 )
             ),
@@ -380,19 +380,19 @@ class Rep {
                         )
                     )
                 ),
-                "re-ad_page_repimport" => array(
+                "re-ad_page_".PLUGIN_RE_NAME."import" => array(
                     "import" => array(
                         "path" => "/includes/js/others/import.js",
                         "dependencies" => array("jquery"),
                         "localize" => array(
                             "variablesImport" => array(
                                 "confirmation" => __("Are you sure that you want to import this file ?", "retxtdom"),
-                                "url" => wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".strtolower(PLUGIN_RE_NAME)."import"), "importAds", "nonceSecurity")
+                                "url" => wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".PLUGIN_RE_NAME."import"), "importAds", "nonceSecurity")
                             )
                         )
                     )
                 ),
-                "re-ad_page_repoptions" => array(
+                "re-ad_page_".PLUGIN_RE_NAME."options" => array(
                     "options" => array(
                         "path" => "/includes/js/others/options.js",
                         "dependencies" => array("jquery"),
@@ -604,7 +604,7 @@ class Rep {
      */
     public function addActionsPluginRow($links) {
        $links = array_merge($links, array(
-            '<a href="'.esc_url(admin_url("/edit.php?post_type=re-ad&page=".strtolower(PLUGIN_RE_NAME)."options")).'">'.__("Options", "retxtdom")."</a>"
+            '<a href="'.esc_url(admin_url("/edit.php?post_type=re-ad&page=".PLUGIN_RE_NAME."options")).'">'.__("Options", "retxtdom")."</a>"
         ));
 	return $links;
     }
@@ -666,4 +666,4 @@ class Rep {
     }
     
 }
-new Rep;
+new Realm;

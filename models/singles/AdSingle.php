@@ -47,7 +47,7 @@ class AdSingle {
     public static $nameContact;
     public static $morePosts;
     public static $customMainFields;
-    public static $customComplementaryFields;
+    public static $customAdditionalFields;
     
      
     public static function getCurrency() {
@@ -174,16 +174,16 @@ class AdSingle {
             ));
             
             self::$customMainFields = array();
-            self::$customComplementaryFields = array();
-            $optionsDisplayads = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
-            if($optionsDisplayads !== false ) {
-                $customFields = $optionsDisplayads["customFields"];
+            self::$customAdditionalFields = array();
+            $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
+            if($optionsGeneral !== false ) {
+                $customFields = $optionsGeneral["customFields"];
                 if(!empty($customFields) || $customFields !== "[]") {
                    foreach(json_decode($customFields, true) as $field) {
                        if($field["section"] === "mainFeatures") {
                            array_push(self::$customMainFields, $field["name"]);
                        }else if($field["section"] === "complementaryFeatures") {
-                           array_push(self::$customComplementaryFields, $field["name"]);
+                           array_push(self::$customAdditionalFields, $field["name"]);
                        }
                    }
                 }
