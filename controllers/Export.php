@@ -120,7 +120,7 @@ class Export {
                     "name"      =>  html_entity_decode(get_the_title($agencyID, ENT_COMPAT, "UTF-8")),
                     "phone"     =>  get_post_meta($agencyID, "agencyPhone", true),
                     "email"     =>  get_post_meta($agencyID, "agencyEmail", true),
-                    "feesUrl"   =>  sanitize_url($optionsFees["feesUrl"])
+                    "feesUrl"   =>  sanitize_url($optionsFees["feesUrl"]??'')
                 );
                 
                 //Get the other post's data
@@ -141,13 +141,11 @@ class Export {
                     }
                 }               
                 
-                if(isset($metas["adImages"])) {
-                    $picturesIds = $metas["adImages"]; //Post's pictures
-                }
+                $picturesIds = $metas["adImages"] ?? '';
                 $pictures = array();
                 if(!is_null($picturesIds)) {
-                    $ids = intval(explode(';', $picturesIds)); //IDs are separated by ;
-                    foreach ($ids as $id) {
+                    $ids = array_map("intval", explode(';', $picturesIds)); //IDs are separated by ;
+                    foreach($ids as $id) {
                         $pictures["img$id"] = wp_get_attachment_image_url($id, "large"); //Get the corresponding URL
                     }
                 }
@@ -263,7 +261,7 @@ class Export {
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><ads></ads>');
         $XMLContent = "\xEF\xBB\xBF".SELF::generateXML($ads, $xml).PHP_EOL; //Need the first part for UTF8
         
-        $path = $dirExport.'/'. uniqid(__("ads_".get_bloginfo("name").'_'.date("Y-m-d_H-i-s").'_', "retxtdom")).".xml";
+        $path = $dirExport.'/'. uniqid(__("ads", "retxtdom").'_'.get_bloginfo("name").'_'.date("Y-m-d_H-i-s").'_').".xml";
         $XMLFile = fopen($path, "w+");
         
         fwrite($XMLFile, $XMLContent);

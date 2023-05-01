@@ -80,7 +80,7 @@
                         <?php the_content(); ?>
                     </div>
                     <div class="mainFeatures">
-                        <h4><?php _e("Main characteristics", "retxtdom"); ?></h4>
+                        <h4><?php _e("Main features", "retxtdom"); ?></h4>
                         <div class="listFeatures">
                             <div>
                                 <span class="nameFeature"><?php _e("Reference", "retxtdom"); ?></span>
@@ -149,7 +149,7 @@
                         </div>
                     </div>
                     <div class="complementaryFeatures">
-                        <h4><?php _e("Complementary characteristics", "retxtdom"); ?></h4>
+                        <h4><?php _e("Additional features", "retxtdom"); ?></h4>
                         <div class="listFeatures">
                             <?php if(intval(AdSingle::$floor) > 0) { ?>
                             <div>

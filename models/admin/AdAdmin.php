@@ -257,7 +257,7 @@ class AdAdmin {
 
         //Custom fields
         $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
-        if($optionsGeneral !== false) {
+        if($optionsGeneral !== false && isset($optionsGeneral["customFields"])) {
         $customFields = $optionsGeneral["customFields"];
             if(!empty($customFields) || $customFields !== "[]") {
                 foreach(json_decode($optionsGeneral, true) as $field) {

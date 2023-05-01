@@ -44,9 +44,10 @@ class Options {
             }else{ //Edit-tags
                 $tab = "general"; //Set the default tab (it will appear as selected)
             }
+            $pluginName = strtoupper(PLUGIN_RE_NAME);
             $pageOptions = PLUGIN_RE_NAME."options"; ?>
-            <h2><?= PLUGIN_RE_NAME; ?></h2>
-            <p>Interface de configuration - <?= PLUGIN_RE_NAME; ?></p>
+            <h2><?= $pluginName; ?></h2>
+            <p>Interface de configuration - <?= $pluginName; ?></p>
             <h2 class="nav-tab-wrapper">
                 <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=general" class="nav-tab <?= $tab === "general" ? "nav-tab-active" : ''; ?>"><?php _e("General", "retxtdom"); ?></a>
                 <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>"><?php _e("Imports", "retxtdom"); ?></a>
@@ -168,9 +169,10 @@ class Options {
         //Add fields
         
         /* General options */
+        $titleFormat = '%s&nbsp;<abbr title="%s"><sup>?</sup></abbr>';
         add_settings_field(
             "currency", //id
-            __("Currency", "retxtdom").SELF::fieldPurpose("Currency's symbol."), //title
+            sprintf($titleFormat, __("Currency", "retxtdom"), __("Currency's symbol.", "retxtdom")), //title
             array($this, "currencyCallback"), //callback
             PLUGIN_RE_NAME."OptionsGeneralPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -178,7 +180,7 @@ class Options {
         
         add_settings_field(
             "customFields", //id
-            __("Customs fields", "retxtdom").SELF::fieldPurpose("Allow to add custom fields for the ads."), //title
+            sprintf($titleFormat, __("Custom fields", "retxtdom"), __("Add custom fields to the ads.", "retxtdom")), //title
             array($this, "customFieldsCallback"), //callback
             PLUGIN_RE_NAME."OptionsGeneralPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -196,7 +198,7 @@ class Options {
              
         add_settings_field(
             "maxSavesImports", //id
-            __("Backups number", "retxtdom").SELF::fieldPurpose("Number of copies of files containing imported ads to keep."),
+            sprintf($titleFormat, __("Backups number", "retxtdom"), __("Number of copies of files containing imported ads to keep.", "retxtdom")), //title    
             array($this, "maxSavesImportsCallback"), //callback
             PLUGIN_RE_NAME."OptionsImportsPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -204,7 +206,7 @@ class Options {
         
         add_settings_field(
             "maxDim", //id
-            __("Pictures size", "retxtdom").SELF::fieldPurpose("Maximum size of imported pictures."),
+            sprintf($titleFormat, __("Pictures size", "retxtdom"), __("Maximum size of imported pictures.", "retxtdom")), //title
             array($this, "maxDimCallback"), //callback
             PLUGIN_RE_NAME."OptionsImportsPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -212,7 +214,7 @@ class Options {
         
         add_settings_field(
             "qualityPictures", //id
-            __("Pictures quality", "retxtdom").SELF::fieldPurpose("The higher the value, the more the quality is faithful to the original, at the expense of the weight of the image."),
+            sprintf($titleFormat, __("Pictures quality", "retxtdom"), __("The higher the value, the more the quality is faithful to the original, at the expense of the weight of the image.", "retxtdom")), //title    
             array($this, "qualityPicturesCallback"), //callback
             PLUGIN_RE_NAME."OptionsImportsPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -239,7 +241,7 @@ class Options {
         
         add_settings_field(
             "maxSavesExports", //id
-            __("Backups number", "retxtdom").SELF::fieldPurpose("Number of copies of files containing exported ads to keep."),
+            sprintf($titleFormat, __("Backups number", "retxtdom"), __("Number of copies of files containing exported ads to keep.", "retxtdom")), //title    
             array($this, "maxSavesExportsCallback"), //callback
             PLUGIN_RE_NAME."OptionsExportsPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -273,7 +275,7 @@ class Options {
         
         add_settings_field(
             "emailAd", //id
-            __("Email address to contact by default for ads", "retxtdom").SELF::fieldPurpose("Email address to contact if it is not possible to contact an agent or agency about an ad."),
+            sprintf($titleFormat, __("Email address to contact by default for ads", "retxtdom"), __("Email address to contact if it is not possible to contact an agent or agency about an ad.", "retxtdom")), //title    
             array($this, "emailAdCallback"), //callback
             PLUGIN_RE_NAME."OptionsEmailPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -283,7 +285,7 @@ class Options {
         
         add_settings_field(
             "feesUrl", //id
-            __("URL address to the fees schedule", "retxtdom").SELF::fieldPurpose("URL to the file presenting the fees schedule. It will be displayed on each ad. You can also directly upload the file with the button below."), //title
+            sprintf($titleFormat, __("URL address to the fees schedule", "retxtdom"), __("URL to the file presenting the fees schedule. It will be displayed on each ad. You can also directly upload the file with the button below.", "retxtdom")), //title    
             array($this, "feesUrlCallback"), //callback
             PLUGIN_RE_NAME."OptionsFeesPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -291,7 +293,7 @@ class Options {
         
         add_settings_field(
             "feesFile", //id
-            __("File with the fees schedule", "retxtdom"), //title
+            sprintf($titleFormat, __("File with the fees schedule", "retxtdom"), ''), //title    
             array($this, "feesFileCallback"), //callback
             PLUGIN_RE_NAME."OptionsFeesPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -302,7 +304,7 @@ class Options {
         
         add_settings_field(
             "apiUsed", //id
-            __("API to use", "retxtdom").SELF::fieldPurpose("API to use to retrieve address data."), //title
+            sprintf($titleFormat, __("API to use", "retxtdom"), __("API to use to retrieve address data.", "retxtdom")), //title    
             array($this, "apiUsedCallback"), //callback
             PLUGIN_RE_NAME."OptionsApisPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -310,7 +312,7 @@ class Options {
         
         add_settings_field(
             "apiKeyGoogle", //id
-            __("Google API key", "retxtdom"), //title,
+            sprintf($titleFormat, __("Google API key", "retxtdom"), ''), //title    
             array($this, "apiKeyGoogleCallback"), //callback
             PLUGIN_RE_NAME."OptionsApisPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -318,7 +320,7 @@ class Options {
         
         add_settings_field(
             "apiLimitNbRequests",
-            __("Limit number of requests per day and user", "retxtdom").SELF::fieldPurpose("Limiting the number of requests makes abuse less likely."),
+            sprintf($titleFormat, __("Limit number of requests per day and user", "retxtdom"), __("Limiting the number of requests makes abuse less likely.", "retxtdom")), //title    
             array($this, "apiLimitNbRequestsCallback"),
             PLUGIN_RE_NAME."OptionsApisPage",
             PLUGIN_RE_NAME."optionsSection"
@@ -326,7 +328,7 @@ class Options {
         
         add_settings_field(
             "apiMaxNbRequests",
-            __("The maximum number of requests made by a user in a day", "retxtdom"),
+            sprintf($titleFormat, __("The maximum number of requests made by a user in a day", "retxtdom"), ''), //title    
             array($this, "apiMaxNbRequestsCallback"),
             PLUGIN_RE_NAME."OptionsApisPage",
             PLUGIN_RE_NAME."optionsSection"
@@ -334,7 +336,7 @@ class Options {
         
         add_settings_field(
             "apiLimitCountry", //id
-            __("Limit search to one country", "retxtdom"), //title
+            sprintf($titleFormat, __("Limit search to one country", "retxtdom"), ''), //title 
             array($this, "apiLimitCountryCallback"), //callback
             PLUGIN_RE_NAME."OptionsApisPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -342,7 +344,7 @@ class Options {
         
         add_settings_field(
             "apiAdminAreaLvl1", //id
-            __("Display addresses with the administration area level 1", "retxtdom").SELF::fieldPurpose("Generally state or prefecture."), //title
+            sprintf($titleFormat, __("Display addresses with the administration area level 1", "retxtdom"), __("Generally state or prefecture.", "retxtdom")), //title    
             array($this, "apiAdminAreaLvl1Callback"), //callback
             PLUGIN_RE_NAME."OptionsApisPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -350,7 +352,7 @@ class Options {
         
         add_settings_field(
             "apiAdminAreaLvl2", //id
-            __("Display addresses with the administration area level 2", "retxtdom").SELF::fieldPurpose("Generally countries or districts."), //title
+            sprintf($titleFormat, __("Display addresses with the administration area level 2", "retxtdom"), __("Generally country or district.", "retxtdom")), //title                   
             array($this, "apiAdminAreaLvl2Callback"), //callback
             PLUGIN_RE_NAME."OptionsApisPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -761,9 +763,5 @@ class Options {
                    value="<?=$value;?>">         
     <?php }*/
     
-    /* Display an explanation about the field's purpose */
-    private function fieldPurpose($text) {
-        return '&nbsp;<abbr title="'.__($text, "retxtdom").'"><sup>?</sup></abbr>';
-    }
     
 }
