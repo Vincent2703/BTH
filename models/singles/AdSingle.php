@@ -1,6 +1,8 @@
 <?php
-
-class AdSingle {
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
+class REALM_AdSingle {
     private static $metas;
     
     public static $refAd;

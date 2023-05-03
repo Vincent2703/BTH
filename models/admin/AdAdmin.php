@@ -1,10 +1,13 @@
 <?php
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
 /*
  * 
  * Get and set ad meta values for the admin front-end
  * 
  */
-class AdAdmin {
+class REALM_AdAdmin {
     private static $metas;
     
     public static $refAgency;
@@ -23,6 +26,7 @@ class AdAdmin {
     public static $allAgents;
     public static $idAgent;
     public static $showAgent;
+    public static $customFieldsMF;
     
     public static $floor;
     public static $nbFloors;
@@ -36,6 +40,7 @@ class AdAdmin {
     public static $terrace;
     public static $DPE;
     public static $GES;
+    public static $customFieldsAF;
     
        
     public static function getMainFeatures($id) {
@@ -66,7 +71,7 @@ class AdAdmin {
             if(!empty($customFields) || $customFields !== "[]") {
                 foreach(json_decode($customFields, true) as $field) {
                     if($field["section"] === "mainFeatures") {
-                        $customFieldsMF[$field["name"]] = sanitize_text_field(self::getMeta("adCF".$field["name"]));
+                        self::$customFieldsMF[$field["name"]] = sanitize_text_field(self::getMeta("adCF".$field["name"]));
                     }
                 }
             }
@@ -92,11 +97,11 @@ class AdAdmin {
         $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
         if($optionsGeneral !== false && isset($optionsGeneral["customFields"])) {
             $customFields = $optionsGeneral["customFields"];
-            self::$customFieldsCF = array();
+            self::$customFieldsAF = array();
             if(!empty($customFields) || $customFields !== "[]") {
                 foreach(json_decode($customFields, true) as $field) {
-                    if($field["section"] === "complementaryFeatures") {
-                        $customFieldsCF[$field["name"]] = sanitize_text_field(self::getMeta("adCF".$field["name"]));
+                    if($field["section"] === "additionalFeatures") {
+                        self::$customFieldsAF[$field["name"]] = sanitize_text_field(self::getMeta("adCF".$field["name"]));
                     }
                 }
             }

@@ -1,17 +1,44 @@
 //Manage the custom fields section in the general tab
-jQuery(document).ready(function($) {    
-    if($("input[name='option_page']").val() === "REPOptionsGeneralGroup") { //If we are in the general setting tab
-            
-        /* Add a row */
-        $(".fieldPlus").click(function() {
-            $("#customFields tr:last").after('<tr><td class="fieldName"><input type="text" placeholder="Ex : Orientation"></td><td class="section"><select><option id="mainFeatures">'+variablesOptions.mainFeatures+'</option><option id="additionalFeatures">'+variablesOptions.additionalFeatures+'</option></select></td><td><span class="dashicons-before dashicons-arrow-up-alt fieldUp" onclick="moveRow(this, \'up\');"></span><span class="dashicons-before dashicons-arrow-down-alt fieldDown" onclick="moveRow(this, \'down\');"></span></td><td><span onclick="deleteRow(this);" class="dashicons-before dashicons-trash fieldTrash"></span></td></tr>');
+jQuery(document).ready(function($) {        
+    const customFields = $("#customFields");
+    const form = $("form");
+    
+    /* Add a row */    
+    $(".fieldPlus").click(function() {
+        $("#customFields tr:last").after('<tr><td class="fieldName"><input type="text" placeholder="Ex : Orientation"></td><td class="section"><select><option id="mainFeatures">'+variablesOptions.mainFeatures+'</option><option id="additionalFeatures">'+variablesOptions.additionalFeatures+'</option></select></td><td><span class="dashicons-before dashicons-arrow-up-alt fieldUp"></span><span class="dashicons-before dashicons-arrow-down-alt fieldDown"></span></td><td><span class="dashicons-before dashicons-trash fieldTrash"></span></td></tr>');
+        
+        $(".fieldUp").click(function() {
+           moveRow(this, "up");
+        });
+
+        $(".fieldDown").click(function() {
+           moveRow(this, "down");
+        });
+
+        $(".fieldTrash").click(function() {
+           deleteRow(this);
         });
         
-
-        $("form").submit(function() { //Before the form is submitted
-            updateCustomFieldsData(); //Get custom fields in the hidden input
+        $(".fieldName input").on("input", function() {
+           removeDemo(); 
         });
-    }
+    });
+    
+    $(".fieldUp").click(function() {
+        moveRow(this, "up");
+    });
+
+     $(".fieldDown").click(function() {
+        moveRow(this, "down");
+    });
+
+     $(".fieldTrash").click(function() {
+        deleteRow(this);
+    });
+
+    $("form").submit(function() { //Before the form is submitted
+        updateCustomFieldsData(); //Get custom fields in the hidden input
+    });
 });
 
 function deleteRow(element) {
@@ -49,4 +76,4 @@ function updateCustomFieldsData() {
     });
     jQuery("#customFieldsData").val(JSON.stringify(fields));
     
-    }
+}

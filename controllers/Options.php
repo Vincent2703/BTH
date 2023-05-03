@@ -1,11 +1,13 @@
 <?php
-
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
 /*
  * 
  * Managing plugin's options
  * 
  */
-class Options {
+class REALM_Options {
     
     /*
      * Main function - Display the form
@@ -77,7 +79,7 @@ class Options {
         //$this->optionsSeLoger = get_option(PLUGIN_RE_NAME."OptionsSeloger");
         
         
-        //Regitster settings
+        //Register settings
         register_setting( //Register a setting for general options
             PLUGIN_RE_NAME."OptionsGeneralGroup", //option group
             PLUGIN_RE_NAME."OptionsGeneral", //option name
@@ -386,9 +388,10 @@ class Options {
             $sanitaryValues["currency"] = sanitize_text_field($input["currency"]);
         }
         
-        if(isset($input["customFields"]) && $input["customFields"][0] === '[' && $input["customFields"][-1] === ']') {
-           $sanitaryValues["customFields"] = sanitize_text_field($input["customFields"]);
-        }   
+
+        if(isset($input["customFields"]) && !empty($input["customFields"]) && $input["customFields"][0] === '[' && $input["customFields"][-1] === ']' && (json_decode($input["customFields"]) !== null || json_last_error() === JSON_ERROR_NONE)) { //Waiting for PHP 8.3 json_validate()
+            $sanitaryValues["customFields"] = sanitize_text_field($input["customFields"]);
+        } 
         
         return $sanitaryValues;
     }
@@ -557,29 +560,29 @@ class Options {
                 </thead>
                 <tbody>
                     <tr class="demo">
-                        <td class="fieldName"><input type="text" oninput="removeDemo();" placeholder="Ex : Orientation"></td>
+                        <td class="fieldName"><input type="text" placeholder="<?php _e("Ex : Orientation", "retxtdom"); ?>"></td>
                         <td class="section"><select><option id="mainFeatures"><?php _e("Main features", "retxtdom"); ?></option><option id="additionalFeatures"><?php _e("Additional features", "retxtdom"); ?></option></select></td>
                         <td>
-                            <span class="dashicons-before dashicons-arrow-up-alt fieldUp" onclick="moveRow(this, 'up');"></span>
-                            <span class="dashicons-before dashicons-arrow-down-alt fieldDown" onclick="moveRow(this, 'down');"></span>
+                            <span class="dashicons-before dashicons-arrow-up-alt fieldUp"></span>
+                            <span class="dashicons-before dashicons-arrow-down-alt fieldDown"></span>
                         </td>
                         <td>
-                            <span class="dashicons-before dashicons-trash fieldTrash" onclick="deleteRow(this);"></span>
+                            <span class="dashicons-before dashicons-trash fieldTrash"></span>
                         </td>
                     </tr>
                     <?php 
-                    if(isset($this->OptionsGeneral["customFields"])) {
-                        $customFields = json_decode($this->OptionsGeneral["customFields"], true);
+                    if(isset($this->optionsGeneral["customFields"])) {
+                        $customFields = json_decode($this->optionsGeneral["customFields"], true);
                         foreach($customFields as $field) { ?>
                             <tr>
-                                <td class="fieldName"><input type="text" oninput="removeDemo();" value="<?=$field["name"];?>"></td>
+                                <td class="fieldName"><input type="text" value="<?=$field["name"];?>"></td>
                                 <td class="section"><select><option id="mainFeatures" <?php selected($field["section"], "mainFeatures"); ?>><?php _e("Main features", "retxtdom"); ?></option><option id="additionalFeatures"  <?php selected($field["section"], "additionalFeatures"); ?>><?php _e("Additional features", "retxtdom"); ?></option></select></td>
                                 <td>
-                                    <span class="dashicons-before dashicons-arrow-up-alt fieldUp" onclick="moveRow(this, 'up');"></span>
-                                    <span class="dashicons-before dashicons-arrow-down-alt fieldDown" onclick="moveRow(this, 'down');"></span>
+                                    <span class="dashicons-before dashicons-arrow-up-alt fieldUp"></span>
+                                    <span class="dashicons-before dashicons-arrow-down-alt fieldDown"></span>
                                 </td>
                                 <td>
-                                    <span class="dashicons-before dashicons-trash fieldTrash" onclick="deleteRow(this);"></span>
+                                    <span class="dashicons-before dashicons-trash fieldTrash"></span>
                                 </td>
                             </tr>
                     <?php               

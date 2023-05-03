@@ -1,4 +1,8 @@
-<?php get_header(); ?>
+<?php 
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
+get_header(); ?>
         <div id="primary" class="content-area">
             <main id="main" class="site-main">
             <?php if(have_posts()) { //Rajouter une limite de posts?>

@@ -1,10 +1,13 @@
 <?php
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
 /*
  * 
  * Get and set agent meta values for the admin front-end
  * 
  */
-class AgentAdmin {
+class REALM_AgentAdmin {
     private static $metas;
     
     public static $phone;

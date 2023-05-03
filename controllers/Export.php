@@ -1,6 +1,8 @@
 <?php
-
-class Export {    
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
+class REALM_Export {    
     
     private static $dirPath; //Path where to save the export files
     private static $errors; //Stock errors messages (not functional)

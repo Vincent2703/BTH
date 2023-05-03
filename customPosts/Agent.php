@@ -1,10 +1,13 @@
 <?php
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
 /*
  * 
  * Agent class
  * 
  */
-class Agent {
+class REALM_Agent {
     
     /*
      * Create the custom post Agent
@@ -33,7 +36,7 @@ class Agent {
                 ),
 
                 "public" => true,
-                "menu_position" => 16,
+                "menu_position" => 17,
                 "supports" => array("title", "thumbnail"),
                 "menu_icon" => "dashicons-businessperson",
                 "has_archive" => false,

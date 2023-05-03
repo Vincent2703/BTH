@@ -1,11 +1,13 @@
 <?php
-
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
 /*
  * 
  * Create or edit agency
  * 
  */
-class EditAgency {
+class REALM_EditAgency {
     public function addMetaBox() {
         add_meta_box( 
             "agencyMetaBox", //ID HTML

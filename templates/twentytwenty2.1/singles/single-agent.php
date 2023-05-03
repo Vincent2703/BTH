@@ -1,4 +1,7 @@
 <?php
+    if(!defined("ABSPATH")) {
+        exit; //Exit if accessed directly
+    }
     if(have_posts()) {
         get_header();                    
         while(have_posts()) { //?

@@ -1,11 +1,13 @@
 <?php
-
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
 /*
  * 
  * Create or edit ad
  * 
  */
-class EditAd {
+class REALM_EditAd {
     
     /*
      * Add meta boxes 
@@ -38,73 +40,73 @@ class EditAd {
             }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAd")) {
                 require_once(PLUGIN_RE_PATH."models/admin/AdAdmin.php");
                 remove_action("save_post_re-ad", array($this, "savePost")); //Avoid infinite loop
-                AdAdmin::setData($adId, $ad); //Save in BDD
+                REALM_AdAdmin::setData($adId, $ad); //Save in BDD
             }
         }
     }
     
     public function mainFeaturesMetaBox($ad) {
         require_once(PLUGIN_RE_PATH."models/admin/AdAdmin.php");
-        AdAdmin::getMainFeatures($ad->ID); //Get values
+        REALM_AdAdmin::getMainFeatures($ad->ID); //Get values
         wp_nonce_field("formEditAd", "nonceSecurity"); //Add nonce
         ?>
         <div id="refAgency">
             <div class="text">
                 <label><?php _e("Ad reference", "retxtdom");?><span id="generateRef" onclick="document.getElementById('refAgencyInput').value = <?= $ad->ID;?>;"><?php _e("Generate a reference", "retxtdom");?></span></label>
-                <input type="text" name="refAgency" id="refAgencyInput" placeholder="Ex : A-123" value="<?= adAdmin::$refAgency; ?>">
+                <input type="text" name="refAgency" id="refAgencyInput" placeholder="Ex : A-123" value="<?= REALM_AdAdmin::$refAgency; ?>">
             </div>
         </div>
         <div id="prices">
             <div class="text">
                 <label><?php _e("Property price", "retxtdom");?> <abbr title="<?php _e("Charges included", "retxtdom"); ?>"><sup>?</sup></abbr></label>
-                <input type="number" name="price" id="priceInput" placeholder="Ex : 180000" value="<?= adAdmin::$price; ?>" required>
+                <input type="number" name="price" id="priceInput" placeholder="Ex : 180000" value="<?= REALM_AdAdmin::$price; ?>" required>
             </div>
             <div class="text">
                 <label><?php _e("Fees amount", "retxtdom");?></label>
-                <input type="number" name="fees" id="feesInput" placeholder="Ex : 85" value="<?= adAdmin::$fees; ?>" required>
+                <input type="number" name="fees" id="feesInput" placeholder="Ex : 85" value="<?= REALM_AdAdmin::$fees; ?>" required>
             </div>
         </div>
         <div id="surfaces">
             <div class="text">
                 <label><?php _e("Living space", "retxtdom");?> (m²)</label>
-                <input type="number" name="surface" id="surfaceInput" placeholder="Ex : 90" value="<?= adAdmin::$surface; ?>"  required>
+                <input type="number" name="surface" id="surfaceInput" placeholder="Ex : 90" value="<?= REALM_AdAdmin::$surface; ?>"  required>
             </div>
             <div class="text">
                 <label><?php _e("Land area", "retxtdom");?> (m²)</label>
-                <input type="number" name="landSurface" id="landSurfaceInput" placeholder="Ex : 90" value="<?= adAdmin::$landSurface; ?>">
+                <input type="number" name="landSurface" id="landSurfaceInput" placeholder="Ex : 90" value="<?= REALM_AdAdmin::$landSurface; ?>">
             </div>
         </div>
         <div id="address">
             <div class="text">
                 <label><?php _e("Property address", "retxtdom");?></label>
-                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder='Ex : <?php _e("123 Chester Square, London", "retxtdom");?>' value="<?= adAdmin::$address; ?>" required>
+                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder='Ex : <?php _e("123 Chester Square, London", "retxtdom");?>' value="<?= REALM_AdAdmin::$address; ?>" required>
             </div>             
 
             <div class="radio">
-                <input type="radio" name="showMap" id="map1" value="onlyPC" <?php checked(adAdmin::$showMap, "onlyPC");?> required><label for="map1"><?php _e("Show postal code and city", "retxtdom");?></label>
-                <input type="radio" name="showMap" id="map2" value="all" <?php checked(adAdmin::$showMap, "all");?> required><label for="map2"><?php _e("Show full address", "retxtdom");?></label>
+                <input type="radio" name="showMap" id="map1" value="onlyPC" <?php checked(REALM_AdAdmin::$showMap, "onlyPC");?> required><label for="map1"><?php _e("Show postal code and city", "retxtdom");?></label>
+                <input type="radio" name="showMap" id="map2" value="all" <?php checked(REALM_AdAdmin::$showMap, "all");?> required><label for="map2"><?php _e("Show full address", "retxtdom");?></label>
             </div>
         </div>
         <div id="nbRooms">
             <div class="text">
                 <label><?php _e("Number rooms", "retxtdom");?></label>       
-                <input type="number" name="nbRooms" id="nbRoomsInput" placeholder="<?php _e("Number rooms", "retxtdom");?>" value="<?= adAdmin::$nbRooms; ?>">
+                <input type="number" name="nbRooms" id="nbRoomsInput" placeholder="<?php _e("Number rooms", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbRooms; ?>">
             </div>
         </div>
         <div id="otherRooms">
             <div class="text">
                 <label><?php _e("Number bedrooms", "retxtdom");?></label>
-                <input type="number" name="nbBedrooms" id="nbBedroomsInput" placeholder="<?php _e("Number bedrooms", "retxtdom");?>" value="<?= adAdmin::$nbBedrooms; ?>">
+                <input type="number" name="nbBedrooms" id="nbBedroomsInput" placeholder="<?php _e("Number bedrooms", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbBedrooms; ?>">
 
                 <label><?php _e("Number bathrooms", "retxtdom");?></label>
-                <input type="number" name="nbBathrooms" id="nbBathroomsInput" placeholder="<?php _e("Number bathrooms", "retxtdom");?>" value="<?= adAdmin::$nbBathrooms; ?>">
+                <input type="number" name="nbBathrooms" id="nbBathroomsInput" placeholder="<?php _e("Number bathrooms", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbBathrooms; ?>">
             </div>
             <div class="text">
                 <label><?php _e("Number shower rooms", "retxtdom");?></label>
-                <input type="number" name="nbWaterRooms" id="nbWaterRoomsInput" placeholder="<?php _e("Number shower rooms", "retxtdom");?>" value="<?= adAdmin::$nbWaterRooms; ?>">
+                <input type="number" name="nbWaterRooms" id="nbWaterRoomsInput" placeholder="<?php _e("Number shower rooms", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbWaterRooms; ?>">
 
                 <label><?php _e("Number toilets", "retxtdom");?></label>
-                <input type="number" name="nbWC" id="nbWCInput" placeholder="<?php _e("Number toilets", "retxtdom");?>" value="<?= adAdmin::$nbWC; ?>">
+                <input type="number" name="nbWC" id="nbWCInput" placeholder="<?php _e("Number toilets", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbWC; ?>">
             </div>
         </div>
         <div id="agent">
@@ -112,29 +114,29 @@ class EditAd {
                 <label><?php _e("Agent linked to the ad", "retxtdom");?></label>
                 <select name="agent" id="agents" onclick="reloadAgents();">
                     <?php
-                        foreach(adAdmin::$allAgents as $agent) {
+                        foreach(REALM_AdAdmin::$allAgents as $agent) {
                             $nameAgent = get_the_title($agent);
                             $idAgent = $agent->ID;
                             ?>
-                            <option value="<?= $idAgent; ?>" <?=($idAgent==adAdmin::$idAgent)?"selected":NULL;?>><?= $nameAgent; ?></option>
+                            <option value="<?= $idAgent; ?>" <?=($idAgent==REALM_AdAdmin::$idAgent)?"selected":NULL;?>><?= $nameAgent; ?></option>
                             <?php
                         }
                     ?>
                 </select>
             </div>
             <div class="select">
-                <input type="checkbox" id="showAgent" name="showAgent" <?=(adAdmin::$showAgent=='1')?"checked":NULL;?>>
+                <input type="checkbox" id="showAgent" name="showAgent" <?=(REALM_AdAdmin::$showAgent=='1')?"checked":NULL;?>>
                 <label for="showAgent"><?php _e("Post agent contact", "retxtdom");?></label>
                 <a target="_blank" href="post-new.php?post_type=agent"><?php _e("Add an agent", "retxtdom");?></a>
             </div>
         </div>
         <div id="addPictures">
-            <a href="#" id="insertAdPictures" class="button"><?php empty(AdAdmin::$images)?_e("Add pictures", "retxtdom"):_e("Replace pictures", "retxtdom");?></a>
-            <input type="hidden" name="images" id="images" value="<?= adAdmin::$images; ?>">
+            <a href="#" id="insertAdPictures" class="button"><?php empty(REALM_AdAdmin::$images)?_e("Add pictures", "retxtdom"):_e("Replace pictures", "retxtdom");?></a>
+            <input type="hidden" name="images" id="images" value="<?= REALM_AdAdmin::$images; ?>">
         </div>
         <div id="showPictures">
-            <?php if(!empty(adAdmin::$images)) {
-                $ids = explode(';', adAdmin::$images);
+            <?php if(!empty(REALM_AdAdmin::$images)) {
+                $ids = explode(';', REALM_AdAdmin::$images);
                 foreach ($ids as $id) { ?>
                     <div class="aPicture" data-imgId="<?=$id;?>">
                         <?= wp_get_attachment_image($id, array(150, 150), false, array("class" => "imgAd")); ?>
@@ -148,9 +150,9 @@ class EditAd {
         </div>
 
         <?php 
-            if(isset(adAdmin::$customFieldsMF) && !empty(adAdmin::$customFieldsMF)) {
+            if(isset(REALM_AdAdmin::$customFieldsMF) && !empty(REALM_AdAdmin::$customFieldsMF)) {
                 echo '<div id="customMFields">';
-                foreach(adAdmin::$customFieldsMF as $kField => $vField) { ?>
+                foreach(REALM_AdAdmin::$customFieldsMF as $kField => $vField) { ?>
                     <div class="text">
                         <label><?=$kField;?></label>
                         <input type="text" name="CF<?=$kField;?>" value="<?=$vField;?>">
@@ -163,41 +165,41 @@ class EditAd {
       
     public function additionalFeaturesMetaBox($ad) {
         require_once(PLUGIN_RE_PATH."models/admin/AdAdmin.php");
-        AdAdmin::getAdditionalFeatures($ad->ID); //Get values
+        REALM_AdAdmin::getAdditionalFeatures($ad->ID); //Get values
         ?>
         <div id="floors">
             <div class="text">
                 <label><?php _e("Floor", "retxtdom");?></label>
-                <input type="number" name="floor" id="floorInput" placeholder="<?php _e("Floor", "retxtdom");?>" value="<?= AdAdmin::$floor; ?>">
+                <input type="number" name="floor" id="floorInput" placeholder="<?php _e("Floor", "retxtdom");?>" value="<?= REALM_AdAdmin::$floor; ?>">
             </div>
             <div class="text">
                 <label><?php _e("Number floors", "retxtdom");?></label>
-                <input type="number" name="nbFloors" id="nbFloorsInput" placeholder="<?php _e("Number floors", "retxtdom");?>" value="<?= AdAdmin::$nbFloors; ?>">
+                <input type="number" name="nbFloors" id="nbFloorsInput" placeholder="<?php _e("Number floors", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbFloors; ?>">
             </div>
         </div>
         <div id="kitchenHeater">
             <div class="select">
             <label><?php _e("Type heating", "retxtdom");?></label>&nbsp;
             <select name="typeHeating">
-                <option value="Unknown" <?php selected(AdAdmin::$typeHeating, "Unknown"); ?>>
+                <option value="Unknown" <?php selected(REALM_AdAdmin::$typeHeating, "Unknown"); ?>>
                     <?php _e("Do not fill", "retxtdom");?>
                 </option>
-                <option value="Individual gas" <?php selected(AdAdmin::$typeHeating, "Individual gas"); ?>>
+                <option value="Individual gas" <?php selected(REALM_AdAdmin::$typeHeating, "Individual gas"); ?>>
                     <?php _e("Invidual gas", "retxtdom");?>
                 </option>
-                <option value="Collective gas" <?php selected(AdAdmin::$typeHeating, "CollectiveGas"); ?>>
+                <option value="Collective gas" <?php selected(REALM_AdAdmin::$typeHeating, "CollectiveGas"); ?>>
                     <?php _e("Collective gas", "retxtdom");?>
                 </option>
-                <option value="Individual fuel" <?php selected(AdAdmin::$typeHeating, "Individual fuel"); ?>>
+                <option value="Individual fuel" <?php selected(REALM_AdAdmin::$typeHeating, "Individual fuel"); ?>>
                     <?php _e("Individual fuel", "retxtdom");?>
                 </option>
-                <option value="Collective fuel" <?php selected(AdAdmin::$typeHeating, "Collective fuel"); ?>>
+                <option value="Collective fuel" <?php selected(REALM_AdAdmin::$typeHeating, "Collective fuel"); ?>>
                     <?php _e("Collective fuel", "retxtdom");?>
                 </option>
-                <option value="Individual electric" <?php selected(AdAdmin::$typeHeating, "Individual electric"); ?>>
+                <option value="Individual electric" <?php selected(REALM_AdAdmin::$typeHeating, "Individual electric"); ?>>
                     <?php _e("Individual electric", "retxtdom");?>
                 </option>
-                <option value="Collective electric" <?php selected(AdAdmin::$typeHeating, "Collective electric"); ?>>
+                <option value="Collective electric" <?php selected(REALM_AdAdmin::$typeHeating, "Collective electric"); ?>>
                     <?php _e("Collective electric", "retxtdom");?>
                 </option>
             </select>
@@ -205,47 +207,47 @@ class EditAd {
             <div class="select">
                 <label><?php _e("Type kitchen", "retxtdom");?></label>&nbsp;
                 <select name="typeKitchen">
-                    <option value="unknown" <?=(AdAdmin::$typeKitchen==="unknown")?"selected":NULL;?>>
+                    <option value="unknown" <?=(REALM_AdAdmin::$typeKitchen==="unknown")?"selected":NULL;?>>
                         <?php _e("Do not fill", "retxtdom");?>
                     </option>
-                    <option value="Not equipped" <?php selected(AdAdmin::$typeKitchen, "Not equipped"); ?>><?php _e("Not equipped", "retxtdom");?></option>
-                    <option value="Kitchenette" <?php selected(AdAdmin::$typeKitchen, "Kitchenette"); ?>><?php _e("Kitchenette", "retxtdom");?></option>
-                    <option value="American" <?php selected(AdAdmin::$typeKitchen, "American"); ?>><?php _e("American", "retxtdom");?></option>
-                    <option value="Industrial" <?php selected(AdAdmin::$typeKitchen, "Industrial"); ?>><?php _e("Industrial", "retxtdom");?></option>
+                    <option value="Not equipped" <?php selected(REALM_AdAdmin::$typeKitchen, "Not equipped"); ?>><?php _e("Not equipped", "retxtdom");?></option>
+                    <option value="Kitchenette" <?php selected(REALM_AdAdmin::$typeKitchen, "Kitchenette"); ?>><?php _e("Kitchenette", "retxtdom");?></option>
+                    <option value="American" <?php selected(REALM_AdAdmin::$typeKitchen, "American"); ?>><?php _e("American", "retxtdom");?></option>
+                    <option value="Industrial" <?php selected(REALM_AdAdmin::$typeKitchen, "Industrial"); ?>><?php _e("Industrial", "retxtdom");?></option>
                 </select>
             </div>
         </div>
         <div id="balconies">
             <div class="text">
                 <label><?php _e("Number balconies", "retxtdom");?></label>
-                <input type="number" name="nbBalconies" id="nbBalconiesInput" placeholder="<?php _e("Number balconies", "retxtdom");?>" value="<?= AdAdmin::$nbBalconies; ?>">
+                <input type="number" name="nbBalconies" id="nbBalconiesInput" placeholder="<?php _e("Number balconies", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbBalconies; ?>">
             </div>
         </div>
         <div id="propertyHas">
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="elevatorInput" name="elevator"<?php checked(AdAdmin::$elevator, '1'); ?>>
+                    <input type="checkbox" id="elevatorInput" name="elevator"<?php checked(REALM_AdAdmin::$elevator, '1'); ?>>
                     <span class="slider"></span>
                 </label> 
                 <label for="elevator"><?php _e("Elevator", "retxtdom");?></label>
             </div>
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="cellarInput" name="cellar" <?php checked(AdAdmin::$cellar, '1'); ?>>
+                    <input type="checkbox" id="cellarInput" name="cellar" <?php checked(REALM_AdAdmin::$cellar, '1'); ?>>
                     <span class="slider"></span>
                 </label> 
                 <label for="cellar"><?php _e("Cellar", "retxtdom");?></label>
             </div>
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="terraceInput" name="terrace" <?php checked(AdAdmin::$terrace, '1'); ?>>
+                    <input type="checkbox" id="terraceInput" name="terrace" <?php checked(REALM_AdAdmin::$terrace, '1'); ?>>
                     <span class="slider"></span>
                 </label>   
                 <label for="terrace"><?php _e("Terrace", "retxtdom");?></label>
             </div>
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="furnishedInput" name="furnished" <?php checked(AdAdmin::$furnished, '1'); ?>>
+                    <input type="checkbox" id="furnishedInput" name="furnished" <?php checked(REALM_AdAdmin::$furnished, '1'); ?>>
                     <span class="slider"></span>
                 </label>   
                 <label for="furnished"><?php _e("Furnished", "retxtdom");?></label>
@@ -254,24 +256,24 @@ class EditAd {
         <div id="year">
             <div class="text">
                 <label><?php _e("Construction year", "retxtdom");?></label>
-                <input type="number" name="year" id="yearInput" placeholder="<?php _e("Construction year", "retxtdom");?>" value="<?= AdAdmin::$year; ?>">
+                <input type="number" name="year" id="yearInput" placeholder="<?php _e("Construction year", "retxtdom");?>" value="<?= REALM_AdAdmin::$year; ?>">
             </div>
         </div>
         <div id="diag">
             <div class="text">
                 <label><?php _e("EPD in kWhPE/m²/year", "retxtdom");?></label>
-                <input type="number" id="DPE" name="DPE" min="0" max="500" value="<?= AdAdmin::$DPE; ?>">
+                <input type="number" id="DPE" name="DPE" min="0" max="500" value="<?= REALM_AdAdmin::$DPE; ?>">
             </div>
             <div class="text">
                 <label><?php _e("Greenhouse gas in kg eqCO2/m²/year", "retxtdom");?></label>
-                <input type="number" id="GES" name="GES" min="0" max="100" value="<?= AdAdmin::$GES; ?>">
+                <input type="number" id="GES" name="GES" min="0" max="100" value="<?= REALM_AdAdmin::$GES; ?>">
             </div>
         </div>
 
         <?php 
-            if(isset(AdAdmin::$customFieldsCF) && !empty(AdAdmin::$customFieldsCF)) {
+            if(isset(REALM_AdAdmin::$customFieldsAF) && !empty(REALM_AdAdmin::$customFieldsAF)) {
                 echo '<div id="customCFields">';
-                foreach(AdAdmin::$customFieldsCF as $kField => $vField) { ?>
+                foreach(REALM_AdAdmin::$customFieldsAF as $kField => $vField) { ?>
                     <div class="text">
                         <label><?=$kField;?></label>
                         <input type="text" name="CF<?=$kField;?>" value="<?=$vField;?>">

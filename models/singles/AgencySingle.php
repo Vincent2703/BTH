@@ -1,6 +1,8 @@
 <?php
-
-class AgencySingle {
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
+class REALM_AgencySingle {
     private static $metas;
     
     public static $agents;

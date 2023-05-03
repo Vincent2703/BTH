@@ -8,6 +8,10 @@ License:  GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
+
 require_once("realm.php"); //Install plugin from interface
 
 /*
@@ -64,18 +68,18 @@ class Realm {
         require_once("models/searches/GetAds.php");
         
         
-        $this->Ad           = new Ad;
-        $this->Agent        = new Agent;
-        $this->Agency       = new Agency;
+        $this->Ad           = new REALM_Ad;
+        $this->Agent        = new REALM_Agent;
+        $this->Agency       = new REALM_Agency;
         
-        $this->Options      = new Options;
-        $this->EditAd       = new EditAd;
-        $this->EditAgent    = new EditAgent;
-        $this->EditAgency   = new EditAgency;
-        $this->Export       = new Export;
-        $this->Import       = new Import;
+        $this->Options      = new REALM_Options;
+        $this->EditAd       = new REALM_EditAd;
+        $this->EditAgent    = new REALM_EditAgent;
+        $this->EditAgency   = new REALM_EditAgency;
+        $this->Export       = new REALM_Export;
+        $this->Import       = new REALM_Import;
         
-        $this->GetAds       = new GetAds;   
+        $this->GetAds       = new REALM_GetAds;   
     }
     
     /*
@@ -278,30 +282,30 @@ class Realm {
         $parentSlug = "edit.php?post_type=re-ad";
         add_submenu_page(
             $parentSlug, //Parent slug
-            "Importez les annonces", //Page title
-            "Importez les annonces", //Menu title
+            __("Import ads", "retxtdom"), //Page title
+            __("Import ads", "retxtdom"), //Menu title
             "manage_options", //Capability
             PLUGIN_RE_NAME."import", //Menu slug
             array($this->Import, "showPage"), //Callback
-            2 //Position
+            2 //Priority
         );
         add_submenu_page(
             $parentSlug, //Parent slug
-            "Exportez les annonces", //Page title
-            "Exportez les annonces", //Menu title
+            __("Export ads", "retxtdom"), //Page title
+            __("Export ads", "retxtdom"), //Menu title
             "manage_options", //Capability
             PLUGIN_RE_NAME."export", //Menu slug
             array($this->Export, "showPage"), //Callback
-            3 //Position
+            3 //Priority
         );
         add_submenu_page(
             $parentSlug, //Parent slug
-            "Options", //Page title
-            "Options", //Menu title
+            __("Options", "retxtdom"), //Page title
+            __("Options", "retxtdom"), //Menu title
             "manage_options", //Capability
             PLUGIN_RE_NAME."options", //Menu slug
             array($this->Options, "showPage"), //Callback
-            4 //Position
+            4 //Priority
         );
     }   
     
@@ -362,6 +366,7 @@ class Realm {
                 "post" => array(
                     "editAd" => array(
                         "path" => "/includes/js/edits/editAd.js",
+                        "footer" => true,
                         "dependencies" => array("jquery"),
                         "localize" => array(
                             "translations" => array(
@@ -372,6 +377,7 @@ class Realm {
                     ),
                     "autocompleteAddress" => array(
                         "path" => "/includes/js/searches/autocompleteAddress.js",
+                        "footer" => true,
                         "dependencies" => array("jquery"),
                         "localize" => array(
                             "variablesAddress" => array(
@@ -383,6 +389,7 @@ class Realm {
                 "re-ad_page_".PLUGIN_RE_NAME."import" => array(
                     "import" => array(
                         "path" => "/includes/js/others/import.js",
+                        "footer" => true,
                         "dependencies" => array("jquery"),
                         "localize" => array(
                             "variablesImport" => array(
@@ -395,6 +402,7 @@ class Realm {
                 "re-ad_page_".PLUGIN_RE_NAME."options" => array(
                     "options" => array(
                         "path" => "/includes/js/others/options.js",
+                        "footer" => true,
                         "dependencies" => array("jquery"),
                         "localize" => array(
                             "variablesOptions" => array(
@@ -409,6 +417,7 @@ class Realm {
                 "post" => array(
                     "editAgent" => array(
                         "path" => "/includes/js/edits/editAgent.js",
+                        "footer" => true,
                         "dependencies" => array("jquery")
                     )
                 )
@@ -417,10 +426,12 @@ class Realm {
                 "post" => array(
                     "editAgency" => array(
                         "path" => "/includes/js/edits/editAgency.js",
+                        "footer" => true,
                         "dependencies" => array("jquery")
                     ),
                     "autocompleteAddress" => array(
                         "path" => "/includes/js/searches/autocompleteAddress.js",
+                        "footer" => true,
                         "dependencies" => array("jquery"),
                         "localize" => array(
                             "variablesAddress" => array(
@@ -434,7 +445,7 @@ class Realm {
 
         $scriptsToRegister = isset($scripts[$postType][$base])?$scripts[$postType][$base]:array();
         foreach($scriptsToRegister as $name => $script) {
-            wp_register_script($name, plugins_url(PLUGIN_RE_NAME.$script["path"]), $script["dependencies"], PLUGIN_RE_VERSION);
+            wp_register_script($name, plugins_url(PLUGIN_RE_NAME.$script["path"]), $script["dependencies"], PLUGIN_RE_VERSION, $script["footer"]);
             if(isset($script["localize"])) {
                 foreach($script["localize"] as $variableName => $localizeData) {
                     wp_localize_script($name, $variableName, $localizeData);
@@ -645,21 +656,22 @@ class Realm {
                 . __("For more information, please read the", "retxtdom").'&nbsp;<a target="_blank" href="#">'.__("documentation", "retxtdom")."</a>");
         }
         
+        $pluginName = strtoupper(PLUGIN_RE_NAME);
         foreach($errors as $error) { ?>
             <div class="notice notice-error is-dismissible">
-                <h3><?= PLUGIN_RE_NAME; ?></h3>
+                <h3><?= $pluginName; ?></h3>
                 <p><?= $error; ?></p>   
             </div>
         <?php }
         foreach($warnings as $warning) { ?>
             <div class="notice notice-warning is-dismissible">
-                <h3><?= PLUGIN_RE_NAME; ?></h3>
+                <h3><?= $pluginName; ?></h3>
                 <p><?= $warning; ?></p>   
             </div>
         <?php }
         foreach($informations as $info) { ?>
             <div class="notice notice-info is-dismissible">
-                <h3><?= PLUGIN_RE_NAME; ?></h3>
+                <h3><?= $pluginName; ?></h3>
                 <p><?= $info; ?></p>   
             </div>
         <?php }

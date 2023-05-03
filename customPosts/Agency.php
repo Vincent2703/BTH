@@ -1,10 +1,13 @@
 <?php
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
 /*
  * 
  * Agency class
  * 
  */
-class Agency {
+class REALM_Agency {
     
     /*
      * Create the custom post Agency
@@ -33,7 +36,7 @@ class Agency {
                 ),
 
                 "public" => true,
-                "menu_position" => 17,
+                "menu_position" => 18,
                 "supports" => array("title", "editor", "thumbnail"),
                 "menu_icon" => "dashicons-admin-multisite",
                 "has_archive" => false

@@ -1,6 +1,8 @@
 <?php
-
-class Import {
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
+class REALM_Import {
     private static $importOptions; //RAJOUTER TABLEAU EXPORTS A IMPORTER
     private static $dirPathImports;
     private static $dirPathExports;

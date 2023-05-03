@@ -1,10 +1,13 @@
 <?php
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
 /*
  * 
  * Ad class
  * 
  */
-class Ad {
+class REALM_Ad {
 
     /*
      * Register plugin styles for the singleAd template

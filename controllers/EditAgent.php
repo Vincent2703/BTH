@@ -1,11 +1,13 @@
 <?php
-
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
 /*
  * 
  * Create or edit agent
  * 
  */
-class editAgent {
+class REALM_EditAgent {
     public function addMetaBoxes() {
         add_meta_box( 
             "agentMetaBox", //ID HTML

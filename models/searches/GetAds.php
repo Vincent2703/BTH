@@ -1,6 +1,8 @@
 <?php
-
-class GetAds {    
+if(!defined("ABSPATH")) {
+    exit; //Exit if accessed directly
+}
+class REALM_GetAds {    
     /*
      * Search an ad in the front end
      */

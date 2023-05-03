@@ -1,4 +1,7 @@
 <?php
+    if(!defined("ABSPATH")) {
+        exit; //Exit if accessed directly
+    }
     if(have_posts()) {
         require_once(PLUGIN_RE_PATH."models/singles/AgencySingle.php");
         require_once(PLUGIN_RE_PATH."models/singles/AdSingle.php");
