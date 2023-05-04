@@ -59,7 +59,7 @@ class REALM_AdAdmin {
         self::$address = sanitize_text_field(self::getMeta("adAddress"));
         self::$showMap = sanitize_text_field(self::getMeta("adShowMap"));
         self::$images = sanitize_text_field(self::getMeta("adImages"));
-        self::$allAgents = get_posts(array("post_type" => "agent"));
+        self::$allAgents = get_posts(array("post_type" => "agent", "numberposts" => -1));
         self::$idAgent = sanitize_text_field(self::getMeta("adIdAgent"));
         self::$showAgent = sanitize_text_field(self::getMeta("adShowAgent"));
         
@@ -265,7 +265,7 @@ class REALM_AdAdmin {
         if($optionsGeneral !== false && isset($optionsGeneral["customFields"])) {
         $customFields = $optionsGeneral["customFields"];
             if(!empty($customFields) || $customFields !== "[]") {
-                foreach(json_decode($optionsGeneral, true) as $field) {
+                foreach(json_decode($customFields, true) as $field) {
                     if(isset($_POST["CF".$field["name"]]) && !ctype_space($_POST["CF".$field["name"]])) {
                         update_post_meta($adId, "adCF".$field["name"], sanitize_text_field($_POST["CF".$field["name"]]));
                     }

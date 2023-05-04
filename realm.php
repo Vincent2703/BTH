@@ -384,6 +384,16 @@ class Realm {
                                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address")
                             )
                         )
+                    ),
+                    "reloadAgents" => array(
+                        "path" => "/includes/js/searches/reloadAgents.js",
+                        "footer" => true,
+                        "dependencies" => array("jquery"),
+                        "localize" => array(
+                            "variablesAgents" => array(
+                                "getAgentsURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents")
+                            )
+                        )
                     )
                 ),
                 "re-ad_page_".PLUGIN_RE_NAME."import" => array(
@@ -415,20 +425,20 @@ class Realm {
             ),
             "agent" => array(
                 "post" => array(
-                    "editAgent" => array(
-                        "path" => "/includes/js/edits/editAgent.js",
+                    "reloadAgents" => array(
+                        "path" => "/includes/js/searches/reloadAgencies.js",
                         "footer" => true,
-                        "dependencies" => array("jquery")
+                        "dependencies" => array("jquery"),
+                        "localize" => array(
+                            "variablesAgencies" => array(
+                                "getAgenciesUrl" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies")
+                            )
+                        )
                     )
                 )
             ),
             "agency" => array(
-                "post" => array(
-                    "editAgency" => array(
-                        "path" => "/includes/js/edits/editAgency.js",
-                        "footer" => true,
-                        "dependencies" => array("jquery")
-                    ),
+                "post" => array(                  
                     "autocompleteAddress" => array(
                         "path" => "/includes/js/searches/autocompleteAddress.js",
                         "footer" => true,

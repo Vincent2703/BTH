@@ -35,7 +35,7 @@ class REALM_EditAd {
     /* Save the post */
     public function savePost($adId, $ad) {
         if($ad->post_type == "re-ad") {
-            if((defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) || (isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formImportAds"))) { //Don't save if it's an autosave or if the nonce is inexistant/incorrect
+            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE || (!isset($_POST["nonceSecurity"]) || (isset($_POST["nonceSecurity"]) && !wp_verify_nonce($_POST["nonceSecurity"], "formEditAd")))) { //Don't save if it's an autosave or if the nonce is inexistant/incorrect
                 return;
             }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAd")) {
                 require_once(PLUGIN_RE_PATH."models/admin/AdAdmin.php");

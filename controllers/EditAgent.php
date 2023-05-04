@@ -29,40 +29,40 @@ class REALM_EditAgent {
     
     public function savePost($agentId, $agent) {
         if($agent->post_type == "agent") {
-            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE || (isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAgent"))) { //Don't save if it's an autosave or if the nonce is inexistant/incorrect) {
+            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE || (!isset($_POST["nonceSecurity"]) || (isset($_POST["nonceSecurity"]) && !wp_verify_nonce($_POST["nonceSecurity"], "formEditAgent")))) { //Don't save if it's an autosave or if the nonce is inexistant/incorrect
                 return;
             }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAgent")) {
                 require_once(PLUGIN_RE_PATH."models/admin/AgentAdmin.php");
                 remove_action("save_post_agent", array($this, "savePost")); //Avoid infinite loop
-                AgentAdmin::setData($agentId); //Save in BDD
+                REALM_AgentAdmin::setData($agentId); //Save in BDD
             }
         }       
     }
     
     public function displayAgentMetaBox($agent) {
         require_once(PLUGIN_RE_PATH."models/admin/AgentAdmin.php");
-        AgentAdmin::getData($agent->ID);
+        REALM_AgentAdmin::getData($agent->ID);
         wp_nonce_field("formEditAgent", "nonceSecurity");
         ?>
             <div id="agentDetails">
                 <div class="text">
                     <label><?php _e("Phone"); ?></label>
-                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "Home phone", "retxtdom"); ?>" value="<?= AgentAdmin::$phone; ?>">
+                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "Home phone", "retxtdom"); ?>" value="<?= REALM_AgentAdmin::$phone; ?>">
                 </div>
                 <div class="text">
                     <label><?php _e("Mobile phone"); ?></label>
-                    <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("0600000000", "retxtdom"); ?>" value="<?= AgentAdmin::$mobilePhone; ?>">
+                    <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("0600000000", "retxtdom"); ?>" value="<?= REALM_AgentAdmin::$mobilePhone; ?>">
                 </div>
                 <div class="text">
                     <label><?php _e("Email address"); ?></label>
-                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= AgentAdmin::$email; ?>">
+                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= REALM_AgentAdmin::$email; ?>">
                 </div>
             </div>
         <?php
     }
     
     public function displayAgencyMetaBox($agent) {
-        $allAgencies = get_posts(array("post_type" => "agency"));
+        $allAgencies = get_posts(array("post_type" => "agency", "numberposts" => -1));
         ?>
             <select name="agency" id="agencies" onclick="reloadAgencies();">
                 <?php
