@@ -34,10 +34,3 @@ function searchByR(select) {
         jQuery("#radiusInput").hide("slow");
     }
 }
-
-function changeAdType(select) {
-    /*var type = jQuery(select).val();
-    if(type==="rental") {
-        console.log("coucou");
-    }*/
-}

@@ -39,15 +39,15 @@ class REALM_EditAgency {
             <div id="agencyDetails">
                 <div class="text">
                     <label for="phone"><?php _e("Phone", "retxtdom"); ?></label>
-                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "retxtdom"); ?>" value="<?= REALM_AgencyAdmin::$phone; ?>">
+                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "retxtdom"); ?>" value="<?= esc_attr(REALM_AgencyAdmin::$phone); ?>">
                 </div>
                 <div class="text">
                     <label for="email"><?php _e("Email address", "retxtdom"); ?></label>
-                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= REALM_AgencyAdmin::$email; ?>">
+                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= esc_attr(REALM_AgencyAdmin::$email); ?>">
                 </div>
                 <div class="text">
                     <label for="addressInput"><?php _e("Postal address", "retxtdom"); ?></label>
-                    <input type="text" name="address" id="addressInput" autocomplete="off" placeholder="<?php _e("123 Chester Square, London", "Postal address example", "retxtdom"); ?>" value="<?= REALM_AgencyAdmin::$address; ?>">
+                    <input type="text" name="address" id="addressInput" autocomplete="off" placeholder="<?php _e("123 Chester Square, London", "Postal address example", "retxtdom"); ?>" value="<?= esc_attr(REALM_AgencyAdmin::$address); ?>">
                 </div>
             </div>
         <?php

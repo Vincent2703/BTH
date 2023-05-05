@@ -47,15 +47,15 @@ class REALM_EditAgent {
             <div id="agentDetails">
                 <div class="text">
                     <label><?php _e("Phone"); ?></label>
-                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "Home phone", "retxtdom"); ?>" value="<?= REALM_AgentAdmin::$phone; ?>">
+                    <input type="text" name="phone" id="phone" placeholder="<?php _e("0100000000", "Home phone", "retxtdom"); ?>" value="<?= esc_attr(REALM_AgentAdmin::$phone); ?>">
                 </div>
                 <div class="text">
                     <label><?php _e("Mobile phone"); ?></label>
-                    <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("0600000000", "retxtdom"); ?>" value="<?= REALM_AgentAdmin::$mobilePhone; ?>">
+                    <input type="text" name="mobilePhone" id="mobilePhone" placeholder="<?php _e("0600000000", "retxtdom"); ?>" value="<?= esc_attr(REALM_AgentAdmin::$mobilePhone); ?>">
                 </div>
                 <div class="text">
                     <label><?php _e("Email address"); ?></label>
-                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= REALM_AgentAdmin::$email; ?>">
+                    <input type="email" name="email" id="email" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" value="<?= esc_attr(REALM_AgentAdmin::$email); ?>">
                 </div>
             </div>
         <?php
@@ -67,10 +67,10 @@ class REALM_EditAgent {
             <select name="agency" id="agencies" onclick="reloadAgencies();">
                 <?php
                     foreach($allAgencies as $agency) {
-                        $nameAgency = get_the_title($agency);
-                        $idAgency = $agency->ID;
+                        $nameAgency = esc_attr(get_the_title($agency));
+                        $idAgency = intval($agency->ID);
                         ?>
-                        <option value="<?= $idAgency; ?>" <?=(isset($agent->post_parent) && $idAgency==$agent->post_parent)?"selected":NULL;?>><?= $nameAgency; ?></option>
+                        <option value="<?= $idAgency; ?>" <?php selected(isset($agent->post_parent) && $idAgency==$agent->post_parent); ?>><?= $nameAgency; ?></option>
                         <?php
                     }
                 ?>
