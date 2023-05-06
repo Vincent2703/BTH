@@ -53,33 +53,33 @@ class REALM_EditAd {
         <div id="refAgency">
             <div class="text">
                 <label><?php _e("Ad reference", "retxtdom");?><span id="generateRef" onclick="document.getElementById('refAgencyInput').value = <?= $ad->ID;?>;"><?php _e("Generate a reference", "retxtdom");?></span></label>
-                <input type="text" name="refAgency" id="refAgencyInput" placeholder="Ex : A-123" value="<?= esc_attr(REALM_AdAdmin::$refAgency); ?>">
+                <input type="text" name="refAgency" id="refAgencyInput" placeholder="Ex : A-123" value="<?= REALM_AdAdmin::$refAgency; ?>">
             </div>
         </div>
         <div id="prices">
             <div class="text">
                 <label><?php _e("Property price", "retxtdom");?> <abbr title="<?php _e("Charges included", "retxtdom"); ?>"><sup>?</sup></abbr></label>
-                <input type="number" name="price" id="priceInput" placeholder="Ex : 180000" value="<?= esc_attr(REALM_AdAdmin::$price); ?>" required>
+                <input type="number" name="price" id="priceInput" placeholder="Ex : 180000" value="<?= REALM_AdAdmin::$price; ?>" required>
             </div>
             <div class="text">
                 <label><?php _e("Fees amount", "retxtdom");?></label>
-                <input type="number" name="fees" id="feesInput" placeholder="Ex : 85" value="<?= esc_attr(REALM_AdAdmin::$fees); ?>" required>
+                <input type="number" name="fees" id="feesInput" placeholder="Ex : 85" value="<?= REALM_AdAdmin::$fees; ?>" required>
             </div>
         </div>
         <div id="surfaces">
             <div class="text">
                 <label><?php _e("Living space", "retxtdom");?> (m²)</label>
-                <input type="number" name="surface" id="surfaceInput" placeholder="Ex : 90" value="<?= esc_attr(REALM_AdAdmin::$surface); ?>"  required>
+                <input type="number" name="surface" id="surfaceInput" placeholder="Ex : 90" value="<?= REALM_AdAdmin::$surface; ?>"  required>
             </div>
             <div class="text">
                 <label><?php _e("Land area", "retxtdom");?> (m²)</label>
-                <input type="number" name="landSurface" id="landSurfaceInput" placeholder="Ex : 90" value="<?= esc_attr(REALM_AdAdmin::$landSurface); ?>">
+                <input type="number" name="landSurface" id="landSurfaceInput" placeholder="Ex : 90" value="<?= REALM_AdAdmin::$landSurface; ?>">
             </div>
         </div>
         <div id="address">
             <div class="text">
                 <label><?php _e("Property address", "retxtdom");?></label>
-                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder='Ex : <?php _e("123 Chester Square, London", "retxtdom");?>' value="<?= esc_attr(REALM_AdAdmin::$address); ?>" required>
+                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder='Ex : <?php _e("123 Chester Square, London", "retxtdom");?>' value="<?= REALM_AdAdmin::$address; ?>" required>
             </div>             
 
             <div class="radio">
@@ -90,23 +90,23 @@ class REALM_EditAd {
         <div id="nbRooms">
             <div class="text">
                 <label><?php _e("Number rooms", "retxtdom");?></label>       
-                <input type="number" name="nbRooms" id="nbRoomsInput" placeholder="<?php _e("Number rooms", "retxtdom");?>" value="<?= esc_attr(REALM_AdAdmin::$nbRooms); ?>">
+                <input type="number" name="nbRooms" id="nbRoomsInput" placeholder="<?php _e("Number rooms", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbRooms; ?>">
             </div>
         </div>
         <div id="otherRooms">
             <div class="text">
                 <label><?php _e("Number bedrooms", "retxtdom");?></label>
-                <input type="number" name="nbBedrooms" id="nbBedroomsInput" placeholder="<?php _e("Number bedrooms", "retxtdom");?>" value="<?= esc_attr(REALM_AdAdmin::$nbBedrooms); ?>">
+                <input type="number" name="nbBedrooms" id="nbBedroomsInput" placeholder="<?php _e("Number bedrooms", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbBedrooms; ?>">
 
                 <label><?php _e("Number bathrooms", "retxtdom");?></label>
-                <input type="number" name="nbBathrooms" id="nbBathroomsInput" placeholder="<?php _e("Number bathrooms", "retxtdom");?>" value="<?= esc_attr(REALM_AdAdmin::$nbBathrooms); ?>">
+                <input type="number" name="nbBathrooms" id="nbBathroomsInput" placeholder="<?php _e("Number bathrooms", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbBathrooms; ?>">
             </div>
             <div class="text">
                 <label><?php _e("Number shower rooms", "retxtdom");?></label>
-                <input type="number" name="nbWaterRooms" id="nbWaterRoomsInput" placeholder="<?php _e("Number shower rooms", "retxtdom");?>" value="<?= esc_attr(REALM_AdAdmin::$nbWaterRooms); ?>">
+                <input type="number" name="nbWaterRooms" id="nbWaterRoomsInput" placeholder="<?php _e("Number shower rooms", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbWaterRooms; ?>">
 
                 <label><?php _e("Number toilets", "retxtdom");?></label>
-                <input type="number" name="nbWC" id="nbWCInput" placeholder="<?php _e("Number toilets", "retxtdom");?>" value="<?= esc_attr(REALM_AdAdmin::$nbWC); ?>">
+                <input type="number" name="nbWC" id="nbWCInput" placeholder="<?php _e("Number toilets", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbWC; ?>">
             </div>
         </div>
         <div id="agent">
@@ -132,7 +132,7 @@ class REALM_EditAd {
         </div>
         <div id="addPictures">
             <a href="#" id="insertAdPictures" class="button"><?php empty(REALM_AdAdmin::$images)?_e("Add pictures", "retxtdom"):_e("Replace pictures", "retxtdom");?></a>
-            <input type="hidden" name="images" id="images" value="<?= esc_attr(REALM_AdAdmin::$images); ?>">
+            <input type="hidden" name="images" id="images" value="<?= REALM_AdAdmin::$images; ?>">
         </div>
         <div id="showPictures">
             <?php if(!empty(REALM_AdAdmin::$images)) {
@@ -150,12 +150,12 @@ class REALM_EditAd {
         </div>
 
         <?php 
-            if(isset(REALM_AdAdmin::$customFieldsMF) && !empty(REALM_AdAdmin::$customFieldsMF)) {
+            if(isset(REALM_AdAdmin::$customFieldsMF) && is_array(REALM_AdAdmin::$customFieldsMF)) {
                 echo '<div id="customMFields">';
                 foreach(REALM_AdAdmin::$customFieldsMF as $kField => $vField) { ?>
                     <div class="text">
-                        <label><?=sanitize_text_field($kField);?></label>
-                        <input type="text" name="CF<?=sanitize_text_field($kField);?>" value="<?=sanitize_text_field($vField);?>">
+                        <label><?=$kField;?></label>
+                        <input type="text" name="CF<?=$vField["nameAttr"];?>" value="<?=$vField["value"];?>">
                     </div>
                     <?php 
                 }
@@ -170,11 +170,11 @@ class REALM_EditAd {
         <div id="floors">
             <div class="text">
                 <label><?php _e("Floor", "retxtdom");?></label>
-                <input type="number" name="floor" id="floorInput" placeholder="<?php _e("Floor", "retxtdom");?>" value="<?= esc_attr(REALM_AdAdmin::$floor); ?>">
+                <input type="number" name="floor" id="floorInput" placeholder="<?php _e("Floor", "retxtdom");?>" value="<?= REALM_AdAdmin::$floor; ?>">
             </div>
             <div class="text">
                 <label><?php _e("Number floors", "retxtdom");?></label>
-                <input type="number" name="nbFloors" id="nbFloorsInput" placeholder="<?php _e("Number floors", "retxtdom");?>" value="<?= esc_attr(REALM_AdAdmin::$nbFloors); ?>">
+                <input type="number" name="nbFloors" id="nbFloorsInput" placeholder="<?php _e("Number floors", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbFloors; ?>">
             </div>
         </div>
         <div id="kitchenHeater">
@@ -220,34 +220,34 @@ class REALM_EditAd {
         <div id="balconies">
             <div class="text">
                 <label><?php _e("Number balconies", "retxtdom");?></label>
-                <input type="number" name="nbBalconies" id="nbBalconiesInput" placeholder="<?php _e("Number balconies", "retxtdom");?>" value="<?= esc_attr(REALM_AdAdmin::$nbBalconies); ?>">
+                <input type="number" name="nbBalconies" id="nbBalconiesInput" placeholder="<?php _e("Number balconies", "retxtdom");?>" value="<?= REALM_AdAdmin::$nbBalconies; ?>">
             </div>
         </div>
         <div id="propertyHas">
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="elevatorInput" name="elevator"<?php checked(REALM_AdAdmin::$elevator, '1'); ?>>
+                    <input type="checkbox" id="elevatorInput" name="elevator"<?php checked(REALM_AdAdmin::$elevator); ?>>
                     <span class="slider"></span>
                 </label> 
                 <label for="elevator"><?php _e("Elevator", "retxtdom");?></label>
             </div>
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="cellarInput" name="cellar" <?php checked(REALM_AdAdmin::$cellar, '1'); ?>>
+                    <input type="checkbox" id="cellarInput" name="cellar" <?php checked(REALM_AdAdmin::$cellar); ?>>
                     <span class="slider"></span>
                 </label> 
                 <label for="cellar"><?php _e("Cellar", "retxtdom");?></label>
             </div>
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="terraceInput" name="terrace" <?php checked(REALM_AdAdmin::$terrace, '1'); ?>>
+                    <input type="checkbox" id="terraceInput" name="terrace" <?php checked(REALM_AdAdmin::$terrace); ?>>
                     <span class="slider"></span>
                 </label>   
                 <label for="terrace"><?php _e("Terrace", "retxtdom");?></label>
             </div>
             <div class="checkbox">
                 <label class="switch">
-                    <input type="checkbox" id="furnishedInput" name="furnished" <?php checked(REALM_AdAdmin::$furnished, '1'); ?>>
+                    <input type="checkbox" id="furnishedInput" name="furnished" <?php checked(REALM_AdAdmin::$furnished); ?>>
                     <span class="slider"></span>
                 </label>   
                 <label for="furnished"><?php _e("Furnished", "retxtdom");?></label>
@@ -256,27 +256,27 @@ class REALM_EditAd {
         <div id="year">
             <div class="text">
                 <label><?php _e("Construction year", "retxtdom");?></label>
-                <input type="number" name="year" id="yearInput" placeholder="<?php _e("Construction year", "retxtdom");?>" value="<?= esc_attr(REALM_AdAdmin::$year); ?>">
+                <input type="number" name="year" id="yearInput" placeholder="<?php _e("Construction year", "retxtdom");?>" value="<?= REALM_AdAdmin::$year; ?>">
             </div>
         </div>
         <div id="diag">
             <div class="text">
                 <label><?php _e("EPD in kWhPE/m²/year", "retxtdom");?></label>
-                <input type="number" id="DPE" name="DPE" min="0" max="500" value="<?= esc_attr(REALM_AdAdmin::$DPE); ?>">
+                <input type="number" id="DPE" name="DPE" min="0" max="500" value="<?= REALM_AdAdmin::$DPE; ?>">
             </div>
             <div class="text">
                 <label><?php _e("Greenhouse gas in kg eqCO2/m²/year", "retxtdom");?></label>
-                <input type="number" id="GES" name="GES" min="0" max="100" value="<?= esc_attr(REALM_AdAdmin::$GES); ?>">
+                <input type="number" id="GES" name="GES" min="0" max="100" value="<?= REALM_AdAdmin::$GES; ?>">
             </div>
         </div>
 
         <?php 
-            if(isset(REALM_AdAdmin::$customFieldsAF) && !empty(REALM_AdAdmin::$customFieldsAF)) {
+            if(isset(REALM_AdAdmin::$customFieldsAF) && is_array(REALM_AdAdmin::$customFieldsAF)) {
                 echo '<div id="customCFields">';
                 foreach(REALM_AdAdmin::$customFieldsAF as $kField => $vField) { ?>
                     <div class="text">
-                        <label><?=esc_attr($kField);?></label>
-                        <input type="text" name="CF<?=esc_attr($kField);?>" value="<?=esc_attr($vField);?>">
+                        <label><?=$kField;?></label>
+                        <input type="text" name="CF<?=$vField["nameAttr"];?>" value="<?=$vField["value"];?>">
                     </div>
                     <?php 
                 }

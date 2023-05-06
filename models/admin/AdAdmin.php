@@ -47,21 +47,21 @@ class REALM_AdAdmin {
         self::$metas = get_post_custom($id);
         
         self::$refAgency = sanitize_text_field(self::getMeta("adRefAgency"));
-        self::$price = intval(self::getMeta("adPrice"));
-        self::$fees = intval(self::getMeta("adFees"));
+        self::$price = absint(self::getMeta("adPrice"));
+        self::$fees = absint(self::getMeta("adFees"));
         self::$surface = sanitize_text_field(self::getMeta("adSurface"));
         self::$landSurface = sanitize_text_field(self::getMeta("adLandSurface"));
-        self::$nbRooms = intval(self::getMeta("adNbRooms"));
-        self::$nbBedrooms = intval(self::getMeta("adNbBedrooms"));
-        self::$nbBathrooms = intval(self::getMeta("adNbBathrooms"));
-        self::$nbWaterRooms = intval(self::getMeta("adNbWaterRooms"));
-        self::$nbWC = intval(self::getMeta("adNbWC"));
+        self::$nbRooms = absint(self::getMeta("adNbRooms"));
+        self::$nbBedrooms = absint(self::getMeta("adNbBedrooms"));
+        self::$nbBathrooms = absint(self::getMeta("adNbBathrooms"));
+        self::$nbWaterRooms = absint(self::getMeta("adNbWaterRooms"));
+        self::$nbWC = absint(self::getMeta("adNbWC"));
         self::$address = sanitize_text_field(self::getMeta("adAddress"));
         self::$showMap = sanitize_text_field(self::getMeta("adShowMap"));
         self::$images = sanitize_text_field(self::getMeta("adImages"));
         self::$allAgents = get_posts(array("post_type" => "agent", "numberposts" => -1));
-        self::$idAgent = sanitize_text_field(self::getMeta("adIdAgent"));
-        self::$showAgent = sanitize_text_field(self::getMeta("adShowAgent"));
+        self::$idAgent = absint(self::getMeta("adIdAgent"));
+        self::$showAgent = boolval(self::getMeta("adShowAgent"));
         
         //Custom fields
         $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
@@ -69,9 +69,10 @@ class REALM_AdAdmin {
             $customFields = $optionsGeneral["customFields"];
             self::$customFieldsMF = array();
             if(!empty($customFields) || $customFields !== "[]") {
-                foreach(json_decode($customFields, true) as $field) {
+                $customFields = json_decode($customFields, true);
+                foreach($customFields as $field) {
                     if($field["section"] === "mainFeatures") {
-                        self::$customFieldsMF[$field["name"]] = sanitize_text_field(self::getMeta("adCF".$field["name"]));
+                        self::$customFieldsMF[sanitize_text_field($field["name"])] = array("nameAttr"=>$field["nameAttr"], "value"=>sanitize_text_field(self::getMeta("adCF".$field["nameAttr"])));
                     }
                 }
             }
@@ -81,27 +82,28 @@ class REALM_AdAdmin {
     public static function getAdditionalFeatures($id) {
         self::$metas = get_post_custom($id);
         
-        self::$floor = intval(self::getMeta("adFloor"));
-        self::$nbFloors = intval(self::getMeta("adNbFloors"));
-        self::$furnished = sanitize_text_field(self::getMeta("adFurnished"));
-        self::$year = intval(self::getMeta("adYear"));
+        self::$floor = absint(self::getMeta("adFloor"));
+        self::$nbFloors = absint(self::getMeta("adNbFloors"));
+        self::$furnished = boolval(self::getMeta("adFurnished"));
+        self::$year = absint(self::getMeta("adYear"));
         self::$typeHeating = sanitize_text_field(self::getMeta("adTypeHeating"));
         self::$typeKitchen = sanitize_text_field(self::getMeta("adTypeKitchen"));
-        self::$nbBalconies = intval(self::getMeta("adNbBalconies"));
-        self::$elevator = sanitize_text_field(self::getMeta("adElevator"));
-        self::$cellar = sanitize_text_field(self::getMeta("adCellar"));
-        self::$terrace = sanitize_text_field(self::getMeta("adTerrace"));
-        self::$DPE = intval(self::getMeta("adDPE"));
-        self::$GES = intval(self::getMeta("adGES"));
+        self::$nbBalconies = absint(self::getMeta("adNbBalconies"));
+        self::$elevator = boolval(self::getMeta("adElevator"));
+        self::$cellar = boolval(self::getMeta("adCellar"));
+        self::$terrace = boolval(self::getMeta("adTerrace"));
+        self::$DPE = absint(self::getMeta("adDPE"));
+        self::$GES = absint(self::getMeta("adGES"));
         
         $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
         if($optionsGeneral !== false && isset($optionsGeneral["customFields"])) {
             $customFields = $optionsGeneral["customFields"];
             self::$customFieldsAF = array();
             if(!empty($customFields) || $customFields !== "[]") {
-                foreach(json_decode($customFields, true) as $field) {
+                $customFields = json_decode($customFields, true);
+                foreach($customFields as $field) {
                     if($field["section"] === "additionalFeatures") {
-                        self::$customFieldsAF[$field["name"]] = sanitize_text_field(self::getMeta("adCF".$field["name"]));
+                        self::$customFieldsAF[sanitize_text_field($field["name"])] = array("nameAttr"=>$field["nameAttr"], "value"=>sanitize_text_field(self::getMeta("adCF".$field["nameAttr"])));
                     }
                 }
             }
@@ -128,35 +130,35 @@ class REALM_AdAdmin {
             update_post_meta($adId, "adRefAgency", sanitize_text_field($_POST["refAgency"]));
         }
         if(isset($_POST["price"]) && is_numeric($_POST["price"])) {
-            update_post_meta($adId, "adPrice", intval($_POST["price"]));
+            update_post_meta($adId, "adPrice", absint($_POST["price"]));
         }
         if(isset($_POST["fees"]) && is_numeric($_POST["fees"])) {
-            update_post_meta($adId, "adFees", intval($_POST["fees"]));
+            update_post_meta($adId, "adFees", absint($_POST["fees"]));
         }        
         if(isset($_POST["surface"]) && is_numeric($_POST["surface"])) {
-            update_post_meta($adId, "adSurface", intval($_POST["surface"]));
+            update_post_meta($adId, "adSurface", absint($_POST["surface"]));
         }
         if(isset($_POST["landSurface"]) && is_numeric($_POST["landSurface"])) {
-            update_post_meta($adId, "adLandSurface", intval($_POST["landSurface"]));
+            update_post_meta($adId, "adLandSurface", absint($_POST["landSurface"]));
         }
         if(isset($_POST["nbRooms"]) && is_numeric($_POST["nbRooms"])) {
-            update_post_meta($adId, "adNbRooms", intval($_POST["nbRooms"]));
+            update_post_meta($adId, "adNbRooms", absint($_POST["nbRooms"]));
         }
         if(isset($_POST["nbBedrooms"]) && is_numeric($_POST["nbBedrooms"])) {
-            update_post_meta($adId, "adNbBedrooms", intval($_POST["nbBedrooms"]));
+            update_post_meta($adId, "adNbBedrooms", absint($_POST["nbBedrooms"]));
         }
         $nbBathWaterRooms = 0;
         if(isset($_POST["nbBathrooms"]) && is_numeric($_POST["nbBathrooms"])) {
             update_post_meta($adId, "adNbBathrooms", intval($_POST["nbBathrooms"]));
-            $nbBathWaterRooms += intval($_POST["nbBathrooms"]);
+            $nbBathWaterRooms += absint($_POST["nbBathrooms"]);
         }
         if(isset($_POST["nbWaterRooms"]) && is_numeric($_POST["nbWaterRooms"])) {
             update_post_meta($adId, "adNbWaterRooms", intval($_POST["nbWaterRooms"]));
-            $nbBathWaterRooms += intval($_POST["nbWaterRooms"]);
+            $nbBathWaterRooms += absint($_POST["nbWaterRooms"]);
         }
         update_post_meta($adId, "adNbBathWaterRooms", $nbBathWaterRooms);
         if(isset($_POST["nbWC"]) && is_numeric($_POST["nbWC"])) {
-            update_post_meta($adId, "adNbWC", intval($_POST["nbWC"]));
+            update_post_meta($adId, "adNbWC", absint($_POST["nbWC"]));
         }            
 
         if(isset($_POST["showMap"]) && !ctype_space($_POST["showMap"])) {
@@ -201,14 +203,11 @@ class REALM_AdAdmin {
             update_post_meta($adId, "adImages", sanitize_text_field($_POST["images"]));
         }
         if(isset($_POST["agent"]) && !ctype_space($_POST["agent"])) {
-            update_post_meta($adId, "adIdAgent", intval($_POST["agent"]));
+            update_post_meta($adId, "adIdAgent", absint($_POST["agent"]));
         }
-        if(isset($_POST["showAgent"])) {
-            update_post_meta($adId, "adShowAgent", '1');
-        }else{
-            update_post_meta($adId, "adShowAgent", '0');
-        }
-
+        
+        update_post_meta($adId, "adShowAgent", isset($_POST["showAgent"]));
+        
 
         if(isset($_POST["labels"]) && !ctype_space($_POST["labels"])) {
             update_post_meta($adId, "adLabels", sanitize_text_field($_POST["labels"]));
@@ -216,58 +215,49 @@ class REALM_AdAdmin {
 
 
         if(isset($_POST["floor"]) && is_numeric($_POST["floor"])) {
-            update_post_meta($adId, "adFloor", intval($_POST["floor"]));
+            update_post_meta($adId, "adFloor", absint($_POST["floor"]));
         }
         if(isset($_POST["nbFloors"]) && is_numeric($_POST["nbFloors"])) {
-            update_post_meta($adId, "adNbFloors", intval($_POST["nbFloors"]));
+            update_post_meta($adId, "adNbFloors", absint($_POST["nbFloors"]));
         }
-        if(isset($_POST["furnished"]) && !ctype_space($_POST["furnished"])) {
-            update_post_meta($adId, "adFurnished", '1');
-        }else{
-            update_post_meta($adId, "adFurnished", '0');
-        }
+        
+        update_post_meta($adId, "adFurnished", isset($_POST["furnished"]));
+
         if(isset($_POST["year"]) && is_numeric($_POST["year"])) {
-            update_post_meta($adId, "adYear", intval($_POST["year"]));
+            update_post_meta($adId, "adYear", absint($_POST["year"]));
         }
         if(isset($_POST["typeHeating"]) && !ctype_space($_POST["typeHeating"])) {
-            update_post_meta($adId, "adTypeHeating", $_POST["typeHeating"]);
+            update_post_meta($adId, "adTypeHeating", sanitize_text_field($_POST["typeHeating"]));
         }
         if(isset($_POST["typeKitchen"]) && !ctype_space($_POST["typeKitchen"])) {
-            update_post_meta($adId, "adTypeKitchen", $_POST["typeKitchen"]);
+            update_post_meta($adId, "adTypeKitchen", sanitize_text_field($_POST["typeKitchen"]));
         }
         if(isset($_POST["nbBalconies"]) && !ctype_space($_POST["nbBalconies"])) {
-            update_post_meta($adId, "adNbBalconies", intval($_POST["nbBalconies"]));
+            update_post_meta($adId, "adNbBalconies", absint($_POST["nbBalconies"]));
         }
-        if(isset($_POST["elevator"]) && !ctype_space($_POST["elevator"])) {
-            update_post_meta($adId, "adElevator", '1');
-        }else{
-            update_post_meta($adId, "adElevator", '0');
-        }
-        if(isset($_POST["cellar"]) && !ctype_space($_POST["cellar"])) {
-            update_post_meta($adId, "adCellar", '1');
-        }else{
-            update_post_meta($adId, "adCellar", '0');                
-        }
-        if(isset($_POST["terrace"]) && !ctype_space($_POST["terrace"])) {
-            update_post_meta($adId, "adTerrace", '1');
-        }else{
-            update_post_meta($adId, "adTerrace", '0');                
-        }
+        
+        update_post_meta($adId, "adElevator", isset($_POST["elevator"]));
+
+        update_post_meta($adId, "adCellar", isset($_POST["cellar"]));
+
+        update_post_meta($adId, "adTerrace", isset($_POST["terrace"]));
+
         if(isset($_POST["DPE"]) && is_numeric($_POST["DPE"])) {
-            update_post_meta($adId, "adDPE", intval($_POST["DPE"]));
+            update_post_meta($adId, "adDPE", absint($_POST["DPE"]));
         }
         if(isset($_POST["GES"]) && is_numeric($_POST["GES"])) {
-            update_post_meta($adId, "adGES", intval($_POST["GES"]));
+            update_post_meta($adId, "adGES", absint($_POST["GES"]));
         }
 
         //Custom fields
         $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
         if($optionsGeneral !== false && isset($optionsGeneral["customFields"])) {
-        $customFields = $optionsGeneral["customFields"];
+            $customFields = $optionsGeneral["customFields"];
             if(!empty($customFields) || $customFields !== "[]") {
-                foreach(json_decode($customFields, true) as $field) {
-                    if(isset($_POST["CF".$field["name"]]) && !ctype_space($_POST["CF".$field["name"]])) {
-                        update_post_meta($adId, "adCF".$field["name"], sanitize_text_field($_POST["CF".$field["name"]]));
+                $customFields = json_decode($customFields, true);
+                foreach($customFields as $field) {
+                    if(isset($_POST["CF".$field["nameAttr"]]) && !ctype_space($_POST["CF".$field["nameAttr"]])) {
+                        update_post_meta($adId, "adCF".$field["nameAttr"], sanitize_text_field($_POST["CF".$field["nameAttr"]]));
                     }
                 }
             }
@@ -280,7 +270,6 @@ class REALM_AdAdmin {
         $taxonomy = sanitize_text_field($_POST[$taxonomyName]);
 
         if(!empty($taxonomy)) {
-
             $term = get_term_by("name", $taxonomy, $taxonomyName);
             if(!empty($term) && !is_wp_error($term)) {
                 wp_set_object_terms($postId, $term->term_id, $taxonomyName, false);

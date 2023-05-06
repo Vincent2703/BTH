@@ -69,6 +69,7 @@ function updateCustomFieldsData() {
         if(fieldNameValue.length > 0 ) {
         field = {
             name: fieldNameValue,
+            nameAttr: fieldNameValue.replace(/[^a-zA-Z0-9]/i, ''),
             section: sectionValue
         };
         fields.push(field);

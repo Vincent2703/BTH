@@ -36,7 +36,7 @@ class REALM_AgentAdmin {
         if(isset($_POST["agency"]) && is_numeric($_POST["agency"])) {
             wp_update_post(array(
                 "ID" => $id,
-                "post_parent" => intval($_POST["agency"])
+                "post_parent" => absint($_POST["agency"])
             ));             
         }
     }

@@ -457,6 +457,7 @@ class REALM_Options {
     public function sanitizationFeesScheduleFields($input) {
         $sanitaryValues = array();
         $inputFile = $_FILES[PLUGIN_RE_NAME."OptionsFees"];
+        $typeFile = $inputFile["type"]["feesFile"];
         
         foreach($inputFile as $key => $value) {
             $inputFile[$key] = $value["feesFile"]; 
@@ -466,7 +467,7 @@ class REALM_Options {
             $sanitaryValues["feesUrl"] = sanitize_url($input["feesUrl"], array("https", "http"));
         }
                 
-        if(isset($inputFile)) {
+        if(isset($inputFile) && $typeFile === "application/pdf" || strpos($typeFile, "image/") === 0) {
             $upload = wp_handle_upload($inputFile, array("test_form" => false));
             if(isset($upload["url"]) && !empty($upload["url"])) {
                 $sanitaryValues["feesUrl"] = $upload["url"];
@@ -575,7 +576,7 @@ class REALM_Options {
                         $customFields = json_decode($this->optionsGeneral["customFields"], true);
                         foreach($customFields as $field) { ?>
                             <tr>
-                                <td class="fieldName"><input type="text" value="<?=esc_url($field["name"]);?>"></td>
+                                <td class="fieldName"><input type="text" value="<?=$field["name"];?>"></td>
                                 <td class="section"><select><option id="mainFeatures" <?php selected($field["section"], "mainFeatures"); ?>><?php _e("Main features", "retxtdom"); ?></option><option id="additionalFeatures"  <?php selected($field["section"], "additionalFeatures"); ?>><?php _e("Additional features", "retxtdom"); ?></option></select></td>
                                 <td>
                                     <span class="dashicons-before dashicons-arrow-up-alt fieldUp"></span>
@@ -688,7 +689,7 @@ class REALM_Options {
     public function feesUrlCallback() { ?>
         <input type="text" id="feesUrl" class="regular-text" 
                name="<?=PLUGIN_RE_NAME."OptionsFees[feesUrl]";?>" 
-               placeholder="<?=$_SERVER["HTTP_HOST"].'/'. __("feesSchedule", "retxtdom").".pdf";?>" 
+               placeholder="<?=get_site_url().'/'. __("feesSchedule", "retxtdom").".pdf";?>" 
                value="<?=isset($this->optionsFees["feesUrl"]) ? esc_url($this->optionsFees["feesUrl"]) : '';?>">
     <?php }
     
