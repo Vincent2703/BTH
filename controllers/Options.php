@@ -457,7 +457,6 @@ class REALM_Options {
     public function sanitizationFeesScheduleFields($input) {
         $sanitaryValues = array();
         $inputFile = $_FILES[PLUGIN_RE_NAME."OptionsFees"];
-        $typeFile = $inputFile["type"]["feesFile"];
         
         foreach($inputFile as $key => $value) {
             $inputFile[$key] = $value["feesFile"]; 
@@ -467,9 +466,16 @@ class REALM_Options {
             $sanitaryValues["feesUrl"] = sanitize_url($input["feesUrl"], array("https", "http"));
         }
                 
-        if(isset($inputFile) && $typeFile === "application/pdf" || strpos($typeFile, "image/") === 0) {
-            $upload = wp_handle_upload($inputFile, array("test_form" => false));
-            if(isset($upload["url"]) && !empty($upload["url"])) {
+        if(isset($inputFile)) {
+            $validMimeTypes = array(
+                "pdf"   => "application/pdf",
+                "jpg"   => "image/jpeg",
+                "jpeg"  => "image/jpeg",
+                "png"   => "image/png",
+                "bmp"   => "image/bmp",
+            );
+            $upload = wp_handle_upload($inputFile, array("test_form" => false, "test_type" => true, "mimes"=>$validMimeTypes));
+            if(!isset($upload["error"]) && isset($upload["url"]) && !empty($upload["url"])) {
                 $sanitaryValues["feesUrl"] = $upload["url"];
             }
         }
@@ -695,7 +701,7 @@ class REALM_Options {
     
     public function feesFileCallback() {
         $name = PLUGIN_RE_NAME."OptionsFees[feesFile]";
-        echo "<input type='file' name='$name' accept='.pdf, image/*'>";
+        echo "<input type='file' name='$name' accept='.pdf, .jpg, .jpeg, .png, .bmp'>";
     }
     
     
