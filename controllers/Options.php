@@ -174,7 +174,7 @@ class REALM_Options {
         $titleFormat = '%s&nbsp;<abbr title="%s"><sup>?</sup></abbr>';
         add_settings_field(
             "currency", //id
-            sprintf($titleFormat, __("Currency", "retxtdom"), __("Currency's symbol.", "retxtdom")), //title
+            sprintf($titleFormat, __("Currency", "retxtdom"), __("Monetary currency symbol.", "retxtdom")), //title
             array($this, "currencyCallback"), //callback
             PLUGIN_RE_NAME."OptionsGeneralPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -200,7 +200,7 @@ class REALM_Options {
              
         add_settings_field(
             "maxSavesImports", //id
-            sprintf($titleFormat, __("Backups number", "retxtdom"), __("Number of copies of files containing imported ads to keep.", "retxtdom")), //title    
+            sprintf($titleFormat, __("Backups number", "retxtdom"), __("Number of file copies containing imported ads to keep.", "retxtdom")), //title    
             array($this, "maxSavesImportsCallback"), //callback
             PLUGIN_RE_NAME."OptionsImportsPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -208,7 +208,7 @@ class REALM_Options {
         
         add_settings_field(
             "maxDim", //id
-            sprintf($titleFormat, __("Pictures size", "retxtdom"), __("Maximum size of imported pictures.", "retxtdom")), //title
+            sprintf($titleFormat, __("Pictures dimensions", "retxtdom"), __("Maximum dimension of the imported pictures.", "retxtdom")), //title
             array($this, "maxDimCallback"), //callback
             PLUGIN_RE_NAME."OptionsImportsPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -243,7 +243,7 @@ class REALM_Options {
         
         add_settings_field(
             "maxSavesExports", //id
-            sprintf($titleFormat, __("Backups number", "retxtdom"), __("Number of copies of files containing exported ads to keep.", "retxtdom")), //title    
+            sprintf($titleFormat, __("Backups number", "retxtdom"), __("Number of file copies containing the exported ads to keep.", "retxtdom")), //title    
             array($this, "maxSavesExportsCallback"), //callback
             PLUGIN_RE_NAME."OptionsExportsPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -322,7 +322,7 @@ class REALM_Options {
         
         add_settings_field(
             "apiLimitNbRequests",
-            sprintf($titleFormat, __("Limit number of requests per day and user", "retxtdom"), __("Limiting the number of requests makes abuse less likely.", "retxtdom")), //title    
+            sprintf($titleFormat, __("Limit the number of requests per day and user", "retxtdom"), __("Limiting the number of requests makes abuse less likely.", "retxtdom")), //title    
             array($this, "apiLimitNbRequestsCallback"),
             PLUGIN_RE_NAME."OptionsApisPage",
             PLUGIN_RE_NAME."optionsSection"
@@ -346,7 +346,7 @@ class REALM_Options {
         
         add_settings_field(
             "apiAdminAreaLvl1", //id
-            sprintf($titleFormat, __("Display addresses with the administration area level 1", "retxtdom"), __("Generally state or prefecture.", "retxtdom")), //title    
+            sprintf($titleFormat, __("Display addresses with the administration area level 1", "retxtdom"), __("Generally a state or a prefecture.", "retxtdom")), //title    
             array($this, "apiAdminAreaLvl1Callback"), //callback
             PLUGIN_RE_NAME."OptionsApisPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -354,7 +354,7 @@ class REALM_Options {
         
         add_settings_field(
             "apiAdminAreaLvl2", //id
-            sprintf($titleFormat, __("Display addresses with the administration area level 2", "retxtdom"), __("Generally country or district.", "retxtdom")), //title                   
+            sprintf($titleFormat, __("Display addresses with the administration area level 2", "retxtdom"), __("Generally a country or a district.", "retxtdom")), //title                   
             array($this, "apiAdminAreaLvl2Callback"), //callback
             PLUGIN_RE_NAME."OptionsApisPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
@@ -567,7 +567,7 @@ class REALM_Options {
                 </thead>
                 <tbody>
                     <tr class="demo">
-                        <td class="fieldName"><input type="text" placeholder="<?php _e("Ex : Orientation", "retxtdom"); ?>"></td>
+                        <td class="fieldName"><input type="text" placeholder="<?php _e("Eg : Orientation", "retxtdom"); ?>"></td>
                         <td class="section"><select><option id="mainFeatures"><?php _e("Main features", "retxtdom"); ?></option><option id="additionalFeatures"><?php _e("Additional features", "retxtdom"); ?></option></select></td>
                         <td>
                             <span class="dashicons-before dashicons-arrow-up-alt fieldUp"></span>

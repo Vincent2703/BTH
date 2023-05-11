@@ -36,7 +36,7 @@ class REALM_AdAdmin {
     public static $typeKitchen;
     public static $nbBalconies;
     public static $elevator;
-    public static $cellar;
+    public static $basement;
     public static $terrace;
     public static $DPE;
     public static $GES;
@@ -90,7 +90,7 @@ class REALM_AdAdmin {
         self::$typeKitchen = sanitize_text_field(self::getMeta("adTypeKitchen"));
         self::$nbBalconies = absint(self::getMeta("adNbBalconies"));
         self::$elevator = boolval(self::getMeta("adElevator"));
-        self::$cellar = boolval(self::getMeta("adCellar"));
+        self::$basement = boolval(self::getMeta("adCellar"));
         self::$terrace = boolval(self::getMeta("adTerrace"));
         self::$DPE = absint(self::getMeta("adDPE"));
         self::$GES = absint(self::getMeta("adGES"));
@@ -238,7 +238,7 @@ class REALM_AdAdmin {
         
         update_post_meta($adId, "adElevator", isset($_POST["elevator"]));
 
-        update_post_meta($adId, "adCellar", isset($_POST["cellar"]));
+        update_post_meta($adId, "adCellar", isset($_POST["basement"]));
 
         update_post_meta($adId, "adTerrace", isset($_POST["terrace"]));
 

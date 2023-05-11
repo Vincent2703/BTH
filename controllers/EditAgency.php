@@ -11,7 +11,7 @@ class REALM_EditAgency {
     public function addMetaBox() {
         add_meta_box( 
             "agencyMetaBox", //ID HTML
-            __("Agency's coordinates", "retxtdom"), //Display
+            __("Agency contact", "retxtdom"), //Display
             array($this, "displayAgencyMetaBox"), //Callback
             "agency", //Custom type
             "normal", //Location on the page

@@ -56,9 +56,9 @@ class REALM_Ad {
                     "not_found"             => __("No ads found", "retxtdom"),
                     "not_found_in_trash"    => __("No ads found in trash", "retxtdom"),
                     "all_items"             => __("All ads", "retxtdom"),
-                    "featured_image"        => __("Ad thumbnail", "retxtdom"),
+                    "featured_image"        => __("Ad's thumbnail", "retxtdom"),
                     "set_featured_image"    => __("Choose a thumbnail", "retxtdom"),
-                    "remove_featured_image" => __("Remove thumbnail", "retxtdom"),
+                    "remove_featured_image" => __("Remove the thumbnail", "retxtdom"),
                     "use_featured_image"    => __("Use as thumbnail", "retxtdom"),
                ),
 
@@ -157,32 +157,40 @@ class REALM_Ad {
      * Fetch the single or archive custom post Ad template
      */
     public function templatePostAd($path) {
+        $dirTemplates = PLUGIN_RE_PATH."templates/";
         $currentTheme = wp_get_theme();
-        $dirName = str_replace(' ', '', strtolower($currentTheme->name)).$currentTheme->version;
-        $dirPath = PLUGIN_RE_PATH."templates/$dirName";
-        if(is_dir($dirPath)) {
+        $themeName = str_replace(' ', '', strtolower($currentTheme->name));
+        $themeVersion = $currentTheme->version;
+
+        if(is_dir($dirTemplates.$themeName)) {
+            $listDirVersions = array_diff(scandir($dirTemplates.$themeName), array('.', ".."));
+
+            if(in_array($themeVersion, $listDirVersions)) {
+                $dirPath = "$themeName/$themeVersion";
+            }else {
+                $dirVersion = end($listDirVersions);
+                $dirPath = "$themeName/$dirVersion";
+            }
+        
+            $dirFullPath = "$dirTemplates$dirPath";
+
             if(get_post_type() === "re-ad") {
-                if(is_single()) {
-                    if(!locate_template(array("single-ad.php"))) {
-                        $path = "$dirPath/singles/single-ad.php";
-                        $this->registerPluginScriptsSingleAd();
-                        $this->registerPluginStylesSingleAd($dirName);
-                    }
-                }else if(is_post_type_archive("re-ad")) {
-                    if(!locate_template(array("archive-ad.php"))) {
-                        $path =  "$dirPath/archives/archive-ad.php";
-                        wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$dirName/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
-                        wp_enqueue_style("archiveAd");
-                    }
+                if(is_single() && !locate_template(array("single-ad.php"))) {
+                    $path = "$dirFullPath/singles/single-ad.php";
+                    $this->registerPluginScriptsSingleAd();
+                    $this->registerPluginStylesSingleAd($dirPath);
+                }else if(is_post_type_archive("re-ad") && !locate_template(array("archive-ad.php"))) {
+                    $path =  "$dirFullPath/archives/archive-ad.php";
+                    wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$dirPath/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
+                    wp_enqueue_style("archiveAd");
                 }
-            }else if(is_search() && !have_posts()) {
-                if(!locate_template(array("no-results.php"))) {
-                    $path =  "$dirPath/archives/no-results.php";
-                    wp_register_style("noResults", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$dirName/archives/noResults.css"), array(), PLUGIN_RE_VERSION);
-                    wp_enqueue_style("noResults");
-                }         
+            }else if(is_search() && !have_posts() && !locate_template(array("no-results.php"))) {
+                $path =  "$dirFullPath/archives/no-results.php";
+                wp_register_style("noResults", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$dirPath/archives/noResults.css"), array(), PLUGIN_RE_VERSION);
+                wp_enqueue_style("noResults");
             }
         }
+
         return $path;
     }
     
@@ -287,7 +295,7 @@ class REALM_Ad {
      */
     public function typePropertyCreateFields($taxonomy) { ?>
         <?php _e("Habitable", "retxtdom"); ?> <input type="checkbox" name="habitable">
-        <p class="description" id="description-description"><?php _e("Is this type of property habitable ?", "retxtdom"); ?></p><br />
+        <p class="description" id="description-description"><?php _e("Is this type of property habitable?", "retxtdom"); ?></p><br />
     <?php }
     
     /*
@@ -299,7 +307,7 @@ class REALM_Ad {
             <tr class="form-field form-required">
               <th scope="row" valign="top"><label for="tag-type">'.__("Habitable", "retxtdom").'</label></th>
               <td><input type="checkbox" name="habitable"'.checked($checked).'>
-              <p class="description" id="description-description">'.__("Is this type of property habitable ?", "retxtdom").'</p>
+              <p class="description" id="description-description">'.__("Is this type of property habitable?", "retxtdom").'</p>
             </td>
             </tr>';
         echo $html;

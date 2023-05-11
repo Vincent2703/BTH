@@ -11,7 +11,7 @@ class REALM_EditAgent {
     public function addMetaBoxes() {
         add_meta_box( 
             "agentMetaBox", //ID HTML
-            "Coordonnées de l'agent", //Display
+            __("Agent's contact", "retxtdom"), //Display
             array($this, "displayAgentMetaBox"), //Callback
             "agent", //Custom type
             "normal", //Location on the page
@@ -19,7 +19,7 @@ class REALM_EditAgent {
         );
         add_meta_box( 
             "agencyMetaBox", //ID HTML
-            "Agence", //Display
+            __("Agency", "retxtdom"), //Display
             array($this, "displayAgencyMetaBox"), //Callback
             "agent", //Custom type
             "side", //Location on the page

@@ -16,18 +16,18 @@ class REALM_Export {
     
     public function showPage() { //Page content ?>
         <div class="wrap">
-            <h2><?php _e("Exports the ads", "retxtdom"); ?></h2>
+            <h2><?php _e("Export the ads", "retxtdom"); ?></h2>
             <?php 
                 if(isset($_POST["submitExport"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formExportAds")) { //Export
                     SELF::startExport();
                     SELF::checkQuotaExports();
-                    _e("Export completed successfully", "retxtdom");
+                    _e("Successful export", "retxtdom");
                 }else if(isset($_GET["exportToDelete"]) && preg_match("/.+\.xml$/", $_GET["exportToDelete"]) && isset($_GET["nonceSecurity"]) && wp_verify_nonce($_GET["nonceSecurity"], "deleteExport")) { //Delete one export
                     if(@unlink(SELF::$dirPath.$_GET["exportToDelete"])) {
                         _e("File deleted with success", "retxtdom");
                         SELF::$files = SELF::getListFiles();
                     }else{
-                        _e("File was not deleted due to an error", "retxtdom");
+                        _e("The file has not been deleted due to an error", "retxtdom");
                     }
                 }
                 $postType = get_current_screen()->post_type;
@@ -68,7 +68,7 @@ class REALM_Export {
     }
     
     public function widgetExport() { //Widget to show on the WP dashboard
-        wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetExport", "Exporter les annonces", array($this, "showPage"));
+        wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetExport", __("Export the ads", "retxtdom"), array($this, "showPage"));
     }
 
     private static function getArrayAds() { //From the ads, get an array

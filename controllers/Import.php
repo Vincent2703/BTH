@@ -33,10 +33,10 @@ class REALM_Import {
                 <?php wp_nonce_field("formImportAds", "nonceSecurity"); ?>
                 <input type="file" name="file" accept="<?=implode(", ", SELF::$extAccepted);?>">
                 <p>
-                    <input type="submit" name="submitImport" class="button button-primary" value="Importer les annonces">
+                    <input type="submit" name="submitImport" class="button button-primary" value="<?php __("Import the ads", "retxtdom"); ?>">
                     <br />
                     <input type="checkbox" id="publishAds" name="publishAds" checked>
-                    <label for="publishAds"><?php _e("Directly publish the ads", "retxtdom"); ?></label><br />        
+                    <label for="publishAds"><?php _e("Publish directly the ads", "retxtdom"); ?></label><br />        
                     <input type="checkbox" id="replaceAds" name="replaceAds" checked>
                     <label for="replaceAds"><?php _e("Replace the ads with the same reference", "retxtdom"); ?></label>          
                 </p>      
@@ -74,7 +74,7 @@ class REALM_Import {
                 $imageFileType = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 
                 if(!in_array(".$imageFileType", SELF::$extAccepted)) { 
-                    echo "Seulement les fichiers ".implode(", ", SELF::$extAccepted)." sont autorisés.";
+                    printf(__('Only the files with one of these extensions are accepted : (%1$s)', "retxtdom"), implode(", ", SELF::$extAccepted));
                     $uploadOk = false;
                 }
 
@@ -82,9 +82,9 @@ class REALM_Import {
                     self::startImport($filePath);
                     @unlink($filePath);
                 }else{
-                    echo "<br/>Une erreur est survenue lors de l'envoi.";
+                    _e("An error occurred while sending.", "retxtdom");
                 }
-                _e("Import completed successfully", "retxtdom");
+                _e("Successful import", "retxtdom");
             }
         }
                 
@@ -182,11 +182,11 @@ class REALM_Import {
     }
     
     public function widgetImport() {
-        wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetImport", "Importer les annonces", array($this, "showPage"));
+        wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetImport", __("Import the ads", "retxtdom"), array($this, "showPage"));
     }
     
     private static function countAds($filePath) {
-        $handle = fopen($filePath, "r");
+        $handle = fopen($filePath, 'r');
         $adsXML = fread($handle, filesize($filePath));
         fclose($handle);
 

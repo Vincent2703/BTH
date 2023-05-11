@@ -21,10 +21,12 @@ class REALM_AdSingle {
     public static $furnished;
     public static $year;
     public static $typeHeating;
+    public static $typeHeatingTranslated;
     public static $typeKitchen;
+    public static $typeKitchenTranslated;
     public static $nbBalconies;
     public static $elevator;
-    public static $cellar;
+    public static $basement;
     public static $terrace;
     public static $DPE;
     public static $GES;
@@ -81,14 +83,55 @@ class REALM_AdSingle {
             self::$nbFloors = intval(self::getMeta("adNbFloors"));
             self::$furnished = self::getMeta("adFurnished");
             self::$year = intval(self::getMeta("adYear"));
-            self::$typeHeating = sanitize_text_field(self::getMeta("adTypeHeating"));
-            self::$typeKitchen = sanitize_text_field(self::getMeta("adTypeKitchen"));
             self::$nbBalconies = sanitize_text_field(self::getMeta("adNbBalconies"));
             self::$elevator = sanitize_text_field(self::getMeta("adElevator"));
-            self::$cellar = sanitize_text_field(self::getMeta("adCellar"));
+            self::$basement = sanitize_text_field(self::getMeta("adCellar"));
             self::$terrace = sanitize_text_field(self::getMeta("adTerrace"));
             self::$DPE = intval(self::getMeta("adDPE"));
             self::$GES = intval(self::getMeta("adGES"));
+            
+            self::$typeHeating = sanitize_text_field(self::getMeta("adTypeHeating"));
+            switch(self::$typeHeating) {
+                case "Individual gas":
+                    self::$typeHeatingTranslated = __("Individual gas", "retxtdom");
+                    break;
+                case "CollectiveGas":
+                    self::$typeHeatingTranslated = __("Collective gas", "retxtdom");
+                    break;
+                case "Individual fuel":
+                    self::$typeHeatingTranslated = __("Individual fuel", "retxtdom");
+                    break;
+                case "Collective fuel":
+                    self::$typeHeatingTranslated = __("Collective fuel", "retxtdom");
+                    break;
+                case "Individual electric":
+                    self::$typeHeatingTranslated = __("Individual electric", "retxtdom");
+                    break;
+                case "Collective electric":
+                    self::$typeHeatingTranslated = __("Collective electric", "retxtdom");
+                    break;
+                default:
+                    self::$typeHeatingTranslated = __("Unknown", "retxtdom");
+                    break;
+            }
+            
+            self::$typeKitchen = sanitize_text_field(self::getMeta("adTypeKitchen"));
+            switch(self::$typeKitchen) {
+                case "Not equipped":
+                    self::$typeKitchenTranslated = __("Not equipped", "retxtdom");
+                    break;
+                case "Kitchenette":
+                    self::$typeKitchenTranslated = __("Kitchenette", "retxtdom");
+                    break;
+                case "Standard":
+                    self::$typeKitchenTranslated = __("Standard", "retxtdom");
+                    break;
+                case "Industrial":
+                    self::$typeKitchenTranslated = __("Industrial", "retxtdom");
+                    break;        
+                default:
+                    self::$typeKitchenTranslated = __("Unknown", "retxtdom");
+            }          
             
             $images = self::getMeta("adImages");
             self::$typeAd = get_the_terms($id, "adTypeAd")[0]->name;

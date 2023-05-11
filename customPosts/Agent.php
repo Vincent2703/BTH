@@ -29,9 +29,9 @@ class REALM_Agent {
                     "not_found"             => __("No agents found", "retxtdom"),
                     "not_found_in_trash"    => __("No agents found in trash", "retxtdom"),
                     "all_items"             => __("All agents", "retxtdom"),
-                    "featured_image"        => __("Agent thumbnail", "retxtdom"),
+                    "featured_image"        => __("Agent's thumbnail", "retxtdom"),
                     "set_featured_image"    => __("Choose a thumbnail", "retxtdom"),
-                    "remove_featured_image" => __("Remove thumbnail", "retxtdom"),
+                    "remove_featured_image" => __("Remove the thumbnail", "retxtdom"),
                     "use_featured_image"    => __("Use as thumbnail", "retxtdom"),
                 ),
 

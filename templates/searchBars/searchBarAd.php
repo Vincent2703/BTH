@@ -73,25 +73,25 @@
                 <div class="pricesSurfacesInputs">
                     <div class="searchBarInput">
                         <label for="minPrice"><?php _e("Price", "retxtdom"); ?></label>
-                        <input type="number" name="minPrice" id="minPrice" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= absint($_GET["minPrice"] ?: 0) ?: '' ?>">
-                        <input type="number" name="maxPrice" id="maxPrice" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= absint($_GET["maxPrice"] ?: 0) ?: '' ?>">
+                        <input type="number" name="minPrice" id="minPrice" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minPrice"]) && absint($_GET["minPrice"] ?: 0) ?: '' ?>">
+                        <input type="number" name="maxPrice" id="maxPrice" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxPrice"]) && absint($_GET["maxPrice"] ?: 0) ?: '' ?>">
                     </div>   
                 
                     <div class="searchBarInput">
                         <label for="minSurface"><?php _e("Living space", "retxtdom"); ?></label>
-                        <input type="number" name="minSurface" id="minSurface" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= absint($_GET["minSurface"] ?: 0) ?: '' ?>">
-                        <input type="number" name="maxSurface" id="maxSurface" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= absint($_GET["maxSurface"] ?: 0) ?: '' ?>">
+                        <input type="number" name="minSurface" id="minSurface" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= isset($_GET["minSurface"]) && absint($_GET["minSurface"] ?: 0) ?: '' ?>">
+                        <input type="number" name="maxSurface" id="maxSurface" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= isset($_GET["maxSurface"]) && absint($_GET["maxSurface"] ?: 0) ?: '' ?>">
                     </div>
                 </div>
                 
                 <div class="searchBarInput otherDetails">
                     <div class="nbRooms">
                         <label for="rooms"><?php _e("Rooms", "retxtdom"); ?></label>
-                        <input type="number" name="nbRooms" id="rooms" value="<?= absint($_GET["nbRooms"] ?: 0) ?: '' ?>">
+                        <input type="number" name="nbRooms" id="rooms" value="<?= isset($_GET["nbRooms"]) && absint($_GET["nbRooms"] ?: 0) ?: '' ?>">
                         <label for="bedrooms"><?php _e("Bedrooms", "retxtdom"); ?></label>
-                        <input type="number" name="nbBedrooms" id="bedrooms" value="<?= absint($_GET["nbBedrooms"] ?: 0) ?: '' ?>">
+                        <input type="number" name="nbBedrooms" id="bedrooms" value="<?= isset($_GET["nbBedrooms"]) && absint($_GET["nbBedrooms"] ?: 0) ?: '' ?>">
                         <label for="bathrooms"><?php _e("Bathrooms", "retxtdom"); ?></label>
-                        <input type="number" name="nbBathrooms" id="bathrooms" value="<?= absint($_GET["nbBathrooms"] ?: 0) ?: '' ?>">
+                        <input type="number" name="nbBathrooms" id="bathrooms" value="<?= isset($_GET["nbBathrooms"]) && absint($_GET["nbBathrooms"] ?: 0) ?: '' ?>">
                     </div>
                     <div class="propertyHas">
                         <div>

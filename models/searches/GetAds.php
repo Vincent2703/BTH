@@ -181,20 +181,22 @@ class REALM_GetAds {
                 }else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"){ 
                     $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=radius&radius=".intval($_GET["radius"])."&nonce=$nonce";
                     $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                    array_push($metas,
-                        array(
-                            "key" => "adLatitude",
-                            "value" => array($addressData["minLat"], $addressData["maxLat"]),
-                            "compare" => "BETWEEN"
-                        )
-                    );
-                    array_push($metas,
-                        array(
-                            "key" => "adLongitude",
-                            "value" => array($addressData["minLong"], $addressData["maxLong"]),
-                            "compare" => "BETWEEN"
-                        )
-                    );
+                    if(isset($addressData["minLat"]) && isset($addressData["maxLat"]) && isset($addressData["minLong"]) && isset($addressData["maxLong"])) {
+                        array_push($metas,
+                            array(
+                                "key" => "adLatitude",
+                                "value" => array($addressData["minLat"], $addressData["maxLat"]),
+                                "compare" => "BETWEEN"
+                            )
+                        );
+                        array_push($metas,
+                            array(
+                                "key" => "adLongitude",
+                                "value" => array($addressData["minLong"], $addressData["maxLong"]),
+                                "compare" => "BETWEEN"
+                            )
+                        );
+                    }
                 }
             }                         
             if(!empty($terms)) {

@@ -187,7 +187,7 @@ class Realm {
         add_filter("template_include", array($this->Agency, "templatePostAgency"), 1); 
         
         //Modify the template file used to display a single agent post type
-        add_filter("template_include", array($this->Agent, "templatePostAgent"), 1); 
+        //add_filter("template_include", array($this->Agent, "templatePostAgent"), 1); 
     }
     
     /*
@@ -403,7 +403,7 @@ class Realm {
                         "dependencies" => array("jquery"),
                         "localize" => array(
                             "variablesImport" => array(
-                                "confirmation" => __("Are you sure that you want to import this file ?", "retxtdom"),
+                                "confirmation" => __("Are you sure that you want to import this file?", "retxtdom"),
                                 "url" => wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".PLUGIN_RE_NAME."import"), "importAds", "nonceSecurity")
                             )
                         )
@@ -642,21 +642,17 @@ class Realm {
         $themeVersion = $currentTheme->version;
         $listThemes = array_diff(scandir(PLUGIN_RE_PATH."templates/"), array("..", '.', "searchBars"));
         
-        foreach($listThemes as $theme) {
-            if(strpos($theme, $themeName) === 0) {
-                $themePluginVersion = substr($theme, strlen($themeName));
-                if($themePluginVersion === $themeVersion) {
-                    $checkTheme = "ok";
-                    break;
-                }else {
-                    $checkTheme = "badVersion";
-                    break;
-                }
+        if(in_array($themeName, $listThemes)) {
+            $listVersions = array_diff(scandir(PLUGIN_RE_PATH."templates/$themeName"), array('.', ".."));
+            if(in_array($themeVersion, $listVersions)) {
+                $checkTheme = "ok";
             }else{
-                $checkTheme = "noTheme";
+                $checkTheme = "badVersion";
             }
+        }else{
+            $checkTheme = "noTheme";
         }
-        
+             
         if($checkTheme === "noTheme") {
             array_push($errors, __("The theme that you are using is not compatible with the plugin. Please use one of the following themes :", "retxtdom")."<br />"
                 . "<ul><li><a target='_blank' href='https://wordpress.org/themes/twentytwenty/'>Twenty twenty 2.1</a></li></ul><br />"
