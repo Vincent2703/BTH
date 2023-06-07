@@ -3,6 +3,10 @@
         exit; //Exit if accessed directly
     }
     if(have_posts()) {
+        //Check if we have the premium complement for the plugin.
+        $activatedPluginsList = get_option("active_plugins");
+        $checkPremiumPlugin = in_array("realmPlus/realmPlus.php", $activatedPluginsList);
+        
         require_once(PLUGIN_RE_PATH."models/singles/AdSingle.php");
         $currency = REALM_AdSingle::getCurrency();
         $feesURL = REALM_AdSingle::getFeesURL();
@@ -15,13 +19,46 @@
             $idPost = get_the_id();
             REALM_AdSingle::getData($idPost);
 
-            if(wp_get_post_terms($idPost, "adAvailable")[0]->slug === "unavailable" /*&& !get_option(PLUGIN_RE_NAME."OptionsAds")["displayAdsUnavailable"]*/) {
+            if(wp_get_post_terms($idPost, "adAvailable")[0]->slug === "unavailable") {
                 wp_redirect(get_home_url(), "302");
                 exit();
             }
+            
+            if($checkPremiumPlugin) {
+                $checkLogin = current_user_can("customer") || current_user_can("administrator");
+                require_once(PLUGIN_REP_PATH."models/front/UserFront.php");
+                $idUser = get_current_user_id();
+                REALMP_UserFront::getData($idUser);
+                $userDataConformity = REALMP_UserFront::checkDataConformity();
+                $alreadyHF = get_posts(array(
+                    "author"        => $idUser,
+                    "post_type"     => "housingfile",
+                    "post_status"   => array("accepted", "decisionwaiting"),
+                    "post_parent"   => $idPost,
+                    "numberposts"   => 1
+                ));
+                $checkAlreadyHF = !empty($alreadyHF);            
+            }   
+        
+            
             get_header();  
-                                  
-            if(isset($_POST["submit"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formContact")) {
+                           
+            if($checkPremiumPlugin && isset($_POST["apply"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formApply")) {
+                //Check that the user is a customer or an admin
+                if($checkLogin) {               
+                    //Check that there is not already a housing file for this user with the accepted or decisionwaiting
+                    if(!$checkAlreadyHF) {
+                    //Check that the user filled all the required data
+                        if($userDataConformity) {
+                            //Create a housing file
+                            require_once(PLUGIN_REP_PATH."models/front/HousingFileFront.php");
+                            $HFID = REALMP_HousingFileFront::createPost($idPost, $idUser, REALM_AdSingle::$refAd ." - ". REALMP_UserFront::$lastName .' '. REALMP_UserFront::$firstName); 
+                        } 
+                    }
+                    
+                }
+                
+            }else if(isset($_POST["contact"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formContact")) {
                 if(isset($_POST["name"]) && isset($_POST["phone"]) && isset($_POST["email"]) && isset($_POST["message"]) && !ctype_space($_POST["names"]) && !ctype_space($_POST["phone"]) && !ctype_space($_POST["email"]) && !ctype_space($_POST["message"])) {
                     $adRef = REALM_AdSingle::$refAd;
                     $contactNames = sanitize_text_field($_POST["names"]);
@@ -224,7 +261,18 @@
                     </div>
                     <?php if($feesURL !== false) { // If there is a fees schedule specified in the options ?> 
                         <span id="feesSchedule"><a target="_blank" href="<?=$feesURL;?>"><?php _e("Fees schedule", "retxtdom") ;?></a></span>
-                    <?php } ?>
+                    <?php }
+                    if($checkPremiumPlugin && $checkLogin) { 
+                        if($checkAlreadyHF || isset($HFID)) { ?>
+                            <a href="<?=get_edit_post_link(isset($HFID)?$HFID:$alreadyHF[0]->ID);?>"><button><?php _e("View my housing file");?></button></a>
+                        <?php }else { ?>
+                        <form method="post" action="" id="applyForm">
+                            <?php wp_nonce_field("formApply", "nonceSecurity"); ?>
+                            <input type="submit" name="apply" id="applyBtn" value="<?php _e("Apply for the property", "retxtdom");?>">
+                        </form>
+                        <?php }                        
+                        }
+                    ?>
                 </div>
                 <div class="contentRightAd">
                     <?php if(REALM_AdSingle::$getCoords) {  
@@ -268,15 +316,18 @@
                             <?php } ?>
                         </div>
                         <form action="" method="post" class="formContact">
-                            <?php wp_nonce_field("formContact", "nonceSecurity"); ?>
-                            <label for="names"><?php _e("First name and last name", "retxtdom"); ?></label><input type="text" name="names" class="formContactInput" required>
-                            <label for="phone"><?php _e("Phone", "retxtdom"); ?></label><input type="tel" name="phone" class="formContactInput" required>
-                            <label for="email"><?php _e("Email address", "retxtdom"); ?></label><input type="text" name="email" class="formContactInput" required>
+                            <?php wp_nonce_field("formContact", "nonceSecurity"); 
+                            $prefillForm = $checkPremiumPlugin&&$checkLogin&&$userDataConformity;
+                            var_dump($userDataConformity);
+                            ?>
+                            <label for="names"><?php _e("First name and last name", "retxtdom"); ?></label><input type="text" name="names" class="formContactInput" value="<?= $prefillForm?REALMP_UserFront::$firstName.' '.REALMP_UserFront::$lastName:''?>" required>
+                            <label for="phone"><?php _e("Phone", "retxtdom"); ?></label><input type="tel" name="phone" class="formContactInput" value="<?= $prefillForm?REALMP_UserFront::$phone:''?>" required>
+                            <label for="email"><?php _e("Email address", "retxtdom"); ?></label><input type="text" name="email" class="formContactInput" value="<?= $prefillForm?REALMP_UserFront::$email:'';?>"required>
                             <label for="message"><?php _e("Message", "retxtdom"); ?></label><textarea name="message" class="formContactInput" cols="22" required></textarea>
                             <?php if(isset($emailStatus)) { ?>
                                 <span id="emailStatus"><?=$emailStatus;?>.</span><br />
                             <?php } ?>
-                            <input type="submit" name="submit" id="formContactSubmit" value="<?php _e("Send", "retxtdom"); ?>">
+                            <input type="submit" name="contact" id="formContactSubmit" value="<?php _e("Send", "retxtdom"); ?>">
                         </form>
                     </div>
                 </div>

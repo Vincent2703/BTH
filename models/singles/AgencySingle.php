@@ -25,7 +25,7 @@ class REALM_AgencySingle {
         
         self::$agents = get_posts(array(
             "post_type" => "agent",
-            "numberposts" => -1,
+            "numberposts" => 99,
             "post_parent" => $id
         ));
         $agentsIDs = wp_list_pluck(self::$agents, "ID");

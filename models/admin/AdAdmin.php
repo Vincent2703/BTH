@@ -59,7 +59,7 @@ class REALM_AdAdmin {
         self::$address = sanitize_text_field(self::getMeta("adAddress"));
         self::$showMap = sanitize_text_field(self::getMeta("adShowMap"));
         self::$images = sanitize_text_field(self::getMeta("adImages"));
-        self::$allAgents = get_posts(array("post_type" => "agent", "numberposts" => -1));
+        self::$allAgents = get_posts(array("post_type" => "agent", "numberposts" => 99));
         self::$idAgent = absint(self::getMeta("adIdAgent"));
         self::$showAgent = boolval(self::getMeta("adShowAgent"));
         

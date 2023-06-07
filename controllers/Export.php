@@ -80,7 +80,7 @@ class REALM_Export {
         }
 
         $args = array(
-            "numberposts" => -1,
+            "numberposts" => 999,
             "post_type" => "re-ad",
             "post_status" => "publish"
         );

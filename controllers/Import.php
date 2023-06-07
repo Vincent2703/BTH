@@ -112,7 +112,7 @@ class REALM_Import {
                 $post = get_posts(array(
                         "post_type" => "re-ad",
                         "fields" => "ids",
-                        "numberposts" => -1,
+                        "numberposts" => 999,
                         "meta_query" => array(
                             array(
                                 "key" => "adRefAgency",

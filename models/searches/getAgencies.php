@@ -7,7 +7,7 @@
     if(!function_exists("getAgencies")) {
         function getAgencies() {
             if(!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest") {
-                return get_posts(array("post_type" => "agency", "numberposts" => -1));
+                return get_posts(array("post_type" => "agency", "numberposts" => 99));
             }
         }
     }

@@ -42,6 +42,15 @@ jQuery(document).ready(function ($) {
     $("#miniSlider ul").css({ width: "100vw" });
 	    
     $(".pagingImg").text("1/" + maxImg);
+    
+    /* REALMP apply button */
+    if($("#applyBtn").length) {
+        $("#applyForm").submit(function(event){
+            if(!confirm("Etes vous sûr de blablabla ?")){
+                event.preventDefault();
+            }
+       });
+    }
 
     function moveSlide(direction) {
         if(direction === "left") {
