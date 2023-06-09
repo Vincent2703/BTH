@@ -61,6 +61,7 @@ class Realm {
         require_once("controllers/EditAd.php");
         require_once("controllers/EditAgent.php");
         require_once("controllers/EditAgency.php");
+        require_once("controllers/RegistrationUser.php");
         require_once("controllers/Export.php");
         require_once("controllers/Import.php");
         
@@ -68,18 +69,19 @@ class Realm {
         require_once("models/searches/GetAds.php");
         
         
-        $this->Ad           = new REALM_Ad;
-        $this->Agent        = new REALM_Agent;
-        $this->Agency       = new REALM_Agency;
+        $this->Ad               = new REALM_Ad;
+        $this->Agent            = new REALM_Agent;
+        $this->Agency           = new REALM_Agency;
         
-        $this->Options      = new REALM_Options;
-        $this->EditAd       = new REALM_EditAd;
-        $this->EditAgent    = new REALM_EditAgent;
-        $this->EditAgency   = new REALM_EditAgency;
-        $this->Export       = new REALM_Export;
-        $this->Import       = new REALM_Import;
+        $this->Options          = new REALM_Options;
+        $this->EditAd           = new REALM_EditAd;
+        $this->EditAgent        = new REALM_EditAgent;
+        $this->EditAgency       = new REALM_EditAgency;
+        $this->RegistrationUser = new REALM_RegistrationUser;
+        $this->Export           = new REALM_Export;
+        $this->Import           = new REALM_Import;
         
-        $this->GetAds       = new REALM_GetAds;   
+        $this->GetAds           = new REALM_GetAds;   
     }
     
     /*
@@ -103,6 +105,9 @@ class Realm {
 
         //Register plugin scripts for the admin area
         add_action("admin_enqueue_scripts", array($this, "registerPluginScriptsAdmin"));
+        
+        //Add fields on registration new user
+        add_action("user_new_form", array($this->RegistrationUser, "addFieldsNewUser"));
 
         //Remove the default search widget
         add_action("widgets_init", array($this, "removeSearchWidget"));
@@ -150,6 +155,7 @@ class Realm {
         
         //Add actions (links) to the plugin row in plugins.php
         add_action("plugin_action_links_" . plugin_basename( __FILE__ ), array($this, "addActionsPluginRow"));
+        
     }
     
     /*
@@ -174,10 +180,10 @@ class Realm {
         //Make the columns added in the previous filter sortable.
         add_filter("manage_edit-agent_sortable_columns", array($this->Agent, "customAgentColumn")); 
         
-        //Add custom columns to the WordPress admin table for the adTypeProperty custom post type
+        //Add custom columns to the WordPress admin table for the adTypeProperty taxonomy
         add_filter("manage_adTypeProperty_custom_column", array($this->Ad, "typePropertyHabitableColumn"), 15, 3); 
         
-        //Define the columns to be displayed in the WordPress admin table for the "adTypeProperty" custom post type
+        //Define the columns to be displayed in the WordPress admin table for the "adTypeProperty" taxonomy
         add_filter("manage_edit-adTypeProperty_columns", array($this->Ad, "typePropertyColumns")); 
         
         //Modify the template file used to display a single or archive ad post type
@@ -196,11 +202,89 @@ class Realm {
     public function onPluginActivation() {
         $this->defaultOptionsValues();
         $this->rewriteFlush(); //Update the permalinks structure
+        
+        //Add custom role agent
+        $capabilities = array(
+            //Ads
+            "read" => true,
+            "publish_ads" => true,
+            "edit_ads" => true,
+            "edit_others_ads" => true,
+            "delete_ads" => true,
+            "delete_others_ads" => true,
+            "read_private_ads" => true,
+            "edit_ad" => true,
+            "delete_ad" => true,
+            "read_ad" => true,
+            
+            //Agents
+            /*"publish_agents" => false,
+            "edit_agents" => true,
+            "edit_others_agents" => false,
+            "delete_agents" => true,
+            "delete_others_agents" => false,
+            "read_private_agents" => false,
+            "edit_agent" => true,
+            "delete_housingfile" => true,
+            "read_housingfile" => true,*/
+            
+            //Housing files (REALM PLUS)
+            "publish_housingfiles" => false,
+            "edit_housingfiles" => true,
+            "edit_others_housingfiles" => true,
+            "delete_housingfiles" => true,
+            "delete_others_housingfiles" => true,
+            "read_private_housingfiles" => true,
+            "edit_housingfile" => true,
+            "delete_housingfile" => true,
+            "read_housingfile" => true,
+        );
+        add_role("agent", __("Agent", "retxtdom"), $capabilities);
+        
+        //Add custom role agency
+        $capabilities = array(
+            //Ads
+            "read" => true,
+            "publish_ads" => true,
+            "edit_ads" => true,
+            "edit_others_ads" => true,
+            "delete_ads" => true,
+            "delete_others_ads" => true,
+            "read_private_ads" => true,
+            "edit_ad" => true,
+            "delete_ad" => true,
+            "read_ad" => true,
+            
+            //Agents
+            /*"publish_agents" => false,
+            "edit_agents" => true,
+            "edit_others_agents" => false,
+            "delete_agents" => true,
+            "delete_others_agents" => false,
+            "read_private_agents" => false,
+            "edit_agent" => true,
+            "delete_housingfile" => true,
+            "read_housingfile" => true,*/
+            
+            //Housing files (REALM PLUS)
+            "publish_housingfiles" => false,
+            "edit_housingfiles" => true,
+            "edit_others_housingfiles" => true,
+            "delete_housingfiles" => true,
+            "delete_others_housingfiles" => true,
+            "read_private_housingfiles" => true,
+            "edit_housingfile" => true,
+            "delete_housingfile" => true,
+            "read_housingfile" => true,
+        );
+        add_role("agency", __("Agency", "retxtdom"), $capabilities);
     }
     
     public function onPluginDeactivation() {
         //TODO : Ajouter option pour supprimer options ou non quand on désactive le plugin
         flush_rewrite_rules(); //Update the permalinks structure
+        
+        remove_role("agent");
     }
 
     /*
@@ -318,6 +402,11 @@ class Realm {
         $base = $screen->base;
         
         $styleSheets = array(
+            '' => array(
+                "user" => array(
+                    "registrationUser" => "/includes/css/others/registrationUser.css"
+                )
+            ),
             "re-ad" => array(
                 "post" => array(
                     "editAd" => "/includes/css/edits/editAd.css",
@@ -362,6 +451,15 @@ class Realm {
         $base = $screen->base;
 
         $scripts = array(
+            '' => array(
+                "user" => array(
+                    "customRegistrationFields" => array(
+                        "path" => "/includes/js/others/registrationUser.js",
+                        "footer" => true,
+                        "dependencies" => array("jquery")
+                    )
+                )
+            ),
             "re-ad" => array(
                 "post" => array(
                     "editAd" => array(
@@ -682,6 +780,12 @@ class Realm {
             </div>
         <?php }
     }
+    
+    /*
+     * Create an agent or agency post if a new agent or agency user is created
+     * Also fill some data
+     */
+    //public function createPostOnNewUser
     
 }
 new Realm;

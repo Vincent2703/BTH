@@ -78,21 +78,25 @@ class REALM_Agent {
      * Filter the agents by agency
      */
     public function agentFilterByAgency() {
-        global $wpdb;
-        if (isset($_GET["post_type"]) && $_GET["post_type"] === "agent") {
-            $sql = "SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'agency' AND post_parent = 0 AND post_status = 'publish' ORDER BY post_title";
-            $parent_pages = $wpdb->get_results($sql, OBJECT_K);
+        if(isset($_GET["post_type"]) && $_GET["post_type"] === "agent") {
+            $args = array(
+                "post_type" => "agency",
+                "post_status" => "publish",
+                "orderby" => "title",
+                "order" => "ASC",
+                "numberposts" => 99
+            );
+            $parentsPage = get_posts($args);
             $select = '
                 <select name="post_parent">
                     <option value="">Agences</option>';
-                    $current = isset($_GET['post_parent']) ? $_GET['post_parent'] : '';
-                    foreach ($parent_pages as $page) {
+                    $current = isset($_GET["post_parent"])?$_GET["post_parent"]:'';
+                    foreach($parentsPage as $page) {
                         $select .= sprintf('<option value="%s"%s>%s</option>', $page->ID, $page->ID == $current ? ' selected="selected"' : '', $page->post_title);
                     }
-            $select .= '
-                </select>';
+            $select .= '</select>';
             echo $select;
-        } else {
+        }else {
             return;
        }
     }
@@ -107,7 +111,7 @@ class REALM_Agent {
     }
     
     /*
-     * Order the agents by agency
+     * Order the agents by agency and remove the date column
      */
     public function customAgentSortableColumns($columns) {
         unset($columns["date"]);
