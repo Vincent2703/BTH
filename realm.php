@@ -64,6 +64,7 @@ class Realm {
         require_once("controllers/RegistrationUser.php");
         require_once("controllers/Export.php");
         require_once("controllers/Import.php");
+        require_once("controllers/EditProfile.php");
         
         //Models
         require_once("models/searches/GetAds.php");
@@ -80,6 +81,7 @@ class Realm {
         $this->RegistrationUser = new REALM_RegistrationUser;
         $this->Export           = new REALM_Export;
         $this->Import           = new REALM_Import;
+        $this->EditProfile      = new REALMP_EditProfile;
         
         $this->GetAds           = new REALM_GetAds;   
     }
@@ -108,6 +110,8 @@ class Realm {
         
         //Add fields on registration new user
         add_action("user_new_form", array($this->RegistrationUser, "addFieldsNewUser"));
+        add_action("user_register", array($this->RegistrationUser, "saveCustomFieldsNewUser"));
+
 
         //Remove the default search widget
         add_action("widgets_init", array($this, "removeSearchWidget"));
@@ -155,6 +159,12 @@ class Realm {
         
         //Add actions (links) to the plugin row in plugins.php
         add_action("plugin_action_links_" . plugin_basename( __FILE__ ), array($this, "addActionsPluginRow"));
+        
+        add_action("show_user_profile", array($this->EditProfile, "addProfileCustomFields"));
+        add_action("edit_user_profile", array($this->EditProfile, "addProfileCustomFields"));
+        
+        add_action("personal_options_update", array($this->EditProfile, "saveProfileCustomFields"));
+        add_action("edit_user_profile_update", array($this->EditProfile, "saveProfileCustomFields"));
         
     }
     
@@ -405,6 +415,9 @@ class Realm {
             '' => array(
                 "user" => array(
                     "registrationUser" => "/includes/css/others/registrationUser.css"
+                ),
+                "user-edit" => array(
+                    "editProfil" => "/includes/css/others/editProfil.css"
                 )
             ),
             "re-ad" => array(
@@ -455,6 +468,13 @@ class Realm {
                 "user" => array(
                     "customRegistrationFields" => array(
                         "path" => "/includes/js/others/registrationUser.js",
+                        "footer" => true,
+                        "dependencies" => array("jquery")
+                    )
+                ),
+                "user-edit" => array(
+                    "editProfil" => array(
+                        "path" => "/includes/js/others/editProfil.js",
                         "footer" => true,
                         "dependencies" => array("jquery")
                     )

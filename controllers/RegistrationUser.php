@@ -14,10 +14,10 @@ class REALM_RegistrationUser {
         
         $agencyPhone = isset($_POST["agencyPhone"])?sanitize_text_field($_POST["agencyPhone"]):'';
         $agencyAddress = isset($_POST["agencyAddress"])?sanitize_text_field($_POST["agencyAddress"]):'';
-        $agencyDescription = isset($_POST["agentPhone"])?wp_kses_post($_POST["agentPhone"]):'';
+        $agencyDescription = isset($_POST["agencyDescription"])?wp_kses_post($_POST["agencyDescription"]):'';
         
         ?>
-        <h3><?php _e("Extra profile information for", "retxtdom");?><span id="roleName"></span></h3>
+        <h3 id="extraInformationTitle"><?php _e("Extra profile information for", "retxtdom");?>&nbsp;<span id="roleName"></span></h3>
         <table class="form-table" id="extraInformation">
             <tr class="form-field agent">
                 <th scope="row">
@@ -69,6 +69,19 @@ class REALM_RegistrationUser {
             </tr>
         </table>
     <?php
+    }
+    
+    public static function saveCustomFieldsNewUser($idUser) {
+        if(!isset($_POST["_wpnonce_create-user"]) || !wp_verify_nonce($_POST["_wpnonce_create-user"], "create-user")) {
+            return;
+	}
+	
+	if(!current_user_can("create_users")) {
+            return;
+	}else {
+            require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
+            REALM_UserAdmin::setData($idUser); //Save in BDD         
+        }
     }
     
 }
