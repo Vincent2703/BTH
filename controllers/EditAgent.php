@@ -64,7 +64,7 @@ class REALM_EditAgent {
     public function displayAgencyMetaBox($agent) {
         $allAgencies = get_posts(array("post_type" => "agency", "numberposts" => -1));
         ?>
-            <select name="agency" id="agencies" onclick="reloadAgencies();">
+            <select name="agency" id="agencies">
                 <?php
                     foreach($allAgencies as $agency) {
                         $nameAgency = esc_attr(get_the_title($agency));

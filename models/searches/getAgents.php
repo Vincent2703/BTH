@@ -7,7 +7,9 @@
     if(!function_exists("getAgents")) {
         function getAgents() {
             if(!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest") {
-                return get_posts(array("post_type" => "agent", "numberposts" => 99));
+                require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
+                $agents = REALM_UserAdmin::getUsersByRole("agent");
+                return $agents;
             }
         }
     }

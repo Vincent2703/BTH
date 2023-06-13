@@ -15,30 +15,7 @@ class REALM_Agent {
     public function createAgent() {
         register_post_type("agent",
             array(
-                "labels" => array(
-                    "name"                  => __("Agents", "retxtdom"),
-                    "singular_name"         => __("An agent", "retxtdom"),
-                    "add_new"               => __("Add", "retxtdom"),
-                    "add_new_item"          => __("Add an agent", "retxtdom"),
-                    "edit"                  => __("Edit", "retxtdom"),
-                    "edit_item"             => __("Edit an agent", "retxtdom"),
-                    "new_item"              => __("New agent", "retxtdom"),
-                    "view"                  => __("View", "retxtdom"),
-                    "view_item"             => __("View an agent", "retxtdom"),
-                    "search_items"          => __("Search agents", "retxtdom"),
-                    "not_found"             => __("No agents found", "retxtdom"),
-                    "not_found_in_trash"    => __("No agents found in trash", "retxtdom"),
-                    "all_items"             => __("All agents", "retxtdom"),
-                    "featured_image"        => __("Agent's thumbnail", "retxtdom"),
-                    "set_featured_image"    => __("Choose a thumbnail", "retxtdom"),
-                    "remove_featured_image" => __("Remove the thumbnail", "retxtdom"),
-                    "use_featured_image"    => __("Use as thumbnail", "retxtdom"),
-                ),
-
-                "public" => true,
-                "menu_position" => 17,
-                "supports" => array("title", "thumbnail"),
-                "menu_icon" => "dashicons-businessperson",
+                "public" => false,
                 "has_archive" => false,
                 "publicly_queryable" => false,
                 "query_var" => false,
@@ -61,78 +38,6 @@ class REALM_Agent {
             }
 	}
 	return $path;
-    }
-    
-    /*
-     * Set up public query vars for agent post type
-     */    
-    public function publicQueryAgentPostParent() {
-        global $pagenow;
-        global $typenow;
-        if(is_admin() && $pagenow == "edit.php" && $typenow === "agent") {
-            $GLOBALS["wp"]->add_query_var("post_parent");
-        }
-    }
-
-    /*
-     * Filter the agents by agency
-     */
-    public function agentFilterByAgency() {
-        if(isset($_GET["post_type"]) && $_GET["post_type"] === "agent") {
-            $args = array(
-                "post_type" => "agency",
-                "post_status" => "publish",
-                "orderby" => "title",
-                "order" => "ASC",
-                "numberposts" => 99
-            );
-            $parentsPage = get_posts($args);
-            $select = '
-                <select name="post_parent">
-                    <option value="">Agences</option>';
-                    $current = isset($_GET["post_parent"])?$_GET["post_parent"]:'';
-                    foreach($parentsPage as $page) {
-                        $select .= sprintf('<option value="%s"%s>%s</option>', $page->ID, $page->ID == $current ? ' selected="selected"' : '', $page->post_title);
-                    }
-            $select .= '</select>';
-            echo $select;
-        }else {
-            return;
-       }
-    }
-    
-    
-    /*
-     * Add a column to display the agent's agency
-     */
-    public function customAgentColumn($columns) {
-        $columns["agency"] = "agency";
-        return $columns;
-    }
-    
-    /*
-     * Order the agents by agency and remove the date column
-     */
-    public function customAgentSortableColumns($columns) {
-        unset($columns["date"]);
-
-        $columns["agency"] = __("Agency", "retxtdom");
-
-        return $columns;
-    }
-
-    /*
-     * Display a link to the agent's agency
-     */
-    public function selectCustomAgentColumn($column, $postID) {
-        if($column === "agency") {
-            if(!empty($parent = get_post_parent($postID))) {
-                echo "<a href='edit.php?post_type=agent&post_parent=".$parent->ID."'>".get_the_title($parent)."</a>";
-            } else {
-               _e("No assigned agency", "retxtdom");
-            }
-        }
-    }
-    
+    }  
     
 }

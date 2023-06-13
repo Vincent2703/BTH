@@ -4,6 +4,8 @@
 class REALMP_EditProfile {
     
     public function addProfileCustomFields($user) {
+        require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
+        
         $role = $user->roles[0];
         //Customer
         $customFieldsValues = array();
@@ -29,11 +31,14 @@ class REALMP_EditProfile {
                 }
             }
         }
+        $agencies = REALM_UserAdmin::getUsersByRole("agency");
+        
         $customerPhone = sanitize_text_field(get_user_meta($user->ID, "userPhone", true));
         
         //Agent
         $agentPhone = sanitize_text_field(get_user_meta($user->ID, "agentPhone", true));
         $agentMobilePhone = sanitize_text_field(get_user_meta($user->ID, "agentMobilePhone", true));
+        $agentAgency = intval(get_user_meta($user->ID, "agentAgency", true));      
         
         //Agency
         $agencyPhone = sanitize_text_field(get_user_meta($user->ID, "agencyPhone", true));
@@ -81,6 +86,22 @@ class REALMP_EditProfile {
                     </th>
                     <td>
                         <input type="text" name="agentMobilePhone" id="agentMobilePhone" class="regular-text" value="<?=$agentMobilePhone;?>">
+                    </td>
+                </tr>
+                <tr class="form-field agent">
+                    <th scope="row">
+                        <label for="agentAgency"><?php _e("Agent's agency");?></label>
+                    </th>
+                    <td>
+                        <select name="agentAgency" id="agencies">
+                        <?php
+                            foreach($agencies as $agency) {
+                                ?>
+                                <option value="<?= $agency->ID; ?>" <?php selected($agency->ID, $agentAgency); ?>><?= $agency->display_name; ?></option>
+                                <?php
+                            }
+                        ?>
+                        </select>
                     </td>
                 </tr>
                 <tr class="form-field agency">

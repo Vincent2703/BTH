@@ -1,18 +1,22 @@
-function reloadAgents() {
-    agentSelected = parseInt(jQuery("#agents :selected").val());
-    jQuery.ajax({
-        url: variablesAgents.getAgentsURL,
-        type: "GET"                 
-    }).done(function(response) {
-        jQuery("#agents").empty();
-        response.forEach(function(val) {
-            jQuery("<option/>")
-                .val(val.ID)
-                .text(val.post_title)
-                .appendTo("#agents");
-            if(agentSelected === val.ID) {
-                jQuery("#agents option:last-child").attr("selected", "selected");
-            }
+jQuery(document).ready(function($) {
+    let select = $("#agents");
+    select.click(function() {
+        agentSelected = parseInt($("#agents :selected").val());
+        $.ajax({
+            url: variablesAgents.getAgentsURL,
+            type: "GET",
+            dataType: "json"
+        }).success(function(response) {
+            $("#agents").empty();
+            response.forEach(function(val) {
+                $("<option/>")
+                    .val(val.ID)
+                    .text(val.data.display_name)
+                    .appendTo("#agents");
+                if(agentSelected === val.ID) {
+                    $("#agents option:last-child").attr("selected", "selected");
+                }
+            });
         });
     });
-}
+});

@@ -15,31 +15,11 @@ class REALM_Agency {
     public function createAgency() {
         register_post_type("agency",
             array(
-                "labels" => array(
-                    "name"                  => __("Agencies", "retxtdom"),
-                    "singular_name"         => __("An agency", "retxtdom"),
-                    "add_new"               => __("Add", "retxtdom"),
-                    "add_new_item"          => __("Add an agency", "retxtdom"),
-                    "edit"                  => __("Edit", "retxtdom"),
-                    "edit_item"             => __("Edit an agency", "retxtdom"),
-                    "new_item"              => __("New agency", "retxtdom"),
-                    "view"                  => __("View", "retxtdom"),
-                    "view_item"             => __("View an agency", "retxtdom"),
-                    "search_items"          => __("Search agencies", "retxtdom"),
-                    "not_found"             => __("No agencies found", "retxtdom"),
-                    "not_found_in_trash"    => __("No agencies found in trash", "retxtdom"),
-                    "all_items"             => __("All agencies", "retxtdom"),
-                    "featured_image"        => __("Agency's thumbnail", "retxtdom"),
-                    "set_featured_image"    => __("Choose a thumbnail", "retxtdom"),
-                    "remove_featured_image" => __("Remove the thumbnail", "retxtdom"),
-                    "use_featured_image"    => __("Use as thumbnail", "retxtdom"),
-                ),
-
-                "public" => true,
-                "menu_position" => 18,
-                "supports" => array("title", "editor", "thumbnail"),
-                "menu_icon" => "dashicons-admin-multisite",
-                "has_archive" => false
+                "public" => false,
+                "has_archive" => false,
+                "publicly_queryable" => false,
+                "query_var" => false,
+                "exclude_from_search" => true
             )
         );
     }

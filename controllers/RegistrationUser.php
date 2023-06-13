@@ -9,6 +9,8 @@ if(!defined("ABSPATH")) {
  */
 class REALM_RegistrationUser {
     public function addFieldsNewUser() {
+        require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
+        
         $agentPhone = isset($_POST["agentPhone"])?sanitize_text_field($_POST["agentPhone"]):'';
         $agentMobilePhone = isset($_POST["agentMobilePhone"])?sanitize_text_field($_POST["agentMobilePhone"]):'';
         
@@ -16,6 +18,7 @@ class REALM_RegistrationUser {
         $agencyAddress = isset($_POST["agencyAddress"])?sanitize_text_field($_POST["agencyAddress"]):'';
         $agencyDescription = isset($_POST["agencyDescription"])?wp_kses_post($_POST["agencyDescription"]):'';
         
+        $agencies = REALM_UserAdmin::getUsersByRole("agency");
         ?>
         <h3 id="extraInformationTitle"><?php _e("Extra profile information for", "retxtdom");?>&nbsp;<span id="roleName"></span></h3>
         <table class="form-table" id="extraInformation">
@@ -33,6 +36,21 @@ class REALM_RegistrationUser {
                 </th>
                 <td>
                     <input type="text" name="agentMobilePhone" id="agentMobilePhone" class="input" value="<?=$agentMobilePhone;?>">
+                </td>
+            </tr>
+            <tr class="form-field agent">
+                <th scope="row">
+                    <label for="agentAgency"><?php _e("Agent's agency");?></label>
+                </th>
+                <td>
+                    <select name="agentAgency" id="agencies"">
+                    <?php
+                        foreach($agencies as $agency) { ?>
+                            <option value="<?= $agency->ID; ?>"><?= $agency->display_name; ?></option>
+                            <?php
+                        }
+                    ?>
+                    </select>
                 </td>
             </tr>
             <tr class="form-field agency">
@@ -82,6 +100,23 @@ class REALM_RegistrationUser {
             require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
             REALM_UserAdmin::setData($idUser); //Save in BDD         
         }
+    }
+    
+    /*
+     * Create an agent or agency post if a new agent or agency user is created
+     * The author is the user
+     */
+    public function createPostOnNewUser($idUser) {
+        $user = get_user_by("id", $idUser);
+        $role = $user->roles[0];
+        if($role === "agent") {
+            require_once(PLUGIN_RE_PATH."models/admin/AgentAdmin.php");
+            REALM_AgentAdmin::createPost($idUser);
+        }else if($role === "agency") {
+            require_once(PLUGIN_RE_PATH."models/admin/AgencyAdmin.php");
+            REALM_AgencyAdmin::createPost($idUser);
+        }
+        
     }
     
 }

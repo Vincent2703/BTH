@@ -68,6 +68,7 @@ class Realm {
         
         //Models
         require_once("models/searches/GetAds.php");
+        require_once("models/admin/UserAdmin.php");
         
         
         $this->Ad               = new REALM_Ad;
@@ -84,6 +85,7 @@ class Realm {
         $this->EditProfile      = new REALMP_EditProfile;
         
         $this->GetAds           = new REALM_GetAds;   
+        $this->UserAdmin        = new REALM_UserAdmin;
     }
     
     /*
@@ -110,8 +112,11 @@ class Realm {
         
         //Add fields on registration new user
         add_action("user_new_form", array($this->RegistrationUser, "addFieldsNewUser"));
+        
+        //Save the custom fields
         add_action("user_register", array($this->RegistrationUser, "saveCustomFieldsNewUser"));
-
+        //When the user is an agent or an agency, create a post
+        add_action("user_register", array($this->RegistrationUser, "createPostOnNewUser"));
 
         //Remove the default search widget
         add_action("widgets_init", array($this, "removeSearchWidget"));
@@ -132,16 +137,9 @@ class Realm {
 
         //Filter custom post types by taxonomies
         add_action("restrict_manage_posts", array($this->Ad, "filterAdsByTaxonomies"));
-        add_action("restrict_manage_posts", array($this->Agent, "agentFilterByAgency"));
-
-        //Set up public query vars for agent post type
-        add_action("admin_init", array($this->Agent, "publicQueryAgentPostParent"));
         
         //Display notices
         add_action("admin_notices", array($this, "displayNotices"));
-
-        //Select custom columns for the agent post type
-        add_action("manage_agent_posts_custom_column" , array($this->Agent, "selectCustomAgentColumn"), 10, 2);
 
         //Update term meta for custom taxonomy
         add_action("created_term", array($this->Ad, "termTypePropertyUpdate"), 10, 3);
@@ -166,6 +164,8 @@ class Realm {
         add_action("personal_options_update", array($this->EditProfile, "saveProfileCustomFields"));
         add_action("edit_user_profile_update", array($this->EditProfile, "saveProfileCustomFields"));
         
+        //Fill the agent's agency column in the users list for the agent role
+        add_action("manage_users_custom_column", array($this->UserAdmin, "agentAgencyDataColumn"), 10, 3);     
     }
     
     /*
@@ -184,11 +184,6 @@ class Realm {
         //Add custom styles or scripts to the WordPress header section
         add_filter("wp_enqueue_scripts", array($this, "updateHeader"));
         
-        //Add or modify the columns shown in the WordPress admin table for the agent custom post type
-        add_filter("manage_agent_posts_columns", array($this->Agent, "customAgentSortableColumns")); 
-        
-        //Make the columns added in the previous filter sortable.
-        add_filter("manage_edit-agent_sortable_columns", array($this->Agent, "customAgentColumn")); 
         
         //Add custom columns to the WordPress admin table for the adTypeProperty taxonomy
         add_filter("manage_adTypeProperty_custom_column", array($this->Ad, "typePropertyHabitableColumn"), 15, 3); 
@@ -199,11 +194,8 @@ class Realm {
         //Modify the template file used to display a single or archive ad post type
         add_filter("template_include", array($this->Ad, "templatePostAd"), 1); 
         
-        //Modify the template file used to display a single agency post type
-        add_filter("template_include", array($this->Agency, "templatePostAgency"), 1); 
-        
-        //Modify the template file used to display a single agent post type
-        //add_filter("template_include", array($this->Agent, "templatePostAgent"), 1); 
+        //Add an agent's agency column header to the agent users list and remove the posts and role columns
+        add_filter("manage_users_columns", array($this->UserAdmin, "agentAgencyHeaderColumn"));             
     }
     
     /*
@@ -470,6 +462,16 @@ class Realm {
                         "path" => "/includes/js/others/registrationUser.js",
                         "footer" => true,
                         "dependencies" => array("jquery")
+                    ),
+                    "reloadAgencies" => array(
+                        "path" => "/includes/js/searches/reloadAgencies.js",
+                        "footer" => true,
+                        "dependencies" => array("jquery"),
+                        "variables" => array(
+                            "variablesAgencies" => array(
+                                "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies")
+                            )
+                        )
                     )
                 ),
                 "user-edit" => array(
@@ -477,6 +479,16 @@ class Realm {
                         "path" => "/includes/js/others/editProfil.js",
                         "footer" => true,
                         "dependencies" => array("jquery")
+                    ),
+                    "reloadAgencies" => array(
+                        "path" => "/includes/js/searches/reloadAgencies.js",
+                        "footer" => true,
+                        "dependencies" => array("jquery"),
+                        "variables" => array(
+                            "variablesAgencies" => array(
+                                "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies")
+                            )
+                        )
                     )
                 )
             ),
@@ -486,7 +498,7 @@ class Realm {
                         "path" => "/includes/js/edits/editAd.js",
                         "footer" => true,
                         "dependencies" => array("jquery"),
-                        "localize" => array(
+                        "variables" => array(
                             "translations" => array(
                                 "replace" => __("Replace pictures", "retxtdom"),
                                 "delete" => __("Delete", "retxtdom")
@@ -497,7 +509,7 @@ class Realm {
                         "path" => "/includes/js/searches/autocompleteAddress.js",
                         "footer" => true,
                         "dependencies" => array("jquery"),
-                        "localize" => array(
+                        "variables" => array(
                             "variablesAddress" => array(
                                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address")
                             )
@@ -507,7 +519,7 @@ class Realm {
                         "path" => "/includes/js/searches/reloadAgents.js",
                         "footer" => true,
                         "dependencies" => array("jquery"),
-                        "localize" => array(
+                        "variables" => array(
                             "variablesAgents" => array(
                                 "getAgentsURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents")
                             )
@@ -519,7 +531,7 @@ class Realm {
                         "path" => "/includes/js/others/import.js",
                         "footer" => true,
                         "dependencies" => array("jquery"),
-                        "localize" => array(
+                        "variables" => array(
                             "variablesImport" => array(
                                 "confirmation" => __("Are you sure that you want to import this file?", "retxtdom"),
                                 "url" => wp_nonce_url(admin_url("edit.php?post_type=re-ad&page=".PLUGIN_RE_NAME."import"), "importAds", "nonceSecurity")
@@ -532,7 +544,7 @@ class Realm {
                         "path" => "/includes/js/others/options.js",
                         "footer" => true,
                         "dependencies" => array("jquery"),
-                        "localize" => array(
+                        "variables" => array(
                             "variablesOptions" => array(
                                 "mainFeatures" => __("main features", "retxtdom"),
                                 "additionalFeatures" => __("Additional features", "retxtdom")
@@ -543,11 +555,11 @@ class Realm {
             ),
             "agent" => array(
                 "post" => array(
-                    "reloadAgents" => array(
+                    "reloadAgencies" => array(
                         "path" => "/includes/js/searches/reloadAgencies.js",
                         "footer" => true,
                         "dependencies" => array("jquery"),
-                        "localize" => array(
+                        "variables" => array(
                             "variablesAgencies" => array(
                                 "getAgenciesUrl" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies")
                             )
@@ -561,7 +573,7 @@ class Realm {
                         "path" => "/includes/js/searches/autocompleteAddress.js",
                         "footer" => true,
                         "dependencies" => array("jquery"),
-                        "localize" => array(
+                        "variables" => array(
                             "variablesAddress" => array(
                                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address")
                             )
@@ -574,9 +586,9 @@ class Realm {
         $scriptsToRegister = isset($scripts[$postType][$base])?$scripts[$postType][$base]:array();
         foreach($scriptsToRegister as $name => $script) {
             wp_register_script($name, plugins_url(PLUGIN_RE_NAME.$script["path"]), $script["dependencies"], PLUGIN_RE_VERSION, $script["footer"]);
-            if(isset($script["localize"])) {
-                foreach($script["localize"] as $variableName => $localizeData) {
-                    wp_localize_script($name, $variableName, $localizeData);
+            if(isset($script["variables"])) {
+                foreach($script["variables"] as $variableName => $variablesData) {
+                    wp_localize_script($name, $variableName, $variablesData);
                 }
             }
             wp_enqueue_script($name);
@@ -719,7 +731,7 @@ class Realm {
         global $post_type;
         global $pagenow;
         if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {         
-            wp_register_script("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
+            wp_register_script("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, true);
             $variablesSearchBar = array(
                 "filters" => __("FILTERS", "retxtdom"),
                 "searchBarURL" => plugin_dir_url(__FILE__)."templates/searchBars/searchBarAd.php",
@@ -799,13 +811,7 @@ class Realm {
                 <p><?= $info; ?></p>   
             </div>
         <?php }
-    }
-    
-    /*
-     * Create an agent or agency post if a new agent or agency user is created
-     * Also fill some data
-     */
-    //public function createPostOnNewUser
+    }    
     
 }
 new Realm;

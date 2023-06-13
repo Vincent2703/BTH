@@ -4,44 +4,20 @@ if(!defined("ABSPATH")) {
 }
 /*
  * 
- * Get and set agent meta values for the admin front-end
+ * Create an Agent post from an Agent user
  * 
  */
 class REALM_AgentAdmin {
-    private static $metas;
     
-    public static $phone;
-    public static $mobilePhone;
-    public static $email;
-    
-    public static function getData($id) {
-        self::$metas = get_post_custom($id);
-        
-        self::$phone = sanitize_text_field(self::getMeta("agentPhone"));
-        self::$mobilePhone = sanitize_text_field(self::getMeta("agentMobilePhone"));
-        self::$email = sanitize_email(self::getMeta("agentEmail"));
-    }
-    
-    public static function setData($id) {
-        if(isset($_POST["phone"]) && !ctype_space($_POST["phone"])) {
-            update_post_meta($id, "agentPhone", sanitize_text_field($_POST["phone"]));
-        }
-        if(isset($_POST["mobilePhone"]) && !ctype_space($_POST["mobilePhone"])) {
-            update_post_meta($id, "agentMobilePhone", sanitize_text_field($_POST["mobilePhone"]));
-        }
-        if(isset($_POST["email"]) && is_email($_POST["email"])) {
-            update_post_meta($id, "agentEmail", sanitize_email($_POST["email"]));
-        }
-
-        if(isset($_POST["agency"]) && is_numeric($_POST["agency"])) {
-            wp_update_post(array(
-                "ID" => $id,
-                "post_parent" => absint($_POST["agency"])
-            ));             
-        }
-    }
-    
-    private static function getMeta($metaName) {
-        return isset(self::$metas[$metaName])?implode(self::$metas[$metaName]):'';
+    public static function createPost($idUser) {
+        require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
+        REALM_UserAdmin::getData($idUser);
+        $postArgs = array(
+            "post_author"   => $idUser,
+            "post_type"     => "agent",
+            "post_status"   => "publish",
+            "post_title"    => REALM_UserAdmin::$firstName .' '. REALM_UserAdmin::$lastName
+        );
+        wp_insert_post($postArgs);
     }
 }

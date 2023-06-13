@@ -47,7 +47,10 @@ class REALM_EditAd {
     
     public function mainFeaturesMetaBox($ad) {
         require_once(PLUGIN_RE_PATH."models/admin/AdAdmin.php");
+        require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
+        
         REALM_AdAdmin::getMainFeatures($ad->ID); //Get values
+        $agents = REALM_UserAdmin::getUsersByRole("agent");
         wp_nonce_field("formEditAd", "nonceSecurity"); //Add nonce
         ?>
         <div id="refAgency">
@@ -112,13 +115,10 @@ class REALM_EditAd {
         <div id="agent">
             <div class="text">
                 <label><?php _e("Agent linked to the ad", "retxtdom");?></label>
-                <select name="agent" id="agents" onclick="reloadAgents();">
+                <select name="agent" id="agents"">
                     <?php
-                        foreach(REALM_AdAdmin::$allAgents as $agent) {
-                            $nameAgent = esc_attr(get_the_title($agent));
-                            $idAgent = absint($agent->ID);
-                            ?>
-                            <option value="<?= $idAgent; ?>" <?php selected($idAgent, REALM_AdAdmin::$idAgent); ?>><?= $nameAgent; ?></option>
+                        foreach($agents as $agent) { ?>
+                            <option value="<?= $agent->ID; ?>" <?php selected($agent->ID, REALM_AdAdmin::$idAgent); ?>><?= $agent->display_name; ?></option>
                             <?php
                         }
                     ?>

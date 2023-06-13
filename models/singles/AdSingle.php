@@ -66,6 +66,8 @@ class REALM_AdSingle {
     }
     
     public static function getData($id) {
+            require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
+            
             self::$metas = get_post_custom($id);
 
             self::$refAd = sanitize_text_field(self::getMeta("adRefAgency"));
@@ -172,19 +174,21 @@ class REALM_AdSingle {
             
             if(!empty($idContact = self::getMeta("adIdAgent"))) {
                 self::$getContact = true;
-                if(self::getMeta("adShowAgent") == '1') {
+                if(intval(self::getMeta("adShowAgent")) === 1) {
+                    REALM_UserAdmin::getData($idContact);
                     self::$idContact = $idContact;
-                    self::$email = get_post_meta($idContact, "agentEmail", true);
-                    self::$phone = get_post_meta($idContact, "agentPhone", true);
-                    self::$mobilePhone = get_post_meta($idContact, "agentMobilePhone", true);
+                    self::$phone = REALM_UserAdmin::$agentPhone;
+                    self::$mobilePhone = REALM_UserAdmin::$agentMobilePhone;
+                    self::$nameContact = REALM_UserAdmin::$firstName .' '. REALM_UserAdmin::$lastName;
                 }else{
-                    self::$idContact = wp_get_post_parent_id($idContact);
-                    self::$email = get_post_meta(self::$idContact, "agencyEmail", true);
-                    self::$phone = get_post_meta(self::$idContact, "agencyPhone", true);
-                    self::$linkAgency = get_post_permalink(self::$idContact);
+                    self::$idContact = get_user_meta($idContact);
+                    REALM_UserAdmin::getData(self::$idContact);
+                    self::$phone = REALM_UserAdmin::$agencyPhone;
+                    self::$linkAgency = get_post_permalink(self::$idContact); //TO REMPLACE
+                    self::$nameContact = REALM_UserAdmin::$displayName;
                 }
-                self::$thumbnailContact = get_the_post_thumbnail_url(self::$idContact, "thumbnail");
-                self::$nameContact = get_the_title(self::$idContact);
+                self::$email = REALM_UserAdmin::$email;
+                self::$thumbnailContact = get_avatar_url($idContact, "thumbnail");
             }else{
                 self::$email = get_option(PLUGIN_RE_NAME."OptionsEmail")["emailAd"];
                 self::$getContact = false;

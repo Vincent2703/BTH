@@ -4,37 +4,20 @@ if(!defined("ABSPATH")) {
 }
 /*
  * 
- * Get and set agency meta values for the admin front-end
+ * Create an Agency post from an Agency user
  * 
  */
 class REALM_AgencyAdmin {
-    private static $metas;
     
-    public static $phone;
-    public static $email;
-    public static $address;
-    
-    public static function getData($id) {
-        self::$metas = get_post_custom($id);
-        
-        self::$phone = sanitize_text_field(self::getMeta("agencyPhone"));
-        self::$email = sanitize_email(self::getMeta("agencyEmail"));
-        self::$address = sanitize_text_field(self::getMeta("agencyAddress"));
-    }
-    
-    public static function setData($id) {
-        if(isset($_POST["phone"]) && !ctype_space($_POST["phone"])) {
-            update_post_meta($id, "agencyPhone", sanitize_text_field($_POST["phone"]));
-        }
-        if(isset($_POST["email"]) && is_email($_POST["email"])) {
-            update_post_meta($id, "agencyEmail", sanitize_email($_POST["email"]));
-        }
-        if(isset($_POST["address"]) && !ctype_space($_POST["address"])) {
-            update_post_meta($id, "agencyAddress", sanitize_text_field($_POST["address"]));
-        }
-    }
-    
-    private static function getMeta($metaName) {
-        return isset(self::$metas[$metaName])?implode(self::$metas[$metaName]):'';
+    public static function createPost($idUser) {
+        require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
+        REALM_UserAdmin::getData($idUser);
+        $postArgs = array(
+            "post_author"   => $idUser,
+            "post_type"     => "agency",
+            "post_status"   => "publish",
+            "post_title"    => REALM_UserAdmin::$displayName
+        );
+        wp_insert_post($postArgs);
     }
 }

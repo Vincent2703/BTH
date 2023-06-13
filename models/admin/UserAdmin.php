@@ -12,6 +12,7 @@ class REALM_UserAdmin {
     private static $metas;
     
     //All
+    public static $displayName;
     public static $lastName;
     public static $firstName;
     public static $email;
@@ -23,6 +24,7 @@ class REALM_UserAdmin {
     //Agent
     public static $agentPhone;
     public static $agentMobilePhone;
+    public static $agentAgency;
             
     //Agency
     public static $agencyPhone;
@@ -34,6 +36,7 @@ class REALM_UserAdmin {
         $role = get_user_by("ID", $id)->roles[0];
         self::$metas = get_user_meta($id);
         
+        self::$displayName = sanitize_text_field(get_userdata($id)->display_name);
         self::$lastName = sanitize_text_field(self::getMeta("last_name"));
         self::$firstName = sanitize_text_field(self::getMeta("first_name"));
         self::$email = sanitize_email(get_userdata($id)->user_email);
@@ -66,16 +69,17 @@ class REALM_UserAdmin {
             }
         }else if($role === "agent") {
             self::$agentPhone = sanitize_text_field(self::getMeta("agentPhone"));
-            self::$agentMobilePhone = sanitize_text_field(self::getMeta("agentMobilePhone"));           
+            self::$agentMobilePhone = sanitize_text_field(self::getMeta("agentMobilePhone"));          
+            self::$agentAgency = intval(self::getMeta("agentAgency"));
         }else if($role === "agency") {
             self::$agencyPhone = sanitize_text_field(self::getMeta("agencyPhone"));
             self::$agencyAddress = sanitize_text_field(self::getMeta("agencyAddress"));
             self::$agencyDescription = sanitize_textarea_field(self::getMeta("agencyDescription"));
         }
          
-     }
+    }
      
-     public static function setData($idUser) {
+    public static function setData($idUser) {
         if(isset($_POST["role"]) && !ctype_space($_POST["role"])) {
             $role = $_POST["role"];
         }else{
@@ -125,6 +129,9 @@ class REALM_UserAdmin {
             if(isset($_POST["agentMobilePhone"]) && !ctype_space($_POST["agentMobilePhone"])) {
                 update_user_meta($idUser, "agentMobilePhone", sanitize_text_field($_POST["agentMobilePhone"]));
             }
+            if(isset($_POST["agentAgency"]) && !ctype_space($_POST["agentAgency"])) {
+                update_user_meta($idUser, "agentAgency", intval($_POST["agentAgency"]));
+            }
         }else if($role === "agency") {
             if(isset($_POST["agencyPhone"]) && !ctype_space($_POST["agencyPhone"])) {
                 update_user_meta($idUser, "agencyPhone", sanitize_text_field($_POST["agencyPhone"]));
@@ -135,10 +142,45 @@ class REALM_UserAdmin {
             if(isset($_POST["agencyDescription"]) && !ctype_space($_POST["agencyDescription"])) {
                 update_user_meta($idUser, "agencyDescription", wp_kses_post($_POST["agencyDescription"]));
             }
+            if(isset($_POST["user_login"]) && !ctype_space($_POST["user_login"])) {
+                wp_update_user(array(
+                    "ID" => $idUser,
+                    "display_name" => sanitize_text_field($_POST["user_login"])
+                ));
+            }
         }
+    }
+    
+    public static function getUsersByRole($role) {
+        $users = get_users(array("role__in" => array($role)));
+        return $users;
     }
     
     private static function getMeta($metaName) {
         return isset(self::$metas[$metaName])?implode(self::$metas[$metaName]):'';
+    }
+    
+    public static function agentAgencyHeaderColumn($columns) {
+        if(isset($_GET["role"]) && $_GET["role"] === "agent") {
+        $columns["agentAgency"] = __("Agent's agency", "retxtdom");
+        unset($columns["posts"]);
+        unset($columns["role"]);
+        }
+        return $columns;
+    }
+    
+    public static function agentAgencyDataColumn($value, $columnName, $idUser) {
+        if(isset($_GET["role"]) && $_GET["role"] === "agent" && $columnName === "agentAgency" && intval($idUser) !== 0) {
+            SELF::getData($idUser);
+            $agentAgency = SELF::$agentAgency;
+
+            if($agentAgency !== 0) {
+                $agency = new SELF;
+                $agency->getData($agentAgency);
+                $agencyOutput = '<a target="_blank" href="' . get_edit_user_link($agentAgency) . '">' . $agency::$displayName . '</a>';
+                return $agencyOutput;
+            }
+        }
+        return $value;
     }
 }
