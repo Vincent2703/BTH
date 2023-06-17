@@ -9,6 +9,11 @@ if(!defined("ABSPATH")) {
  */
 class REALM_Agent {
     
+    private function registerPluginStylesSingleAgenct($path) {
+        wp_register_style("singleAgent", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$path/singleAgent.css"), array(), PLUGIN_RE_VERSION);
+        wp_enqueue_style("singleAgent");
+    }
+    
     /*
      * Create the custom post Agent
      */
@@ -28,16 +33,19 @@ class REALM_Agent {
      * Fetch the single custom post Agency template
      */
     public function templatePostAgent($path) {
-	if(get_post_type() == "agent") {
-            if(is_single()) {
-                if(!locate_template(array("single-agent.php"))) {
-                    $path = plugin_dir_path(__DIR__)."templates/singles/single-agent.php";
-                    wp_register_style("singleAgent", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/singles/singleAgent.css"), array(), PLUGIN_RE_VERSION);
-                    wp_enqueue_style("singleAgent");
+        if(defined("PLUGIN_RE_THEME")) {
+            $shortPath = PLUGIN_RE_THEME["name"].'/'.PLUGIN_RE_THEME["version"];
+            $fullPath = PLUGIN_RE_PATH."templates/$shortPath";
+            if(is_dir($fullPath)) {
+                if(get_post_type() === "agency") {
+                    if(is_single() && !locate_template(array("single-agent.php"))) {
+                        $path = "$fullPath/singles/single-agent.php";
+                        $this->registerPluginStylesSingleAgency($shortPath);
+                    }
                 }
             }
-	}
-	return $path;
+        }
+        return $path;
     }  
     
 }

@@ -21,12 +21,22 @@ require_once("realm.php"); //Install plugin from interface
  */
 class Realm {
     
+    /* Notices messages */
+    private static $errors;
+    private static $warnings;
+    private static $informations;
+    
     /*
      * When the class is instantiate
      */
     public function __construct() {
         
+        self::$errors = array();
+        self::$warnings = array();
+        self::$informations = array();
+                
         $this->defineGlobalConsts();
+        $this->checkTheme();
         
         $this->requireClasses();
         
@@ -165,7 +175,7 @@ class Realm {
         add_action("edit_user_profile_update", array($this->EditProfile, "saveProfileCustomFields"));
         
         //Fill the agent's agency column in the users list for the agent role
-        add_action("manage_users_custom_column", array($this->UserAdmin, "agentAgencyDataColumn"), 10, 3);     
+        //add_action("manage_users_custom_column", array($this->UserAdmin, "agentAgencyDataColumn"), 10, 3);     
     }
     
     /*
@@ -195,7 +205,14 @@ class Realm {
         add_filter("template_include", array($this->Ad, "templatePostAd"), 1); 
         
         //Add an agent's agency column header to the agent users list and remove the posts and role columns
-        add_filter("manage_users_columns", array($this->UserAdmin, "agentAgencyHeaderColumn"));             
+        add_filter("manage_users_columns", array($this->UserAdmin, "agentAgencyHeaderColumn"));         
+        
+        //Ads the agent's agency name to the previous column
+        add_filter("manage_users_custom_column", array($this->UserAdmin, "agentAgencyDataColumn"), 10, 3);
+        
+        //To do : sort and filter by the agent's agency
+        //add_filter("manage_users_sortable_columns", array($this->UserAdmin, "agentAgencySortableColumn"));
+
     }
     
     /*
@@ -409,7 +426,10 @@ class Realm {
                     "registrationUser" => "/includes/css/others/registrationUser.css"
                 ),
                 "user-edit" => array(
-                    "editProfil" => "/includes/css/others/editProfil.css"
+                    "editProfile" => "/includes/css/others/editProfile.css"
+                ),
+                "profile" => array(
+                    "editProfile" => "/includes/css/others/editProfile.css"
                 )
             ),
             "re-ad" => array(
@@ -475,8 +495,8 @@ class Realm {
                     )
                 ),
                 "user-edit" => array(
-                    "editProfil" => array(
-                        "path" => "/includes/js/others/editProfil.js",
+                    "editProfile" => array(
+                        "path" => "/includes/js/others/editProfile.js",
                         "footer" => true,
                         "dependencies" => array("jquery")
                     ),
@@ -489,6 +509,13 @@ class Realm {
                                 "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies")
                             )
                         )
+                    )
+                ),
+                "profile" => array(
+                    "editProfile" => array(
+                        "path" => "/includes/js/others/editProfile.js",
+                        "footer" => true,
+                        "dependencies" => array("jquery")
                     )
                 )
             ),
@@ -760,52 +787,52 @@ class Realm {
 	return $links;
     }
     
-    public function displayNotices() {
-        $errors = array();
-        $warnings = array();
-        $informations = array();
-        
-        //Check theme
-        
+    /*
+     * Check that the theme used is compatible with the plugin
+     * Fill the notices arrays if needed
+     * Save a constant with the templates path to use
+     */
+    public function checkTheme() {
         $currentTheme = wp_get_theme();
         $themeName = str_replace(' ', '', strtolower($currentTheme->name));
         $themeVersion = $currentTheme->version;
-        $listThemes = array_diff(scandir(PLUGIN_RE_PATH."templates/"), array("..", '.', "searchBars"));
+        $listThemes = array_diff(scandir(PLUGIN_RE_PATH."templates/"), array("..", '.', "searchBars")); 
         
         if(in_array($themeName, $listThemes)) {
             $listVersions = array_diff(scandir(PLUGIN_RE_PATH."templates/$themeName"), array('.', ".."));
-            if(in_array($themeVersion, $listVersions)) {
-                $checkTheme = "ok";
+            if(!in_array($themeVersion, $listVersions)) {
+                array_push(self::$warnings, sprintf(__('The version of the theme you are using (%1$s) is different from the ones the plugin templates were built with (%2$s). Expect potential bugs.', "retxtdom"), $themeVersion, implode(", ", $listVersions))."<br />"
+                . __("For more information, please read the", "retxtdom").'&nbsp;<a target="_blank" href="#">'.__("documentation", "retxtdom")."</a>");
+                $versionToUse = end($listVersions);
             }else{
-                $checkTheme = "badVersion";
+                $versionToUse = $themeVersion;
             }
+            define("PLUGIN_RE_THEME", array("name" => $themeName, "version" => $versionToUse));
         }else{
-            $checkTheme = "noTheme";
-        }
-             
-        if($checkTheme === "noTheme") {
-            array_push($errors, __("The theme that you are using is not compatible with the plugin. Please use one of the following themes :", "retxtdom")."<br />"
+            array_push(self::$errors, __("The theme that you are using is not compatible with the plugin. Please use one of the following themes :", "retxtdom")."<br />"
                 . "<ul><li><a target='_blank' href='https://wordpress.org/themes/twentytwenty/'>Twenty twenty 2.1</a></li></ul><br />"
                 . __("For more information, please read the", "retxtdom").'&nbsp;<a target="_blank" href="#">'.__("documentation", "retxtdom")."</a>");
-        }else if($checkTheme === "badVersion") {
-            array_push($warnings, sprintf(__('The version of the theme you are using (%1$s) is different from the one the plugin templates were built with (%2$s). Expect potential bugs.', "retxtdom"), $themeVersion, $themePluginVersion)."<br />"
-                . __("For more information, please read the", "retxtdom").'&nbsp;<a target="_blank" href="#">'.__("documentation", "retxtdom")."</a>");
-        }
-        
+        } 
+    }
+    
+    /*
+     * Display a notice panel with one  or several messages if needed
+     */
+    public function displayNotices() {
         $pluginName = strtoupper(PLUGIN_RE_NAME);
-        foreach($errors as $error) { ?>
+        foreach(self::$errors as $error) { ?>
             <div class="notice notice-error is-dismissible">
                 <h3><?= $pluginName; ?></h3>
                 <p><?= $error; ?></p>   
             </div>
         <?php }
-        foreach($warnings as $warning) { ?>
+        foreach(self::$warnings as $warning) { ?>
             <div class="notice notice-warning is-dismissible">
                 <h3><?= $pluginName; ?></h3>
                 <p><?= $warning; ?></p>   
             </div>
         <?php }
-        foreach($informations as $info) { ?>
+        foreach(self::$informations as $info) { ?>
             <div class="notice notice-info is-dismissible">
                 <h3><?= $pluginName; ?></h3>
                 <p><?= $info; ?></p>   

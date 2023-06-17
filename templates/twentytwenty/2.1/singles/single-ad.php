@@ -11,7 +11,7 @@
         $currency = REALM_AdSingle::getCurrency();
         $feesURL = REALM_AdSingle::getFeesURL();
         while(have_posts()) {
-            if (is_active_sidebar("before_content-side-bar") ) {
+            if(is_active_sidebar("before_content-side-bar")) {
                dynamic_sidebar("before_content-side-bar");
             }
             the_post();
@@ -25,7 +25,7 @@
             }
             
             if($checkPremiumPlugin) {
-                $checkLogin = current_user_can("customer") || current_user_can("administrator");
+                $checkLogin = current_user_can("customer");
                 require_once(PLUGIN_REP_PATH."models/front/UserFront.php");
                 $idUser = get_current_user_id();
                 REALMP_UserFront::getData($idUser);
@@ -38,6 +38,15 @@
                     "numberposts"   => 1
                 ));
                 $checkAlreadyHF = !empty($alreadyHF);            
+                
+                $optionsHF = get_option(PLUGIN_REP_NAME."Options");
+                $nbUserHF = count(get_posts(array(
+                    "author"        => $idUser,
+                    "post_type"     => "housingfile",
+                    "post_status"   => array("accepted", "decisionwaiting"),
+                    "numberposts"   => 100
+                )));
+                $exceededNumberHF = $nbUserHF >= $optionsHF["limitNbHousingFiles"];
             }   
         
             
@@ -265,6 +274,9 @@
                     if($checkPremiumPlugin && $checkLogin) { 
                         if($checkAlreadyHF || isset($HFID)) { ?>
                             <a href="<?=get_edit_post_link(isset($HFID)?$HFID:$alreadyHF[0]->ID);?>"><button><?php _e("View my housing file");?></button></a>
+                        <?php }else if($exceededNumberHF) { ?>
+                            <span><?php _e("You have exceeded the maximum number of housing files that you can submit", "retxtdom");?></span>
+                            <a href="<?=admin_url("edit.php?post_type=housingfile");?>"><button><?php _e("View my housing files");?></button></a>
                         <?php }else { ?>
                         <form method="post" action="" id="applyForm">
                             <?php wp_nonce_field("formApply", "nonceSecurity"); ?>
@@ -318,7 +330,6 @@
                         <form action="" method="post" class="formContact">
                             <?php wp_nonce_field("formContact", "nonceSecurity"); 
                             $prefillForm = $checkPremiumPlugin&&$checkLogin&&$userDataConformity;
-                            var_dump($userDataConformity);
                             ?>
                             <label for="names"><?php _e("First name and last name", "retxtdom"); ?></label><input type="text" name="names" class="formContactInput" value="<?= $prefillForm?REALMP_UserFront::$firstName.' '.REALMP_UserFront::$lastName:''?>" required>
                             <label for="phone"><?php _e("Phone", "retxtdom"); ?></label><input type="tel" name="phone" class="formContactInput" value="<?= $prefillForm?REALMP_UserFront::$phone:''?>" required>

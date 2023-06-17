@@ -32,7 +32,7 @@ class REALM_UserAdmin {
     public static $agencyDescription;
     
     
-    public static function getData($id) {
+    public static function getData($id) {     
         $role = get_user_by("ID", $id)->roles[0];
         self::$metas = get_user_meta($id);
         
@@ -112,8 +112,8 @@ class REALM_UserAdmin {
                                 );
                                 $upload = wp_handle_upload($_FILES["CF".$field["nameAttr"]], array("test_form" => false, "test_type" => true, "mimes"=>$validMimeTypes));
                                 if(!isset($upload["error"])) {
-                                    preg_match("/(?<=\/)[a-zA-Z-0-9]+\.[a-zA-Z-0-9]+$/", $upload["file"], $matches);
-                                    $fileName = sanitize_text_field($matches[0]);
+                                    preg_match("/[^\/]+$/", $upload["file"], $matches);        
+                                    $fileName = wp_unique_filename(wp_upload_dir()["path"], $matches[0]);
                                     $path = str_replace("\\", '/', $upload["file"]);
                                     update_user_meta($idUser, "customerCF".$field["nameAttr"], array("name"=>$fileName, "type"=>$upload["type"], "url"=>$upload["url"], "path"=>$path));
                                 }
@@ -162,9 +162,13 @@ class REALM_UserAdmin {
     
     public static function agentAgencyHeaderColumn($columns) {
         if(isset($_GET["role"]) && $_GET["role"] === "agent") {
-        $columns["agentAgency"] = __("Agent's agency", "retxtdom");
-        unset($columns["posts"]);
-        unset($columns["role"]);
+            $role = "agent";
+            $orderby = "agentAgency";
+            $order = isset($_GET["order"]) && strtolower($_GET['order']) === "asc"?"desc":"asc";
+            //$columns["agentAgency"] = '<a href="?role='.$role.'&orderby='.$orderby.'&order='.$order.'">' . __("Agent's agency", "retxtdom") . '</a>';
+            $columns["agentAgency"] = __("Agent's agency", "retxtdom");
+            unset($columns["posts"]);
+            unset($columns["role"]);
         }
         return $columns;
     }
@@ -177,10 +181,18 @@ class REALM_UserAdmin {
             if($agentAgency !== 0) {
                 $agency = new SELF;
                 $agency->getData($agentAgency);
-                $agencyOutput = '<a target="_blank" href="' . get_edit_user_link($agentAgency) . '">' . $agency::$displayName . '</a>';
+                //$agencyOutput = '<a target="_blank" href="' . get_edit_user_link($agentAgency) . '">' . $agency::$displayName . '</a>';
+                $agencyOutput = $agency::$displayName;
                 return $agencyOutput;
             }
         }
         return $value;
+    }
+    
+    public static function agentAgencySortableColumn($columns) {
+        if(isset($_GET["role"]) && $_GET["role"] === "agent") {
+            $columns["agentAgency"] = "agentAgency";
+        }
+        return $columns;
     }
 }

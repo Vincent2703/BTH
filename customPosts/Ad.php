@@ -12,10 +12,10 @@ class REALM_Ad {
     /*
      * Register plugin styles for the singleAd template
      */
-    private function registerPluginStylesSingleAd($CSSDirName) {
+    private function registerPluginStylesSingleAd($path) {
         wp_register_style("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leaflet.min.css"), array(), "1.9.3");
         wp_register_style("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leafletFullscreen.min.css"), array(), "2.3.0");
-        wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$CSSDirName/singles/singleAd.css"));
+        wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$path/singles/singleAd.css"));
         wp_register_style("googleIcons", "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0");
         wp_enqueue_style("leaflet");
         wp_enqueue_style("leafletFullscreen");
@@ -157,37 +157,25 @@ class REALM_Ad {
      * Fetch the single or archive custom post Ad template
      */
     public function templatePostAd($path) {
-        $dirTemplates = PLUGIN_RE_PATH."templates/";
-        $currentTheme = wp_get_theme();
-        $themeName = str_replace(' ', '', strtolower($currentTheme->name));
-        $themeVersion = $currentTheme->version;
-
-        if(is_dir($dirTemplates.$themeName)) {
-            $listDirVersions = array_diff(scandir($dirTemplates.$themeName), array('.', ".."));
-
-            if(in_array($themeVersion, $listDirVersions)) {
-                $dirPath = "$themeName/$themeVersion";
-            }else {
-                $dirVersion = end($listDirVersions);
-                $dirPath = "$themeName/$dirVersion";
-            }
-        
-            $dirFullPath = "$dirTemplates$dirPath";
-
-            if(get_post_type() === "re-ad") {
-                if(is_single() && !locate_template(array("single-ad.php"))) {
-                    $path = "$dirFullPath/singles/single-ad.php";
-                    $this->registerPluginScriptsSingleAd();
-                    $this->registerPluginStylesSingleAd($dirPath);
-                }else if(is_post_type_archive("re-ad") && !locate_template(array("archive-ad.php"))) {
-                    $path =  "$dirFullPath/archives/archive-ad.php";
-                    wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$dirPath/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
-                    wp_enqueue_style("archiveAd");
+        if(defined("PLUGIN_RE_THEME")) {
+            $shortPath = PLUGIN_RE_THEME["name"].'/'.PLUGIN_RE_THEME["version"];
+            $fullPath = PLUGIN_RE_PATH."templates/$shortPath";
+            if(is_dir($fullPath)) {
+                if(get_post_type() === "re-ad") {
+                    if(is_single() && !locate_template(array("single-ad.php"))) {
+                        $path = "$fullPath/singles/single-ad.php";
+                        $this->registerPluginScriptsSingleAd();
+                        $this->registerPluginStylesSingleAd($shortPath);
+                    }else if(is_post_type_archive("re-ad") && !locate_template(array("archive-ad.php"))) {
+                        $path =  "$fullPath/archives/archive-ad.php";
+                        wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$shortPath/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
+                        wp_enqueue_style("archiveAd");
+                    }
+                }else if(is_search() && !have_posts() && !locate_template(array("no-results.php"))) {
+                    $path =  "$fullPath/archives/no-results.php";
+                    wp_register_style("noResults", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$shortPath/archives/noResults.css"), array(), PLUGIN_RE_VERSION);
+                    wp_enqueue_style("noResults");
                 }
-            }else if(is_search() && !have_posts() && !locate_template(array("no-results.php"))) {
-                $path =  "$dirFullPath/archives/no-results.php";
-                wp_register_style("noResults", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$dirPath/archives/noResults.css"), array(), PLUGIN_RE_VERSION);
-                wp_enqueue_style("noResults");
             }
         }
 
@@ -268,7 +256,7 @@ class REALM_Ad {
     public function typePropertyColumns($originalColumns) {
         $newColumns = $originalColumns;
         array_splice($newColumns, 1);
-        $newColumns["habitable"] = "Habitable";
+        $newColumns["habitable"] = __("Habitable", "retxtdom");
         $posts = $originalColumns["posts"];
         unset($originalColumns["posts"]);
         $newColumns = array_merge($originalColumns, $newColumns);

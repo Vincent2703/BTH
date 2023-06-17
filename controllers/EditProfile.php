@@ -6,56 +6,24 @@ class REALMP_EditProfile {
     public function addProfileCustomFields($user) {
         require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
         
-        $role = $user->roles[0];
-        //Customer
-        $customFieldsValues = array();
-
-        $options = get_option(PLUGIN_REP_NAME."Options");
-        if($options !== false && isset($options["customFields"])) {
-            $customFields = $options["customFields"];
-            if(!empty($customFields) || $customFields !== "[]") {
-                $customFields = json_decode($customFields, true);
-                foreach($customFields as $field) {
-                    $name = sanitize_text_field($field["name"]);
-                    $nameAttr = $field["nameAttr"];
-                    $type = sanitize_text_field($field["type"]);
-                    $optionnal = boolval($field["optionnal"]);
-                    $value = maybe_unserialize(get_user_meta($user->ID, "userCF".$nameAttr, true));
-
-                    if($field["type"] === "text") {                        
-                        $customFieldsValues[$name] = array("nameAttr"=>$nameAttr, "type"=>$type, "optionnal"=>$optionnal, "value"=>sanitize_text_field($value));
-                    }else if($field["type"] === "file") {
-                        $extensions = sanitize_text_field($field["extensions"]);
-                        $customFieldsValues[$name] = array("nameAttr"=>$nameAttr, "type"=>$type, "extensions"=>$extensions, "optionnal"=>$optionnal, "file"=>$value);
-                    }
-                }
-            }
-        }
+        $role = $user->roles[0];        
         $agencies = REALM_UserAdmin::getUsersByRole("agency");
         
-        $customerPhone = sanitize_text_field(get_user_meta($user->ID, "userPhone", true));
-        
-        //Agent
-        $agentPhone = sanitize_text_field(get_user_meta($user->ID, "agentPhone", true));
-        $agentMobilePhone = sanitize_text_field(get_user_meta($user->ID, "agentMobilePhone", true));
-        $agentAgency = intval(get_user_meta($user->ID, "agentAgency", true));      
-        
-        //Agency
-        $agencyPhone = sanitize_text_field(get_user_meta($user->ID, "agencyPhone", true));
-        $agencyAddress = sanitize_text_field(get_user_meta($user->ID, "agencyAddress", true));
-        $agencyDescription = wp_kses_post(get_user_meta($user->ID, "agencyDescription", true));
+        REALM_UserAdmin::getData($user->ID);
         ?>
-            <h3 id="extraInformationTitle"><?= ucfirst($role);?></h3>
+        <h3 id="extraInformationTitle"><span id="roleName"><?= ucfirst($role);?></span></h3>
+        <input type="hidden" name="nickname" value="<?=REALM_UserAdmin::$displayName;?>">
             <table class="form-table" id="extraInformation">
                 <tr class="form-field customer">
                     <th scope="row">
                         <label for="customerPhone"><?php _e("Phone", "reptxtdom");?></label>
                     </th>
                     <td>
-                        <input type="text" name="customerPhone" id="customerPhone" class="regular-text" value="<?=$customerPhone;?>">
+                        <input type="text" name="customerPhone" id="customerPhone" class="regular-text" value="<?=REALM_UserAdmin::$customerPhone;?>">
                     </td>
                 </tr>
-                <?php foreach($customFieldsValues as $kField => $vField) { ?>
+                <?php if($role === "customer") {
+                foreach(REALM_UserAdmin::$customFields as $kField => $vField) { ?>
                 <tr class="form-field customer">
                     <th scope="row">
                         <label for="CF<?=$vField["nameAttr"];?>"><?=$kField;?></label>
@@ -72,12 +40,13 @@ class REALMP_EditProfile {
                     } ?>
                     </td>
                 </tr>
+                <?php } ?>
                 <tr class="form-field agent">
                     <th scope="row">
                         <label for="agentPhone"><?php _e("Phone", "retxtdom");?></label>
                     </th>
                     <td>
-                        <input type="text" name="agentPhone" id="agentPhone" class="regular-text" value="<?=$agentPhone;?>">
+                        <input type="text" name="agentPhone" id="agentPhone" class="regular-text" value="<?=REALM_UserAdmin::$agentPhone;?>">
                     </td>
                 </tr>
                 <tr class="form-field agent">
@@ -85,7 +54,7 @@ class REALMP_EditProfile {
                          <label for="agentMobilePhone"><?php _e("Mobile phone", "retxtdom");?></label>
                     </th>
                     <td>
-                        <input type="text" name="agentMobilePhone" id="agentMobilePhone" class="regular-text" value="<?=$agentMobilePhone;?>">
+                        <input type="text" name="agentMobilePhone" id="agentMobilePhone" class="regular-text" value="<?=REALM_UserAdmin::$agentMobilePhone;?>">
                     </td>
                 </tr>
                 <tr class="form-field agent">
@@ -97,7 +66,7 @@ class REALMP_EditProfile {
                         <?php
                             foreach($agencies as $agency) {
                                 ?>
-                                <option value="<?= $agency->ID; ?>" <?php selected($agency->ID, $agentAgency); ?>><?= $agency->display_name; ?></option>
+                                <option value="<?= $agency->ID; ?>" <?php selected($agency->ID, REALM_UserAdmin::$agentAgency); ?>><?= REALM_UserAdmin::$displayName; ?></option>
                                 <?php
                             }
                         ?>
@@ -109,7 +78,7 @@ class REALMP_EditProfile {
                         <label for="agencyPhone"><?php _e("Phone", "retxtdom");?></label>
                     </th>
                     <td>
-                        <input type="text" name="agencyPhone" id="agencyPhone" class="regular-text" value="<?=$agencyPhone;?>">
+                        <input type="text" name="agencyPhone" id="agencyPhone" class="regular-text" value="<?=REALM_UserAdmin::$agencyPhone;?>">
                     </td>
                 </tr>
                 <tr class="form-field agency">
@@ -117,7 +86,7 @@ class REALMP_EditProfile {
                          <label for="agencyAddress"><?php _e("Address", "retxtdom");?></label>
                     </th>
                     <td>
-                        <input type="text" name="agencyAddress" id="agencyAddress" class="regular-text" value="<?=$agencyAddress;?>">
+                        <input type="text" name="agencyAddress" id="agencyAddress" class="regular-text" value="<?=REALM_UserAdmin::$agencyAddress;?>">
                     </td>
                 </tr>
                 <tr class="form-field agency">
@@ -127,7 +96,7 @@ class REALMP_EditProfile {
                     <td>
                         <?php
                             wp_editor(
-                                $agencyDescription, //Content
+                                REALM_UserAdmin::$agencyDescription, //Content
                                 "agencyDescription", array(
                                     "textarea_name" => "agencyDescription",
                                     "textarea_rows" => 10,

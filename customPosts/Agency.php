@@ -9,6 +9,11 @@ if(!defined("ABSPATH")) {
  */
 class REALM_Agency {
     
+    private function registerPluginStylesSingleAgency($path) {
+        wp_register_style("singleAgency", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$path/singles/singleAgency.css"), array(), PLUGIN_RE_VERSION);
+        wp_enqueue_style("singleAgency");
+    }
+    
     /*
      * Create the custom post Agency
      */
@@ -27,31 +32,19 @@ class REALM_Agency {
     /*
      * Fetch the single custom post Agency template
      */
-    function templatePostAgency($path) {
-        $dirTemplates = PLUGIN_RE_PATH."templates/";
-        $currentTheme = wp_get_theme();
-        $themeName = str_replace(' ', '', strtolower($currentTheme->name));
-        $themeVersion = $currentTheme->version;
-
-        if(is_dir($dirTemplates.$themeName)) {
-            $listDirVersions = array_diff(scandir($dirTemplates.$themeName), array('.', ".."));
-
-            if(in_array($themeVersion, $listDirVersions)) {
-                $dirPath = "$themeName/$themeVersion";
-            }else {
-                $dirVersion = end($listDirVersions);
-                $dirPath = "$themeName/$dirVersion";
-            }
-
-            $dirFullPath = "$dirTemplates$dirPath";
-
-            if(get_post_type() === "agency" && is_single() && !locate_template(array("single-agency.php"))) {
-                $path = "$dirFullPath/singles/single-agency.php";
-                wp_register_style("singleAgency", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$dirPath/singles/singleAgency.css"), array(), PLUGIN_RE_VERSION);
-                wp_enqueue_style("singleAgency");
+    public function templatePostAgency($path) {
+        if(defined("PLUGIN_RE_THEME")) {
+            $shortPath = PLUGIN_RE_THEME["name"].'/'.PLUGIN_RE_THEME["version"];
+            $fullPath = PLUGIN_RE_PATH."templates/$shortPath";
+            if(is_dir($fullPath)) {
+                if(get_post_type() === "agency") {
+                    if(is_single() && !locate_template(array("single-agency.php"))) {
+                        $path = "$fullPath/singles/single-agency.php";
+                        $this->registerPluginStylesSingleAgency($shortPath);
+                    }
+                }
             }
         }
-
         return $path;
     }
 }

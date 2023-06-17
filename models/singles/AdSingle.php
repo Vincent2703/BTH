@@ -174,14 +174,14 @@ class REALM_AdSingle {
             
             if(!empty($idContact = self::getMeta("adIdAgent"))) {
                 self::$getContact = true;
+                REALM_UserAdmin::getData($idContact);
                 if(intval(self::getMeta("adShowAgent")) === 1) {
-                    REALM_UserAdmin::getData($idContact);
                     self::$idContact = $idContact;
                     self::$phone = REALM_UserAdmin::$agentPhone;
                     self::$mobilePhone = REALM_UserAdmin::$agentMobilePhone;
                     self::$nameContact = REALM_UserAdmin::$firstName .' '. REALM_UserAdmin::$lastName;
                 }else{
-                    self::$idContact = get_user_meta($idContact);
+                    self::$idContact = REALM_UserAdmin::$agentAgency;//Agency
                     REALM_UserAdmin::getData(self::$idContact);
                     self::$phone = REALM_UserAdmin::$agencyPhone;
                     self::$linkAgency = get_post_permalink(self::$idContact); //TO REMPLACE
