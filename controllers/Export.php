@@ -68,7 +68,9 @@ class REALM_Export {
     }
     
     public function widgetExport() { //Widget to show on the WP dashboard
-        wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetExport", __("Export the ads", "retxtdom"), array($this, "showPage"));
+        if(current_user_can("administrator")) {
+            wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetExport", __("Export the ads", "retxtdom"), array($this, "showPage"));
+        }
     }
 
     private static function getArrayAds() { //From the ads, get an array

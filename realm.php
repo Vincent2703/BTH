@@ -135,6 +135,9 @@ class Realm {
 
         //Add tabs to the admin notice area
         add_action("all_admin_notices", array($this->Options, "tabsOption"));
+        
+        //Remove some widgets from the WordPress dashboard
+        add_action("wp_dashboard_setup", array($this, "removeWidgets"));
 
         //Add widgets to the WordPress dashboard
         add_action("wp_dashboard_setup", array($this->Import, "widgetImport"));
@@ -839,6 +842,17 @@ class Realm {
             </div>
         <?php }
     }    
+    
+    /*
+     * Remove the default WP widgets from the dashboard for the non-administrators
+     */
+    public function removeWidgets() {
+        if(!current_user_can("administrator")) {
+            global $wp_meta_boxes;
+            unset($wp_meta_boxes["dashboard"]["normal"]["core"]["dashboard_activity"]);
+            unset($wp_meta_boxes["dashboard"]["side"]["core"]["dashboard_primary"]);
+        }
+    }
     
 }
 new Realm;

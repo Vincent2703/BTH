@@ -122,14 +122,14 @@
     display: inline-block;
     width: 20px;
     height: 20px;
-    background: url("../../../../images/bathIcon.svg") no-repeat bottom;
+    background: url("../../../../../images/bathIcon.svg") no-repeat bottom;
 }
 
 .inShortAd .detailsAd .iconsDate .icons .nbBedrooms .bedIcon {
     display: inline-block;
     width: 22px;
     height: 20px;
-    background: url("../../../../images/bedIcon.svg") no-repeat bottom;    
+    background: url("../../../../../images/bedIcon.svg") no-repeat bottom;    
 }
 
 /* REPONSIVE */

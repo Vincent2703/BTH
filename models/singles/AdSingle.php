@@ -172,25 +172,34 @@ class REALM_AdSingle {
             }
             self::$city = self::getMeta("adCity");
             
-            if(!empty($idContact = self::getMeta("adIdAgent"))) {
-                self::$getContact = true;
-                REALM_UserAdmin::getData($idContact);
-                if(intval(self::getMeta("adShowAgent")) === 1) {
-                    self::$idContact = $idContact;
-                    self::$phone = REALM_UserAdmin::$agentPhone;
-                    self::$mobilePhone = REALM_UserAdmin::$agentMobilePhone;
-                    self::$nameContact = REALM_UserAdmin::$firstName .' '. REALM_UserAdmin::$lastName;
-                }else{
-                    self::$idContact = REALM_UserAdmin::$agentAgency;//Agency
-                    REALM_UserAdmin::getData(self::$idContact);
-                    self::$phone = REALM_UserAdmin::$agencyPhone;
-                    self::$linkAgency = get_post_permalink(self::$idContact); //TO REMPLACE
-                    self::$nameContact = REALM_UserAdmin::$displayName;
+            $idContact = self::getMeta("adIdAgent");
+            if(!empty($idContact)) {
+                if(get_user_by("id", $idContact) !== false) {
+                    REALM_UserAdmin::getData($idContact);
+                    if (intval(self::getMeta("adShowAgent")) === 1) {
+                        self::$idContact = $idContact;
+                        self::$phone = REALM_UserAdmin::$agentPhone;
+                        self::$mobilePhone = REALM_UserAdmin::$agentMobilePhone;
+                        self::$nameContact = REALM_UserAdmin::$firstName .' '. REALM_UserAdmin::$lastName;
+                    }else {
+                        if(get_user_by("id", REALM_UserAdmin::$agentAgency) !== false) {
+                            self::$idContact = REALM_UserAdmin::$agentAgency; //Agency
+                            REALM_UserAdmin::getData(self::$idContact);
+                            self::$phone = REALM_UserAdmin::$agencyPhone;
+                            self::$linkAgency = get_post_permalink(self::$idContact); //TO REPLACE
+                            self::$nameContact = REALM_UserAdmin::$displayName;
+                        }
+                    }
+                    if(is_numeric(self::$idContact)) {
+                        self::$email = REALM_UserAdmin::$email;
+                        self::$thumbnailContact = get_avatar_url($idContact, "thumbnail");
+                    }
+                    self::$getContact = true;
                 }
-                self::$email = REALM_UserAdmin::$email;
-                self::$thumbnailContact = get_avatar_url($idContact, "thumbnail");
-            }else{
-                self::$email = get_option(PLUGIN_RE_NAME."OptionsEmail")["emailAd"];
+            }
+
+            if (!is_numeric(self::$idContact)) {
+                self::$email = get_option(PLUGIN_RE_NAME . "OptionsEmail")["emailAd"];
                 self::$getContact = false;
             }
 

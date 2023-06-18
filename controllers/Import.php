@@ -182,7 +182,9 @@ class REALM_Import {
     }
     
     public function widgetImport() {
-        wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetImport", __("Import the ads", "retxtdom"), array($this, "showPage"));
+        if(current_user_can("administrator")) {
+            wp_add_dashboard_widget(PLUGIN_RE_NAME."widgetImport", __("Import the ads", "retxtdom"), array($this, "showPage"));
+        }
     }
     
     private static function countAds($filePath) {
