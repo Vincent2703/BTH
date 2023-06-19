@@ -2,6 +2,15 @@ jQuery(function($) {
     $(document).ready(function(){
             $("#title").attr("maxLength", 64); //Limit ad's title to 64 characteres
             $("#insertAdPictures").click(mediaManager); //Open the WP media manager
+            
+            
+            const selectStatus = $("#post_status");
+            
+            selectStatus.change(function(event) {
+                let textOption = $("option:selected", this).text();      
+                $("option:selected", this).attr("selected", "selected");
+                $("#post-status-display").text(textOption); 
+            });
         });
 
     //Media manager - Add Id pictures to an hidden input

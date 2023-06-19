@@ -175,10 +175,10 @@ class Realm {
         add_action("edit_user_profile", array($this->EditProfile, "addProfileCustomFields"));
         
         add_action("personal_options_update", array($this->EditProfile, "saveProfileCustomFields"));
-        add_action("edit_user_profile_update", array($this->EditProfile, "saveProfileCustomFields"));
+        add_action("edit_user_profile_update", array($this->EditProfile, "saveProfileCustomFields"));      
         
-        //Fill the agent's agency column in the users list for the agent role
-        //add_action("manage_users_custom_column", array($this->UserAdmin, "agentAgencyDataColumn"), 10, 3);     
+        //Fix an issue with the post_status when we update twice a post with a custom type
+        add_action("admin_footer-post.php", array($this, "fixPostStatusUpdate"));
     }
     
     /*
@@ -215,7 +215,7 @@ class Realm {
         
         //To do : sort and filter by the agent's agency
         //add_filter("manage_users_sortable_columns", array($this->UserAdmin, "agentAgencySortableColumn"));
-
+        
     }
     
     /*
@@ -851,6 +851,37 @@ class Realm {
             global $wp_meta_boxes;
             unset($wp_meta_boxes["dashboard"]["normal"]["core"]["dashboard_activity"]);
             unset($wp_meta_boxes["dashboard"]["side"]["core"]["dashboard_primary"]);
+        }
+    }
+    
+    /*
+     * Fix an issue with the post_status when we update twice a post with a custom type
+     */
+    public function fixPostStatusUpdate() {
+        $screen = get_current_screen();
+        $postType = $screen->post_type;
+        $base = $screen->base;
+        
+        if($base === "post" && $postType === "re-ad") {            
+            $publish = __("Publish", "retxtdom");
+            ?>
+            <script>
+                jQuery(document).ready(function() {
+                    const postStatus = jQuery("#post_status");
+                    const publish = "<?=$publish;?>";
+                    
+                    if(jQuery("#post_status:has('option[value=publish]')").length === 0) {
+                        jQuery("#post_status").append(jQuery("<option>", {
+                            value: "publish",
+                            text: publish
+                        }));
+                    }
+                    
+                    postStatus.prop("name", "postStatus"); //Must do that to fix an issuewith the post_status when we update the post a second time
+                    
+                });
+            </script>
+            <?php
         }
     }
     
