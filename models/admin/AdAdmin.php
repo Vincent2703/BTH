@@ -108,6 +108,14 @@ class REALM_AdAdmin {
         }
     }
     
+    public static function getAdsByUserAlert($userId) {
+        require_once("UserAdmin.php");
+        REALM_UserAdmin::getData($userId);
+        $alert = REALM_UserAdmin::$alert;
+        
+        print_r($alert);
+    }
+    
     //Save data in BDD
     public static function setData($adId, $ad) {       
         if(isset($_POST["postStatus"]) && in_array($_POST["postStatus"], array("publish", "pending", "draft", "future"))) {

@@ -112,13 +112,16 @@ class Realm {
         add_action("admin_init", array($this, "initAdmin"));
 
         //Add menu items to the WordPress admin dashboard
-        add_action("admin_menu", array($this, "completeMenu"));
+        add_action("admin_menu", array($this, "completeMenu"));    
 
         //Register plugin styles for the admin area
         add_action("admin_enqueue_scripts", array($this, "registerPluginStylesAdmin"));
 
         //Register plugin scripts for the admin area
         add_action("admin_enqueue_scripts", array($this, "registerPluginScriptsAdmin"));
+        
+        //Activate dashicons for the front-end
+        add_action("wp_enqueue_scripts", array($this, "loadDashicons"));
         
         //Add fields on registration new user
         add_action("user_new_form", array($this->RegistrationUser, "addFieldsNewUser"));
@@ -778,6 +781,13 @@ class Realm {
             wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
             wp_enqueue_style("autocompleteAddress");
         }
+    }
+    
+    /*
+     * Activate dashicons for the front end
+     */
+    public function loadDashicons() {
+        wp_enqueue_style("dashicons");
     }
     
     /*

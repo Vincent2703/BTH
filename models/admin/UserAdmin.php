@@ -20,6 +20,7 @@ class REALM_UserAdmin {
     //Customer
     public static $customerPhone;
     public static $customFields;
+    public static $alert;
     
     //Agent
     public static $agentPhone;
@@ -67,6 +68,7 @@ class REALM_UserAdmin {
                     }
                 }
             }
+            self::$alert = self::getMeta("customerAlert");
         }else if($role === "agent") {
             self::$agentPhone = sanitize_text_field(self::getMeta("agentPhone"));
             self::$agentMobilePhone = sanitize_text_field(self::getMeta("agentMobilePhone"));          
@@ -121,7 +123,7 @@ class REALM_UserAdmin {
                         }
                     }
                 }
-            } 
+            }           
         }else if($role === "agent") {
             if(isset($_POST["agentPhone"]) && !ctype_space($_POST["agentPhone"])) {
                 update_user_meta($idUser, "agentPhone", sanitize_text_field($_POST["agentPhone"]));
@@ -149,6 +151,30 @@ class REALM_UserAdmin {
                 ));
             }
         }
+    }
+    
+    public static function setAlert($data) {
+        $idUser = apply_filters("determine_current_user", false);
+        $alert = array(
+            "typeAd" => sanitize_text_field($data->get_param("typeAd")),
+            "typeProperty" => sanitize_text_field($data->get_param("typeProperty")),
+            "minSurface" => intval($data->get_param("minSurface")),
+            "maxSurface" => intval($data->get_param("maxSurface")),
+            "minPrice" => intval($data->get_param("minPrice")),
+            "maxPrice" => intval($data->get_param("maxPrice")),
+            "nbRooms" => intval($data->get_param("nbRooms")),
+            "nbBedrooms" => intval($data->get_param("nbBedrooms")),
+            "nbBathrooms" => intval($data->get_param("nbBathrooms")),
+            "furnished" => $data->get_param("furnished") === "on",
+            "land" => $data->get_param("land") === "on",
+            "cellar" => $data->get_param("cellar") === "on",
+            "terrace" => $data->get_param("terrace") === "on",
+            "elevator" => $data->get_param("elevator") === "on",
+            "city" => sanitize_text_field($data->get_param("city")),
+            "searchBy" => sanitize_text_field($data->get_param("searchBy")),
+            "radius" => intval($data->get_param("radius"))
+        );
+        update_user_meta($idUser, "customerAlert", $alert);
     }
     
     public static function getUsersByRole($role) {

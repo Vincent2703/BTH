@@ -6,7 +6,8 @@ get_header(); ?>
         <div id="primary" class="content-area">
             <main id="main" class="site-main">
             <?php if(have_posts()) { //Rajouter une limite de posts?>
-                <h3>Liste des <span class="color-accent"><?php _e("Ads", "retxtdom"); ?></span></h3>
+                <h3><span class="color-accent"><?php _e("Ads list", "retxtdom"); ?></span></h3>
+                <button id="subscribeAlerts">test</button>
                 <?php
                 while(have_posts()) {
                     the_post();

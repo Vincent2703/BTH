@@ -13,7 +13,7 @@ class REALM_GetAds {
             $terms = array();
             $metas = array();
             
-            if(isset($_GET["typeAd"]) && !empty($_GET["typeAd"])) {
+            if(isset($_GET["typeAd"]) && !ctype_space($_GET["typeAd"])) {
                 array_push($terms,
                     array(
                         "taxonomy" => "adTypeAd",
@@ -22,7 +22,7 @@ class REALM_GetAds {
                     )
                 );            
             }
-            if(isset($_GET["typeProperty"]) && !empty($_GET["typeProperty"])) {
+            if(isset($_GET["typeProperty"]) && !ctype_space($_GET["typeProperty"])) {
                 array_push($terms,
                     array(
                         "taxonomy" => "adTypeProperty",
@@ -146,7 +146,7 @@ class REALM_GetAds {
                 );
             }
             
-            if(isset($_GET["city"]) && !empty($_GET["city"])) {
+            if(isset($_GET["city"]) && !ctype_space($_GET["city"])) {
                 $nonce = wp_create_nonce("apiAddress"); //Would be probably MUCH better in a hidden field, TODO ?
                 if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
                     $url = urlencode(get_rest_url(null, PLUGIN_RE_NAME."/v1/address") ."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=city&nonce=$nonce");
