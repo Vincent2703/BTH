@@ -55,6 +55,9 @@ class Realm {
         define("PLUGIN_RE_NAME", "realm");
         define("PLUGIN_RE_VERSION", "dev");
         define("PLUGIN_RE_PATH", WP_PLUGIN_DIR.'/'.PLUGIN_RE_NAME.'/');
+        
+        $activatedPluginsList = get_option("active_plugins");
+        define("PLUGIN_RE_REP", in_array("realm/realm.php", $activatedPluginsList));
     }
     
     /*

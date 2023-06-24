@@ -68,7 +68,7 @@ class REALM_UserAdmin {
                     }
                 }
             }
-            self::$alert = self::getMeta("customerAlert");
+            self::$alert = maybe_unserialize(self::getMeta("customerAlert"));
         }else if($role === "agent") {
             self::$agentPhone = sanitize_text_field(self::getMeta("agentPhone"));
             self::$agentMobilePhone = sanitize_text_field(self::getMeta("agentMobilePhone"));          
@@ -174,7 +174,13 @@ class REALM_UserAdmin {
             "searchBy" => sanitize_text_field($data->get_param("searchBy")),
             "radius" => intval($data->get_param("radius"))
         );
-        update_user_meta($idUser, "customerAlert", $alert);
+        $prevValue = get_user_meta($idUser, "customerAlert", true);
+        if($prevValue === $alert) {
+            $result = "sameAlert";
+        }else{
+            $result = update_user_meta($idUser, "customerAlert", $alert);
+        }
+        echo json_encode(array("result" => $result));
     }
     
     public static function getUsersByRole($role) {

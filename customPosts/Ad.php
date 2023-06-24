@@ -171,6 +171,11 @@ class REALM_Ad {
                         wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$shortPath/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
                         wp_enqueue_style("archiveAd");
                     }
+                    if(is_post_type_archive("re-ad") && PLUGIN_RE_REP) {
+                        wp_register_script("archiveAds", plugins_url(PLUGIN_REP_NAME."/includes/js/templates/archives/archiveAds.js"), array("jquery"), PLUGIN_REP_VERSION, true);
+                        wp_localize_script("archiveAds", "variables", array("APIURL" => get_rest_url(null, PLUGIN_REP_NAME."/v1/alerts")));
+                        wp_enqueue_script("archiveAds");
+                    }
                 }else if(is_search() && !have_posts() && !locate_template(array("no-results.php"))) {
                     $path =  "$fullPath/archives/no-results.php";
                     wp_register_style("noResults", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$shortPath/archives/noResults.css"), array(), PLUGIN_RE_VERSION);

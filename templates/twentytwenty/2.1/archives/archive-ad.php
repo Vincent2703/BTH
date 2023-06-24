@@ -7,8 +7,9 @@ get_header(); ?>
             <main id="main" class="site-main">
             <?php if(have_posts()) { //Rajouter une limite de posts?>
                 <h3><span class="color-accent"><?php _e("Ads list", "retxtdom"); ?></span></h3>
+                <?php if(PLUGIN_RE_REP && current_user_can("customer")) { ?>
                 <button id="subscribeAlerts">test</button>
-                <?php
+                <?php }
                 while(have_posts()) {
                     the_post();
                     $idPost = get_the_id();

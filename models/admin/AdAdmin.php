@@ -108,12 +108,42 @@ class REALM_AdAdmin {
         }
     }
     
-    public static function getAdsByUserAlert($userId) {
+    public static function getInterestingAdsForUser($userId) {
         require_once("UserAdmin.php");
         REALM_UserAdmin::getData($userId);
         $alert = REALM_UserAdmin::$alert;
-        
-        print_r($alert);
+        if(!is_array($alert)) {
+            return "noAlert";
+        }else{
+            print_r($alert);
+            /*$ads = get_posts(array(
+                "post_type"     => "re-ad",
+                "numberposts"   => 5,
+                "post_status"   => "publish",
+                
+                "meta_query" => array(
+                    array(
+                        "key" => "adCity",
+                        "value" => self::$city
+                    ),
+                    array(
+                        "key" => "_thumbnail_id"
+                    )
+                ),
+                "tax_query" => array(
+                    array(
+                        "taxonomy" => "adTypeAd",
+                        "field" => "name",
+                        "terms" => self::$typeAd
+                    ),
+                    array(
+                        "taxonomy" => "adAvailable",
+                        "field" => "slug",
+                        "terms" => "available"
+                    )
+                )
+            ));*/
+        }
     }
     
     //Save data in BDD
@@ -276,7 +306,6 @@ class REALM_AdAdmin {
             }
         }
     }
-    
     
     
     private static function saveTaxonomy($postId, $taxonomyName) {
