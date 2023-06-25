@@ -151,7 +151,7 @@ class REALM_Ad {
         wp_insert_term(__("Unavailable", "retxtdom"), "adAvailable", array("slug"=>"unavailable"));
         
     }
-   
+    
   
     /*
      * Fetch the single or archive custom post Ad template
@@ -173,7 +173,12 @@ class REALM_Ad {
                     }
                     if(is_post_type_archive("re-ad") && PLUGIN_RE_REP) {
                         wp_register_script("archiveAds", plugins_url(PLUGIN_REP_NAME."/includes/js/templates/archives/archiveAds.js"), array("jquery"), PLUGIN_REP_VERSION, true);
-                        wp_localize_script("archiveAds", "variables", array("APIURL" => get_rest_url(null, PLUGIN_REP_NAME."/v1/alerts")));
+                        wp_localize_script("archiveAds", "variables", array(
+                            "APIURL" => get_rest_url(null, PLUGIN_REP_NAME."/v1/alerts"), 
+                            "success" => __("You are subscribed to this alert with success.", "reptxtdom"),
+                            "sameAlert" => __("You are already subscribed to this alert.", "reptxtdom"),
+                            "error" => __("An error occured, please try again later.", "reptxtdom")
+                            ));
                         wp_enqueue_script("archiveAds");
                     }
                 }else if(is_search() && !have_posts() && !locate_template(array("no-results.php"))) {

@@ -68,7 +68,7 @@
                 }
                 
             }else if(isset($_POST["contact"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formContact")) {
-                if(isset($_POST["name"]) && isset($_POST["phone"]) && isset($_POST["email"]) && isset($_POST["message"]) && !ctype_space($_POST["names"]) && !ctype_space($_POST["phone"]) && !ctype_space($_POST["email"]) && !ctype_space($_POST["message"])) {
+                if(isset($_POST["name"]) && isset($_POST["phone"]) && isset($_POST["email"]) && isset($_POST["message"]) && !empty(trim($_POST["names"])) && !empty(trim($_POST["phone"])) && !empty(trim($_POST["email"])) && !empty(trim($_POST["message"]))) {
                     $adRef = REALM_AdSingle::$refAd;
                     $contactNames = sanitize_text_field($_POST["names"]);
                     $contactPhone = sanitize_text_field($_POST["phone"]);

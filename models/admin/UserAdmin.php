@@ -82,14 +82,14 @@ class REALM_UserAdmin {
     }
      
     public static function setData($idUser) {
-        if(isset($_POST["role"]) && !ctype_space($_POST["role"])) {
+        if(isset($_POST["role"]) && !empty(trim($_POST["role"]))) {
             $role = $_POST["role"];
         }else{
             $role = get_user_by("ID", $idUser)->roles[0];
         }
         
         if($role === "customer") {
-            if(isset($_POST["customerPhone"]) && !ctype_space($_POST["customerPhone"])) {
+            if(isset($_POST["customerPhone"]) && !empty(trim($_POST["customerPhone"]))) {
                 update_user_meta($idUser, "customerPhone", sanitize_text_field($_POST["customerPhone"]));
             }   
 
@@ -99,7 +99,7 @@ class REALM_UserAdmin {
                 if(!empty($customFields) || $customFields !== "[]") {
                     $customFields = json_decode($customFields, true);
                     foreach($customFields as $field) {
-                        if(isset($_POST["CF".$field["nameAttr"]]) && !ctype_space($_POST["CF".$field["nameAttr"]])) {
+                        if(isset($_POST["CF".$field["nameAttr"]]) && !empty(trim($_POST["CF".$field["nameAttr"]]))) {
                             if($field["type"] === "text") {
                                 update_user_meta($idUser, "customerCF".$field["nameAttr"], sanitize_text_field($_POST["CF".$field["nameAttr"]]));
                             }                       
@@ -125,62 +125,32 @@ class REALM_UserAdmin {
                 }
             }           
         }else if($role === "agent") {
-            if(isset($_POST["agentPhone"]) && !ctype_space($_POST["agentPhone"])) {
+            if(isset($_POST["agentPhone"]) && !empty(trim($_POST["agentPhone"]))) {
                 update_user_meta($idUser, "agentPhone", sanitize_text_field($_POST["agentPhone"]));
             }
-            if(isset($_POST["agentMobilePhone"]) && !ctype_space($_POST["agentMobilePhone"])) {
+            if(isset($_POST["agentMobilePhone"]) && !empty(trim($_POST["agentMobilePhone"]))) {
                 update_user_meta($idUser, "agentMobilePhone", sanitize_text_field($_POST["agentMobilePhone"]));
             }
-            if(isset($_POST["agentAgency"]) && !ctype_space($_POST["agentAgency"])) {
+            if(isset($_POST["agentAgency"]) && !empty(trim($_POST["agentAgency"]))) {
                 update_user_meta($idUser, "agentAgency", intval($_POST["agentAgency"]));
             }
         }else if($role === "agency") {
-            if(isset($_POST["agencyPhone"]) && !ctype_space($_POST["agencyPhone"])) {
+            if(isset($_POST["agencyPhone"]) && !empty(trim($_POST["agencyPhone"]))) {
                 update_user_meta($idUser, "agencyPhone", sanitize_text_field($_POST["agencyPhone"]));
             }
-            if(isset($_POST["agencyAddress"]) && !ctype_space($_POST["agencyAddress"])) {
+            if(isset($_POST["agencyAddress"]) && !empty(trim($_POST["agencyAddress"]))) {
                 update_user_meta($idUser, "agencyAddress", sanitize_text_field($_POST["agencyAddress"]));
             }
-            if(isset($_POST["agencyDescription"]) && !ctype_space($_POST["agencyDescription"])) {
+            if(isset($_POST["agencyDescription"]) && !empty(trim($_POST["agencyDescription"]))) {
                 update_user_meta($idUser, "agencyDescription", wp_kses_post($_POST["agencyDescription"]));
             }
-            if(isset($_POST["user_login"]) && !ctype_space($_POST["user_login"])) {
+            if(isset($_POST["user_login"]) && !empty(trim($_POST["user_login"]))) {
                 wp_update_user(array(
                     "ID" => $idUser,
                     "display_name" => sanitize_text_field($_POST["user_login"])
                 ));
             }
         }
-    }
-    
-    public static function setAlert($data) {
-        $idUser = apply_filters("determine_current_user", false);
-        $alert = array(
-            "typeAd" => sanitize_text_field($data->get_param("typeAd")),
-            "typeProperty" => sanitize_text_field($data->get_param("typeProperty")),
-            "minSurface" => intval($data->get_param("minSurface")),
-            "maxSurface" => intval($data->get_param("maxSurface")),
-            "minPrice" => intval($data->get_param("minPrice")),
-            "maxPrice" => intval($data->get_param("maxPrice")),
-            "nbRooms" => intval($data->get_param("nbRooms")),
-            "nbBedrooms" => intval($data->get_param("nbBedrooms")),
-            "nbBathrooms" => intval($data->get_param("nbBathrooms")),
-            "furnished" => $data->get_param("furnished") === "on",
-            "land" => $data->get_param("land") === "on",
-            "cellar" => $data->get_param("cellar") === "on",
-            "terrace" => $data->get_param("terrace") === "on",
-            "elevator" => $data->get_param("elevator") === "on",
-            "city" => sanitize_text_field($data->get_param("city")),
-            "searchBy" => sanitize_text_field($data->get_param("searchBy")),
-            "radius" => intval($data->get_param("radius"))
-        );
-        $prevValue = get_user_meta($idUser, "customerAlert", true);
-        if($prevValue === $alert) {
-            $result = "sameAlert";
-        }else{
-            $result = update_user_meta($idUser, "customerAlert", $alert);
-        }
-        echo json_encode(array("result" => $result));
     }
     
     public static function getUsersByRole($role) {

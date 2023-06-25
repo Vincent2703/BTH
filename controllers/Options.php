@@ -109,6 +109,12 @@ class REALM_Options {
             PLUGIN_RE_NAME."OptionsFees", //option name
             array($this, "sanitizationFeesScheduleFields") //Sanitization callback
         );
+        
+        register_setting( //Register a setting for the fee schedule
+            PLUGIN_RE_NAME."OptionsApisGroup", //option group
+            PLUGIN_RE_NAME."OptionsApis", //option name
+            array($this, "sanitizationApisFields") //Sanitization callback
+        );
 
         /*register_setting( //Register a setting for SeLoger template
             PLUGIN_RE_NAME."OptionsSeLogerGroup", //option group
@@ -383,8 +389,8 @@ class REALM_Options {
     //Sanitization callbacks
     public function sanitizationGeneralFields($input) {
         $sanitaryValues = array();
-        
-        if(isset($input["currency"]) && !ctype_space($input["currency"])) {
+
+        if(isset($input["currency"]) && !empty(trim($input["currency"]))) {
             $sanitaryValues["currency"] = sanitize_text_field($input["currency"]);
         }
         
@@ -399,7 +405,7 @@ class REALM_Options {
     public function sanitizationImportFields($input) {
         $sanitaryValues = array();
         
-        /*if(isset($input["templateUsedImport"]) && !ctype_space($input["templateUsedImport"])) {
+        /*if(isset($input["templateUsedImport"]) && !empty(trim($input["templateUsedImport"]))) {
             $sanitaryValues["templateUsedImport"] = sanitize_text_field($input["templateUsedImport"]);
         }*/
                 
@@ -462,7 +468,7 @@ class REALM_Options {
             $inputFile[$key] = $value["feesFile"]; 
         }
         
-        if(isset($input["feesUrl"]) && !ctype_space($input["feesUrl"])) {
+        if(isset($input["feesUrl"]) && !empty(trim($input["feesUrl"]))) {
             $sanitaryValues["feesUrl"] = sanitize_url($input["feesUrl"], array("https", "http"));
         }
                 
@@ -490,7 +496,7 @@ class REALM_Options {
             $sanitaryValues["apiUsed"] = $input["apiUsed"];
         }
         
-        if(isset($input["apiKeyGoogle"]) && !ctype_space($input["apiKeyGoogle"])) {
+        if(isset($input["apiKeyGoogle"]) && !empty(trim($input["apiKeyGoogle"]))) {
             $sanitaryValues["apiKeyGoogle"] = sanitize_text_field($input["apiKeyGoogle"]);
         }
         
@@ -500,7 +506,7 @@ class REALM_Options {
              $sanitaryValues["apiMaxNbRequests"] = intval($input["apiMaxNbRequests"]);
         }
         
-        if(isset($input["apiLimitCountry"]) && !ctype_space($input["apiLimitCountry"])) {
+        if(isset($input["apiLimitCountry"]) && !empty(trim($input["apiLimitCountry"]))) {
             $sanitaryValues["apiLimitCountry"] = sanitize_text_field($input["apiLimitCountry"]);
         }
         
@@ -516,11 +522,11 @@ class REALM_Options {
     /*public function sanitizationSeLogerFields($input) {
         $sanitaryValues = array();
         
-        if(isset($input["versionSeLoger"]) && !ctype_space($input["versionSeLoger"])) {
+        if(isset($input["versionSeLoger"]) && !empty(trim($input["versionSeLoger"]))) {
             $sanitaryValues["versionSeLoger"] = sanitize_text_field($input["versionSeLoger"]);
         }
         
-        if(isset($input["idAgency"]) && !ctype_space($input["idAgency"])) {
+        if(isset($input["idAgency"]) && !empty(trim($input["idAgency"]))) {
             $sanitaryValues["idAgency"] = sanitize_text_field($input["idAgency"]);
         }
         

@@ -108,42 +108,141 @@ class REALM_AdAdmin {
         }
     }
     
-    public static function getInterestingAdsForUser($userId) {
-        require_once("UserAdmin.php");
-        REALM_UserAdmin::getData($userId);
-        $alert = REALM_UserAdmin::$alert;
-        if(!is_array($alert)) {
-            return "noAlert";
-        }else{
-            print_r($alert);
-            /*$ads = get_posts(array(
-                "post_type"     => "re-ad",
-                "numberposts"   => 5,
-                "post_status"   => "publish",
-                
-                "meta_query" => array(
-                    array(
-                        "key" => "adCity",
-                        "value" => self::$city
-                    ),
-                    array(
-                        "key" => "_thumbnail_id"
-                    )
+    public static function getAdsBySearch($search) {
+        $taxonomies = 
+            array(
+                array(
+                    "taxonomy" => "adTypeAd",
+                    "field" => "slug",
+                    "terms" => $search["typeAd"]
                 ),
-                "tax_query" => array(
-                    array(
-                        "taxonomy" => "adTypeAd",
-                        "field" => "name",
-                        "terms" => self::$typeAd
-                    ),
-                    array(
-                        "taxonomy" => "adAvailable",
-                        "field" => "slug",
-                        "terms" => "available"
-                    )
+                array(
+                    "taxonomy" => "adTypeProperty",
+                    "field" => "slug",
+                    "terms" => $search["typeProperty"]
                 )
-            ));*/
+            );
+        
+        $metas = 
+            array(
+                array(
+                    "key" => "adNbRooms",
+                    "value" => $search["nbRooms"],
+                    "compare" => ">=",
+                    "type" => "NUMERIC"
+                ),
+                array(
+                    "key" => "adNbBedrooms",
+                    "value" => $search["nbBedrooms"],
+                    "compare" => ">=",
+                    "type" => "NUMERIC"
+                ),
+                array(
+                    "key" => "adNbBathWaterRooms",
+                    "value" => $search["nbBathrooms"],
+                    "compare" => ">=",
+                    "type" => "NUMERIC"
+                ),
+            );
+        
+            if(isset($search["furnished"]) && $search["furnished"] === true) {
+                array_push($metas,
+                    array(
+                        "key" => "adFurnished",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+            if(isset($search["land"]) && $search["land"] === true) {
+                array_push($metas,
+                    array(
+                        "key" => "adLandSurface",
+                        "value" => '0',
+                        "compare" => ">",
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+            if(isset($search["cellar"]) && $search["cellar"] === true) {
+                array_push($metas,
+                    array(
+                        "key" => "adCellar",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+            if(isset($search["terrace"]) && $search["terrace"] === true) {
+                array_push($metas,
+                    array(
+                        "key" => "adTerrace",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+            if(isset($search["elevator"]) && $search["elevator"] === true) {
+                array_push($metas,
+                    array(
+                        "key" => "adElevator",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+        
+        if(isset($search["minSurface"]) && isset($search["maxSurface"]) && $search["maxSurface"] !== 0) {
+            array_push($metas,
+                array(
+                    "key" => "adSurface",
+                    "value" => array(intval($search["minSurface"]), $search["maxSurface"]),
+                    "compare" => "BETWEEN",
+                    "type" => "DECIMAL"
+                )
+            );
+        }else if(isset($search["minSurface"]) && $search["minSurface"] !== 0) {
+            array_push($metas,
+                array(
+                    "key" => "adSurface",
+                    "value" => intval($search["minSurface"]),
+                    "compare" => ">=",
+                    "type" => "DECIMAL"
+                )
+            );
         }
+        if(isset($search["minPrice"]) && isset($search["maxPrice"]) && $search["maxPrice"] !== 0) {
+            array_push($metas,
+                array(
+                    "key" => "adPrice",
+                    "value" => array(intval($search["minPrice"]), $search["maxPrice"]),
+                    "compare" => "BETWEEN",
+                    "type" => "DECIMAL"
+                )
+            );
+        }else if(isset($search["minPrice"]) && $search["minPrice"] !== 0) {
+            array_push($metas,
+                array(
+                    "key" => "adPrice",
+                    "value" => $search["minPrice"],
+                    "compare" => ">=",
+                    "type" => "DECIMAL"
+                )
+            );
+        }        
+        
+        
+        
+        $args = array(
+            "post_type" => "re-ad",
+            "numberposts" => 99,
+            "tax_query" => $taxonomies,
+            "meta_query" => $metas
+        );
+        
+        //print_r($metas);
+
+        return get_posts($args);
     }
     
     //Save data in BDD
@@ -157,10 +256,10 @@ class REALM_AdAdmin {
         
         $ad->post_title = substr(sanitize_text_field($ad->postTitle), 0, 64);
 
-        if(isset($_POST["adTypeProperty"]) && !ctype_space($_POST["adTypeProperty"])) {
+        if(isset($_POST["adTypeProperty"]) && !empty(trim($_POST["adTypeProperty"]))) {
             self::saveTaxonomy($adId, "adTypeProperty");
         }
-        if(isset($_POST["adTypeAd"]) && !ctype_space($_POST["adTypeAd"])) {
+        if(isset($_POST["adTypeAd"]) && !empty(trim($_POST["adTypeAd"]))) {
             self::saveTaxonomy($adId, "adTypeAd");
         }
         if(isset($_POST["adAvailable"]) && $_POST["adAvailable"] === "available") {
@@ -169,7 +268,7 @@ class REALM_AdAdmin {
             self::saveTaxonomyAdAvailable($adId, "unavailable");
         }            
 
-        if(isset($_POST["refAgency"]) && !ctype_space($_POST["refAgency"])) {
+        if(isset($_POST["refAgency"]) && !empty(trim($_POST["refAgency"]))) {
             update_post_meta($adId, "adRefAgency", sanitize_text_field($_POST["refAgency"]));
         }
         if(isset($_POST["price"]) && is_numeric($_POST["price"])) {
@@ -204,9 +303,9 @@ class REALM_AdAdmin {
             update_post_meta($adId, "adNbWC", absint($_POST["nbWC"]));
         }            
 
-        if(isset($_POST["showMap"]) && !ctype_space($_POST["showMap"])) {
+        if(isset($_POST["showMap"]) && !empty(trim($_POST["showMap"]))) {
             update_post_meta($adId, "adShowMap", sanitize_text_field($_POST["showMap"]));
-            if(isset($_POST["address"]) && !ctype_space($_POST["address"])) {                   
+            if(isset($_POST["address"]) && !empty(trim($_POST["address"]))) {                   
                 $query = urlencode(addslashes(htmlentities(sanitize_text_field($_POST["address"]))));
                 $nonce = wp_create_nonce("apiAddress");
                 if($_POST["showMap"] !== "all") { 
@@ -242,17 +341,17 @@ class REALM_AdAdmin {
                 update_post_meta($adId, "adCity", $city);
             }
         }
-        if(isset($_POST["images"]) && !ctype_space($_POST["images"])) {
+        if(isset($_POST["images"]) && !empty(trim($_POST["images"]))) {
             update_post_meta($adId, "adImages", sanitize_text_field($_POST["images"]));
         }
-        if(isset($_POST["agent"]) && !ctype_space($_POST["agent"])) {
+        if(isset($_POST["agent"]) && !empty(trim($_POST["agent"]))) {
             update_post_meta($adId, "adIdAgent", absint($_POST["agent"]));
         }
         
         update_post_meta($adId, "adShowAgent", isset($_POST["showAgent"]));
         
 
-        if(isset($_POST["labels"]) && !ctype_space($_POST["labels"])) {
+        if(isset($_POST["labels"]) && !empty(trim($_POST["labels"]))) {
             update_post_meta($adId, "adLabels", sanitize_text_field($_POST["labels"]));
         }
 
@@ -269,13 +368,13 @@ class REALM_AdAdmin {
         if(isset($_POST["year"]) && is_numeric($_POST["year"])) {
             update_post_meta($adId, "adYear", absint($_POST["year"]));
         }
-        if(isset($_POST["typeHeating"]) && !ctype_space($_POST["typeHeating"])) {
+        if(isset($_POST["typeHeating"]) && !empty(trim($_POST["typeHeating"]))) {
             update_post_meta($adId, "adTypeHeating", sanitize_text_field($_POST["typeHeating"]));
         }
-        if(isset($_POST["typeKitchen"]) && !ctype_space($_POST["typeKitchen"])) {
+        if(isset($_POST["typeKitchen"]) && !empty(trim($_POST["typeKitchen"]))) {
             update_post_meta($adId, "adTypeKitchen", sanitize_text_field($_POST["typeKitchen"]));
         }
-        if(isset($_POST["nbBalconies"]) && !ctype_space($_POST["nbBalconies"])) {
+        if(isset($_POST["nbBalconies"]) && !empty(trim($_POST["nbBalconies"]))) {
             update_post_meta($adId, "adNbBalconies", absint($_POST["nbBalconies"]));
         }
         
@@ -299,7 +398,7 @@ class REALM_AdAdmin {
             if(!empty($customFields) || $customFields !== "[]") {
                 $customFields = json_decode($customFields, true);
                 foreach($customFields as $field) {
-                    if(isset($_POST["CF".$field["nameAttr"]]) && !ctype_space($_POST["CF".$field["nameAttr"]])) {
+                    if(isset($_POST["CF".$field["nameAttr"]]) && !empty(trim($_POST["CF".$field["nameAttr"]]))) {
                         update_post_meta($adId, "adCF".$field["nameAttr"], sanitize_text_field($_POST["CF".$field["nameAttr"]]));
                     }
                 }
