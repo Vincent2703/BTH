@@ -21,6 +21,8 @@ class REALM_AdAdmin {
     public static $nbWaterRooms;
     public static $nbWC;
     public static $address;
+    public static $city;
+    public static $postalCode;
     public static $showMap;
     public static $images;
     public static $idAgent;
@@ -41,8 +43,12 @@ class REALM_AdAdmin {
     public static $GES;
     public static $customFieldsAF;
     
+    public static $typeAd;
+    public static $typeProperty;
+    public static $availability;
+    
        
-    public static function getMainFeatures($id) {
+    public static function getMainFeatures($id) { /* TODO : Merge the two gets */
         self::$metas = get_post_custom($id);
         
         self::$refAgency = sanitize_text_field(self::getMeta("adRefAgency"));
@@ -56,6 +62,8 @@ class REALM_AdAdmin {
         self::$nbWaterRooms = absint(self::getMeta("adNbWaterRooms"));
         self::$nbWC = absint(self::getMeta("adNbWC"));
         self::$address = sanitize_text_field(self::getMeta("adAddress"));
+        self::$city = sanitize_text_field(self::getMeta("adCity"));
+        self::$postalCode = sanitize_text_field(self::getMeta("adPostCode"));
         self::$showMap = sanitize_text_field(self::getMeta("adShowMap"));
         self::$images = sanitize_text_field(self::getMeta("adImages"));
         self::$idAgent = absint(self::getMeta("adIdAgent"));
@@ -108,6 +116,12 @@ class REALM_AdAdmin {
         }
     }
     
+    public static function getTaxonomies($id) {
+        self::$typeAd = get_the_terms($id, "adTypeAd")[0]->name;
+        self::$typeProperty = get_the_terms($id, "adTypeProperty")[0]->name;
+        self::$availability = get_the_terms($id, "adAvailable")[0]->name;
+    }
+    
     public static function getAdsBySearch($search) {
         $taxonomies = 
             array(
@@ -120,6 +134,11 @@ class REALM_AdAdmin {
                     "taxonomy" => "adTypeProperty",
                     "field" => "slug",
                     "terms" => $search["typeProperty"]
+                ),
+                array(
+                    "taxonomy" => "adAvailable",
+                    "field" => "slug",
+                    "terms" => "available"
                 )
             );
         
@@ -231,18 +250,26 @@ class REALM_AdAdmin {
             );
         }        
         
-        
-        
         $args = array(
             "post_type" => "re-ad",
             "numberposts" => 99,
+            "fields" => "ids",
             "tax_query" => $taxonomies,
             "meta_query" => $metas
         );
         
-        //print_r($metas);
-
-        return get_posts($args);
+        $postsIds = get_posts($args);
+        $ads = array();
+        foreach($postsIds as $id) {
+            $Ad = new SELF;
+            $Ad->getMainFeatures($id);
+            $Ad->getAdditionalFeatures($id);
+            $Ad->getTaxonomies($id);
+            
+            array_push($ads, $Ad);
+        }
+        
+        return $ads;
     }
     
     //Save data in BDD
@@ -250,7 +277,7 @@ class REALM_AdAdmin {
         if(isset($_POST["postStatus"]) && in_array($_POST["postStatus"], array("publish", "pending", "draft", "future"))) {
             wp_update_post(array(
                 "ID" => $adId, 
-                "post_status"=> $_POST["postStatus"])
+                "post_status" => $_POST["postStatus"])
             );
         }
         
