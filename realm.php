@@ -113,9 +113,15 @@ class Realm {
 
         //Initialize the admin area
         add_action("admin_init", array($this, "initAdmin"));
+        
+        //Add capabilities to admin/agent/agency for Ad posts
+        add_action("admin_init", array($this, "addRolesCaps"));
 
         //Add menu items to the WordPress admin dashboard
         add_action("admin_menu", array($this, "completeMenu"));    
+        
+        //https://wordpress.stackexchange.com/questions/178033/disable-posts-only-allow-to-edit-existing-pages-not-create-new-ones-create-po
+        add_action("admin_menu", array($this, "fixWPBug22895"));
 
         //Register plugin styles for the admin area
         add_action("admin_enqueue_scripts", array($this, "registerPluginStylesAdmin"));
@@ -231,81 +237,57 @@ class Realm {
         $this->defaultOptionsValues();
         $this->rewriteFlush(); //Update the permalinks structure
         
-        //Add custom role agent
-        $capabilities = array(
-            //Ads
-            "read" => true,
-            "publish_ads" => true,
-            "edit_ads" => true,
-            "edit_others_ads" => true,
-            "delete_ads" => true,
-            "delete_others_ads" => true,
-            "read_private_ads" => true,
-            "edit_ad" => true,
-            "delete_ad" => true,
-            "read_ad" => true,
-            
-            //Agents
-            /*"publish_agents" => false,
-            "edit_agents" => true,
-            "edit_others_agents" => false,
-            "delete_agents" => true,
-            "delete_others_agents" => false,
-            "read_private_agents" => false,
-            "edit_agent" => true,
-            "delete_housingfile" => true,
-            "read_housingfile" => true,*/
-            
-            //Housing files (REALM PLUS)
-            "publish_housingfiles" => false,
-            "edit_housingfiles" => true,
-            "edit_others_housingfiles" => true,
-            "delete_housingfiles" => true,
-            "delete_others_housingfiles" => true,
-            "read_private_housingfiles" => true,
-            "edit_housingfile" => true,
-            "delete_housingfile" => true,
-            "read_housingfile" => true,
+        add_role(
+            "agent",
+            __("Agent", "retxtdom"),
+            array(
+                "read" => true,
+                "edit_posts" => false,
+                "delete_posts" => false,
+                "publish_posts" => false,
+                "upload_files" => false, //false ?
+            ) 
         );
-        add_role("agent", __("Agent", "retxtdom"), $capabilities);
         
-        //Add custom role agency
-        $capabilities = array(
-            //Ads
-            "read" => true,
-            "publish_ads" => true,
-            "edit_ads" => true,
-            "edit_others_ads" => true,
-            "delete_ads" => true,
-            "delete_others_ads" => true,
-            "read_private_ads" => true,
-            "edit_ad" => true,
-            "delete_ad" => true,
-            "read_ad" => true,
+        add_role(
+            "agency",
+            __("Agency", "retxtdom"),
+            array(
+                "read" => true,
+                "edit_posts" => false,
+                "delete_posts" => false,
+                "publish_posts" => false,
+                "upload_files" => true, //false ?
+            ) 
+        );        
+    }
+    
+    public function addRolesCaps() {
+        $rolesSlug = array("administrator", "agent", "agency");
+        
+        foreach($rolesSlug as $roleSlug) {
+            $role = get_role("$roleSlug");
             
-            //Agents
-            /*"publish_agents" => false,
-            "edit_agents" => true,
-            "edit_others_agents" => false,
-            "delete_agents" => true,
-            "delete_others_agents" => false,
-            "read_private_agents" => false,
-            "edit_agent" => true,
-            "delete_housingfile" => true,
-            "read_housingfile" => true,*/
-            
-            //Housing files (REALM PLUS)
-            "publish_housingfiles" => false,
-            "edit_housingfiles" => true,
-            "edit_others_housingfiles" => true,
-            "delete_housingfiles" => true,
-            "delete_others_housingfiles" => true,
-            "read_private_housingfiles" => true,
-            "edit_housingfile" => true,
-            "delete_housingfile" => true,
-            "read_housingfile" => true,
-        );
-        add_role("agency", __("Agency", "retxtdom"), $capabilities);
+            if($role !== null) {
+                $role->add_cap("read");
+
+                //Ads
+                $role->add_cap("read_ad");
+                $role->add_cap("read_private_ads");
+                $role->add_cap("edit_ad");
+                $role->add_cap("edit_ads");
+                $role->add_cap("edit_others_ads");
+                $role->add_cap("edit_published_ads");
+                $role->add_cap("edit_private_ads");
+                $role->add_cap("create_ads");
+                $role->add_cap("publish_ads");
+                $role->add_cap("delete_ad");
+                $role->add_cap("delete_ads");
+                $role->add_cap("delete_others_ads");
+                $role->add_cap("delete_private_ads");
+                $role->add_cap("delete_published_ads");
+            }
+        }    
     }
     
     public function onPluginDeactivation() {
@@ -870,7 +852,7 @@ class Realm {
     /*
      * Fix an issue with the post_status when we update twice a post with a custom type
      */
-    public function fixPostStatusUpdate() {
+    /*public function fixPostStatusUpdate() {
         $screen = get_current_screen();
         $postType = $screen->post_type;
         $base = $screen->base;
@@ -890,12 +872,25 @@ class Realm {
                         }));
                     }
                     
-                    postStatus.prop("name", "postStatus"); //Must do that to fix an issuewith the post_status when we update the post a second time
+                    postStatus.prop("name", "postStatus");
                     
                 });
             </script>
             <?php
         }
+    }*/
+    
+    /*
+     * Fix a bug when we only want to edit a post with a custom type
+     */
+    public function fixWPBug22895() {    
+        add_submenu_page("edit.php?post_type=housingfile", "fixWPBug22895", "fixWPBug22895", "edit_housingfiles", "fixWPBug22895");
+        add_filter("add_menu_classes", array($this, "fixWPBug22895Unset"));    
+    }
+    
+    public function fixWPBug22895Unset($menu){
+        remove_submenu_page("edit.php?post_type=housingfile", "fixWPBug22895");
+        return $menu;
     }
     
 }

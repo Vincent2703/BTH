@@ -252,6 +252,20 @@ class REALM_EditAd {
                 </label>   
                 <label for="furnished"><?php _e("Furnished", "retxtdom");?></label>
             </div>
+            <div class="checkbox">
+                <label class="switch">
+                    <input type="checkbox" id="garageInput" name="garage" <?php checked(REALM_AdAdmin::$garage); ?>>
+                    <span class="slider"></span>
+                </label>   
+                <label for="garage"><?php _e("Garage", "retxtdom");?></label>
+            </div>
+            <div class="checkbox">
+                <label class="switch">
+                    <input type="checkbox" id="parkingInput" name="parking" <?php checked(REALM_AdAdmin::$parking); ?>>
+                    <span class="slider"></span>
+                </label>   
+                <label for="parking"><?php _e("Parking", "retxtdom");?></label>
+            </div>
         </div>
         <div id="year">
             <div class="text">

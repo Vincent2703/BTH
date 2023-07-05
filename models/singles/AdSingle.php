@@ -28,6 +28,8 @@ class REALM_AdSingle {
     public static $elevator;
     public static $basement;
     public static $terrace;
+    public static $garage;
+    public static $parking;
     public static $DPE;
     public static $GES;
     
@@ -89,6 +91,8 @@ class REALM_AdSingle {
             self::$elevator = sanitize_text_field(self::getMeta("adElevator"));
             self::$basement = sanitize_text_field(self::getMeta("adCellar"));
             self::$terrace = sanitize_text_field(self::getMeta("adTerrace"));
+            self::$garage = sanitize_text_field(self::getMeta("adGarage"));
+            self::$parking = sanitize_text_field(self::getMeta("adParking"));
             self::$DPE = intval(self::getMeta("adDPE"));
             self::$GES = intval(self::getMeta("adGES"));
             

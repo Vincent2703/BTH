@@ -145,6 +145,24 @@ class REALM_GetAds {
                     )
                 );
             }
+            if(isset($_GET["garage"]) && $_GET["garage"] === "on") {
+                array_push($metas,
+                    array(
+                        "key" => "adGarage",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+            if(isset($_GET["parking"]) && $_GET["parking"] === "on") {
+                array_push($metas,
+                    array(
+                        "key" => "adParking",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
             
             if(isset($_GET["city"]) && !empty(trim($_GET["city"]) && !empty($_GET["city"]))) {
                 $nonce = wp_create_nonce("apiAddress"); //Would be probably MUCH better in a hidden field, TODO ?

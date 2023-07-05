@@ -39,6 +39,8 @@ class REALM_AdAdmin {
     public static $elevator;
     public static $basement;
     public static $terrace;
+    public static $garage;
+    public static $parking;
     public static $DPE;
     public static $GES;
     public static $customFieldsAF;
@@ -98,6 +100,8 @@ class REALM_AdAdmin {
         self::$elevator = boolval(self::getMeta("adElevator"));
         self::$basement = boolval(self::getMeta("adCellar"));
         self::$terrace = boolval(self::getMeta("adTerrace"));
+        self::$garage = boolval(self::getMeta("adGarage"));
+        self::$parking = boolval(self::getMeta("adParking"));
         self::$DPE = absint(self::getMeta("adDPE"));
         self::$GES = absint(self::getMeta("adGES"));
         
@@ -210,6 +214,24 @@ class REALM_AdAdmin {
                     )
                 );
             }
+            if(isset($search["garage"]) && $search["garage"] === true) {
+                array_push($metas,
+                    array(
+                        "key" => "adGarage",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
+            if(isset($search["parking"]) && $search["parking"] === true) {
+                array_push($metas,
+                    array(
+                        "key" => "adParking",
+                        "value" => '1',
+                        "type" => "NUMERIC"
+                    )
+                );
+            }
         
         if(isset($search["minSurface"]) && isset($search["maxSurface"]) && $search["maxSurface"] !== 0) {
             array_push($metas,
@@ -259,17 +281,8 @@ class REALM_AdAdmin {
         );
         
         $postsIds = get_posts($args);
-        $ads = array();
-        foreach($postsIds as $id) {
-            $Ad = new SELF;
-            $Ad->getMainFeatures($id);
-            $Ad->getAdditionalFeatures($id);
-            $Ad->getTaxonomies($id);
-            
-            array_push($ads, $Ad);
-        }
-        
-        return $ads;
+
+        return $postsIds;
     }
     
     //Save data in BDD
@@ -410,6 +423,10 @@ class REALM_AdAdmin {
         update_post_meta($adId, "adCellar", isset($_POST["basement"]));
 
         update_post_meta($adId, "adTerrace", isset($_POST["terrace"]));
+        
+        update_post_meta($adId, "adGarage", isset($_POST["garage"]));
+        
+        update_post_meta($adId, "adParking", isset($_POST["parking"]));
 
         if(isset($_POST["DPE"]) && is_numeric($_POST["DPE"])) {
             update_post_meta($adId, "adDPE", absint($_POST["DPE"]));

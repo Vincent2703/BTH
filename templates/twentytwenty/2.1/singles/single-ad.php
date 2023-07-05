@@ -230,6 +230,18 @@
                                 <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
                             </div>
                             <?php } ?>
+                            <?php if(REALM_AdSingle::$garage == '1' || REALM_AdSingle::$parking == '1') { ?>
+                            <div>
+                                <span class="nameFeature"><?php _e("Garage/Parking", "retxtdom"); ?></span>
+                                <span class="valueFeature">
+                                    <?php if(REALM_AdSingle::$garage == '1') {
+                                        _e("Garage", "retxtdom");
+                                    }else if(REALM_AdSingle::$parking== '1') {
+                                        _e("Parking", "retxtdom");
+                                    } ?>
+                                </span>
+                            </div>
+                            <?php } ?>
                             <?php if(is_numeric(REALM_AdSingle::$year) && intval(REALM_AdSingle::$year)>0) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Construction year", "retxtdom"); ?></span>
