@@ -48,6 +48,17 @@
     right: 5px;
 }
 
+.inShortAd .thumbnailAd .titleAgency {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 5px;
+    padding: 5px;
+    color: white;
+    font-size: 9px;
+    bottom: 2px;
+    right: 5px;
+}
+
 .inShortAd .detailsAd {
     display: flex;
     flex-direction: column;

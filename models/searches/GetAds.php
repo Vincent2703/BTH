@@ -145,21 +145,20 @@ class REALM_GetAds {
                     )
                 );
             }
-            if(isset($_GET["garage"]) && $_GET["garage"] === "on") {
+            if(isset($_GET["garageparking"]) && $_GET["garageparking"] === "on") {
                 array_push($metas,
                     array(
-                        "key" => "adGarage",
-                        "value" => '1',
-                        "type" => "NUMERIC"
-                    )
-                );
-            }
-            if(isset($_GET["parking"]) && $_GET["parking"] === "on") {
-                array_push($metas,
-                    array(
-                        "key" => "adParking",
-                        "value" => '1',
-                        "type" => "NUMERIC"
+                        "relation" => "OR",
+                        array(
+                            "key" => "adGarage",
+                            "value" => '1',
+                            "type" => "NUMERIC"
+                        ),
+                        array(
+                            "key" => "adParking",
+                            "value" => '1',
+                            "type" => "NUMERIC"
+                        )
                     )
                 );
             }

@@ -15,7 +15,7 @@ get_header(); ?>
                     $idPost = get_the_id();
                     
                     if(wp_get_post_terms($idPost, "adAvailable")[0]->slug === "available") {
-   
+                        // TODO : REFACTOR MODELS AND CREATE ONE AD OBJECT EACH ITERATION
                         $descriptionAd = get_the_content();
                         $maxLengthDescriptionAd = 35;
                         if(substr_count($descriptionAd, ' ') > $maxLengthDescriptionAd) {
@@ -36,7 +36,10 @@ get_header(); ?>
                         $nbBedrooms = get_post_meta($idPost, "adNbBedrooms", true);
                         $nbWaterRooms = get_post_meta($idPost, "adNbWaterRooms", true);
                         $nbBathrooms = get_post_meta($idPost, "adNbBathrooms", true);
+                        $nbGarageParking = get_post_meta($idPost, "adNbGarage", true);
                         $furnished = get_post_meta($idPost, "adFurnished", true);
+                        
+                        $agency = get_user_by("ID", get_user_meta(get_post_meta($idPost, "adIdAgent", true), "agentAgency", true));
                         ?>
                         <div class="rowAd">
                             <div class="inShortAd">
@@ -44,6 +47,7 @@ get_header(); ?>
                                     <a href="<?= get_post_permalink($idPost); ?>"><?= get_the_post_thumbnail($idPost, array(600, 600)); ?></a>
                                     <span class="typeAd"><?php _e($typeAd, "retxtdom"); ?></span>
                                     <span class="typeProperty"><?= $typeProperty; ?></span>
+                                    <span class="titleAgency"><?= $agency->display_name;?></span>
                                 </div>
                                 <div class="detailsAd">
                                     <span class="titleAd"><a href="<?= get_post_permalink($idPost); ?>"><?php the_title(); ?></a></span>
@@ -58,6 +62,9 @@ get_header(); ?>
                                             <?php } ?>
                                             <?php if(!empty($nbBedrooms) || $nbBedrooms != 0) { ?>
                                             <span class="nbBedrooms"><span class="bedIcon"></span><span><?=intval($nbBedrooms);?></span></span>
+                                            <?php } ?>
+                                            <?php if(!empty($nbWaterRooms) || !empty($nbBathrooms) || $nbWaterRooms != 0 || $nbBathrooms != 0) { ?>
+                                            <span class="nbBathrooms"><span class="bathIcon"></span><span><?=intval($nbWaterRooms)+intval($nbBathrooms);?></span></span>
                                             <?php } ?>
                                             <?php if(!empty($nbWaterRooms) || !empty($nbBathrooms) || $nbWaterRooms != 0 || $nbBathrooms != 0) { ?>
                                             <span class="nbBathrooms"><span class="bathIcon"></span><span><?=intval($nbWaterRooms)+intval($nbBathrooms);?></span></span>

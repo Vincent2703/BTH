@@ -287,12 +287,17 @@ class REALM_AdAdmin {
     
     //Save data in BDD
     public static function setData($adId, $ad) {       
-        if(isset($_POST["postStatus"]) && in_array($_POST["postStatus"], array("publish", "pending", "draft", "future"))) {
+        /*if(isset($_POST["postStatus"]) && in_array($_POST["postStatus"], array("publish", "pending", "draft", "future"))) {
             wp_update_post(array(
                 "ID" => $adId, 
                 "post_status" => $_POST["postStatus"])
             );
-        }
+        }*/
+        
+        /*wp_update_post(array(
+            "ID" => $adId, 
+            "post_status" => "publish"
+        ));*/
         
         $ad->post_title = substr(sanitize_text_field($ad->postTitle), 0, 64);
 

@@ -111,11 +111,11 @@ class Realm {
         //Initialize custom posts
         add_action("init", array($this, "initCustomPosts"));
 
-        //Initialize the admin area
-        add_action("admin_init", array($this, "initAdmin"));
-        
         //Add capabilities to admin/agent/agency for Ad posts
-        add_action("admin_init", array($this, "addRolesCaps"));
+        add_action("init", array($this, "addRolesCaps"));
+        
+        //Initialize the admin area
+        add_action("admin_init", array($this, "initAdmin"));      
 
         //Add menu items to the WordPress admin dashboard
         add_action("admin_menu", array($this, "completeMenu"));    
@@ -161,7 +161,7 @@ class Realm {
         add_action("save_post_agency", array($this->EditAgency, "savePost"), 10, 2);
 
         //Filter custom post types by taxonomies
-        add_action("restrict_manage_posts", array($this->Ad, "filterAdsByTaxonomies"));
+        add_action("restrict_manage_posts", array($this->Ad, "dropdownsTaxonomies"));
         
         //Display notices
         add_action("admin_notices", array($this, "displayNotices"));
@@ -189,8 +189,6 @@ class Realm {
         add_action("personal_options_update", array($this->EditProfile, "saveProfileCustomFields"));
         add_action("edit_user_profile_update", array($this->EditProfile, "saveProfileCustomFields"));      
         
-        //Fix an issue with the post_status when we update twice a post with a custom type
-        add_action("admin_footer-post.php", array($this, "fixPostStatusUpdate"));
     }
     
     /*
@@ -198,10 +196,10 @@ class Realm {
      */
     private function filters() {
         //Change the default text shown in the title field of a WordPress post editor
-        add_filter("enter_title_here", array($this, "changeTitle"));
+        //add_filter("enter_title_here", array($this, "changeTitle"));
         
         //Modify the query before it is executed, in order to convert post ID values into their corresponding taxonomy terms
-        add_filter("pre_get_posts", array($this, "convertIdToTermInQuery")); 
+        add_filter("pre_get_posts", array($this->Ad, "convertIdToTermInQuery")); 
         
         //Modify the query before it is executed, in order to include custom search functionality for the ads
         add_filter("pre_get_posts", array($this->GetAds, "getAds")); 
@@ -280,6 +278,7 @@ class Realm {
                 $role->add_cap("edit_published_ads");
                 $role->add_cap("edit_private_ads");
                 $role->add_cap("create_ads");
+                $role->add_cap("publish_ad");
                 $role->add_cap("publish_ads");
                 $role->add_cap("delete_ad");
                 $role->add_cap("delete_ads");
@@ -295,6 +294,7 @@ class Realm {
         flush_rewrite_rules(); //Update the permalinks structure
         
         remove_role("agent");
+        remove_role("agency");
     }
 
     /*
@@ -703,44 +703,6 @@ class Realm {
         return $clientAllowed;
     }
     
-    /*
-     * Change the default text shown in the title field of a WordPress post editor
-     */
-    public function changeTitle($title) {
-        $postType = get_current_screen()->post_type;
-        if($postType === "agent") {
-            $title = "Nom et prénom de l'agent";
-        }else if($postType === "agency") {
-            $title = "Nom de l'agence";
-        }       
-        return $title;
-    }
-    
-    /*
-     * Modify the query before it is executed, in order to convert post ID values into their corresponding taxonomy terms
-     */
-    public function convertIdToTermInQuery($query) {
-        global $pagenow;            
-        global $typenow;
-
-        if(is_admin() && $pagenow == "edit.php") {
-
-            $taxonomies = get_taxonomies(["object_type" => [$typenow]]);
-
-            foreach($taxonomies as $taxonomy) {
-                if(isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
-                    $taxQuery = array(
-                            "taxonomy" => $taxonomy,
-                            "terms"    => array($_GET[$taxonomy]),
-                            "field"    => "id",
-                            "operator" => "IN",
-                    );
-                    $query->tax_query->queries[] = $taxQuery; 
-                    $query->query_vars["tax_query"] = $query->tax_query->queries;
-                }
-            }
-        }
-    }
     
     /*
      * Add custom styles or scripts to the WordPress header section
@@ -847,38 +809,7 @@ class Realm {
             unset($wp_meta_boxes["dashboard"]["normal"]["core"]["dashboard_activity"]);
             unset($wp_meta_boxes["dashboard"]["side"]["core"]["dashboard_primary"]);
         }
-    }
-    
-    /*
-     * Fix an issue with the post_status when we update twice a post with a custom type
-     */
-    /*public function fixPostStatusUpdate() {
-        $screen = get_current_screen();
-        $postType = $screen->post_type;
-        $base = $screen->base;
-        
-        if($base === "post" && $postType === "re-ad") {            
-            $publish = __("Publish", "retxtdom");
-            ?>
-            <script>
-                jQuery(document).ready(function() {
-                    const postStatus = jQuery("#post_status");
-                    const publish = "<?=$publish;?>";
-                    
-                    if(jQuery("#post_status:has('option[value=publish]')").length === 0) {
-                        jQuery("#post_status").append(jQuery("<option>", {
-                            value: "publish",
-                            text: publish
-                        }));
-                    }
-                    
-                    postStatus.prop("name", "postStatus");
-                    
-                });
-            </script>
-            <?php
-        }
-    }*/
+    }   
     
     /*
      * Fix a bug when we only want to edit a post with a custom type

@@ -67,7 +67,8 @@ class REALM_Ad {
                     "delete_post"            => "delete_ad", 
                     "edit_posts"             => "edit_ads", 
                     "edit_others_posts"      => "edit_others_ads", 
-                    "publish_posts"          => "publish_ads", 
+                    "publish_post"           => "publish_ad", 
+                    "publish_posts"          => "publish_ads",
                     "read_private_posts"     => "read_private_ads",
                     "read"                   => "read", 
                     "delete_posts"           => "delete_ads",  
@@ -79,6 +80,7 @@ class REALM_Ad {
                     "create_posts"           => "create_ads", 
                 ),
                 "capability_type" => array("ad", "ads"),
+                "hierarchical" => true, //To be able to use wp_dropdown_pages
                 "map_meta_cap" => true, 
                 "public" => true,
                 "menu_position" => 15,
@@ -256,13 +258,13 @@ class REALM_Ad {
     /*
      * Filtering the ads by the taxonomies in the admin area
      */
-    public function filterAdsByTaxonomies() {
+    public function dropdownsTaxonomies() {
         global $typenow;
         $postType = "re-ad"; 
         $taxonomies = get_taxonomies(["object_type" => [$postType]]);
-        foreach($taxonomies as $taxonomy) {
-            if($typenow == $postType) {
-                $selected      = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : "";
+        if($typenow === $postType) {
+            foreach($taxonomies as $taxonomy) {
+                $selected      = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : '';
                 $taxonomyData = get_taxonomy($taxonomy);
                 wp_dropdown_categories(array(
                         "show_option_all" => $taxonomyData->label,
@@ -274,6 +276,31 @@ class REALM_Ad {
                         "hide_empty"      => true,
                         "hide_if_empty"   => true
                 ));
+            }
+        }
+    }
+    
+    /*
+     * Modify the query before it is executed, in order to convert post ID values into their corresponding taxonomy terms
+     */
+    public function convertIdToTermInQuery($query) {
+        global $pagenow;            
+        global $typenow;
+
+        if(is_admin() && $pagenow == "edit.php" && $typenow === "re-ad") {
+            $taxonomies = get_taxonomies(["object_type" => [$typenow]]);
+
+            foreach($taxonomies as $taxonomy) {
+                if(isset($_GET[$taxonomy]) && is_numeric($_GET[$taxonomy]) && $_GET[$taxonomy] != 0) {
+                    $taxQuery = array(
+                            "taxonomy" => $taxonomy,
+                            "terms"    => array($_GET[$taxonomy]),
+                            "field"    => "id",
+                            "operator" => "IN",
+                    );
+                    $query->tax_query->queries[] = $taxQuery; 
+                    $query->query_vars["tax_query"] = $query->tax_query->queries;
+                }
             }
         }
     }

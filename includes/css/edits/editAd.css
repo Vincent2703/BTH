@@ -210,3 +210,8 @@ abbr sup {
     color: blue;
     cursor: help;
 }
+
+/* Publish box */
+#minor-publishing-actions, .misc-pub-section.misc-pub-post-status {
+    display: none;
+}
