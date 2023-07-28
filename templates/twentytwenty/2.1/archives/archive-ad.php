@@ -15,61 +15,39 @@ get_header(); ?>
                     $idPost = get_the_id();
                     
                     if(wp_get_post_terms($idPost, "adAvailable")[0]->slug === "available") {
-                        // TODO : REFACTOR MODELS AND CREATE ONE AD OBJECT EACH ITERATION
-                        $descriptionAd = get_the_content();
-                        $maxLengthDescriptionAd = 35;
-                        if(substr_count($descriptionAd, ' ') > $maxLengthDescriptionAd) {
-                            $arrayDescriptionAd = explode(" ", $descriptionAd);
-                            $shortDescriptionAd = implode(" ", array_splice($arrayDescriptionAd, 0, $maxLengthDescriptionAd)) . " [...]";
-                        }else{
-                            $shortDescriptionAd = $descriptionAd;
-                        }                 
-                        $typeAd = get_the_terms($idPost, "adTypeAd")[0]->name;
-                        $typeProperty = get_the_terms($idPost, "adTypeProperty")[0]->name;
-                        $city = get_post_meta($idPost, "adCity", true);
-                        $postalCode = get_post_meta($idPost, "adPostCode", true);
-                        $price = get_post_meta($idPost, "adPrice", true);
-                        $fees = get_post_meta($idPost, "adFees", true);
-                        $currency = get_option(PLUGIN_RE_NAME."OptionsGeneral")["currency"];
-                        $surface = get_post_meta($idPost, "adSurface", true);
-                        $nbRooms = get_post_meta($idPost, "adNbRooms", true);
-                        $nbBedrooms = get_post_meta($idPost, "adNbBedrooms", true);
-                        $nbWaterRooms = get_post_meta($idPost, "adNbWaterRooms", true);
-                        $nbBathrooms = get_post_meta($idPost, "adNbBathrooms", true);
-                        $nbGarageParking = get_post_meta($idPost, "adNbGarage", true);
-                        $furnished = get_post_meta($idPost, "adFurnished", true);
+                        require_once(PLUGIN_RE_PATH."models/AdModel.php");
                         
-                        $agency = get_user_by("ID", get_user_meta(get_post_meta($idPost, "adIdAgent", true), "agentAgency", true));
+                        $ad = REALM_AdModel::getAd($idPost);
+                        $currency = REALM_AdModel::getCurrency();
                         ?>
                         <div class="rowAd">
                             <div class="inShortAd">
                                 <div class="thumbnailAd">
                                     <a href="<?= get_post_permalink($idPost); ?>"><?= get_the_post_thumbnail($idPost, array(600, 600)); ?></a>
-                                    <span class="typeAd"><?php _e($typeAd, "retxtdom"); ?></span>
-                                    <span class="typeProperty"><?= $typeProperty; ?></span>
-                                    <span class="titleAgency"><?= $agency->display_name;?></span>
+                                    <span class="typeAd"><?php _e($ad["typeAd"], "retxtdom"); ?></span>
+                                    <span class="typeProperty"><?= $ad["typeProperty"]; ?></span>
+                                    <?php if(!empty($ad["agency"]) && $ad["agency"]->exists()) { ?>
+                                    <span class="titleAgency"><?= $ad["agency"]->display_name;?></span>
+                                    <?php } ?>
                                 </div>
                                 <div class="detailsAd">
-                                    <span class="titleAd"><a href="<?= get_post_permalink($idPost); ?>"><?php the_title(); ?></a></span>
-                                    <span class="address"><?= "$city $postalCode"; ?></span>
-                                    <span class="shortDescription"><?= $shortDescriptionAd; ?></span>
-                                    <span class="price"><span class="includingFees"><?= $price.$currency; ?><?= $typeAd==="Location"?'/'.__("month", "retxtdom"):'';?></span>&nbsp;<span class="fees"><?= !empty($fees)||$fees!=0?__("including", "retxtdom")." $fees$currency of fees":'';?></span></span>
+                                    <span class="titleAd"><a href="<?= get_post_permalink($idPost); ?>"><?= $ad["title"]; ?></a></span>
+                                    <span class="address"><?= $ad["city"].' '.$ad["postalCode"]; ?></span>
+                                    <span class="shortDescription"><?= $ad["shortDescription"]; ?></span>
+                                    <span class="price"><span class="includingFees"><?= $ad["price"].$currency; ?><?= $ad["typeAd"]==="Location"?'/'.__("month", "retxtdom"):'';?></span>&nbsp;<span class="fees"><?= !empty($ad["fees"])||$ad["fees"]!=0?__("including", "retxtdom").' '.$ad["fees"]."$currency of fees":'';?></span></span>
                                     <span class="iconsDate">
                                         <span class="icons">
-                                            <span class="surface"><span class="dashicons dashicons-fullscreen-alt"></span><span><?=intval($surface)." m²";?></span></span>
-                                            <?php if(!empty($nbRooms) || $nbRooms != 0) { ?>
-                                            <span class="nbRooms"><span class="dashicons dashicons-grid-view"></span><span><?=intval($nbRooms);?></span></span>
+                                            <span class="surface"><span class="dashicons dashicons-fullscreen-alt"></span><span><?=intval($ad["surface"])." m²";?></span></span>
+                                            <?php if(!empty($ad["nbRooms"]) || $ad["nbRooms"] != 0) { ?>
+                                            <span class="nbRooms"><span class="dashicons dashicons-grid-view"></span><span><?=intval($ad["nbRooms"]);?></span></span>
                                             <?php } ?>
-                                            <?php if(!empty($nbBedrooms) || $nbBedrooms != 0) { ?>
-                                            <span class="nbBedrooms"><span class="bedIcon"></span><span><?=intval($nbBedrooms);?></span></span>
+                                            <?php if(!empty($ad["nbBedrooms"]) || $ad["nbBedrooms"] != 0) { ?>
+                                            <span class="nbBedrooms"><span class="bedIcon"></span><span><?=intval($ad["nbBedrooms"]);?></span></span>
                                             <?php } ?>
-                                            <?php if(!empty($nbWaterRooms) || !empty($nbBathrooms) || $nbWaterRooms != 0 || $nbBathrooms != 0) { ?>
-                                            <span class="nbBathrooms"><span class="bathIcon"></span><span><?=intval($nbWaterRooms)+intval($nbBathrooms);?></span></span>
+                                            <?php if(!empty($ad["nbWaterRooms"]) || !empty($ad["nbBathrooms"]) || $ad["nbWaterRooms"] != 0 || $ad["nbBathrooms"] != 0) { ?>
+                                            <span class="nbBathrooms"><span class="bathIcon"></span><span><?=intval($ad["nbWaterRooms"])+intval($ad["nbBathrooms"]);?></span></span>
                                             <?php } ?>
-                                            <?php if(!empty($nbWaterRooms) || !empty($nbBathrooms) || $nbWaterRooms != 0 || $nbBathrooms != 0) { ?>
-                                            <span class="nbBathrooms"><span class="bathIcon"></span><span><?=intval($nbWaterRooms)+intval($nbBathrooms);?></span></span>
-                                            <?php } ?>
-                                            <?php if($typeAd==="Rental" && $furnished == 1) { ?>
+                                            <?php if($ad["typeAd"]==="Rental" && $ad["furnished"] == 1) { ?>
                                             <span class="furnished"><span class="dashicons dashicons-archive"></span><span><?php _e("furnished", "retxtdom");?></span></span>
                                             <?php } ?>
                                         </span>

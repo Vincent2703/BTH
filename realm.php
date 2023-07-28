@@ -72,16 +72,14 @@ class Realm {
         //Controllers
         require_once("controllers/Options.php");
         require_once("controllers/EditAd.php");
-        require_once("controllers/EditAgent.php");
-        require_once("controllers/EditAgency.php");
         require_once("controllers/RegistrationUser.php");
         require_once("controllers/Export.php");
         require_once("controllers/Import.php");
         require_once("controllers/EditProfile.php");
         
         //Models
-        require_once("models/searches/GetAds.php");
-        require_once("models/admin/UserAdmin.php");
+        require_once("models/AdModel.php");
+        require_once("models/UserModel.php");
         
         
         $this->Ad               = new REALM_Ad;
@@ -90,15 +88,13 @@ class Realm {
         
         $this->Options          = new REALM_Options;
         $this->EditAd           = new REALM_EditAd;
-        $this->EditAgent        = new REALM_EditAgent;
-        $this->EditAgency       = new REALM_EditAgency;
         $this->RegistrationUser = new REALM_RegistrationUser;
         $this->Export           = new REALM_Export;
         $this->Import           = new REALM_Import;
-        $this->EditProfile      = new REALMP_EditProfile;
+        $this->EditProfile      = new REALM_EditProfile;
         
-        $this->GetAds           = new REALM_GetAds;   
-        $this->UserAdmin        = new REALM_UserAdmin;
+        $this->AdModel          = new REALM_AdModel;   
+        $this->UserModel        = new REALM_UserModel;
     }
     
     /*
@@ -157,8 +153,6 @@ class Realm {
 
         //Save custom post types
         add_action("save_post_re-ad", array($this->EditAd, "savePost"), 10, 2);
-        add_action("save_post_agent", array($this->EditAgent, "savePost"), 10, 2);
-        add_action("save_post_agency", array($this->EditAgency, "savePost"), 10, 2);
 
         //Filter custom post types by taxonomies
         add_action("restrict_manage_posts", array($this->Ad, "dropdownsTaxonomies"));
@@ -202,7 +196,7 @@ class Realm {
         add_filter("pre_get_posts", array($this->Ad, "convertIdToTermInQuery")); 
         
         //Modify the query before it is executed, in order to include custom search functionality for the ads
-        add_filter("pre_get_posts", array($this->GetAds, "getAds")); 
+        add_filter("pre_get_posts", array($this->AdModel, "setQueryAds")); 
         
         //Add custom styles or scripts to the WordPress header section
         add_filter("wp_enqueue_scripts", array($this, "updateHeader"));
@@ -218,13 +212,13 @@ class Realm {
         add_filter("template_include", array($this->Ad, "templatePostAd"), 1); 
         
         //Add an agent's agency column header to the agent users list and remove the posts and role columns
-        add_filter("manage_users_columns", array($this->UserAdmin, "agentAgencyHeaderColumn"));         
+        add_filter("manage_users_columns", array($this->UserModel, "agentAgencyHeaderColumn"));         
         
         //Ads the agent's agency name to the previous column
-        add_filter("manage_users_custom_column", array($this->UserAdmin, "agentAgencyDataColumn"), 10, 3);
+        add_filter("manage_users_custom_column", array($this->UserModel, "agentAgencyDataColumn"), 10, 3);
         
         //To do : sort and filter by the agent's agency
-        //add_filter("manage_users_sortable_columns", array($this->UserAdmin, "agentAgencySortableColumn"));
+        //add_filter("manage_users_sortable_columns", array($this->UserModel, "agentAgencySortableColumn"));
         
     }
     
@@ -364,8 +358,6 @@ class Realm {
      */
     public function initAdmin() {
         $this->EditAd->addMetaBoxes();
-        $this->EditAgent->addMetaBoxes();
-        $this->EditAgency->addMetaBox();
         $this->Options->optionsPageInit();
     }
     
@@ -571,34 +563,6 @@ class Realm {
                     )
                 )
             ),
-            "agent" => array(
-                "post" => array(
-                    "reloadAgencies" => array(
-                        "path" => "/includes/js/searches/reloadAgencies.js",
-                        "footer" => true,
-                        "dependencies" => array("jquery"),
-                        "variables" => array(
-                            "variablesAgencies" => array(
-                                "getAgenciesUrl" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies")
-                            )
-                        )
-                    )
-                )
-            ),
-            "agency" => array(
-                "post" => array(                  
-                    "autocompleteAddress" => array(
-                        "path" => "/includes/js/searches/autocompleteAddress.js",
-                        "footer" => true,
-                        "dependencies" => array("jquery"),
-                        "variables" => array(
-                            "variablesAddress" => array(
-                                "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address")
-                            )
-                        )
-                    )
-                )
-            )
         );
 
         $scriptsToRegister = isset($scripts[$postType][$base])?$scripts[$postType][$base]:array();
@@ -632,33 +596,27 @@ class Realm {
      * Register custom API route
      */
     public function registerRouteCustomAPIs() {
-        require_once("models/searches/getAddressData.php");
+        require_once("models/getAddressData.php");
         register_rest_route(PLUGIN_RE_NAME."/v1", "address", array( 
             "methods" => "GET",
             "callback" => "getAddressData",
             "permission_callback" => array($this, "permissionCallbackGetAddressData")
         ));
         
-        require_once("models/searches/getAgencies.php");
         register_rest_route(PLUGIN_RE_NAME."/v1", "agencies", array( 
             "methods" => "GET",
-            "callback" => "getAgencies",
-            "permission_callback" => function() {
-                $idUser = apply_filters("determine_current_user", false);
-                wp_set_current_user($idUser);
-                return current_user_can("edit_others_posts");
-            }
+            "callback" => function() {
+                $this->UserModel->getUsersByRole("agency");
+            },
+            "permission_callback" => array($this, "permissionCallbackApiGetUsers")
         ));
         
-        require_once("models/searches/getAgents.php");
         register_rest_route(PLUGIN_RE_NAME."/v1", "agents", array( 
             "methods" => "GET",
-            "callback" => "getAgents",
-            "permission_callback" => function() {
-                $idUser = apply_filters("determine_current_user", false);
-                wp_set_current_user($idUser);
-                return current_user_can("edit_others_posts");
-            }
+            "callback" => function() {
+                $this->UserModel->getUsersByRole("agent");
+            },
+            "permission_callback" => array($this, "permissionCallbackApiGetUsers")
         ));
     }
     
@@ -670,7 +628,7 @@ class Realm {
         $idUser = apply_filters("determine_current_user", false);
         wp_set_current_user($idUser);
         $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
-        $userCanEdit = current_user_can("edit_others_posts");
+        $userCanEdit = current_user_can("edit_ads");
         $nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && wp_verify_nonce($request->get_param("nonce"), "apiAddress");
         $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";
         $noLimit = !boolval($apisOptions["apiLimitNbRequests"]);
@@ -701,6 +659,16 @@ class Realm {
             update_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests", $newLogsAPI);
         }
         return $clientAllowed;
+    }
+    
+    public function permissionCallbackApiGetUsers(/*$request*/) {
+        $idUser = apply_filters("determine_current_user", false);
+        wp_set_current_user($idUser);
+        $userCanEdit = current_user_can("edit_ads");
+        //$nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && wp_verify_nonce($request->get_param("nonce"), "apiAddress");
+        $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";
+
+        return $userCanEdit && /*$nonceExistsAndIsValid &&*/ $isAjax;
     }
     
     

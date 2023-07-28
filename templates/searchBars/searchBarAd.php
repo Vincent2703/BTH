@@ -103,8 +103,8 @@
                             <input type="checkbox" name="cellar" id="cellar" <?php checked(isset($_GET["cellar"])&&$_GET["cellar"]==="on"); ?>>
                         </div>
                         <div>
-                            <label for="terrace"><?php _e("Terrace", "retxtdom"); ?></label>
-                            <input type="checkbox" name="terrace" id="terrace" <?php checked(isset($_GET["terrace"])&&$_GET["terrace"]==="on"); ?>>
+                            <label for="outdoorSpace"><?php _e("Outdoor space", "retxtdom"); ?></label>
+                            <input type="checkbox" name="outdoorSpace" id="outdoorSpace" <?php checked(isset($_GET["outdoorSpace"])&&$_GET["outdoorSpace"]==="on"); ?>>
                             <label for="elevator"><?php _e("Elevator", "retxtdom"); ?></label>
                             <input type="checkbox" name="elevator" id="elevator" <?php checked(isset($_GET["elevator"])&&$_GET["elevator"]==="on"); ?>>
                             <label for="garageparking"><?php _e("Garage/Parking", "retxtdom"); ?></label>

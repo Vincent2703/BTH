@@ -7,9 +7,9 @@
         $activatedPluginsList = get_option("active_plugins");
         $checkPremiumPlugin = in_array("realmPlus/realmPlus.php", $activatedPluginsList);
         
-        require_once(PLUGIN_RE_PATH."models/singles/AdSingle.php");
-        $currency = REALM_AdSingle::getCurrency();
-        $feesURL = REALM_AdSingle::getFeesURL();
+        require_once(PLUGIN_RE_PATH."models/AdModel.php");
+        $currency = REALM_AdModel::getCurrency();
+        $feesURL = REALM_AdModel::getFeesURL();
         while(have_posts()) {
             if(is_active_sidebar("before_content-side-bar")) {
                dynamic_sidebar("before_content-side-bar");
@@ -17,19 +17,20 @@
             the_post();
 
             $idPost = get_the_id();
-            REALM_AdSingle::getData($idPost);
+            $ad = REALM_AdModel::getAd($idPost);
 
-            if(wp_get_post_terms($idPost, "adAvailable")[0]->slug === "unavailable") {
+            if($ad["taxonomies"]["availability"]["slug"] === "unavailable") {
                 wp_redirect(get_home_url(), "302");
                 exit();
             }
             
-            if($checkPremiumPlugin) {
-                $checkLogin = current_user_can("customer");
-                require_once(PLUGIN_REP_PATH."models/front/UserFront.php");
+            $userIsCustomer = current_user_can("customer");
+            
+            if($checkPremiumPlugin && $userIsCustomer) {               
+                require_once(PLUGIN_RE_PATH."models/UserModel.php");
                 $idUser = get_current_user_id();
-                REALMP_UserFront::getData($idUser);
-                $userDataConformity = REALMP_UserFront::checkDataConformity();
+                $user = REALM_UserModel::getUser($id);
+                $userDataConformity = REALM_UserModel::checkDataConformity($idUser);
                 $alreadyHF = get_posts(array(
                     "author"        => $idUser,
                     "post_type"     => "housingfile",
@@ -54,14 +55,14 @@
                            
             if($checkPremiumPlugin && isset($_POST["apply"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formApply")) {
                 //Check that the user is a customer or an admin
-                if($checkLogin) {               
+                if($userIsCustomer) {               
                     //Check that there is not already a housing file for this user with the accepted or decisionwaiting
                     if(!$checkAlreadyHF) {
                     //Check that the user filled all the required data
                         if($userDataConformity) {
                             //Create a housing file
                             require_once(PLUGIN_REP_PATH."models/front/HousingFileFront.php");
-                            $HFID = REALMP_HousingFileFront::createPost($idPost, $idUser, REALM_AdSingle::$refAd ." - ". REALMP_UserFront::$lastName .' '. REALMP_UserFront::$firstName); 
+                            $HFID = REALMP_HousingFileFront::createPost($idPost, $idUser, $ad["refAd"] ." - ". $user["lastName"] .' '. $user["firstName"]); 
                         } 
                     }
                     
@@ -69,13 +70,13 @@
                 
             }else if(isset($_POST["contact"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formContact")) {
                 if(isset($_POST["name"]) && isset($_POST["phone"]) && isset($_POST["email"]) && isset($_POST["message"]) && !empty(trim($_POST["names"])) && !empty(trim($_POST["phone"])) && !empty(trim($_POST["email"])) && !empty(trim($_POST["message"]))) {
-                    $adRef = REALM_AdSingle::$refAd;
+                    $adRef = $ad["refAd"];
                     $contactNames = sanitize_text_field($_POST["names"]);
                     $contactPhone = sanitize_text_field($_POST["phone"]);
                     $contactEmail = sanitize_email($_POST["email"]);
                     $messageInput = sanitize_textarea_field($_POST["message"]);
 
-                    $subject = __("Message about the ad", "retxtdom").' '.REALM_AdSingle::$refAd;
+                    $subject = __("Message about the ad", "retxtdom").' '.$ad["refAd"];
                     $message = __("Message from", "retxtdom")." : $contactNames<br />"
                             . __("Phone", "retxtdom")." : $contactPhone - ".__("Email address", "retxtdom")." : $contactEmail<br />"
                             . __("About", "retxtdom")." \"" . get_the_title() . "\"<br /><br />"
@@ -83,7 +84,7 @@
                             . $messageInput;
                     $headers = array("Content-Type: text/html; charset=UTF-8");
 
-                    if(wp_mail(REALM_AdSingle::$email, $subject, $message, $headers)) {
+                    if(wp_mail($ad["email"], $subject, $message, $headers)) {
                         $emailStatus = __("The email has been sent successfully", "retxtdom");
                     }else{
                         $emailStatus = __("The email could not be sent", "retxtdom");
@@ -99,15 +100,15 @@
         <div id="primary" class="content-area contentAd">
             <main id="main" class="site-main">
                 <span class="titleAd"><h1><?php the_title(); ?></h1></span>
-                <span class="subtitleAd"><?= ucfirst(REALM_AdSingle::$city)." - ".REALM_AdSingle::$price.REALM_AdSingle::$afterPrice; ?></span>
-                <?php if(!empty(REALM_AdSingle::$imagesIds[0])) { ?>
+                <span class="subtitleAd"><?= ucfirst($ad["city"])." - ".$ad["price"].$ad["afterPrice"]; ?></span>
+                <?php if(!empty($ad["imagesIds"][0])) { ?>
                 <div class="sliders">
                     <div id="miniSlider">
                         <span class="controlNext">></span>
                         <span class="controlPrev"><</span>
                         <span class="pagingImg"></span>
                         <ul>
-                        <?php foreach (REALM_AdSingle::$imagesIds as $id) {
+                        <?php foreach ($ad["imagesIds"] as $id) {
                             echo "<li>".wp_get_attachment_image($id, "large")."</li>";
                         } ?>
                         </ul>
@@ -133,60 +134,60 @@
                         <div class="listFeatures">
                             <div>
                                 <span class="nameFeature"><?php _e("Reference", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$refAd; ?></span>
+                                <span class="valueFeature"><?= $ad["refAd"]; ?></span>
                             </div>
                             <div>
                                 <span class="nameFeature"><?php _e("Price", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$price.$currency; ?></span>
+                                <span class="valueFeature"><?= $ad["price"].$currency; ?></span>
                             </div>
                             <div>
                                 <span class="nameFeature"><?php _e("Fees", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$fees.$currency; ?></span>
+                                <span class="valueFeature"><?= $ad["fees"].$currency; ?></span>
                             </div>
                             <div>
                                 <span class="nameFeature"><?php _e("Address", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$address; ?>&nbsp;<a id="linkGMaps" target="_blank" href="https://www.google.fr/maps/place/<?=urlencode(REALM_AdSingle::$address);?>"><span class="dashicons dashicons-location"></span></a></span>
+                                <span class="valueFeature"><?= $ad["address"]; ?>&nbsp;<a id="linkGMaps" target="_blank" href="https://www.google.fr/maps/place/<?=urlencode($ad["address"]);?>"><span class="dashicons dashicons-location"></span></a></span>
                             </div>
                             <div>
                                 <span class="nameFeature"><?php _e("Living space", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$surface; ?>m²</span>
+                                <span class="valueFeature"><?= $ad["surface"]; ?>m²</span>
                             </div>
-                            <?php if(intval(REALM_AdSingle::$landSurface) > 0) { ?> 
+                            <?php if(intval($ad["landSurface"]) > 0) { ?> 
                             <div>
                                 <span class="nameFeature"><?php _e("Land area", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$landSurface; ?>m²</span>
+                                <span class="valueFeature"><?= $ad["landSurface"]; ?>m²</span>
                             </div>
                             <?php } ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Number of rooms", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$nbRooms; ?></span>
+                                <span class="valueFeature"><?= $ad["nbRooms"]; ?></span>
                             </div>
-                            <?php if(intval(REALM_AdSingle::$nbBedrooms) > 0) { ?>
+                            <?php if(intval($ad["nbBedrooms"]) > 0) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Number of bedrooms", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$nbBedrooms; ?></span>
+                                <span class="valueFeature"><?= $ad["nbBedrooms"]; ?></span>
                             </div>
                             <?php } ?>
-                            <?php if(intval(REALM_AdSingle::$nbWC) > 0) { ?>
+                            <?php if(intval($ad["nbWC"]) > 0) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Number of toilets", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$nbWC; ?></span>
+                                <span class="valueFeature"><?= $ad["nbWC"]; ?></span>
                             </div>
                             <?php } ?>
-                            <?php if(intval(REALM_AdSingle::$nbBathrooms) > 0) { ?>
+                            <?php if(intval($ad["nbBathrooms"]) > 0) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Number of bathrooms", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$nbBathrooms; ?></span>
+                                <span class="valueFeature"><?= $ad["nbBathrooms"]; ?></span>
                             </div>
                             <?php } ?>
-                            <?php if(intval(REALM_AdSingle::$nbWaterRooms) > 0) { ?>
+                            <?php if(intval($ad["nbWaterRooms"]) > 0) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Number of shower rooms", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$nbWaterRooms ?></span>
+                                <span class="valueFeature"><?= $ad["nbWaterRooms"]; ?></span>
                             </div>
                             <?php } ?>
-                            <?php if(!empty(REALM_AdSingle::$customMainFields)) {
-                                foreach(REALM_AdSingle::$customMainFields as $fieldName) {
+                            <?php if(!empty($ad["customMainFields"])) {
+                                foreach($ad["customMainFields"] as $fieldName) {
                                     if(!empty(get_post_meta($idPost, "adCF".$fieldName, true))) { ?>
                                         <div>
                                             <span class="nameFeature"><?= $fieldName; ?></span>
@@ -200,73 +201,73 @@
                     <div class="complementaryFeatures">
                         <h4><?php _e("Additional features", "retxtdom"); ?></h4>
                         <div class="listFeatures">
-                            <?php if(intval(REALM_AdSingle::$floor) > 0) { ?>
+                            <?php if(intval($ad["floor"]) > 0) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Floor", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$floor; ?> (sur <?=REALM_AdSingle::$nbFloors;?>)</span>
+                                <span class="valueFeature"><?= $ad["floor"]; ?> (sur <?=$ad["nbFloors"];?>)</span>
                             </div>
                             <?php } ?>
-                            <?php if(REALM_AdSingle::$furnished == '1' ) { ?>
+                            <?php if($ad["furnished"] == '1' ) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Furnished", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
                             </div>
                             <?php } ?>
-                            <?php if(REALM_AdSingle::$elevator == '1' ) { ?>
+                            <?php if($ad["elevator"] == '1' ) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Elevator", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
                             </div>
                             <?php } ?>
-                            <?php if(REALM_AdSingle::$basement == '1' ) { ?>
+                            <?php if($ad["basement"] == '1' ) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Basement", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
                             </div>
                             <?php } ?>
-                            <?php if(REALM_AdSingle::$terrace == '1' ) { ?>
+                            <?php if($ad["outdoorSpace"] == '1' ) { ?>
                             <div>
-                                <span class="nameFeature"><?php _e("Terrace", "retxtdom"); ?></span>
+                                <span class="nameFeature"><?php _e("Outdoor space", "retxtdom"); ?></span>
                                 <span class="valueFeature"><?php _e("Yes", "retxtdom"); ?></span>
                             </div>
                             <?php } ?>
-                            <?php if(REALM_AdSingle::$garage == '1' || REALM_AdSingle::$parking == '1') { ?>
+                            <?php if($ad["garage"] == '1' || $ad["parking"] == '1') { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Garage/Parking", "retxtdom"); ?></span>
                                 <span class="valueFeature">
-                                    <?php if(REALM_AdSingle::$garage == '1') {
+                                    <?php if($ad["garage"] == '1') {
                                         _e("Garage", "retxtdom");
-                                    }else if(REALM_AdSingle::$parking== '1') {
+                                    }else if($ad["parking"] == '1') {
                                         _e("Parking", "retxtdom");
                                     } ?>
                                 </span>
                             </div>
                             <?php } ?>
-                            <?php if(is_numeric(REALM_AdSingle::$year) && intval(REALM_AdSingle::$year)>0) { ?>
+                            <?php if(is_numeric($ad["year"]) && intval($ad["year"])>0) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Construction year", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= REALM_AdSingle::$year; ?></span>
+                                <span class="valueFeature"><?= $ad["year"]; ?></span>
                             </div>
                             <?php } ?>
-                            <?php if(REALM_AdSingle::$typeHeating !== "Unknown") { ?>
+                            <?php if($ad["typeHeating"] !== "Unknown") { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Type of heating", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?php _e(REALM_AdSingle::$typeHeatingTranslated, "retxtdom"); ?></span>
+                                <span class="valueFeature"><?php _e($ad["typeHeatingTranslated"], "retxtdom"); ?></span>
                             </div>
                             <?php } ?>
-                            <?php if(REALM_AdSingle::$typeKitchen !== "Unknown") { ?>
+                            <?php if($ad["typeKitchen"] !== "Unknown") { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Type of kitchen", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?php _e(REALM_AdSingle::$typeKitchenTranslated, "retxtdom"); ?></span>
+                                <span class="valueFeature"><?php _e($ad["typeKitchenTranslated"], "retxtdom"); ?></span>
                             </div>
                             <?php } ?>
                             <div>
                                 <span id="DPEName" class="nameFeature"><?php _e("EPD", "retxtdom"); ?>&nbsp;<abbr data-title="<?php _e("In kWhPE/m²/year", "retxtdom"); ?>"><sup>?</sup></abbr></span>
-                                <span id="DPEValue" class="valueFeature"><?= REALM_AdSingle::$DPE; ?>&nbsp;</span>
+                                <span id="DPEValue" class="valueFeature"><?= $ad["DPE"]; ?>&nbsp;</span>
                             </div>
                             <div>
                                 <span id="GESName" class="nameFeature"><?php _e("Greenhouse gas", "retxtdom"); ?>&nbsp;<abbr data-title="<?php _e("In kg eqCO2/m²/year", "retxtdom"); ?>"><sup>?</sup></abbr></span>
-                                <span id="GESValue" class="valueFeature"><?= REALM_AdSingle::$GES; ?>&nbsp;</span>
+                                <span id="GESValue" class="valueFeature"><?= $ad["GES"]; ?>&nbsp;</span>
                             </div>
                             <?php if(!empty($customComplementaryFields)) {
                                 foreach($customComplementaryFields as $fieldName) {
@@ -283,7 +284,7 @@
                     <?php if($feesURL !== false) { // If there is a fees schedule specified in the options ?> 
                         <span id="feesSchedule"><a target="_blank" href="<?=$feesURL;?>"><?php _e("Fees schedule", "retxtdom") ;?></a></span>
                     <?php }
-                    if($checkPremiumPlugin && $checkLogin) { 
+                    if($checkPremiumPlugin && $userIsCustomer) { 
                         if($checkAlreadyHF || isset($HFID)) { ?>
                             <a href="<?=get_edit_post_link(isset($HFID)?$HFID:$alreadyHF[0]->ID);?>"><button><?php _e("View my housing file");?></button></a>
                         <?php }else if($exceededNumberHF) { ?>
@@ -299,37 +300,37 @@
                     ?>
                 </div>
                 <div class="contentRightAd">
-                    <?php if(REALM_AdSingle::$getCoords) {  
-                        if(REALM_AdSingle::$showMap == "onlyPC") { ?>
+                    <?php if($ad["getCoords"]) {  
+                        if($ad["showMap"] === "onlyPC") { ?>
                             <span id="addressApprox"><?php _e("The location of the property is approximate", "retxtdom"); ?>.</span>
                         <?php } ?>
-                        <div id="map" class="map" data-coords="<?= implode(',', REALM_AdSingle::$coords); ?>"></div>
+                        <div id="map" class="map" data-coords="<?= implode(',', $ad["coords"]); ?>"></div>
                     <?php } ?>
                     <div class="contact">
                         <div class="headerContact">
-                            <?php if(REALM_AdSingle::$getContact) { ?>
+                            <?php if($ad["getContact"]) { ?>
                             <div class="headerContactLeft">
-                            <?php if(!empty(REALM_AdSingle::$thumbnailContact)) {
-                                if(isset(REALM_AdSingle::$linkAgency)&&REALM_AdSingle::$linkAgency!==false) { ?>
-                                <a href="<?=REALM_AdSingle::$linkAgency;?>">
-                                    <img src="<?= REALM_AdSingle::$thumbnailContact; ?>" alt="<?php _e("Contact's thumbnail", "retxtdom"); ?>" id="thumbnailContact">
+                            <?php if(!empty($ad["thumbnailContact"])) {
+                                if(isset($ad["linkAgency"]) && $ad["linkAgency"]!==false) { ?>
+                                <a href="<?=$ad["linkAgency"];?>">
+                                    <img src="<?= $ad["thumbnailContact"]; ?>" alt="<?php _e("Contact's thumbnail", "retxtdom"); ?>" id="thumbnailContact">
                                 </a>
                                 <?php }else{ ?>
-                                    <img src="<?= REALM_AdSingle::$thumbnailContact; ?>" alt="<?php _e("Contact's thumbnail", "retxtdom"); ?>" id="thumbnailContact">
+                                    <img src="<?= $ad["thumbnailContact"]; ?>" alt="<?php _e("Contact's thumbnail", "retxtdom"); ?>" id="thumbnailContact">
                                 <?php }
                             }?>
                             </div>
                             <div class="headerContactRight">
-                                <span id="nameContact"><?= REALM_AdSingle::$nameContact; ?></span>
-                                <?php if(isset(REALM_AdSingle::$phone) && REALM_AdSingle::$phone!==false || isset(REALM_AdSingle::$mobilePhone) && REALM_AdSingle::$mobilePhone!==false) { ?>
+                                <span id="nameContact"><?= $ad["nameContact"]; ?></span>
+                                <?php if(isset($ad["phone"]) && $ad["phone"]!==false || isset($ad["mobilePhone"]) && $ad["mobilePhone"]!==false) { ?>
                                 <table id="phoneContact">
                                     <tbody>
                                         <tr>
                                             <td id="phoneIcon" rowspan="2"><span class="material-symbols-outlined">call</span></td>
-                                            <?php if(isset(REALM_AdSingle::$phone)) { ?><td id="phoneContact"><a href="tel:<?= REALM_AdSingle::$phone; ?>"><?= implode(' ', str_split(REALM_AdSingle::$phone, 2)); ?></a></td><?php } ?>
+                                            <?php if(isset($ad["phone"])) { ?><td id="phoneContact"><a href="tel:<?= $ad["phone"]; ?>"><?= implode(' ', str_split($ad["phone"], 2)); ?></a></td><?php } ?>
                                         </tr>
                                         <tr>
-                                            <?php if(isset(REALM_AdSingle::$mobilePhone)) { ?><td><span id="mobilePhoneContact"><a href="tel:<?= REALM_AdSingle::$mobilePhone; ?>"><?= implode(' ', str_split(REALM_AdSingle::$mobilePhone, 2)); ?></a></span></td><?php } ?>
+                                            <?php if(isset($ad["mobilePhone"])) { ?><td><span id="mobilePhoneContact"><a href="tel:<?= $ad["mobilePhone"]; ?>"><?= implode(' ', str_split($ad["mobilePhone"], 2)); ?></a></span></td><?php } ?>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -341,11 +342,11 @@
                         </div>
                         <form action="" method="post" class="formContact">
                             <?php wp_nonce_field("formContact", "nonceSecurity"); 
-                            $prefillForm = $checkPremiumPlugin&&$checkLogin&&$userDataConformity;
+                            $prefillForm = $checkPremiumPlugin&&$userIsCustomer&&$userDataConformity;
                             ?>
-                            <label for="names"><?php _e("First name and last name", "retxtdom"); ?></label><input type="text" name="names" class="formContactInput" value="<?= $prefillForm?REALMP_UserFront::$firstName.' '.REALMP_UserFront::$lastName:''?>" required>
-                            <label for="phone"><?php _e("Phone", "retxtdom"); ?></label><input type="tel" name="phone" class="formContactInput" value="<?= $prefillForm?REALMP_UserFront::$phone:''?>" required>
-                            <label for="email"><?php _e("Email address", "retxtdom"); ?></label><input type="text" name="email" class="formContactInput" value="<?= $prefillForm?REALMP_UserFront::$email:'';?>"required>
+                            <label for="names"><?php _e("First name and last name", "retxtdom"); ?></label><input type="text" name="names" class="formContactInput" value="<?= $prefillForm?$ad["firstName"].' '.$ad["lastName"]:''?>" required>
+                            <label for="phone"><?php _e("Phone", "retxtdom"); ?></label><input type="tel" name="phone" class="formContactInput" value="<?= $prefillForm?$ad["phone"]:''?>" required>
+                            <label for="email"><?php _e("Email address", "retxtdom"); ?></label><input type="text" name="email" class="formContactInput" value="<?= $prefillForm?$ad["email"]:'';?>"required>
                             <label for="message"><?php _e("Message", "retxtdom"); ?></label><textarea name="message" class="formContactInput" cols="22" required></textarea>
                             <?php if(isset($emailStatus)) { ?>
                                 <span id="emailStatus"><?=$emailStatus;?>.</span><br />
@@ -354,12 +355,12 @@
                         </form>
                     </div>
                 </div>
-                <?php if(!empty(REALM_AdSingle::$morePosts)) { ?>
+                <?php if(!empty($ad["morePosts"])) { ?>
                 <div class="more">
-                    <span id="moreTitle"><?php _e("Other", "retxtdom"); ?> <?= lcfirst(REALM_AdSingle::$typeAd); ?>s <?= _e("in", "retxtdom"); ?> <?= ucfirst(REALM_AdSingle::$city); ?></span><br />
+                    <span id="moreTitle"><?php _e("Other", "retxtdom"); ?> <?= lcfirst($ad["typeAd"]); ?>s <?= _e("in", "retxtdom"); ?> <?= ucfirst($ad["city"]); ?></span><br />
                     <div class="morePosts">
                         <?php 
-                            $nbPosts = count(REALM_AdSingle::$morePosts);
+                            $nbPosts = count($ad["morePosts"]);
                             $adByPanel = 5;
                             $nbPanels = ceil($nbPosts/$adByPanel);
                             for($i=0; $i<$nbPanels; $i++) { ?>
@@ -367,8 +368,8 @@
                                     <span class="prevMorePosts" <?= $nbPanels<$adByPanel ? 'style="display: none;"':'';?>><</span>
                                     <?php for($y=0; $y<$adByPanel; $y++) {
                                         $currentNbPost = $i*5+$y;
-                                        if(isset(REALM_AdSingle::$morePosts[$currentNbPost]) && get_the_post_thumbnail_url(REALM_AdSingle::$morePosts[$currentNbPost]) !== false) { 
-                                            $morePost = REALM_AdSingle::$morePosts[$currentNbPost];?>
+                                        if(isset($ad["morePosts"][$currentNbPost]) && get_the_post_thumbnail_url($ad["morePosts"][$currentNbPost]) !== false) { 
+                                            $morePost = $ad["morePosts"][$currentNbPost];?>
                                             <div class="moreAd">
                                                 <div class="moreThumbnailAd">
                                                     <?= '<a href="'.get_post_permalink($morePost).'">'.get_the_post_thumbnail($morePost, "thumbnail").'</a>' ;?>

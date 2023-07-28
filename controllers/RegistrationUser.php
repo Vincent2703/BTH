@@ -9,7 +9,7 @@ if(!defined("ABSPATH")) {
  */
 class REALM_RegistrationUser {
     public function addFieldsNewUser() {
-        require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
+        require_once(PLUGIN_RE_PATH."models/UserModel.php");
         
         $agentPhone = isset($_POST["agentPhone"])?sanitize_text_field($_POST["agentPhone"]):'';
         $agentMobilePhone = isset($_POST["agentMobilePhone"])?sanitize_text_field($_POST["agentMobilePhone"]):'';
@@ -97,7 +97,7 @@ class REALM_RegistrationUser {
 	if(!current_user_can("create_users")) {
             return;
 	}else {
-            require_once(PLUGIN_RE_PATH."models/admin/UserAdmin.php");
+            require_once(PLUGIN_RE_PATH."models/UserModel.php");
             REALM_UserAdmin::setData($idUser); //Save in BDD         
         }
     }

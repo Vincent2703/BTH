@@ -8,44 +8,23 @@ if(!defined("ABSPATH")) {
  * 
  */
 
-class REALM_UserAdmin {
+class REALM_UserModel {
     private static $metas;
-    
-    //All
-    public static $displayName;
-    public static $lastName;
-    public static $firstName;
-    public static $email;
-    
-    //Customer
-    public static $customerPhone;
-    public static $customFields;
-    public static $alert;
-    
-    //Agent
-    public static $agentPhone;
-    public static $agentMobilePhone;
-    public static $agentAgency;
-            
-    //Agency
-    public static $agencyPhone;
-    public static $agencyAddress;
-    public static $agencyDescription;
-    
-    
-    public static function getData($id) {     
+ 
+    public static function getUser($id) {     
         $role = get_user_by("ID", $id)->roles[0];
         self::$metas = get_user_meta($id);
+        $user = array();
         
-        self::$displayName = sanitize_text_field(get_userdata($id)->display_name);
-        self::$lastName = sanitize_text_field(self::getMeta("last_name"));
-        self::$firstName = sanitize_text_field(self::getMeta("first_name"));
-        self::$email = sanitize_email(get_userdata($id)->user_email);
+        $user["displayName"] = sanitize_text_field(get_userdata($id)->display_name);
+        $user["lastName"] = sanitize_text_field(self::getMeta("last_name"));
+        $user["firstName"] = sanitize_text_field(self::getMeta("first_name"));
+        $user["email"] = sanitize_email(get_userdata($id)->user_email);
          
         if($role === "customer") {
-            self::$customerPhone = sanitize_text_field(self::getMeta("customerPhone"));
+            $user["customerPhone"] = sanitize_text_field(self::getMeta("customerPhone"));
 
-            self::$customFields = array();
+            $user["customFields"] = array();
 
             $options = get_option(PLUGIN_REP_NAME."Options");
             if($options !== false && isset($options["customFields"])) {
@@ -59,29 +38,29 @@ class REALM_UserAdmin {
                         $optionnal = boolval($field["optionnal"]);
                         $value = maybe_unserialize(self::getMeta("customerCF".$nameAttr));
 
-                        if($field["type"] === "text") {                        
-                            self::$customFields[$name] = array("nameAttr"=>$nameAttr, "type"=>$type, "optionnal"=>$optionnal, "value"=>sanitize_text_field($value));
+                        if($field["type"] === "text") {     
+                            $user["customFields"]["$name"] = array("nameAttr"=>$nameAttr, "type"=>$type, "optionnal"=>$optionnal, "value"=>sanitize_text_field($value));
                         }else if($field["type"] === "file") {
                             $extensions = sanitize_text_field($field["extensions"]);
-                            self::$customFields[$name] = array("nameAttr"=>$nameAttr, "type"=>$type, "extensions"=>$extensions, "optionnal"=>$optionnal, "file"=>$value);
+                            $user["customFields"]["$name"] = array("nameAttr"=>$nameAttr, "type"=>$type, "extensions"=>$extensions, "optionnal"=>$optionnal, "file"=>$value);
                         }
                     }
                 }
             }
-            self::$alert = maybe_unserialize(self::getMeta("customerAlert"));
+            $user["alert"] = maybe_unserialize(self::getMeta("customerAlert"));
         }else if($role === "agent") {
-            self::$agentPhone = sanitize_text_field(self::getMeta("agentPhone"));
-            self::$agentMobilePhone = sanitize_text_field(self::getMeta("agentMobilePhone"));          
-            self::$agentAgency = intval(self::getMeta("agentAgency"));
+            $user["agentPhone"] = sanitize_text_field(self::getMeta("agentPhone"));
+            $user["agentMobilePhone"] = sanitize_text_field(self::getMeta("agentMobilePhone"));          
+            $user["agentAgency"] = intval(self::getMeta("agentAgency"));
         }else if($role === "agency") {
-            self::$agencyPhone = sanitize_text_field(self::getMeta("agencyPhone"));
-            self::$agencyAddress = sanitize_text_field(self::getMeta("agencyAddress"));
-            self::$agencyDescription = sanitize_textarea_field(self::getMeta("agencyDescription"));
+            $user["agencyPhone"] = sanitize_text_field(self::getMeta("agencyPhone"));
+            $user["agencyAddress"] = sanitize_text_field(self::getMeta("agencyAddress"));
+            $user["agencyDescription"] = sanitize_textarea_field(self::getMeta("agencyDescription"));
         }
-         
+        return $user;
     }
      
-    public static function setData($idUser) {
+    public static function updateUser($idUser) {
         if(isset($_POST["role"]) && !empty(trim($_POST["role"]))) {
             $role = $_POST["role"];
         }else{
@@ -156,11 +135,7 @@ class REALM_UserAdmin {
     public static function getUsersByRole($role) {
         $users = get_users(array("role__in" => array($role)));
         return $users;
-    }
-    
-    private static function getMeta($metaName) {
-        return isset(self::$metas[$metaName])?implode(self::$metas[$metaName]):'';
-    }
+    }    
     
     public static function agentAgencyHeaderColumn($columns) {
         if(isset($_GET["role"]) && $_GET["role"] === "agent") {
@@ -196,5 +171,87 @@ class REALM_UserAdmin {
             $columns["agentAgency"] = "agentAgency";
         }
         return $columns;
+    }
+    
+    public static function setAlert($data) {
+        $idUser = apply_filters("determine_current_user", false);
+        
+        if(!empty(trim($data->get_param("address")))) {
+            $nonce = wp_create_nonce("apiAddress"); //Hidden input
+            if($data->get_param("searchBy") === "city") {
+                $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address") ."?query=".$data->get_param("address")."&context=searchAds&searchBy=city&nonce=$nonce";
+                $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
+                $city = sanitize_text_field($addressData["city"]);
+                $postCode = sanitize_text_field($addressData["postCode"]);               
+            }else { 
+                $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=".$data->get_param("address")."&context=searchAds&searchBy=radius&radius=".$data->get_param("radius")."&nonce=$nonce";
+                $city = $data->get_param("address");
+                $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
+                $latitudes = array($addressData["minLat"], $addressData["maxLat"]);
+                $longitudes = array($addressData["minLong"], $addressData["maxLong"]);
+            }
+        }  
+                
+        $alert = array(
+            "typeAd" => sanitize_text_field($data->get_param("typeAd")),
+            "typeProperty" => sanitize_text_field($data->get_param("typeProperty")),
+            "minSurface" => intval($data->get_param("minSurface")),
+            "maxSurface" => intval($data->get_param("maxSurface")),
+            "minPrice" => intval($data->get_param("minPrice")),
+            "maxPrice" => intval($data->get_param("maxPrice")),
+            "nbRooms" => intval($data->get_param("nbRooms")),
+            "nbBedrooms" => intval($data->get_param("nbBedrooms")),
+            "nbBathrooms" => intval($data->get_param("nbBathrooms")),
+            "furnished" => $data->get_param("furnished") === "true",
+            "land" => $data->get_param("land") === "true",
+            "cellar" => $data->get_param("cellar") === "true",
+            "terrace" => $data->get_param("terrace") === "true",
+            "elevator" => $data->get_param("elevator") === "true",
+            "city" => $city??'',
+            "postCode" => $postCode??'',
+            "latitudes" => $latitudes??'',
+            "longitudes" => $longitudes??'',
+            "searchBy" => sanitize_text_field($data->get_param("searchBy"))
+        );
+        $prevValue = maybe_unserialize(get_user_meta($idUser, "customerAlert", true));
+        if($prevValue === $alert) {
+            $result = "sameAlert";
+        }else{
+            $result = update_user_meta($idUser, "customerAlert", $alert);
+        }
+        echo json_encode(array("result" => $result));
+    }
+     
+    public static function checkDataConformity($idUser) {
+        $user = self::getUser($idUser);
+        $checkCF = true;
+        foreach($user["customFields"] as $CF) {
+            if($CF["type"] === "text") {
+                if(empty(trim($CF["nameAttr"])) || !is_bool($CF["optionnal"]) || empty(trim($CF["value"]))) {
+                   $checkCF = false;
+                }
+            }else if($CF["type"] === "file") {
+                if(empty(trim($CF["nameAttr"])) || !is_array($CF["extensions"]) || empty($CF["extensions"]) || !is_bool($CF["optionnal"]) || !is_array($CF["file"]) || empty(trim($CF["file"]["url"]))) {
+                    $checkCF = false;
+                }
+            }else{
+                $checkCF = false;
+            }
+        }     
+        if(
+            !empty(trim($user["lastName"])) &&
+            !empty(trim($user["firstName"])) &&
+            !empty(trim($user["phone"])) &&
+            !empty(trim($user["email"])) &&
+            $checkCF
+        ) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    private static function getMeta($metaName) {
+        return isset(self::$metas[$metaName])?implode(self::$metas[$metaName]):'';
     }
 }

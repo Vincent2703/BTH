@@ -27,13 +27,14 @@ jQuery(function($) {
 
             this.window.on("select", () => {
                 const attachments = this.window.state().get("selection").toJSON();
+                
+                const pictureIds = attachments.map(attachment => attachment.id).join(";");
+                inputImages.val(pictureIds);
 
                 const picturesHtml = attachments
                     .map((attachment) => {
-                    inputImages.val((i, val) => '${val}${attachment.id};');
-
                     return `
-                        <div class="aPicture" data-imgId="${attachment.id}">
+                        <div class="aPicture" data-imgid="${attachment.id}">
                             <img src="${attachment.sizes.thumbnail.url}" class="imgAd">
                             <div class="controlPicture">
                                 <span class="moveToLeft" onclick="movePicture(this, 'left');">←</span>
@@ -45,7 +46,6 @@ jQuery(function($) {
                     .join("");
 
                 showPictures.html(picturesHtml);
-                inputImages.val((i, val) => val.slice(0, -1));
                 $("#insertAdPictures").text(translations.replace);
             });
         }
@@ -74,7 +74,7 @@ function deletePicture(elem) {
 //Move a picture in the list
 function movePicture(elem, dir) {
     const pictureElem = jQuery(elem).parents()[1];
-    const pictureId = pictureElem.dataset.imgId;
+    const pictureId = pictureElem.dataset.imgid;
     const picturesElem = jQuery("#images");
     const picturesArray = picturesElem.val().split(';');
     
@@ -82,7 +82,7 @@ function movePicture(elem, dir) {
         var previous = jQuery(pictureElem).prev();
         if(previous.length >= 1) {
             jQuery(pictureElem).insertBefore(jQuery(previous));
-            var previousPictureId = jQuery(previous).attr("data-imgId");
+            var previousPictureId = jQuery(previous).attr("data-imgid");
             var indexCurrent = picturesArray.findIndex(item=>item.toString()===pictureId);
             var indexPrevious = picturesArray.findIndex(item=>item.toString()===previousPictureId);
             picturesArray[indexCurrent] = previousPictureId;
@@ -93,7 +93,7 @@ function movePicture(elem, dir) {
         var next = jQuery(pictureElem).next();
         if(next.length >= 1) {
             jQuery(pictureElem).insertAfter(jQuery(next));
-            var nextPictureId = jQuery(next).attr("data-imgId");
+            var nextPictureId = jQuery(next).attr("data-imgid");
             var indexCurrent = picturesArray.findIndex(item=>item.toString()===pictureId);
             var indexNext = picturesArray.findIndex(item=>item.toString()===nextPictureId);
             picturesArray[indexCurrent] = nextPictureId;
