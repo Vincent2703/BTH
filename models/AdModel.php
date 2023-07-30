@@ -10,7 +10,7 @@ class REALM_AdModel {
 
         self::$metas = get_post_custom($id);
         $ad = array();
-        
+         
         $ad["taxonomies"] = self::getTaxonomies($id);
         
         $ad["title"] = get_the_title($id);
@@ -104,6 +104,7 @@ class REALM_AdModel {
         }
 
         $ad["showMap"] = self::getMeta("adShowMap");
+        $ad["fullAddress"] = self::getMeta("adAddress");
         if($ad["showMap"] === "onlyPC") {
             $ad["address"] = self::getMeta("adCity").' '.self::getMeta("adPostCode");
             $optionsApis = get_option(PLUGIN_RE_NAME."OptionsApis");
@@ -116,7 +117,7 @@ class REALM_AdModel {
                 $ad["address"] .= ' '.self::getMeta("adAdminLvl1");
             }
         }else if($ad["showMap"] === "all"){
-            $ad["address"] = self::getMeta("adAddress");
+            $ad["address"] = $ad["fullAddress"];
         }
         $ad["coords"] = unserialize(self::getMeta("adDataMap"));
         $ad["postalCode"] = self::getMeta("adPostCode");
@@ -380,12 +381,19 @@ class REALM_AdModel {
     }
     
     private static function getTaxonomies($id) {
-        $taxonomies = array(
-            "typeAd"        => array("name" => get_the_terms($id, "adTypeAd")[0]->name, "slug" => get_the_terms($id, "adTypeAd")[0]->slug),
-            "typeProperty"  => array("name" => get_the_terms($id, "adTypeProperty")[0]->name, "slug" => get_the_terms($id, "adTypeProperty")[0]->slug),
-            "availability"  => array("name" => get_the_terms($id, "adAvailable")[0]->name, "slug" => get_the_terms($id, "adAvailable")[0]->slug)
-        );
-        return $taxonomies;
+        $typeAdTerm = get_the_terms($id, "adTypeAd");
+        $typePropertyTerm = get_the_terms($id, "adTypeProperty");
+        $availabilityTerm = get_the_terms($id, "adAvailable");
+
+        $typeAd = $typeAdTerm ? array("name" => $typeAdTerm[0]->name, "slug" => $typeAdTerm[0]->slug) : array("name" => null, "slug" => null);
+        $typeProperty = $typePropertyTerm ? array("name" => $typePropertyTerm[0]->name, "slug" => $typePropertyTerm[0]->slug) : array("name" => null, "slug" => null);
+        $availability = $availabilityTerm ? array("name" => $availabilityTerm[0]->name, "slug" => $availabilityTerm[0]->slug) : array("name" => null, "slug" => null);
+
+        return array(
+            "typeAd"        => $typeAd,
+            "typeProperty"  => $typeProperty,
+            "availability"  => $availability
+        );        
     }
     
     public static function getAdsBySearch($search) {
@@ -532,7 +540,31 @@ class REALM_AdModel {
                     "type" => "DECIMAL"
                 )
             );
-        }        
+        }
+
+        if(isset($search["searchBy"]) && $search["searchBy"] === "city") {
+            array_push($metas,
+                array(
+                    "key" => "adCity",
+                    "value" => $search["city"]
+                )
+            );
+        }else if(isset($search["searchBy"]) && isset($search["radius"]) && $search["searchBy"] === "radius") {
+            array_push($metas,
+                array(
+                    "key" => "adLatitude",
+                    "value" => array($search["latitudes"][0], $search["latitudes"][1]),
+                    "compare" => "BETWEEN"
+                )
+            );
+            array_push($metas,
+                array(
+                    "key" => "adLongitude",
+                    "value" => array($search["longitudes"][0], $search["longitudes"][1]),
+                    "compare" => "BETWEEN"
+                )
+            );
+        }
         
         $args = array(
             "post_type" => "re-ad",
@@ -704,7 +736,7 @@ class REALM_AdModel {
                 );
             }
             
-            if(isset($_GET["city"]) && !empty(trim($_GET["city"]) && !empty($_GET["city"]))) {
+            if(isset($_GET["city"]) && !empty(trim($_GET["city"]))) {
                 $nonce = wp_create_nonce("apiAddress"); //Would be probably MUCH better in a hidden field, TODO ?
                 if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
                     $url = urlencode(get_rest_url(null, PLUGIN_RE_NAME."/v1/address") ."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=city&nonce=$nonce");

@@ -173,51 +173,80 @@ class REALM_UserModel {
         return $columns;
     }
     
-    public static function setAlert($data) {
-        $idUser = apply_filters("determine_current_user", false);
+    public static function setAlert($apiRequest = null, $params = array()) {        
+        if(!is_null($apiRequest)) {
+            $userID = apply_filters("determine_current_user", false);
+            wp_set_current_user($userID);
+            
+            $address = sanitize_text_field($apiRequest->get_param("address"));
+            
+            $alert = array(
+                "typeAd" => sanitize_text_field($apiRequest->get_param("typeAd")),
+                "typeProperty" => sanitize_text_field($apiRequest->get_param("typeProperty")),
+                "minSurface" => absint($apiRequest->get_param("minSurface")),
+                "maxSurface" => absint($apiRequest->get_param("maxSurface")),
+                "minPrice" => absint($apiRequest->get_param("minPrice")),
+                "maxPrice" => absint($apiRequest->get_param("maxPrice")),
+                "nbRooms" => absint($apiRequest->get_param("nbRooms")),
+                "nbBedrooms" => absint($apiRequest->get_param("nbBedrooms")),
+                "nbBathrooms" => absint($apiRequest->get_param("nbBathrooms")),
+                "furnished" => $apiRequest->get_param("furnished") === "true",
+                "land" => $apiRequest->get_param("land") === "true",
+                "cellar" => $apiRequest->get_param("cellar") === "true",
+                "terrace" => $apiRequest->get_param("terrace") === "true",
+                "elevator" => $apiRequest->get_param("elevator") === "true",
+                "searchBy" => sanitize_text_field($apiRequest->get_param("searchBy")),
+                "radius" => absint($apiRequest->get_param("radius"))
+            );
+        }else if(!empty($params)){
+            $userID = absint($params["userID"]);
+                    
+            $address = $params["address"];
+            
+            $alert = array(
+                "typeAd" => sanitize_text_field($params["typeAd"]),
+                "typeProperty" => sanitize_text_field($params["typeProperty"]),
+                "minSurface" => absint($params["minSurface"]),
+                "maxSurface" => absint($params["maxSurface"]),
+                "minPrice" => absint($params["minPrice"]),
+                "maxPrice" => absint($params["maxPrice"]),
+                "nbRooms" => absint($params["nbRooms"]),
+                "nbBedrooms" => absint($params["nbBedrooms"]),
+                "nbBathrooms" => absint($params["nbBathrooms"]),
+                "furnished" => $params["furnished"],
+                "land" => $params["land"],
+                "cellar" => $params["cellar"],
+                "outdoorSpace" => $params["outdoorSpace"],
+                "elevator" => $params["elevator"],
+                "searchBy" => sanitize_text_field($params["searchBy"]),
+                "radius" => absint($params["radius"])
+            );
+        }else{
+            return false;
+        }
         
-        if(!empty(trim($data->get_param("address")))) {
-            $nonce = wp_create_nonce("apiAddress"); //Hidden input
-            if($data->get_param("searchBy") === "city") {
-                $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address") ."?query=".$data->get_param("address")."&context=searchAds&searchBy=city&nonce=$nonce";
+        
+        if(!empty(trim($address))) {
+            $nonce = wp_create_nonce("apiAddress");
+            if($alert["searchBy"] === "city") {
+                $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address") ."?query=".$address."&context=searchAds&searchBy=city&nonce=$nonce";
                 $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                $city = sanitize_text_field($addressData["city"]);
-                $postCode = sanitize_text_field($addressData["postCode"]);               
+                $alert["city"] = sanitize_text_field($addressData["city"]);
+                $alert["postCode"] = sanitize_text_field($addressData["postCode"]);               
             }else { 
-                $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=".$data->get_param("address")."&context=searchAds&searchBy=radius&radius=".$data->get_param("radius")."&nonce=$nonce";
-                $city = $data->get_param("address");
+                $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=".$address."&context=searchAds&searchBy=radius&radius=".$alert["radius"]."&nonce=$nonce";
+                $alert["city"] = $address;
                 $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                $latitudes = array($addressData["minLat"], $addressData["maxLat"]);
-                $longitudes = array($addressData["minLong"], $addressData["maxLong"]);
+                $alert["latitudes"] = array($addressData["minLat"], $addressData["maxLat"]);
+                $alert["longitudes"] = array($addressData["minLong"], $addressData["maxLong"]);
             }
         }  
-                
-        $alert = array(
-            "typeAd" => sanitize_text_field($data->get_param("typeAd")),
-            "typeProperty" => sanitize_text_field($data->get_param("typeProperty")),
-            "minSurface" => intval($data->get_param("minSurface")),
-            "maxSurface" => intval($data->get_param("maxSurface")),
-            "minPrice" => intval($data->get_param("minPrice")),
-            "maxPrice" => intval($data->get_param("maxPrice")),
-            "nbRooms" => intval($data->get_param("nbRooms")),
-            "nbBedrooms" => intval($data->get_param("nbBedrooms")),
-            "nbBathrooms" => intval($data->get_param("nbBathrooms")),
-            "furnished" => $data->get_param("furnished") === "true",
-            "land" => $data->get_param("land") === "true",
-            "cellar" => $data->get_param("cellar") === "true",
-            "terrace" => $data->get_param("terrace") === "true",
-            "elevator" => $data->get_param("elevator") === "true",
-            "city" => $city??'',
-            "postCode" => $postCode??'',
-            "latitudes" => $latitudes??'',
-            "longitudes" => $longitudes??'',
-            "searchBy" => sanitize_text_field($data->get_param("searchBy"))
-        );
-        $prevValue = maybe_unserialize(get_user_meta($idUser, "customerAlert", true));
+               
+        $prevValue = maybe_unserialize(get_user_meta($userID, "customerAlert", true));
         if($prevValue === $alert) {
             $result = "sameAlert";
         }else{
-            $result = update_user_meta($idUser, "customerAlert", $alert);
+            $result = update_user_meta($userID, "customerAlert", $alert);
         }
         echo json_encode(array("result" => $result));
     }

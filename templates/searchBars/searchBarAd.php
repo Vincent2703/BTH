@@ -73,25 +73,25 @@
                 <div class="pricesSurfacesInputs">
                     <div class="searchBarInput">
                         <label for="minPrice"><?php _e("Price", "retxtdom"); ?></label>
-                        <input type="number" min="0" name="minPrice" id="minPrice" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= is_numeric($_GET["minPrice"] ?? 0) ? absint($_GET["minPrice"]) : '' ?>">
-                        <input type="number" min="0" name="maxPrice" id="maxPrice" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= is_numeric($_GET["maxPrice"] ?? 0) ? absint($_GET["maxPrice"]) : '' ?>">
+                        <input type="number" min="0" name="minPrice" id="minPrice" placeholder="<?php _e("min", "retxtdom"); ?>" <?= $_GET["minPrice"] ?? '' ? 'value="'.absint($_GET["minPrice"]).'"' : '' ?>>
+                        <input type="number" min="0" name="maxPrice" id="maxPrice" placeholder="<?php _e("max", "retxtdom"); ?>" <?= $_GET["maxPrice"] ?? '' ? 'value="'.absint($_GET["maxPrice"]).'"' : '' ?>>
                     </div>   
                 
                     <div class="searchBarInput">
                         <label for="minSurface"><?php _e("Living space", "retxtdom"); ?></label>
-                        <input type="number" min="0" name="minSurface" id="minSurface" placeholder="<?php _e("min", "retxtdom"); ?>" value="<?= is_numeric($_GET["minSurface"] ?? 0) ? absint($_GET["minSurface"]) : '' ?>">
-                        <input type="number" min="0" name="maxSurface" id="maxSurface" placeholder="<?php _e("max", "retxtdom"); ?>" value="<?= is_numeric($_GET["maxSurface"] ?? 0) ? absint($_GET["maxSurface"]) : '' ?>">
+                        <input type="number" min="0" name="minSurface" id="minSurface" placeholder="<?php _e("min", "retxtdom"); ?>" <?= $_GET["minSurface"] ?? '' ? 'value="'.absint($_GET["minSurface"]).'"' : '' ?>>
+                        <input type="number" min="0" name="maxSurface" id="maxSurface" placeholder="<?php _e("max", "retxtdom"); ?>"<?= $_GET["maxSurface"] ?? '' ? 'value="'.absint($_GET["maxSurface"]).'"' : '' ?>>
                     </div>
                 </div>
                 
                 <div class="searchBarInput otherDetails">
                     <div class="nbRooms">
                         <label for="rooms"><?php _e("Rooms", "retxtdom"); ?></label>
-                        <input type="number" name="nbRooms" id="rooms" value="<?= is_numeric($_GET["nbRooms"] ?? 0) ? absint($_GET["nbRooms"]) : '' ?>">
+                        <input type="number" name="nbRooms" id="rooms" <?= $_GET["nbRooms"] ?? '' ? 'value="'.absint($_GET["nbRooms"]).'"' : '' ?>>
                         <label for="bedrooms"><?php _e("Bedrooms", "retxtdom"); ?></label>
-                        <input type="number" name="nbBedrooms" id="bedrooms" value="<?= is_numeric($_GET["nbBedrooms"] ?? 0) ? absint($_GET["nbBedrooms"]) : '' ?>">
+                        <input type="number" name="nbBedrooms" id="bedrooms" <?= $_GET["nbBedrooms"] ?? '' ? 'value="'.absint($_GET["nbBedrooms"]).'"' : '' ?>>
                         <label for="bathrooms"><?php _e("Bathrooms", "retxtdom"); ?></label>
-                        <input type="number" name="nbBathrooms" id="bathrooms" value="<?= is_numeric($_GET["nbBathrooms"] ?? 0) ? absint($_GET["nbBathrooms"]) : '' ?>">
+                        <input type="number" name="nbBathrooms" id="bathrooms" <?= $_GET["nbBathrooms"] ?? '' ? 'value="'.absint($_GET["nbBathrooms"]).'"' : '' ?>>
                     </div>
                     <div class="propertyHas">
                         <div>

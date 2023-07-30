@@ -630,7 +630,7 @@ class Realm {
         $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
         $userCanEdit = current_user_can("edit_ads");
         $nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && wp_verify_nonce($request->get_param("nonce"), "apiAddress");
-        $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";
+        $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";        
         $noLimit = !boolval($apisOptions["apiLimitNbRequests"]);
         
         if($userCanEdit || ($nonceExistsAndIsValid || $isAjax) || $noLimit) {

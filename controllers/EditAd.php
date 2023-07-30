@@ -82,7 +82,7 @@ class REALM_EditAd {
         <div id="address">
             <div class="text">
                 <label><?php _e("Property address", "retxtdom");?></label>
-                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder='Eg : <?php _e("123 Chester Square, London", "retxtdom");?>' value="<?= $ad["address"]; ?>" required>
+                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder='Eg : <?php _e("123 Chester Square, London", "retxtdom");?>' value="<?= $ad["fullAddress"]; ?>" required>
             </div>             
 
             <div class="radio">
