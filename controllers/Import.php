@@ -23,7 +23,7 @@ class REALM_Import {
     public function showPage() { 
         $postType = get_current_screen()->post_type;
         $base = get_current_screen()->base;
-        if(isset($_GET["import"]) && preg_match("/.+\.xml$/", $_GET["import"]) && isset($_GET["nonceSecurity"]) && wp_verify_nonce($_GET["nonceSecurity"], "importAds")) {
+        if(isset($_GET["import"]) && preg_match("/.+\.xml$/", $_GET["import"]) && isset($_GET["nonceSecurity"]) && is_numeric(wp_verify_nonce($_GET["nonceSecurity"], "importAds"))) {
             SELF::startImport(SELF::$dirPathExports.$_GET["import"]);
         }
         ?>

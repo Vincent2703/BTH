@@ -132,9 +132,13 @@ class REALM_UserModel {
         }
     }
     
-    public static function getUsersByRole($role) {
-        $users = get_users(array("role__in" => array($role)));
-        return $users;
+    public static function getUsersByRole($role, $json=false) {
+        $users = get_users(array("role__in" => array($role), "fields" => array("ID", "display_name", "email")));    
+        if($json) {
+            echo json_encode($users);
+        }else{
+            return $users;
+        }
     }    
     
     public static function agentAgencyHeaderColumn($columns) {
@@ -174,7 +178,7 @@ class REALM_UserModel {
     }
     
     public static function setAlert($apiRequest = null, $params = array()) {        
-        if(!is_null($apiRequest)) {
+        if(!is_null($apiRequest)) { //If API call
             $userID = apply_filters("determine_current_user", false);
             wp_set_current_user($userID);
             
@@ -190,11 +194,11 @@ class REALM_UserModel {
                 "nbRooms" => absint($apiRequest->get_param("nbRooms")),
                 "nbBedrooms" => absint($apiRequest->get_param("nbBedrooms")),
                 "nbBathrooms" => absint($apiRequest->get_param("nbBathrooms")),
-                "furnished" => $apiRequest->get_param("furnished") === "true",
-                "land" => $apiRequest->get_param("land") === "true",
-                "cellar" => $apiRequest->get_param("cellar") === "true",
-                "terrace" => $apiRequest->get_param("terrace") === "true",
-                "elevator" => $apiRequest->get_param("elevator") === "true",
+                "furnished" => filter_var($apiRequest->get_param("furnished"), FILTER_VALIDATE_BOOLEAN),
+                "land" => filter_var($apiRequest->get_param("land"), FILTER_VALIDATE_BOOLEAN),
+                "cellar" => filter_var($apiRequest->get_param("cellar"), FILTER_VALIDATE_BOOLEAN),
+                "outdoorSpace" => filter_var($apiRequest->get_param("outdoorSpace"), FILTER_VALIDATE_BOOLEAN),
+                "elevator" => filter_var($apiRequest->get_param("elevator"), FILTER_VALIDATE_BOOLEAN),
                 "searchBy" => sanitize_text_field($apiRequest->get_param("searchBy")),
                 "radius" => absint($apiRequest->get_param("radius"))
             );
@@ -270,7 +274,7 @@ class REALM_UserModel {
         if(
             !empty(trim($user["lastName"])) &&
             !empty(trim($user["firstName"])) &&
-            !empty(trim($user["phone"])) &&
+            !empty(trim($user["customerPhone"])) &&
             !empty(trim($user["email"])) &&
             $checkCF
         ) {

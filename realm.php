@@ -531,7 +531,8 @@ class Realm {
                         "dependencies" => array("jquery"),
                         "variables" => array(
                             "variablesAgents" => array(
-                                "getAgentsURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents")
+                                "getAgentsURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents"),
+                                "currentUserRole" => get_user_by("ID", get_current_user_id())->roles[0]
                             )
                         )
                     )
@@ -606,7 +607,7 @@ class Realm {
         register_rest_route(PLUGIN_RE_NAME."/v1", "agencies", array( 
             "methods" => "GET",
             "callback" => function() {
-                $this->UserModel->getUsersByRole("agency");
+                $this->UserModel->getUsersByRole("agency", true);
             },
             "permission_callback" => array($this, "permissionCallbackApiGetUsers")
         ));
@@ -614,7 +615,7 @@ class Realm {
         register_rest_route(PLUGIN_RE_NAME."/v1", "agents", array( 
             "methods" => "GET",
             "callback" => function() {
-                $this->UserModel->getUsersByRole("agent");
+                $this->UserModel->getUsersByRole("agent", true);
             },
             "permission_callback" => array($this, "permissionCallbackApiGetUsers")
         ));
@@ -629,7 +630,7 @@ class Realm {
         wp_set_current_user($idUser);
         $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
         $userCanEdit = current_user_can("edit_ads");
-        $nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && wp_verify_nonce($request->get_param("nonce"), "apiAddress");
+        $nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && is_numeric(wp_verify_nonce($request->get_param("nonce"), "apiAddress"));
         $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";        
         $noLimit = !boolval($apisOptions["apiLimitNbRequests"]);
         
@@ -665,10 +666,10 @@ class Realm {
         $idUser = apply_filters("determine_current_user", false);
         wp_set_current_user($idUser);
         $userCanEdit = current_user_can("edit_ads");
-        //$nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && wp_verify_nonce($request->get_param("nonce"), "apiAddress");
+        //$nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && is_numeric(wp_verify_nonce($request->get_param("nonce"), "apiAddress"));
         $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";
 
-        return $userCanEdit && /*$nonceExistsAndIsValid &&*/ $isAjax;
+        return $userCanEdit /*&& $nonceExistsAndIsValid && $isAjax*/;
     }
     
     
@@ -679,7 +680,7 @@ class Realm {
         global $post_type;
         global $pagenow;
         if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {         
-            wp_register_script("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, true);
+            wp_register_script("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
             $variablesSearchBar = array(
                 "filters" => __("FILTERS", "retxtdom"),
                 "searchBarURL" => plugin_dir_url(__FILE__)."templates/searchBars/searchBarAd.php",

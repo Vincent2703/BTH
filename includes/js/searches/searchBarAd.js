@@ -6,12 +6,17 @@ jQuery(document).ready(function($) {
     }).done(function(response) {
         nonce = variablesSearchBar.nonce;
         $("header:first").after(response);
+            $("#searchBySelect").change(function() {
+                searchByR($("#searchBySelect :selected").val());
+            });
+            $("#filters").click(function() {
+                addFilters($("#filters"));
+            });
         $.ajax({
            url: variablesSearchBar.autocompleteURL,
            dataType: "script"
         });
-    });
-    
+    }); 
 });
 
 function addFilters(button) {
@@ -22,12 +27,10 @@ function addFilters(button) {
     }else{
         complementaryFilters.hide("slow");
         jQuery(button).text(variablesSearchBar.filters+" +");
-    }
-    
+    }   
 }
 
-function searchByR(select) {
-    var value = jQuery(select).val();
+function searchByR(value) {
     if(value==="radius") {
         jQuery("#radiusInput").show("slow");
     }else{

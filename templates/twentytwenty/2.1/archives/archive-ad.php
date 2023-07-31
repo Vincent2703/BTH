@@ -24,8 +24,8 @@ get_header(); ?>
                             <div class="inShortAd">
                                 <div class="thumbnailAd">
                                     <a href="<?= get_post_permalink($idPost); ?>"><?= get_the_post_thumbnail($idPost, array(600, 600)); ?></a>
-                                    <span class="typeAd"><?php _e($ad["typeAd"], "retxtdom"); ?></span>
-                                    <span class="typeProperty"><?= $ad["typeProperty"]; ?></span>
+                                    <span class="typeAd"><?php _e($ad["taxonomies"]["typeAd"]["name"], "retxtdom"); ?></span>
+                                    <span class="typeProperty"><?= $ad["taxonomies"]["typeProperty"]["name"]; ?></span>
                                     <?php if(!empty($ad["agency"]) && $ad["agency"]->exists()) { ?>
                                     <span class="titleAgency"><?= $ad["agency"]->display_name;?></span>
                                     <?php } ?>
@@ -34,21 +34,27 @@ get_header(); ?>
                                     <span class="titleAd"><a href="<?= get_post_permalink($idPost); ?>"><?= $ad["title"]; ?></a></span>
                                     <span class="address"><?= $ad["city"].' '.$ad["postalCode"]; ?></span>
                                     <span class="shortDescription"><?= $ad["shortDescription"]; ?></span>
-                                    <span class="price"><span class="includingFees"><?= $ad["price"].$currency; ?><?= $ad["typeAd"]==="Location"?'/'.__("month", "retxtdom"):'';?></span>&nbsp;<span class="fees"><?= !empty($ad["fees"])||$ad["fees"]!=0?__("including", "retxtdom").' '.$ad["fees"]."$currency of fees":'';?></span></span>
+                                    <span class="price"><span class="includingFees"><?= $ad["price"].$currency; ?><?= $ad["taxonomies"]["typeAd"]["slug"]==="rental"?'/'.__("month", "retxtdom"):'';?></span>&nbsp;<span class="fees"><?= !empty($ad["fees"])||$ad["fees"]!=0?__("including", "retxtdom").' '.$ad["fees"]."$currency of fees":'';?></span></span>
                                     <span class="iconsDate">
                                         <span class="icons">
-                                            <span class="surface"><span class="dashicons dashicons-fullscreen-alt"></span><span><?=intval($ad["surface"])." m²";?></span></span>
+                                            <span class="surface"><span class="dashicons dashicons-fullscreen-alt"></span><span><?=$ad["surface"]." m²";?></span></span>
                                             <?php if(!empty($ad["nbRooms"]) || $ad["nbRooms"] != 0) { ?>
-                                            <span class="nbRooms"><span class="dashicons dashicons-grid-view"></span><span><?=intval($ad["nbRooms"]);?></span></span>
+                                            <span class="nbRooms"><span class="dashicons dashicons-grid-view"></span><span><?=$ad["nbRooms"];?></span></span>
                                             <?php } ?>
                                             <?php if(!empty($ad["nbBedrooms"]) || $ad["nbBedrooms"] != 0) { ?>
-                                            <span class="nbBedrooms"><span class="bedIcon"></span><span><?=intval($ad["nbBedrooms"]);?></span></span>
+                                            <span class="nbBedrooms"><span class="bedIcon"></span><span><?=$ad["nbBedrooms"];?></span></span>
                                             <?php } ?>
-                                            <?php if(!empty($ad["nbWaterRooms"]) || !empty($ad["nbBathrooms"]) || $ad["nbWaterRooms"] != 0 || $ad["nbBathrooms"] != 0) { ?>
-                                            <span class="nbBathrooms"><span class="bathIcon"></span><span><?=intval($ad["nbWaterRooms"])+intval($ad["nbBathrooms"]);?></span></span>
+                                            <?php if(!empty($ad["nbWaterRooms"]) || $ad["nbWaterRooms"] != 0) { ?>
+                                            <span class="nbWaterRooms"><span class="showerIcon"></span><span><?=$ad["nbWaterRooms"];?></span></span>
                                             <?php } ?>
-                                            <?php if($ad["typeAd"]==="Rental" && $ad["furnished"] == 1) { ?>
+                                            <?php if(!empty($ad["nbBathrooms"]) || $ad["nbBathrooms"] != 0) { ?>
+                                            <span class="nbBathrooms"><span class="bathIcon"></span><span><?=$ad["nbBathrooms"];?></span></span>
+                                            <?php } ?>
+                                            <?php if($ad["taxonomies"]["typeAd"]["slug"]==="rental" && $ad["furnished"] == 1) { ?>
                                             <span class="furnished"><span class="dashicons dashicons-archive"></span><span><?php _e("furnished", "retxtdom");?></span></span>
+                                            <?php } ?>
+                                            <?php if($ad["outdoorSpace"]) { ?>
+                                            <span class="furnished"><span class="exteriorIcon"></span><span><?php _e("Outdoor space", "retxtdom");?></span></span>
                                             <?php } ?>
                                         </span>
                                         <span class="date"><?= get_the_date(); ?></span>

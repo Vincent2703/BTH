@@ -22,6 +22,15 @@ class REALM_AdModel {
         }else{
             $ad["shortDescription"] = $ad["description"];
         }
+        
+        $ad["thumbnails"] = array(
+            "small" => get_the_post_thumbnail($id, "thumbnail"),
+            "medium" => get_the_post_thumbnail($id, "medium"),      
+            "large" => get_the_post_thumbnail($id, "large"),
+            "full" => get_the_post_thumbnail($id, "full")
+        );
+        
+        $ad["permalink"] = get_permalink($id);
 
         $ad["refAd"] = sanitize_text_field(self::getMeta("adRefAgency"));
         $ad["price"] = intval(self::getMeta("adPrice"));
@@ -32,6 +41,7 @@ class REALM_AdModel {
         $ad["nbBedrooms"] = intval(self::getMeta("adNbBedrooms"));
         $ad["nbBathrooms"] = intval(self::getMeta("adNbBathrooms"));
         $ad["nbWaterRooms"] = intval(self::getMeta("adNbWaterRooms"));
+        $ad["nbBathWaterRooms"] = intval(self::getMeta("adNbBathWaterRooms"));
         $ad["nbWC"] = intval(self::getMeta("adNbWC"));
 
         $ad["floor"] = intval(self::getMeta("adFloor"));
@@ -91,16 +101,16 @@ class REALM_AdModel {
         }          
 
         $images = self::getMeta("adImages");
-        $ad["typeAd"] = get_the_terms($id, "adTypeAd")[0]->name;
-        $ad["typeAdSlug"] = get_the_terms($id, "adTypeAd")[0]->slug;
-        $ad["typeProperty"] = get_the_terms($id, "adTypeProperty")[0]->name;
+
         $ad["afterPrice"] = self::getCurrency();
-        if($ad["typeAdSlug"] === "rental") {
+        if($ad["taxonomies"]["typeAd"]["slug"] === "rental") {
             $ad["afterPrice"] .= '/'.__("month", "retxtdom");
         }
 
-        if(!is_null($images) && $images !== false) {
+        if(!empty($images) && $images !== false) {
             $ad["imagesIds"] = explode(';', $images);
+        }else{
+            $ad["imagesIds"] = null;
         }
 
         $ad["showMap"] = self::getMeta("adShowMap");
@@ -133,18 +143,17 @@ class REALM_AdModel {
         $ad["showAgent"] = self::getMeta("adShowAgent") == 1;
         $ad["agency"] = get_user_by("ID", get_user_meta($ad["agent"], "agentAgency", true));       
        
-        $idContact = $ad["agent"];
-        if(!empty($idContact)) {
-            if(get_user_by("id", $idContact) !== false) {
+        $ad["idContact"] = $ad["agent"];
+        if(!empty($ad["idContact"])) {
+            if(get_user_by("id", $ad["idContact"]) !== false) {
                 require_once(PLUGIN_RE_PATH."models/UserModel.php");
-                $contact = REALM_UserModel::getUser($idContact);
+                $contact = REALM_UserModel::getUser($ad["idContact"]);
                 if($ad["showAgent"]) {
-                    $ad["idContact"] = $idContact;
                     $ad["phone"] = $contact["agentPhone"];
                     $ad["mobilePhone"] = $contact["agentMobilePhone"];
                     $ad["nameContact"] = $contact["firstName"] .' '. $contact["lastName"];
                 }else {
-                    if(get_user_by("id", intval($ad["agency"])) !== false) {
+                    if(get_user_by("id", $ad["agency"]->ID) !== false) {
                         $ad["idContact"] = $ad["agency"]->ID; //Agency
                         $contact = REALM_UserModel::getUser($ad["idContact"]);
                         $ad["phone"] = $contact["agencyPhone"];
@@ -154,13 +163,13 @@ class REALM_AdModel {
                 }
                 if(is_numeric($ad["idContact"])) {
                     $ad["email"] = $contact["email"];
-                    $ad["thumbnailContact"] = get_avatar_url($ad["idContact"], "thumbnail");
+                    $ad["thumbnailContact"] = get_avatar_url($ad["idContact"], "thumbnail"); //Move to UserModel ?
                 }
                 $ad["getContact"] = true;
             }
         }
 
-        if (!is_numeric($ad["idContact"])) {
+        if(!is_numeric($ad["idContact"])) {
             $ad["email"] = get_option(PLUGIN_RE_NAME . "OptionsEmail")["emailAd"];
             $ad["getContact"] = false;
         }
@@ -182,8 +191,8 @@ class REALM_AdModel {
             "tax_query" => array(
                 array(
                     "taxonomy" => "adTypeAd",
-                    "field" => "name",
-                    "terms" => $ad["typeAd"]
+                    "field" => "slug",
+                    "terms" => $ad["taxonomies"]["typeAd"]["slug"]
                 ),
                 array(
                     "taxonomy" => "adAvailable",

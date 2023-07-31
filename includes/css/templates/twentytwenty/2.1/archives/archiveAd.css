@@ -26,7 +26,7 @@
     width: 100%;
 }
 
-.inShortAd .thumbnailAd .typeAd {
+.inShortAd .typeAd {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.4);
     border-radius: 5px;
@@ -37,7 +37,7 @@
     left: 5px;
 }
 
-.inShortAd .thumbnailAd .typeProperty {
+.inShortAd .typeProperty {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.4);
     border-radius: 5px;
@@ -48,7 +48,7 @@
     right: 5px;
 }
 
-.inShortAd .thumbnailAd .titleAgency {
+.inShortAd .titleAgency {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.4);
     border-radius: 5px;
@@ -69,35 +69,35 @@
     display: block;
 }
 
-.inShortAd .detailsAd .titleAd {
+.inShortAd .titleAd {
     text-transform: uppercase;
     margin-bottom: 5px;
 }
 
-.inShortAd .detailsAd .titleAd a {
+.inShortAd .titleAd a {
     text-decoration: none;
 }
 
-.inShortAd .detailsAd .address {
+.inShortAd .address {
     font-size: 16px;
     font-style: italic;
     margin-bottom: 20px;
 }
 
-.inShortAd .detailsAd .shortDescription {
+.inShortAd .shortDescription {
     font-size: 14px;
     height: 35%;
 }
 
-.inShortAd .detailsAd .price {
+.inShortAd .price {
     margin-bottom: 25px;
 }
 
-.inShortAd .detailsAd .price .includingFees {
+.inShortAd .price .includingFees {
     font-weight: bold;
 }
 
-.inShortAd .detailsAd .price .fees {
+.inShortAd .price .fees {
     font-size: 12px;
 }
 
@@ -109,7 +109,7 @@
     margin-top: auto;
 }
 
-.inShortAd .detailsAd .iconsDate .icons {
+.inShortAd .iconsDate .icons {
     display: flex;
     align-items: flex-end;
     gap: 0 15px;
@@ -120,27 +120,41 @@
     align-items: center;
 }
 
-.inShortAd .detailsAd .iconsDate .icons span span {
+.inShortAd .iconsDate .icons span span {
     margin-right: 5px;
 }
 
-.inShortAd .detailsAd .iconsDate .icons .nbBathrooms, .inShortAd .detailsAd .iconsDate .icons .nbBedrooms {
+.inShortAd .icons span {
     display: flex;
     align-items: center;
 }
 
-.inShortAd .detailsAd .iconsDate .icons .nbBathrooms .bathIcon {
+.inShortAd .bathIcon {
     display: inline-block;
     width: 20px;
     height: 20px;
     background: url("../../../../../images/bathIcon.svg") no-repeat bottom;
 }
 
-.inShortAd .detailsAd .iconsDate .icons .nbBedrooms .bedIcon {
+.inShortAd .bedIcon {
     display: inline-block;
     width: 22px;
     height: 20px;
     background: url("../../../../../images/bedIcon.svg") no-repeat bottom;    
+}
+
+.inShortAd .showerIcon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: url("../../../../../images/showerIcon.svg") no-repeat bottom;    
+}
+
+.inShortAd .exteriorIcon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: url("../../../../../images/exteriorIcon.svg") no-repeat bottom;    
 }
 
 /* REPONSIVE */

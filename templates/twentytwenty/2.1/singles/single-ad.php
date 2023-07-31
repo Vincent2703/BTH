@@ -29,7 +29,7 @@
             if($checkPremiumPlugin && $userIsCustomer) {               
                 require_once(PLUGIN_RE_PATH."models/UserModel.php");
                 $idUser = get_current_user_id();
-                $user = REALM_UserModel::getUser($id);
+                $user = REALM_UserModel::getUser($idUser);
                 $userDataConformity = REALM_UserModel::checkDataConformity($idUser);
                 $alreadyHF = get_posts(array(
                     "author"        => $idUser,
@@ -53,7 +53,7 @@
             
             get_header();  
                            
-            if($checkPremiumPlugin && isset($_POST["apply"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formApply")) {
+            if($checkPremiumPlugin && isset($_POST["apply"]) && isset($_POST["nonceSecurity"]) && is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formApply"))) {
                 //Check that the user is a customer or an admin
                 if($userIsCustomer) {               
                     //Check that there is not already a housing file for this user with the accepted or decisionwaiting
@@ -64,11 +64,10 @@
                             require_once(PLUGIN_REP_PATH."models/front/HousingFileFront.php");
                             $HFID = REALMP_HousingFileFront::createPost($idPost, $idUser, $ad["refAd"] ." - ". $user["lastName"] .' '. $user["firstName"]); 
                         } 
-                    }
-                    
+                    }                    
                 }
                 
-            }else if(isset($_POST["contact"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formContact")) {
+            }else if(isset($_POST["contact"]) && isset($_POST["nonceSecurity"]) && is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formContact"))) {
                 if(isset($_POST["name"]) && isset($_POST["phone"]) && isset($_POST["email"]) && isset($_POST["message"]) && !empty(trim($_POST["names"])) && !empty(trim($_POST["phone"])) && !empty(trim($_POST["email"])) && !empty(trim($_POST["message"]))) {
                     $adRef = $ad["refAd"];
                     $contactNames = sanitize_text_field($_POST["names"]);
@@ -357,7 +356,7 @@
                 </div>
                 <?php if(!empty($ad["morePosts"])) { ?>
                 <div class="more">
-                    <span id="moreTitle"><?php _e("Other", "retxtdom"); ?> <?= lcfirst($ad["typeAd"]); ?>s <?= _e("in", "retxtdom"); ?> <?= ucfirst($ad["city"]); ?></span><br />
+                    <span id="moreTitle"><?php _e("Other", "retxtdom"); ?> <?= lcfirst($ad["taxonomies"]["typeAd"]["name"]); ?>s <?= _e("in", "retxtdom"); ?> <?= ucfirst($ad["city"]); ?></span><br />
                     <div class="morePosts">
                         <?php 
                             $nbPosts = count($ad["morePosts"]);

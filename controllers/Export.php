@@ -18,11 +18,11 @@ class REALM_Export {
         <div class="wrap">
             <h2><?php _e("Export the ads", "retxtdom"); ?></h2>
             <?php 
-                if(isset($_POST["submitExport"]) && isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formExportAds")) { //Export
+                if(isset($_POST["submitExport"]) && isset($_POST["nonceSecurity"]) && is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formExportAds"))) { //Export
                     SELF::startExport();
                     SELF::checkQuotaExports();
                     _e("Successful export", "retxtdom");
-                }else if(isset($_GET["exportToDelete"]) && preg_match("/.+\.xml$/", $_GET["exportToDelete"]) && isset($_GET["nonceSecurity"]) && wp_verify_nonce($_GET["nonceSecurity"], "deleteExport")) { //Delete one export
+                }else if(isset($_GET["exportToDelete"]) && preg_match("/.+\.xml$/", $_GET["exportToDelete"]) && isset($_GET["nonceSecurity"]) && is_numeric(wp_verify_nonce($_GET["nonceSecurity"], "deleteExport"))) { //Delete one export
                     if(@unlink(SELF::$dirPath.$_GET["exportToDelete"])) {
                         _e("File deleted with success", "retxtdom");
                         SELF::$files = SELF::getListFiles();

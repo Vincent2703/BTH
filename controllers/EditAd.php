@@ -37,7 +37,7 @@ class REALM_EditAd {
         if($ad->post_type == "re-ad") {
             if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE || (!isset($_POST["nonceSecurity"]) || (isset($_POST["nonceSecurity"]) && !wp_verify_nonce($_POST["nonceSecurity"], "formEditAd")))) { //Don't save if it's an autosave or if the nonce is inexistant/incorrect
                 return;
-            }else if(isset($_POST["nonceSecurity"]) && wp_verify_nonce($_POST["nonceSecurity"], "formEditAd")) {
+            }else if(isset($_POST["nonceSecurity"]) && is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formEditAd"))) {
                 require_once(PLUGIN_RE_PATH."models/AdModel.php");
                 remove_action("save_post_re-ad", array($this, "savePost")); //Avoid infinite loop
                 REALM_AdModel::updateAd($adId, $ad); //Save in BDD
@@ -50,7 +50,13 @@ class REALM_EditAd {
         require_once(PLUGIN_RE_PATH."models/UserModel.php");
         
         $ad = REALM_AdModel::getAd($adWP->ID); //Get values
-        $agents = REALM_UserModel::getUsersByRole("agent");
+        $currentUser = get_user_by("ID", get_current_user_id());
+        $userRole = $currentUser->roles[0];
+        if($userRole === "agent") {
+            $agents = [$currentUser];
+        }else{
+            $agents = REALM_UserModel::getUsersByRole("agent");
+        }
         wp_nonce_field("formEditAd", "nonceSecurity"); //Add nonce
         ?>
         <div id="refAgency">
@@ -132,11 +138,11 @@ class REALM_EditAd {
         </div>
         <div id="addPictures">
             <a href="#" id="insertAdPictures" class="button"><?php empty($ad["imagesIds"])?_e("Add pictures", "retxtdom"):_e("Replace pictures", "retxtdom");?></a>
-            <input type="hidden" name="images" id="images" value="<?= implode(';', $ad["imagesIds"]); ?>">
+            <input type="hidden" name="images" id="images" value="<?= !is_null($ad["imagesIds"])?implode(';', $ad["imagesIds"]):''; ?>">
         </div>
         <div id="showPictures">
             <?php $images = $ad["imagesIds"];
-            if(!empty($images)) {
+            if(!is_null($images)) {
                 foreach($images as $id) { ?>
                     <div class="aPicture" data-imgId="<?=absint($id);?>">
                         <?= wp_get_attachment_image($id, array(150, 150), false, array("class" => "imgAd")); ?>

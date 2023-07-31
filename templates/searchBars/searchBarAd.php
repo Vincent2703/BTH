@@ -20,7 +20,7 @@
             <div class="mainSearchBarInputs">
                 <div class="searchBarInput">
                     <label for="typeAd"><?php _e("Ad type", "retxtdom"); ?></label>
-                    <select name="typeAd" id="typeAd" onchange="changeAdType(this);">
+                    <select name="typeAd" id="typeAd">
                         <?php
                         if(empty($adTypesAd)) { ?>
                             <option disabled selected><?php _e("No ad posted", "retxtdom") ;?></option>
@@ -56,7 +56,7 @@
                 <div id="searchBy" class="searchBarInput">
                     <div id="searchBySelect">
                         <label for="searchBySelect"><?php _e("Search by", "retxtdom");?></label>
-                        <select id="searchBySelect" name="searchBy" onchange="searchByR(this);">
+                        <select id="searchBySelect" name="searchBy">
                             <option value="city" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city"); ?>><?php _e("City", "retxtdom"); ?></option>
                             <option value="radius" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"); ?>><?php _e("Radius", "retxtdom"); ?></option>
                         </select>
@@ -67,7 +67,7 @@
                     </div>
                 </div>
                 
-                <button type="button" id="filters" onclick="addFilters(this);"><?php _e("Filters", "retxtdom"); ?> <?=$compSearchBarExtended?'-':'+';?></button>
+                <button type="button" id="filters"><?php _e("Filters", "retxtdom"); ?> <?=$compSearchBarExtended?'-':'+';?></button>
             </div>          
             <div class="compSearchBarInputs" <?= $compSearchBarExtended ?: 'style="display: none;"'; ?>>
                 <div class="pricesSurfacesInputs">
