@@ -72,7 +72,7 @@ class Realm {
         //Controllers
         require_once("controllers/Options.php");
         require_once("controllers/EditAd.php");
-        require_once("controllers/RegistrationUser.php");
+        require_once("controllers/RegisterUserDashboard.php");
         require_once("controllers/Export.php");
         require_once("controllers/Import.php");
         require_once("controllers/EditProfile.php");
@@ -88,7 +88,7 @@ class Realm {
         
         $this->Options          = new REALM_Options;
         $this->EditAd           = new REALM_EditAd;
-        $this->RegistrationUser = new REALM_RegistrationUser;
+        $this->RegistrationUser = new REALM_RegisterUserDashboard;
         $this->Export           = new REALM_Export;
         $this->Import           = new REALM_Import;
         $this->EditProfile      = new REALM_EditProfile;
@@ -118,6 +118,9 @@ class Realm {
         
         //https://wordpress.stackexchange.com/questions/178033/disable-posts-only-allow-to-edit-existing-pages-not-create-new-ones-create-po
         add_action("admin_menu", array($this, "fixWPBug22895"));
+        
+        //Hide the update version of WP in the footer
+        add_filter("admin_menu", array($this, "hideWPVersion"));
 
         //Register plugin styles for the admin area
         add_action("admin_enqueue_scripts", array($this, "registerPluginStylesAdmin"));
@@ -791,6 +794,12 @@ class Realm {
     public function fixWPBug22895Unset($menu){
         remove_submenu_page("edit.php?post_type=housingfile", "fixWPBug22895");
         return $menu;
+    }
+    
+    public function hideWPVersion() {
+        if(!current_user_can("manage_options")) {
+            remove_filter("update_footer", "core_update_footer"); 
+        }
     }
     
 }

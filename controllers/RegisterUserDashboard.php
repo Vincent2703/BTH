@@ -7,7 +7,7 @@ if(!defined("ABSPATH")) {
  * Create a new user
  * 
  */
-class REALM_RegistrationUser {
+class REALM_RegisterUserDashboard {
     public function addFieldsNewUser() {
         require_once(PLUGIN_RE_PATH."models/UserModel.php");
         
@@ -18,7 +18,7 @@ class REALM_RegistrationUser {
         $agencyAddress = isset($_POST["agencyAddress"])?sanitize_text_field($_POST["agencyAddress"]):'';
         $agencyDescription = isset($_POST["agencyDescription"])?wp_kses_post($_POST["agencyDescription"]):'';
         
-        $agencies = REALM_UserAdmin::getUsersByRole("agency");
+        $agencies = REALM_UserModel::getUsersByRole("agency");
         ?>
         <h3 id="extraInformationTitle"><?php _e("Extra profile information for", "retxtdom");?>&nbsp;<span id="roleName"></span></h3>
         <table class="form-table" id="extraInformation">
