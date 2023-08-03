@@ -59,14 +59,14 @@ class REALM_EditProfile {
                 </tr>
                 <tr class="form-field agent">
                     <th scope="row">
-                        <label for="agentAgency"><?php _e("Agent's agency");?></label>
+                        <label for="agentAgency"><?php _e("Agency", "retxtdom");?></label>
                     </th>
                     <td>
                         <select name="agentAgency" id="agencies">
                         <?php
                             foreach($agencies as $agency) {
                                 ?>
-                                <option value="<?= $agency->ID; ?>" <?php selected($agency->ID, $user["agentAgency"]); ?>><?= $user["displayName"]; ?></option>
+                                <option value="<?= $agency->ID; ?>" <?php selected($agency->ID, $user["agentAgency"]); ?>><?= $agency->display_name; ?></option>
                                 <?php
                             }
                         ?>

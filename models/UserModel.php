@@ -133,13 +133,28 @@ class REALM_UserModel {
     }
     
     public static function getUsersByRole($role, $json=false) {
-        $users = get_users(array("role__in" => array($role), "fields" => array("ID", "display_name", "email")));    
+        $users = get_users(array("role" => $role, "fields" => array("ID", "display_name", "email")));    
         if($json) {
             echo json_encode($users);
         }else{
             return $users;
         }
-    }    
+    }
+
+    public static function getAgentsAgency($agencyID) {
+        $users = get_users(array(
+            "role" => "agent", 
+            "meta_query" => array( 
+                array(
+                    "key" => "agentAgency",
+                    "value" => $agencyID,
+                    "compare" => '='
+                )
+            ),
+            "fields" => array("ID", "display_name", "email")
+        ));
+        return $users;
+    }
     
     public static function agentAgencyHeaderColumn($columns) {
         if(isset($_GET["role"]) && $_GET["role"] === "agent") {

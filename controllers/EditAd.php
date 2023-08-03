@@ -50,12 +50,24 @@ class REALM_EditAd {
         require_once(PLUGIN_RE_PATH."models/UserModel.php");
         
         $ad = REALM_AdModel::getAd($adWP->ID); //Get values
-        $currentUser = get_user_by("ID", get_current_user_id());
+        $currentUserID = get_current_user_id();
+        $currentUser = get_user_by("ID", $currentUserID);
         $userRole = $currentUser->roles[0];
-        if($userRole === "agent") {
-            $agents = [$currentUser];
-        }else{
+        
+        if($userRole === "administrator") {
             $agents = REALM_UserModel::getUsersByRole("agent");
+        }else if($userRole === "agent") {
+            $user = REALM_UserModel::getUser($currentUserID);
+            $agents = REALM_UserModel::getAgentsAgency($user["agentAgency"]);
+        }else if($userRole === "agency") {
+            $agents = REALM_UserModel::getAgentsAgency($$currentUserID);
+        }
+        if(is_int($ad["agent"])) {
+            $agentSelected = $ad["agent"];
+        }else if($userRole === "agent") {
+            $agentSelected = get_current_user_id();
+        }else{
+            $agentSelected = null;
         }
         wp_nonce_field("formEditAd", "nonceSecurity"); //Add nonce
         ?>
@@ -121,10 +133,10 @@ class REALM_EditAd {
         <div id="agent">
             <div class="text">
                 <label><?php _e("Agent linked to the ad", "retxtdom");?></label>
-                <select name="agent" id="agents"">
+                <select name="agent" id="agents">
                     <?php
                         foreach($agents as $agent) { ?>
-                            <option value="<?= $agent->ID; ?>" <?php selected($agent->ID, $ad["agent"]); ?>><?= $agent->display_name; ?></option>
+                            <option value="<?= $agent->ID; ?>" <?php selected($agent->ID, $agentSelected); ?>><?= $agent->display_name; ?></option>
                             <?php
                         }
                     ?>
@@ -133,7 +145,10 @@ class REALM_EditAd {
             <div class="select">
                 <input type="checkbox" id="showAgent" name="showAgent" <?php checked($ad["showAgent"], '1'); ?>>
                 <label for="showAgent"><?php _e("Publish the agent contact", "retxtdom");?></label>
-                <a target="_blank" href="post-new.php?post_type=agent"><?php _e("Add an agent", "retxtdom");?></a>
+                <?php if($userRole === "administrator") { 
+                    $createUserURL = admin_url("user-new.php");?>
+                <a target="_blank" href="<?=$createUserURL;?>"><?php _e("Add an agent", "retxtdom");?></a>
+                <?php } ?>
             </div>
         </div>
         <div id="addPictures">

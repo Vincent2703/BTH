@@ -185,7 +185,7 @@ class Realm {
         
         add_action("personal_options_update", array($this->EditProfile, "saveProfileCustomFields"));
         add_action("edit_user_profile_update", array($this->EditProfile, "saveProfileCustomFields"));      
-        
+                
     }
     
     /*
@@ -197,6 +197,9 @@ class Realm {
         
         //Modify the query before it is executed, in order to convert post ID values into their corresponding taxonomy terms
         add_filter("pre_get_posts", array($this->Ad, "convertIdToTermInQuery")); 
+        
+        //Modify the query before it is executed, in order to filter the ads by an agency if needed
+        add_filter("pre_get_posts", array($this->Ad, "customFilters"));
         
         //Modify the query before it is executed, in order to include custom search functionality for the ads
         add_filter("pre_get_posts", array($this->AdModel, "setQueryAds")); 
@@ -220,6 +223,8 @@ class Realm {
         //Ads the agent's agency name to the previous column
         add_filter("manage_users_custom_column", array($this->UserModel, "agentAgencyDataColumn"), 10, 3);
         
+        add_filter("views_edit-re-ad", array($this, "editAdsFilters"));
+             
         //To do : sort and filter by the agent's agency
         //add_filter("manage_users_sortable_columns", array($this->UserModel, "agentAgencySortableColumn"));
         
@@ -469,7 +474,7 @@ class Realm {
                         "footer" => true,
                         "dependencies" => array("jquery")
                     ),
-                    "reloadAgencies" => array(
+                    /*"reloadAgencies" => array(
                         "path" => "/includes/js/searches/reloadAgencies.js",
                         "footer" => true,
                         "dependencies" => array("jquery"),
@@ -478,7 +483,7 @@ class Realm {
                                 "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies")
                             )
                         )
-                    )
+                    )*/
                 ),
                 "user-edit" => array(
                     "editProfile" => array(
@@ -486,7 +491,7 @@ class Realm {
                         "footer" => true,
                         "dependencies" => array("jquery")
                     ),
-                    "reloadAgencies" => array(
+                    /*"reloadAgencies" => array(
                         "path" => "/includes/js/searches/reloadAgencies.js",
                         "footer" => true,
                         "dependencies" => array("jquery"),
@@ -495,7 +500,7 @@ class Realm {
                                 "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies")
                             )
                         )
-                    )
+                    )*/
                 ),
                 "profile" => array(
                     "editProfile" => array(
@@ -528,7 +533,7 @@ class Realm {
                             )
                         )
                     ),
-                    "reloadAgents" => array(
+                    /*"reloadAgents" => array(
                         "path" => "/includes/js/searches/reloadAgents.js",
                         "footer" => true,
                         "dependencies" => array("jquery"),
@@ -538,7 +543,7 @@ class Realm {
                                 "currentUserRole" => get_user_by("ID", get_current_user_id())->roles[0]
                             )
                         )
-                    )
+                    )*/
                 ),
                 "re-ad_page_".PLUGIN_RE_NAME."import" => array(
                     "import" => array(
@@ -718,6 +723,33 @@ class Realm {
         ));
 	return $links;
     }
+    
+    /*
+     * Add filters to edit-re-ad page
+     */
+    public function editAdsFilters($views) {
+        $currentUserId = get_current_user_id();
+        $currentUser = get_user_by("ID", $currentUserId);
+        $currentUserRole = $currentUser->roles[0];
+        
+        if(in_array($currentUserRole, array("agent", "agency"))) {
+            $agencyLink = '<a href="'.admin_url("edit.php?post_type=re-ad&agency").'">'.__("Agency", "retxtdom")."</a>";
+            $array["agency"] = $agencyLink;
+            $arrayBefore = array_slice($views, 0, 1, true);
+            $arrayAfter = array_slice($views, 1, null, true);
+            $views = array_merge($arrayBefore, $array, $arrayAfter);
+        }else if($currentUserRole === "administrator") {
+            require_once(PLUGIN_RE_PATH."models/UserModel.php");
+            $agencies = REALM_UserModel::getUsersByRole("agency");
+            foreach($agencies as $agency) {
+                $agencyLink = '<a href="'.admin_url("edit.php?post_type=re-ad&agency=".$agency->ID).'">'. $agency->display_name."</a>";
+                $views[$agency->display_name] = $agencyLink;
+            }
+        }      
+        
+        return $views;
+    }
+    
     
     /*
      * Check that the theme used is compatible with the plugin

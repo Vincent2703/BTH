@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
             response.forEach(function(val) {
                 $("<option/>")
                     .val(val.ID)
-                    .text(val.data.display_name)
+                    .text(val.display_name)
                     .appendTo("#agencies");
                 if(agencySelected === val.ID) {
                     $("#agencies option:last-child").attr("selected", "selected");

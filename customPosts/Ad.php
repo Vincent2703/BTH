@@ -306,6 +306,45 @@ class REALM_Ad {
     }
     
     /*
+     * Modify the query before it is executed, in order to filter the ads by an agency if needed
+     * If agency : itself
+     * If agent : own agency
+     * If admin : by id agency get variable
+     */
+    public function customFilters($query) {
+        global $pagenow;            
+        global $typenow;
+
+        if(is_admin() && $pagenow == "edit.php" && $typenow === "re-ad") {
+            $currentUserID = get_current_user_id();
+            $currentUser = get_user_by("ID", $currentUserID);
+            $currentUserRole = $currentUser->roles[0];
+            if(isset($_GET["agency"])) {
+                if($currentUserRole === "agency") {
+                    $idAgency = $currentUserID;
+                }else if($currentUserRole === "agent") {
+                    $idAgency = get_user_meta($currentUserID, "agentAgency", true);
+                }else if(isset($_GET["agency"]) && is_numeric($_GET["agency"]) && $currentUserRole === "administrator") {
+                    $idAgency = absint($_GET["agency"]);
+                    var_dump($idAgency);
+                }
+            }
+            if(isset($idAgency)) {
+                require_once(PLUGIN_RE_PATH."models/UserModel.php");
+                $agentsAgency = REALM_UserModel::getAgentsAgency($idAgency);
+                $agentsAgencyIds = array_column($agentsAgency, "ID");
+                $query->set("meta_query", array(
+                    array(
+                        "key"     => "adIdAgent",
+                        "value"   => $agentsAgencyIds,
+                        "compare" => "IN",
+                    ),
+                ));
+            }
+        }
+    }
+    
+    /*
      * Add a column to display the typeProperty
      */
     public function typePropertyColumns($originalColumns) {

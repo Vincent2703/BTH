@@ -589,8 +589,14 @@ class REALM_AdModel {
     }
     
     public function setQueryAds($query) {
-        if(!is_admin() && $query->is_search && isset($_GET["post_type"]) && $_GET["post_type"] === "re-ad") {        
+        if(!is_admin() && $query->is_search && isset($_GET["post_type"]) && $_GET["post_type"] === "re-ad") {       
             $query->set("post_type", "re-ad");
+            $adsPerPage = 4;
+            $page = get_query_var("paged")>0?absint(get_query_var("paged")):1;
+            $offset = ($page-1)*$adsPerPage;
+            
+            $query->set("posts_per_page", $adsPerPage);
+            $query->set("offset", $offset);
             
             $terms = array();
             $metas = array();
@@ -803,7 +809,7 @@ class REALM_AdModel {
             }
             if(!empty($metas)) {
                 $query->set("meta_query", array($metas));
-            }
+            }          
         }
     }
     
