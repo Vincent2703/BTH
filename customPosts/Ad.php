@@ -312,37 +312,48 @@ class REALM_Ad {
      * If admin : by id agency get variable
      */
     public function customFilters($query) {
-        global $pagenow;            
-        global $typenow;
+        global $pagenow, $typenow;
+        $currentUserID = get_current_user_id();
+        $currentUser = get_user_by("ID", $currentUserID);
+        if(!$currentUser) {
+            return;
+        }
+        $currentUserRole = $currentUser->roles[0];
 
-        if(is_admin() && $pagenow == "edit.php" && $typenow === "re-ad") {
-            $currentUserID = get_current_user_id();
-            $currentUser = get_user_by("ID", $currentUserID);
-            $currentUserRole = $currentUser->roles[0];
-            if(isset($_GET["agency"])) {
-                if($currentUserRole === "agency") {
-                    $idAgency = $currentUserID;
-                }else if($currentUserRole === "agent") {
-                    $idAgency = get_user_meta($currentUserID, "agentAgency", true);
-                }else if(isset($_GET["agency"]) && is_numeric($_GET["agency"]) && $currentUserRole === "administrator") {
-                    $idAgency = absint($_GET["agency"]);
-                    var_dump($idAgency);
-                }
+        if(is_admin() && $pagenow === "edit.php" && $typenow === "re-ad" && isset($_GET["agency"])) {
+            if($currentUserRole === "agency") {
+                $idAgency = $currentUserID;
+            }else if($currentUserRole === "agent") {
+                $idAgency = get_user_meta($currentUserID, "agentAgency", true);
+            }else if(is_numeric($_GET["agency"]) && $currentUserRole === "administrator") {
+                $idAgency = absint($_GET["agency"]);
             }
+
             if(isset($idAgency)) {
-                require_once(PLUGIN_RE_PATH."models/UserModel.php");
+                require_once(PLUGIN_RE_PATH . "models/UserModel.php");
                 $agentsAgency = REALM_UserModel::getAgentsAgency($idAgency);
                 $agentsAgencyIds = array_column($agentsAgency, "ID");
-                $query->set("meta_query", array(
-                    array(
-                        "key"     => "adIdAgent",
-                        "value"   => $agentsAgencyIds,
-                        "compare" => "IN",
-                    ),
-                ));
+                $metaQueryValue = !empty($agentsAgencyIds) ? $agentsAgencyIds : 0;
+                $meta_query = array(
+                    "key" => "adIdAgent",
+                    "value" => $metaQueryValue,
+                    "compare" => !empty($agentsAgencyIds) ? "IN" : "=",
+                );
+            }else if($currentUserRole === "administrator" && $_GET["agency"] === "no") {
+                $meta_query = array(
+                    "key" => "adIdAgent",
+                    "compare" => "NOT EXISTS",
+                );
+            }
+
+            if(isset($meta_query)) {
+                $query->set("post_status", array("publish", "draft"));
+                $query->set("meta_query", array($meta_query));
             }
         }
     }
+
+
     
     /*
      * Add a column to display the typeProperty

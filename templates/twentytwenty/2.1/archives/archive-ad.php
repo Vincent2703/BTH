@@ -5,14 +5,12 @@ if(!defined("ABSPATH")) {
 get_header(); ?>
         <div id="primary" class="content-area">
             <main id="main" class="site-main">
-            <?php if(have_posts()) { //Rajouter une limite de posts
+            <?php if(have_posts()) {
                 global $wp_query;
                 $nbAds = $wp_query->found_posts; ?>
                 
                 <h3><span class="color-accent"><?= sprintf("%d %s", $nbAds, __("ads found", "retxtdom")); ?></span></h3>
-                <?php if(PLUGIN_RE_REP && current_user_can("customer")) { ?>
-                <button id="subscribeAlerts">test</button>
-                <?php }       
+                <?php
                 while(have_posts()) {
                     the_post();
                     $idPost = get_the_id();
@@ -75,6 +73,11 @@ get_header(); ?>
                 <?php get_template_part("content", "none" ); ?>
             <?php } ?>
 
+            <?php if(defined("PLUGIN_RE_REP") && PLUGIN_RE_REP && current_user_can("customer")) { ?>
+            <span id="btnSubscribeAlert">
+                <button id="subscribeAlert"><?php _e("Save the search", "reptxtdom"); ?></button>
+            </span>
+            <?php } ?> 
             </main>
 	</div>
 

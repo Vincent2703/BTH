@@ -1,3 +1,8 @@
 main h3 {
     text-align: center;
 }
+
+#btnSubscribeAlert {
+    display: flex;
+    justify-content: center;
+}

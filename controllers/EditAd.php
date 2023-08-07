@@ -48,7 +48,7 @@ class REALM_EditAd {
     public function mainFeaturesMetaBox($adWP) {
         require_once(PLUGIN_RE_PATH."models/AdModel.php");
         require_once(PLUGIN_RE_PATH."models/UserModel.php");
-        
+                
         $ad = REALM_AdModel::getAd($adWP->ID); //Get values
         $currentUserID = get_current_user_id();
         $currentUser = get_user_by("ID", $currentUserID);
@@ -62,7 +62,7 @@ class REALM_EditAd {
         }else if($userRole === "agency") {
             $agents = REALM_UserModel::getAgentsAgency($$currentUserID);
         }
-        if(is_int($ad["agent"])) {
+        if(is_numeric($ad["agent"])) {
             $agentSelected = $ad["agent"];
         }else if($userRole === "agent") {
             $agentSelected = get_current_user_id();

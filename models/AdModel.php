@@ -323,7 +323,7 @@ class REALM_AdModel {
         if(isset($_POST["images"]) && !empty(trim($_POST["images"]))) {
             update_post_meta($adId, "adImages", sanitize_text_field($_POST["images"]));
         }
-        if(isset($_POST["agent"]) && !empty(trim($_POST["agent"]))) {
+        if(isset($_POST["agent"]) && is_numeric($_POST["agent"])) {
             update_post_meta($adId, "adIdAgent", absint($_POST["agent"]));
         }
         
@@ -589,7 +589,7 @@ class REALM_AdModel {
     }
     
     public function setQueryAds($query) {
-        if(!is_admin() && $query->is_search && isset($_GET["post_type"]) && $_GET["post_type"] === "re-ad") {       
+        if(!is_admin() && $query->is_main_query() && is_post_type_archive("re-ad")) {       
             $query->set("post_type", "re-ad");
             $adsPerPage = 4;
             $page = get_query_var("paged")>0?absint(get_query_var("paged")):1;
@@ -598,7 +598,13 @@ class REALM_AdModel {
             $query->set("posts_per_page", $adsPerPage);
             $query->set("offset", $offset);
             
-            $terms = array();
+            $terms = array(
+                array(
+                    "taxonomy" => "adAvailable",
+                    "field" => "slug",
+                    "terms" => array("available"),
+                )
+            );
             $metas = array();
             
             if(isset($_GET["typeAd"]) && !empty(trim($_GET["typeAd"]))) {
@@ -804,13 +810,49 @@ class REALM_AdModel {
                     }
                 }
             }                         
-            if(!empty($terms)) {
-                $query->set("tax_query", array($terms));
-            }
+            $query->set("tax_query", array($terms));
+            
             if(!empty($metas)) {
                 $query->set("meta_query", array($metas));
             }          
         }
+    }
+    
+    public static function getNbAdsByAgency($agencyID) {
+        require_once(PLUGIN_RE_PATH."models/UserModel.php");
+        
+        $agentsAgency = REALM_UserModel::getAgentsAgency($agencyID);
+        $agentsAgencyIds = array_column($agentsAgency, "ID");
+        $metaQueryValue = !empty($agentsAgencyIds) ? implode(',', $agentsAgencyIds) : 0;
+
+        $SQLRequest = //get_posts doesn't work well for some reason here
+            "SELECT COUNT(p.ID) as count
+            FROM wp_posts p
+            JOIN wp_postmeta pm ON p.ID = pm.post_id
+            WHERE p.post_type = 're-ad'
+            AND p.post_status = 'publish'
+            AND pm.meta_key = 'adIdAgent'
+            AND pm.meta_value IN ($metaQueryValue)
+            ";
+
+        global $wpdb;
+
+        return $wpdb->get_results($SQLRequest)[0]->count;
+    }
+    
+    public static function getNbAdsWithoutAgency() {
+        $SQLRequest = 
+            "SELECT COUNT(p.ID) as count
+            FROM wp_posts p
+            LEFT JOIN wp_postmeta pm ON p.ID = pm.post_id AND pm.meta_key = 'adIdAgent'
+            WHERE p.post_type = 're-ad'
+            AND p.post_status IN ('publish', 'draft')
+            AND pm.meta_key IS NULL
+            ";
+        
+        global $wpdb;
+        
+        return $wpdb->get_results($SQLRequest)[0]->count;
     }
     
     public static function getCurrency() {

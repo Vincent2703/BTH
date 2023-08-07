@@ -1,7 +1,0 @@
-#extraInformation, #extraInformation .customer, #extraInformation .agent, #extraInformation .agency {
-    display: none;
-}
-
-#extraInformation .regular-text {
-    width: 25em;
-}

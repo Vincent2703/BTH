@@ -157,6 +157,22 @@
     background: url("../../../../../images/exteriorIcon.svg") no-repeat bottom;    
 }
 
+#btnSubscribeAlert {
+    position: fixed;
+    bottom: 3%;
+    left: 50%;
+    transform: translate(-50%,0);   
+}
+
+#btnSubscribeAlert button {
+    border-radius: 15px;
+    opacity: 75%;
+}
+
+#btnSubscribeAlert button:hover {
+    opacity: 100%;
+}
+
 /* REPONSIVE */
 
 @media only screen and (max-width : 900px) {
