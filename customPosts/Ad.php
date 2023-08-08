@@ -311,7 +311,7 @@ class REALM_Ad {
      * If agent : own agency
      * If admin : by id agency get variable
      */
-    public function customFilters($query) {
+    public function customFiltersQuery($query) {
         global $pagenow, $typenow;
         $currentUserID = get_current_user_id();
         $currentUser = get_user_by("ID", $currentUserID);
@@ -351,6 +351,48 @@ class REALM_Ad {
                 $query->set("meta_query", array($meta_query));
             }
         }
+    }
+    
+    /*
+     * Modify the tabs in edit re-ad for each custom filter
+     */
+    public function customFiltersTabs($tabs) {
+        $currentUserId = get_current_user_id();
+        $currentUser = get_user_by("ID", $currentUserId);
+        $currentUserRole = $currentUser->roles[0];
+        
+        $currentCustomFilter = isset($_GET["agency"]) && (is_numeric($_GET["agency"]) || $_GET["agency"] === "no" || empty($_GET["agency"]))?$_GET["agency"]:null;
+        if(in_array($currentUserRole, array("agent", "agency"))) {
+            require_once(PLUGIN_RE_PATH."models/AdModel.php");
+            $currentUserAgencyID = get_user_meta($currentUserId, "agentAgency", true);
+            $nbAds = REALM_AdModel::getNbAdsByAgency($currentUserAgencyID);
+            $current = empty($_GET["agency"]);
+            $agencyLink = '<a'.($current?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&agency").'">'.__("Agency", "retxtdom").'</a><span class="count">('.$nbAds.')</span>';
+            $array["agency"] = $agencyLink;
+            $arrayBefore = array_slice($tabs, 0, 1, true);
+            $arrayAfter = array_slice($tabs, 1, null, true);
+            $tabs = array_merge($arrayBefore, $array, $arrayAfter);
+        }else if($currentUserRole === "administrator") {
+            require_once(PLUGIN_RE_PATH."models/UserModel.php");
+            require_once(PLUGIN_RE_PATH."models/AdModel.php");
+            $agencies = REALM_UserModel::getUsersByRole("agency");
+            foreach($agencies as $agency) {
+                $nbAds = REALM_AdModel::getNbAdsByAgency($agency->ID);
+                $current = $currentCustomFilter === $agency->ID;
+                $agencyLink = '<a'.($current?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&agency=".$agency->ID).'">'.$agency->display_name.'</a><span class="count">('.$nbAds.')</span>';
+                $tabs[$agency->display_name] = $agencyLink;
+            }
+            $nbAds = REALM_AdModel::getNbAdsWithoutAgency();
+            $currentNoAgency = $currentCustomFilter === "no";
+            $noAgencyLink = '<a'.($currentNoAgency?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&agency=no").'">'.__("Without agency", "retxtdom").'</a><span class="count">('.$nbAds.')</span>';
+            $tabs["noAgency"] = $noAgencyLink;
+        }
+        
+        if(in_array($currentUserRole, array("agent", "agency"))) {
+            unset($tabs["all"]);
+        }
+        
+        return $tabs;
     }
 
 

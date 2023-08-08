@@ -55,14 +55,14 @@
                            
             if($checkPremiumPlugin && isset($_POST["apply"]) && isset($_POST["nonceSecurity"]) && is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formApply"))) {
                 //Check that the user is a customer or an admin
-                if($userIsCustomer) {               
+                if($userIsCustomer) {        
                     //Check that there is not already a housing file for this user with the accepted or decisionwaiting
                     if(!$checkAlreadyHF) {
                     //Check that the user filled all the required data
                         if($userDataConformity) {
                             //Create a housing file
-                            require_once(PLUGIN_REP_PATH."models/front/HousingFileFront.php");
-                            $HFID = REALMP_HousingFileFront::createPost($idPost, $idUser, $ad["refAd"] ." - ". $user["lastName"] .' '. $user["firstName"]); 
+                            require_once(PLUGIN_REP_PATH."models/HousingFileModel.php");
+                            $HFID = REALMP_HousingFileModel::createPost($idPost, $idUser, $ad["refAd"] ." - ". $user["lastName"] .' '. $user["firstName"]); 
                         } 
                     }                    
                 }
@@ -285,7 +285,7 @@
                     <?php }
                     if($checkPremiumPlugin && $userIsCustomer) { 
                         if($checkAlreadyHF || isset($HFID)) { ?>
-                            <a href="<?=get_edit_post_link(isset($HFID)?$HFID:$alreadyHF[0]->ID);?>"><button><?php _e("View my housing file");?></button></a>
+                            <a href="<?=admin_url();?>"><button><?php _e("View my housing file");?></button></a>
                         <?php }else if($exceededNumberHF) { ?>
                             <span><?php _e("You have exceeded the maximum number of housing files that you can submit", "retxtdom");?></span>
                             <a href="<?=admin_url("edit.php?post_type=housingfile");?>"><button><?php _e("View my housing files");?></button></a>

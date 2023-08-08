@@ -11,15 +11,16 @@ if(!defined("ABSPATH")) {
 class REALM_UserModel {
     private static $metas;
  
-    public static function getUser($id) {     
-        $role = get_user_by("ID", $id)->roles[0];
+    public static function getUser($id) {
+        $userData = get_userdata($id);
+        $role = $userData->roles[0];
         self::$metas = get_user_meta($id);
         $user = array();
         
-        $user["displayName"] = sanitize_text_field(get_userdata($id)->display_name);
-        $user["lastName"] = sanitize_text_field(self::getMeta("last_name"));
-        $user["firstName"] = sanitize_text_field(self::getMeta("first_name"));
-        $user["email"] = sanitize_email(get_userdata($id)->user_email);
+        $user["displayName"] = $userData->display_name;
+        $user["lastName"] = $userData->last_name;
+        $user["firstName"] = $userData->first_name;
+        $user["email"] = $userData->user_email;
          
         if($role === "customer") {
             $user["customerPhone"] = sanitize_text_field(self::getMeta("customerPhone"));
@@ -32,17 +33,18 @@ class REALM_UserModel {
                 if(!empty($customFieldsOption) || $customFieldsOption !== "[]") {
                     $customFieldsOption = json_decode($customFieldsOption, true);
                     foreach($customFieldsOption as $field) {
-                        $name = sanitize_text_field($field["name"]);
-                        $nameAttr = sanitize_text_field($field["nameAttr"]);
-                        $type = sanitize_text_field($field["type"]);
+                        $name = $field["name"];
+                        $nameAttr = $field["nameAttr"];
+                        $type = $field["type"];
                         $optionnal = boolval($field["optionnal"]);
+                        $category = $field["category"];
                         $value = maybe_unserialize(self::getMeta("customerCF".$nameAttr));
 
                         if($field["type"] === "text") {     
-                            $user["customFields"]["$name"] = array("nameAttr"=>$nameAttr, "type"=>$type, "optionnal"=>$optionnal, "value"=>sanitize_text_field($value));
+                            $user["customFields"]["$name"] = array("nameAttr"=>$nameAttr, "type"=>$type, "optionnal"=>$optionnal, "category"=>$category, "value"=>sanitize_text_field($value));
                         }else if($field["type"] === "file") {
                             $extensions = sanitize_text_field($field["extensions"]);
-                            $user["customFields"]["$name"] = array("nameAttr"=>$nameAttr, "type"=>$type, "extensions"=>$extensions, "optionnal"=>$optionnal, "file"=>$value);
+                            $user["customFields"]["$name"] = array("nameAttr"=>$nameAttr, "type"=>$type, "extensions"=>$extensions, "category"=>$category, "optionnal"=>$optionnal, "file"=>$value);
                         }
                     }
                 }
@@ -279,13 +281,13 @@ class REALM_UserModel {
                    $checkCF = false;
                 }
             }else if($CF["type"] === "file") {
-                if(empty(trim($CF["nameAttr"])) || !is_array($CF["extensions"]) || empty($CF["extensions"]) || !is_bool($CF["optionnal"]) || !is_array($CF["file"]) || empty(trim($CF["file"]["url"]))) {
+                if(empty(trim($CF["nameAttr"])) || !preg_match("/^(\.\w+)(,\s*\.\w+)*$/", $CF["extensions"]) || !is_bool($CF["optionnal"]) || !is_array($CF["file"]) || empty(trim($CF["file"]["url"]))) {
                     $checkCF = false;
                 }
             }else{
                 $checkCF = false;
             }
-        }     
+        }
         if(
             !empty(trim($user["lastName"])) &&
             !empty(trim($user["firstName"])) &&

@@ -818,7 +818,7 @@ class REALM_AdModel {
         }
     }
     
-    public static function getNbAdsByAgency($agencyID) {
+    public static function getAdsByAgency($agencyID) {
         require_once(PLUGIN_RE_PATH."models/UserModel.php");
         
         $agentsAgency = REALM_UserModel::getAgentsAgency($agencyID);
@@ -826,18 +826,21 @@ class REALM_AdModel {
         $metaQueryValue = !empty($agentsAgencyIds) ? implode(',', $agentsAgencyIds) : 0;
 
         $SQLRequest = //get_posts doesn't work well for some reason here
-            "SELECT COUNT(p.ID) as count
+            "SELECT p.ID
             FROM wp_posts p
             JOIN wp_postmeta pm ON p.ID = pm.post_id
             WHERE p.post_type = 're-ad'
             AND p.post_status = 'publish'
             AND pm.meta_key = 'adIdAgent'
-            AND pm.meta_value IN ($metaQueryValue)
-            ";
+            AND pm.meta_value IN ($metaQueryValue)";
 
         global $wpdb;
 
-        return $wpdb->get_results($SQLRequest)[0]->count;
+        return $wpdb->get_results($SQLRequest);
+    }
+    
+    public static function getNbAdsByAgency($agencyID) {
+        return count(self::getAdsByAgency($agencyID));
     }
     
     public static function getNbAdsWithoutAgency() {
@@ -847,11 +850,25 @@ class REALM_AdModel {
             LEFT JOIN wp_postmeta pm ON p.ID = pm.post_id AND pm.meta_key = 'adIdAgent'
             WHERE p.post_type = 're-ad'
             AND p.post_status IN ('publish', 'draft')
-            AND pm.meta_key IS NULL
-            ";
+            AND pm.meta_key IS NULL";
         
         global $wpdb;
         
+        return $wpdb->get_results($SQLRequest)[0]->count;
+    }
+    
+    public static function getNbAdsByAgent($agentID) {
+        $SQLRequest = 
+            "SELECT COUNT(p.ID) as count
+            FROM wp_posts p
+            JOIN wp_postmeta pm ON p.ID = pm.post_id
+            WHERE p.post_type = 're-ad'
+            AND p.post_status = 'publish'
+            AND pm.meta_key = 'adIdAgent'
+            AND pm.meta_value = $agentID";
+
+        global $wpdb;
+
         return $wpdb->get_results($SQLRequest)[0]->count;
     }
     

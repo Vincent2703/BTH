@@ -199,7 +199,7 @@ class Realm {
         add_filter("pre_get_posts", array($this->Ad, "convertIdToTermInQuery")); 
         
         //Modify the query before it is executed, in order to filter the ads by an agency if needed
-        add_filter("pre_get_posts", array($this->Ad, "customFilters"));
+        add_filter("pre_get_posts", array($this->Ad, "customFiltersQuery"));
         
         //Modify the query before it is executed, in order to include custom search functionality for the ads
         add_filter("pre_get_posts", array($this->AdModel, "setQueryAds")); 
@@ -223,7 +223,8 @@ class Realm {
         //Ads the agent's agency name to the previous column
         add_filter("manage_users_custom_column", array($this->UserModel, "agentAgencyDataColumn"), 10, 3);
         
-        add_filter("views_edit-re-ad", array($this, "editAdsFilters"));
+        //Modify the tabs in edit re-ad for each custom filter
+        add_filter("views_edit-re-ad", array($this->Ad, "customFiltersTabs"));
              
         //To do : sort and filter by the agent's agency
         //add_filter("manage_users_sortable_columns", array($this->UserModel, "agentAgencySortableColumn"));
@@ -712,49 +713,6 @@ class Realm {
         ));
 	return $links;
     }
-    
-    /*
-     * Add filters to edit-re-ad page
-     */
-    public function editAdsFilters($views) {
-        $currentUserId = get_current_user_id();
-        $currentUser = get_user_by("ID", $currentUserId);
-        $currentUserRole = $currentUser->roles[0];
-        
-        $currentCustomFilter = isset($_GET["agency"]) && (is_numeric($_GET["agency"]) || $_GET["agency"] === "no" || empty($_GET["agency"]))?$_GET["agency"]:null;
-        if(in_array($currentUserRole, array("agent", "agency"))) {
-            require_once(PLUGIN_RE_PATH."models/AdModel.php");
-            $currentUserAgencyID = get_user_meta($currentUserId, "agentAgency", true);
-            $nbAds = REALM_AdModel::getNbAdsByAgency($currentUserAgencyID);
-            $current = empty($_GET["agency"]);
-            $agencyLink = '<a'.($current?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&agency").'">'.__("Agency", "retxtdom").'</a><span class="count">('.$nbAds.')</span>';
-            $array["agency"] = $agencyLink;
-            $arrayBefore = array_slice($views, 0, 1, true);
-            $arrayAfter = array_slice($views, 1, null, true);
-            $views = array_merge($arrayBefore, $array, $arrayAfter);
-        }else if($currentUserRole === "administrator") {
-            require_once(PLUGIN_RE_PATH."models/UserModel.php");
-            require_once(PLUGIN_RE_PATH."models/AdModel.php");
-            $agencies = REALM_UserModel::getUsersByRole("agency");
-            foreach($agencies as $agency) {
-                $nbAds = REALM_AdModel::getNbAdsByAgency($agency->ID);
-                $current = $currentCustomFilter === $agency->ID;
-                $agencyLink = '<a'.($current?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&agency=".$agency->ID).'">'.$agency->display_name.'</a><span class="count">('.$nbAds.')</span>';
-                $views[$agency->display_name] = $agencyLink;
-            }
-            $nbAds = REALM_AdModel::getNbAdsWithoutAgency();
-            $currentNoAgency = $currentCustomFilter === "no";
-            $noAgencyLink = '<a'.($currentNoAgency?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&agency=no").'">'.__("Without agency", "retxtdom").'</a><span class="count">('.$nbAds.')</span>';
-            $views["noAgency"] = $noAgencyLink;
-        }
-        
-        if(in_array($currentUserRole, array("agent", "agency"))) {
-            unset($views["all"]);
-        }
-        
-        return $views;
-    }
-    
     
     /*
      * Check that the theme used is compatible with the plugin
