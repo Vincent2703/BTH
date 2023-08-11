@@ -173,14 +173,13 @@ class REALM_UserModel {
     
     public static function agentAgencyDataColumn($value, $columnName, $idUser) {
         if(isset($_GET["role"]) && $_GET["role"] === "agent" && $columnName === "agentAgency" && intval($idUser) !== 0) {
-            SELF::getData($idUser);
-            $agentAgency = SELF::$agentAgency;
+            $agent = SELF::getUser($idUser);
+            $agentAgency = $agent["agentAgency"];
 
-            if($agentAgency !== 0) {
-                $agency = new SELF;
-                $agency->getData($agentAgency);
+            if($agentAgency > 0) {
+                $agency = SELF::getUser($agentAgency);
                 //$agencyOutput = '<a target="_blank" href="' . get_edit_user_link($agentAgency) . '">' . $agency::$displayName . '</a>';
-                $agencyOutput = $agency::$displayName;
+                $agencyOutput = $agency["displayName"];
                 return $agencyOutput;
             }
         }

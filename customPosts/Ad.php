@@ -261,29 +261,109 @@ class REALM_Ad {
     public function dropdownsTaxonomies() {
         global $typenow;
         $postType = "re-ad"; 
-        $taxonomies = get_taxonomies(["object_type" => [$postType]]);
         if($typenow === $postType) {
-            foreach($taxonomies as $taxonomy) {
-                $selected      = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : '';
-                $taxonomyData = get_taxonomy($taxonomy);
-                wp_dropdown_categories(array(
-                        "show_option_all" => $taxonomyData->label,
-                        "taxonomy"        => $taxonomy,
-                        "name"            => $taxonomy,
-                        "orderby"         => "name",
-                        "selected"        => $selected,
-                        "show_count"      => true,
-                        "hide_empty"      => true,
-                        "hide_if_empty"   => true
-                ));
+            $currentUserID = get_current_user_id();
+            $currentUser = get_user_by("ID", $currentUserID);
+            if(!$currentUser) {
+                return;
             }
+            $currentUserRole = $currentUser->roles[0];
+        global $wp_query;
+        
+            $taxonomies = get_taxonomies(["object_type" => [$postType]]);
+            require_once(PLUGIN_RE_PATH."models/UserModel.php");
+            if($currentUserRole === "administrator") {
+                $agents = REALM_UserModel::getUsersByRole("agent");
+            }else{
+                if($currentUserRole === "agent") {
+                    $agencyID = intval(get_user_meta($currentUserID, "agentAgency", true));
+                }else if($currentUserRole === "agency") {
+                    $agencyID = $currentUserID;
+                }
+                $agents = REALM_UserModel::getAgentsAgency($agencyID);
+            }
+            foreach($taxonomies as $taxonomy) {
+                $taxonomyData = get_taxonomy($taxonomy);
+                $terms = get_terms(array(
+                    "taxonomy" => $taxonomy,
+                    "orderby" => "name",
+                    "hide_empty"   => true,
+                    
+                ));
+                ?>
+                <select name="<?=$taxonomy;?>">
+                    <option value=""><?=$taxonomyData->label;?></option>
+                    <?php
+                    $current = isset($_GET["$taxonomy"]) && intval($_GET["$taxonomy"]) > 0?intval($_GET["$taxonomy"]):'';
+                    foreach($terms as $term) { 
+                        $nbTerms = 0;
+                        foreach($wp_query->posts as $post) {                           
+                            $adTermID = get_the_terms($post->ID, "$taxonomy")[0]->term_id;
+                            if($adTermID === $term->term_id) {
+                                $nbTerms++;
+                            }
+                        }?>
+                        <option value="<?=$term->term_id;?>" <?php selected($term->term_id==$current);?>><?=$term->name;?>&nbsp;(<?=$nbTerms;?>)</option>
+                    <?php } ?>
+                </select>
+            <?php
+            } ?>
+            
+            <select name="agent">
+                <option value=""><?php _e("Agents", "reptxtdom");?></option>
+                <?php
+                    $current = isset($_GET["agent"])?$_GET["agent"]:'';
+                    foreach($agents as $agent) {
+                        $nbAdsByAgent = 0;
+                        global $wp_query;
+                        foreach($wp_query->posts as $post) {                           
+                            $agentInCharge = get_post_meta($post->ID, "adIdAgent", true);
+                            if($agentInCharge === $agent->ID) {
+                                $nbAdsByAgent++;
+                            }
+                        }
+                        $agentName = get_user_meta($agent->ID, "first_name", true).' '.get_user_meta($agent->ID, "last_name", true); ?>
+                        <option value="<?=$agent->ID;?>" <?php selected($agent->ID==$current);?>><?=$agentName;?>&nbsp;(<?=$nbAdsByAgent;?>)</option>
+                    <?php } ?>
+            </select>
+        <?php }
+    }
+    
+    
+    /*
+     * Add or modify the columns shown in the WordPress admin table for the re-da custom post type
+     */
+    public function colsAdsList($columns) {
+        unset($columns["date"]);
+        $columns["inCharge"] = __("Agent in charge", "retxtdom");
+        $columns["date"] = __("Date", "retxtdom");
+        return $columns;
+    }
+    
+    
+    public function contentCustomColsAds($column, $postID) {
+        if($column === "inCharge") {
+            $agentID = intval(get_post_meta($postID, "adIdAgent", true));
+            $url = admin_url("edit.php?post_type=re-ad&agent=$agentID");
+            $agentName = get_user_meta($agentID, "first_name", true).' '.get_user_meta($agentID, "last_name", true);
+            echo '<a href="'.esc_attr($url).'">'.$agentName."</a>";
         }
     }
     
     /*
+     * Make the columns sortable
+    */
+    /*public function colsAdsListSortable($columns) {
+        $columns["taxonomy-adTypeProperty"] = "taxonomy-adTypeProperty";
+        $columns["taxonomy-adTypeAd"] = "taxonomy-adTypeAd";
+        $columns["taxonomy-adAvailable"] = "taxonomy-adAvailable";
+        return $columns;
+    }*/
+    
+    /*
      * Modify the query before it is executed, in order to convert post ID values into their corresponding taxonomy terms
      */
-    public function convertIdToTermInQuery($query) {
+    public function taxonomiesQuery($query) {
         global $pagenow;            
         global $typenow;
 
@@ -303,7 +383,7 @@ class REALM_Ad {
                 }
             }
         }
-    }
+    } 
     
     /*
      * Modify the query before it is executed, in order to filter the ads by an agency if needed
@@ -320,12 +400,12 @@ class REALM_Ad {
         }
         $currentUserRole = $currentUser->roles[0];
 
-        if(is_admin() && $pagenow === "edit.php" && $typenow === "re-ad" && isset($_GET["agency"])) {
+        if(is_admin() && $pagenow === "edit.php" && $typenow === "re-ad") {
             if($currentUserRole === "agency") {
                 $idAgency = $currentUserID;
             }else if($currentUserRole === "agent") {
                 $idAgency = get_user_meta($currentUserID, "agentAgency", true);
-            }else if(is_numeric($_GET["agency"]) && $currentUserRole === "administrator") {
+            }else if(isset($_GET["agency"]) && is_numeric($_GET["agency"]) && $currentUserRole === "administrator") {
                 $idAgency = absint($_GET["agency"]);
             }
 
@@ -339,7 +419,7 @@ class REALM_Ad {
                     "value" => $metaQueryValue,
                     "compare" => !empty($agentsAgencyIds) ? "IN" : "=",
                 );
-            }else if($currentUserRole === "administrator" && $_GET["agency"] === "no") {
+            }else if($currentUserRole === "administrator" && isset($_GET["agency"]) && $_GET["agency"] === "no") {
                 $meta_query = array(
                     "key" => "adIdAgent",
                     "compare" => "NOT EXISTS",
@@ -347,7 +427,11 @@ class REALM_Ad {
             }
 
             if(isset($meta_query)) {
-                $query->set("post_status", array("publish", "draft"));
+                if(isset($query->query["post_status"]) && empty($query->query["post_status"]) && !isset($query->query["author"])) {
+                    $query->set("post_status", "publish");
+                }else if(isset($query->query["post_status"]) && $query->query["post_status"] === "trash"){
+                    $query->set("post_status", "trash");
+                }
                 $query->set("meta_query", array($meta_query));
             }
         }
@@ -359,12 +443,19 @@ class REALM_Ad {
     public function customFiltersTabs($tabs) {
         $currentUserId = get_current_user_id();
         $currentUser = get_user_by("ID", $currentUserId);
+        if(!$currentUser) {
+            return;
+        }
         $currentUserRole = $currentUser->roles[0];
         
         $currentCustomFilter = isset($_GET["agency"]) && (is_numeric($_GET["agency"]) || $_GET["agency"] === "no" || empty($_GET["agency"]))?$_GET["agency"]:null;
         if(in_array($currentUserRole, array("agent", "agency"))) {
             require_once(PLUGIN_RE_PATH."models/AdModel.php");
-            $currentUserAgencyID = get_user_meta($currentUserId, "agentAgency", true);
+            if($currentUserRole === "agent") {
+                $currentUserAgencyID = get_user_meta($currentUserId, "agentAgency", true);
+            }else{
+                $currentUserAgencyID = $currentUserId;
+            }
             $nbAds = REALM_AdModel::getNbAdsByAgency($currentUserAgencyID);
             $current = empty($_GET["agency"]);
             $agencyLink = '<a'.($current?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&agency").'">'.__("Agency", "retxtdom").'</a><span class="count">('.$nbAds.')</span>';
@@ -390,6 +481,7 @@ class REALM_Ad {
         
         if(in_array($currentUserRole, array("agent", "agency"))) {
             unset($tabs["all"]);
+            unset($tabs["publish"]);
         }
         
         return $tabs;

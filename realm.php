@@ -112,7 +112,7 @@ class Realm {
         
         //Initialize the admin area
         add_action("admin_init", array($this, "initAdmin"));      
-
+        
         //Add menu items to the WordPress admin dashboard
         add_action("admin_menu", array($this, "completeMenu"));    
         
@@ -170,6 +170,8 @@ class Realm {
         //Add fields to custom taxonomy creation/editing screens
         add_action("adTypeProperty_add_form_fields", array($this->Ad, "typePropertyCreateFields"));
         add_action("adTypeProperty_edit_form_fields", array($this->Ad, "typePropertyEditFields"), 10, 2);
+        
+        add_action("manage_re-ad_posts_custom_column", array($this->Ad, "contentCustomColsAds"), 10, 2);
 
         //Import data via AJAX
         add_action("wp_ajax_nopriv_import", array($this->Import, "startImport"));
@@ -196,7 +198,7 @@ class Realm {
         //add_filter("enter_title_here", array($this, "changeTitle"));
         
         //Modify the query before it is executed, in order to convert post ID values into their corresponding taxonomy terms
-        add_filter("pre_get_posts", array($this->Ad, "convertIdToTermInQuery")); 
+        add_filter("pre_get_posts", array($this->Ad, "taxonomiesQuery")); 
         
         //Modify the query before it is executed, in order to filter the ads by an agency if needed
         add_filter("pre_get_posts", array($this->Ad, "customFiltersQuery"));
@@ -207,7 +209,12 @@ class Realm {
         //Add custom styles or scripts to the WordPress header section
         add_filter("wp_enqueue_scripts", array($this, "updateHeader"));
         
+        //Add or modify the columns shown in the WordPress admin table for the re-da custom post type
+        add_filter("manage_re-ad_posts_columns", array($this->Ad, "colsAdsList")); 
         
+        //Make the taxonomy columns in the list of ads sortable
+        //add_filter("manage_edit-re-ad_sortable_columns", array($this->Ad, "colsAdsListSortable")); 
+                
         //Add custom columns to the WordPress admin table for the adTypeProperty taxonomy
         add_filter("manage_adTypeProperty_custom_column", array($this->Ad, "typePropertyHabitableColumn"), 15, 3); 
         

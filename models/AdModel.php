@@ -857,9 +857,9 @@ class REALM_AdModel {
         return $wpdb->get_results($SQLRequest)[0]->count;
     }
     
-    public static function getNbAdsByAgent($agentID) {
+    public static function getAdsByAgent($agentID) {
         $SQLRequest = 
-            "SELECT COUNT(p.ID) as count
+            "SELECT p.ID
             FROM wp_posts p
             JOIN wp_postmeta pm ON p.ID = pm.post_id
             WHERE p.post_type = 're-ad'
@@ -869,7 +869,11 @@ class REALM_AdModel {
 
         global $wpdb;
 
-        return $wpdb->get_results($SQLRequest)[0]->count;
+        return $wpdb->get_results($SQLRequest);
+    }
+    
+    public static function getNbAdsByAgent($agentID) {
+        return count(self::getAdsByAgent($agentID));
     }
     
     public static function getCurrency() {

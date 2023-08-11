@@ -35,8 +35,24 @@ class REALM_EditAd {
     /* Save the post */
     public function savePost($adId, $ad) {
         if($ad->post_type == "re-ad") {
-            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE || (!isset($_POST["nonceSecurity"]) || (isset($_POST["nonceSecurity"]) && !wp_verify_nonce($_POST["nonceSecurity"], "formEditAd")))) { //Don't save if it's an autosave or if the nonce is inexistant/incorrect
-                return;
+            if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+                $currentUserId = get_current_user_id();
+                $currentUser = get_user_by("ID", $currentUserId);
+                if(!$currentUser) {
+                    return;
+                }
+                $currentUserRole = $currentUser->roles[0];
+                require_once(PLUGIN_RE_PATH."models/UserModel.php");
+                if($currentUserRole === "agency") {
+                    $agent = REALM_UserModel::getAgentsAgency($currentUserId)[0];
+                }else if($currentUserRole === "agent") {
+                    $agent = $currentUserId;
+                }else if($currentUserRole === "administrator") {
+                    $agent = REALM_UserModel::getUsersByRole("agent")[0];
+                }
+                update_post_meta($adId, "adIdAgent", intval($agent));
+            }else if(!isset($_POST["nonceSecurity"]) || (isset($_POST["nonceSecurity"]) && !wp_verify_nonce($_POST["nonceSecurity"], "formEditAd"))) { //Don't save if the nonce is inexistant/incorrect                return;
+                return;              
             }else if(isset($_POST["nonceSecurity"]) && is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formEditAd"))) {
                 require_once(PLUGIN_RE_PATH."models/AdModel.php");
                 remove_action("save_post_re-ad", array($this, "savePost")); //Avoid infinite loop
