@@ -227,7 +227,7 @@ class REALM_Ad {
             }
         }
 
-        foreach ($terms as $term) {
+        foreach($terms as $term) {
         ?>
             <label title="<?php esc_attr_e($term->name); ?>">
                 <input type="radio" name="<?= $taxonomyName; ?>" value="<?php esc_attr_e($term->name); ?>" <?php checked($term->name, $name); ?> required>
@@ -268,7 +268,7 @@ class REALM_Ad {
                 return;
             }
             $currentUserRole = $currentUser->roles[0];
-        global $wp_query;
+            global $wp_query;
         
             $taxonomies = get_taxonomies(["object_type" => [$postType]]);
             require_once(PLUGIN_RE_PATH."models/UserModel.php");
@@ -351,16 +351,6 @@ class REALM_Ad {
     }
     
     /*
-     * Make the columns sortable
-    */
-    /*public function colsAdsListSortable($columns) {
-        $columns["taxonomy-adTypeProperty"] = "taxonomy-adTypeProperty";
-        $columns["taxonomy-adTypeAd"] = "taxonomy-adTypeAd";
-        $columns["taxonomy-adAvailable"] = "taxonomy-adAvailable";
-        return $columns;
-    }*/
-    
-    /*
      * Modify the query before it is executed, in order to convert post ID values into their corresponding taxonomy terms
      */
     public function taxonomiesQuery($query) {
@@ -391,8 +381,10 @@ class REALM_Ad {
      * If agent : own agency
      * If admin : by id agency get variable
      */
-    public function customFiltersQuery($query) {
-        global $pagenow, $typenow;
+public function customFiltersQuery($query) {
+    global $pagenow, $typenow;
+
+    if(is_admin() && $pagenow === "edit.php" && $typenow === "re-ad") {
         $currentUserID = get_current_user_id();
         $currentUser = get_user_by("ID", $currentUserID);
         if(!$currentUser) {
@@ -400,42 +392,56 @@ class REALM_Ad {
         }
         $currentUserRole = $currentUser->roles[0];
 
-        if(is_admin() && $pagenow === "edit.php" && $typenow === "re-ad") {
-            if($currentUserRole === "agency") {
-                $idAgency = $currentUserID;
-            }else if($currentUserRole === "agent") {
-                $idAgency = get_user_meta($currentUserID, "agentAgency", true);
-            }else if(isset($_GET["agency"]) && is_numeric($_GET["agency"]) && $currentUserRole === "administrator") {
-                $idAgency = absint($_GET["agency"]);
-            }
+        if($currentUserRole === "agency") {
+            $idAgency = $currentUserID;
+        }elseif ($currentUserRole === "agent") {
+            $idAgency = get_user_meta($currentUserID, "agentAgency", true);
+        }elseif($currentUserRole === "administrator" && isset($_GET["agency"]) && absint($_GET["agency"]) > 0) {
+            $idAgency = absint($_GET["agency"]);
+        }
 
-            if(isset($idAgency)) {
-                require_once(PLUGIN_RE_PATH . "models/UserModel.php");
-                $agentsAgency = REALM_UserModel::getAgentsAgency($idAgency);
-                $agentsAgencyIds = array_column($agentsAgency, "ID");
-                $metaQueryValue = !empty($agentsAgencyIds) ? $agentsAgencyIds : 0;
-                $meta_query = array(
-                    "key" => "adIdAgent",
-                    "value" => $metaQueryValue,
-                    "compare" => !empty($agentsAgencyIds) ? "IN" : "=",
-                );
-            }else if($currentUserRole === "administrator" && isset($_GET["agency"]) && $_GET["agency"] === "no") {
+        if(isset($idAgency)) {
+            $agentsAgency = REALM_UserModel::getAgentsAgency($idAgency);
+            $agentsAgencyIds = array_column($agentsAgency, "ID");
+
+            $metaQueryValue = !empty($agentsAgencyIds) ? $agentsAgencyIds : 0;
+            $meta_query = array(
+                "key" => "adIdAgent",
+                "value" => $metaQueryValue,
+                "compare" => !empty($agentsAgencyIds) ? "IN" : "=",
+            );
+
+            if(isset($_GET["agent"]) && is_numeric($_GET["agent"]) && in_array(absint($_GET["agent"]), $agentsAgencyIds)) {
+                $meta_query["value"] = absint($_GET["agent"]);
+            }
+        }else if($currentUserRole === "administrator") {
+            if(isset($_GET["agency"]) && $_GET["agency"] === "no") {
                 $meta_query = array(
                     "key" => "adIdAgent",
                     "compare" => "NOT EXISTS",
                 );
-            }
-
-            if(isset($meta_query)) {
-                if(isset($query->query["post_status"]) && empty($query->query["post_status"]) && !isset($query->query["author"])) {
-                    $query->set("post_status", "publish");
-                }else if(isset($query->query["post_status"]) && $query->query["post_status"] === "trash"){
-                    $query->set("post_status", "trash");
-                }
-                $query->set("meta_query", array($meta_query));
+            }else if(isset($_GET["agent"]) && absint($_GET["agent"]) > 0) {
+                $meta_query = array(
+                    "key" => "adIdAgent",
+                    "value" => absint($_GET["agent"])
+                );
             }
         }
+
+        if(isset($meta_query)) {
+            $postStatus = $query->get("post_status");
+
+            if(empty($postStatus) && !$query->get("author")) {
+                $query->set("post_status", array("publish", "draft"));
+            }elseif ($postStatus === "trash") {
+                $query->set("post_status", "trash");
+            }
+            $query->set("meta_query", array($meta_query));
+        }
+        
     }
+}
+
     
     /*
      * Modify the tabs in edit re-ad for each custom filter
@@ -450,26 +456,46 @@ class REALM_Ad {
         
         $currentCustomFilter = isset($_GET["agency"]) && (is_numeric($_GET["agency"]) || $_GET["agency"] === "no" || empty($_GET["agency"]))?$_GET["agency"]:null;
         if(in_array($currentUserRole, array("agent", "agency"))) {
+            global $wp_query;
             require_once(PLUGIN_RE_PATH."models/AdModel.php");
+
             if($currentUserRole === "agent") {
                 $currentUserAgencyID = get_user_meta($currentUserId, "agentAgency", true);
+                $nbDrafts = REALM_AdModel::getNbAdsByAgent($currentUserId, "draft");
+                $nbTrashedAds = REALM_AdModel::getNbAdsByAgent($currentUserId, "trash");
             }else{
                 $currentUserAgencyID = $currentUserId;
+                $nbDrafts = REALM_AdModel::getNbAdsByAgency($currentUserId, "draft");
+                $nbTrashedAds = REALM_AdModel::getNbAdsByAgency($currentUserId, "trash");
             }
+            $currentDraft = isset($wp_query->query["post_status"]) && $wp_query->query["post_status"]==="draft";
+            $draftLink = '<a'.($currentDraft?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&post_status=draft").'">'.__("Draft").'</a><span class="count">('.$nbDrafts.')</span>';
+            $tabs["draft"] = $draftLink;     
+            
+            $currentTrash = isset($wp_query->query["post_status"]) && $wp_query->query["post_status"]==="trash";
+            $trashLink = '<a'.($currentTrash?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&post_status=trash").'">'.__("Trash", "reptxtdom").'</a><span class="count">('.$nbTrashedAds.')</span>';
+            $tabs["trash"] = $trashLink;  
+                    
             $nbAds = REALM_AdModel::getNbAdsByAgency($currentUserAgencyID);
-            $current = empty($_GET["agency"]);
-            $agencyLink = '<a'.($current?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&agency").'">'.__("Agency", "retxtdom").'</a><span class="count">('.$nbAds.')</span>';
+            $current = !isset($wp_query->query["author"]) && (!isset($wp_query->query["post_status"]) || empty($wp_query->query["post_status"]));
+            $agencyLink = '<a'.($current?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad").'">'.__("Agency", "retxtdom").'</a><span class="count">('.$nbAds.')</span>';
             $array["agency"] = $agencyLink;
             $arrayBefore = array_slice($tabs, 0, 1, true);
             $arrayAfter = array_slice($tabs, 1, null, true);
             $tabs = array_merge($arrayBefore, $array, $arrayAfter);
         }else if($currentUserRole === "administrator") {
+            global $wp_query;
             require_once(PLUGIN_RE_PATH."models/UserModel.php");
             require_once(PLUGIN_RE_PATH."models/AdModel.php");
             $agencies = REALM_UserModel::getUsersByRole("agency");
             foreach($agencies as $agency) {
                 $nbAds = REALM_AdModel::getNbAdsByAgency($agency->ID);
-                $current = $currentCustomFilter === $agency->ID;
+                if(isset($_GET["agent"]) && absint($_GET["agent"])>0 && empty($wp_query->query["post_status"])) {
+                    $agentsAgency = array_column(REALM_UserModel::getAgentsAgency($agency->ID), "ID");
+                    $current = in_array(absint($_GET["agent"]), $agentsAgency);
+                }else{
+                    $current = $currentCustomFilter === $agency->ID;
+                }
                 $agencyLink = '<a'.($current?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&agency=".$agency->ID).'">'.$agency->display_name.'</a><span class="count">('.$nbAds.')</span>';
                 $tabs[$agency->display_name] = $agencyLink;
             }
@@ -482,7 +508,7 @@ class REALM_Ad {
         if(in_array($currentUserRole, array("agent", "agency"))) {
             unset($tabs["all"]);
             unset($tabs["publish"]);
-        }
+        }   
         
         return $tabs;
     }

@@ -818,19 +818,20 @@ class REALM_AdModel {
         }
     }
     
-    public static function getAdsByAgency($agencyID) {
+    public static function getAdsByAgency($agencyID, $status=array("publish", "draft")) {
         require_once(PLUGIN_RE_PATH."models/UserModel.php");
+        $postStatusSQL = is_array($status)?"'".implode("','", $status)."'":"'{$status}'";
         
         $agentsAgency = REALM_UserModel::getAgentsAgency($agencyID);
         $agentsAgencyIds = array_column($agentsAgency, "ID");
         $metaQueryValue = !empty($agentsAgencyIds) ? implode(',', $agentsAgencyIds) : 0;
 
-        $SQLRequest = //get_posts doesn't work well for some reason here
+        $SQLRequest =
             "SELECT p.ID
             FROM wp_posts p
             JOIN wp_postmeta pm ON p.ID = pm.post_id
             WHERE p.post_type = 're-ad'
-            AND p.post_status = 'publish'
+            AND p.post_status IN ($postStatusSQL)
             AND pm.meta_key = 'adIdAgent'
             AND pm.meta_value IN ($metaQueryValue)";
 
@@ -839,8 +840,8 @@ class REALM_AdModel {
         return $wpdb->get_results($SQLRequest);
     }
     
-    public static function getNbAdsByAgency($agencyID) {
-        return count(self::getAdsByAgency($agencyID));
+    public static function getNbAdsByAgency($agencyID, $status=array("publish", "draft")) {
+        return count(self::getAdsByAgency($agencyID, $status));
     }
     
     public static function getNbAdsWithoutAgency() {
@@ -857,13 +858,14 @@ class REALM_AdModel {
         return $wpdb->get_results($SQLRequest)[0]->count;
     }
     
-    public static function getAdsByAgent($agentID) {
+    public static function getAdsByAgent($agentID, $status=array("publish", "draft")) {
+        $postStatusSQL = is_array($status)?"'".implode("','", $status)."'":"'{$status}'";
         $SQLRequest = 
             "SELECT p.ID
             FROM wp_posts p
             JOIN wp_postmeta pm ON p.ID = pm.post_id
             WHERE p.post_type = 're-ad'
-            AND p.post_status = 'publish'
+            AND p.post_status IN ($postStatusSQL)
             AND pm.meta_key = 'adIdAgent'
             AND pm.meta_value = $agentID";
 
@@ -872,9 +874,9 @@ class REALM_AdModel {
         return $wpdb->get_results($SQLRequest);
     }
     
-    public static function getNbAdsByAgent($agentID) {
-        return count(self::getAdsByAgent($agentID));
-    }
+    public static function getNbAdsByAgent($agentID, $status=array("publish", "draft")) {
+        return count(self::getAdsByAgent($agentID, $status));
+    }    
     
     public static function getCurrency() {
         return get_option(PLUGIN_RE_NAME."OptionsGeneral")["currency"];
