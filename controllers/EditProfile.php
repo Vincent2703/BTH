@@ -15,7 +15,7 @@ class REALM_EditProfile {
             $customerCustomFields = json_decode(get_option(PLUGIN_REP_NAME."Options")["customFields"], true);
             
             $fields = array(
-                "buyer" => array(
+                "applicant" => array(
                     "personalSituation" => array(),
                     "professionalSituation" => array(),
                     "other" => array()
@@ -28,10 +28,10 @@ class REALM_EditProfile {
             );
                    
             foreach($customerCustomFields as $CF) {
-                if($CF["forWhom"] === "buyer" || $CF["forWhom"] === "guarantor") {
+                if($CF["forWhom"] === "applicant" || $CF["forWhom"] === "guarantor") {
                     array_push($fields[$CF["forWhom"]][$CF["category"]], $CF);
                 }else{
-                    array_push($fields["buyer"][$CF["category"]], $CF);
+                    array_push($fields["applicant"][$CF["category"]], $CF);
                     array_push($fields["guarantor"][$CF["category"]], $CF);
                 }
             }
@@ -39,33 +39,47 @@ class REALM_EditProfile {
         ?>
             
         <div id="tableCustomProfile">
-            <input type="radio" class="tct" name="tct" id="tctAccount">
-            <input type="radio" class="tct" name="tct" id="tctBuyer" checked>
-            <input type="radio" class="tct" name="tct" id="tctGuarantor">
+            <input type="hidden" name="nbApplicants" class="counter applicant" value="1">
+            <input type="hidden" name="nbGuarantors" class="counter guarantor" value="1">
+            <div id="tabsControl">
+                <input type="radio" class="tct account" name="tct" id="tctAccount">
+                <input type="radio" class="tct applicant" name="tct" id="tctApplicant1" checked>
+                <input type="radio" class="tct guarantor" name="tct" id="tctGuarantor1">
+            </div>
             <div id="tabs">
-                <span class="tabAccount">
-                    <label for="tctAccount"><?php _e("Account", "reptxtdom"); ?></label>
-                </span>
-                <span class="tabBuyer">
-                    <label class="selectedTab" for="tctBuyer"><?php _e("Buyer", "reptxtdom"); ?> 1</label>
-                </span>
-                <span class="tabGuarantor">
-                    <label for="tctGuarantor"><?php _e("Guarantor", "reptxtdom"); ?> 1</label>
-                </span>
+                <div id="tabsContainer">
+                    <span class="tab account" id="tabAccount">
+                        <label for="tctAccount"><?php _e("Account", "reptxtdom"); ?></label>
+                    </span>
+                    <span class="tab applicant" id="tabApplicant1">
+                        <label class="selectedTab" for="tctApplicant1"><?php _e("Applicant", "reptxtdom"); ?> 1</label>
+                    </span>
+                    <span class="tab guarantor" id="tabGuarantor1">
+                        <label for="tctGuarantor1"><?php _e("Guarantor", "reptxtdom"); ?> 1</label>
+                    </span>
+                </div>
+                <div id="btnActions">
+                    <span class="btn applicant">
+                        <label><span class="dashicons dashicons-plus-alt"></span>&nbsp;<?php _e("Add an applicant", "reptxtdom"); ?></label>
+                    </span>
+                    <span class="btn guarantor">
+                        <label><span class="dashicons dashicons-plus-alt"></span>&nbsp;<?php _e("Add a guarantor", "reptxtdom"); ?></label>
+                    </span>
+                </div>
             </div>
             <div id="tabsContent">
-                <div class="contentAccount">
+                <div id="contentAccount">
                     <fieldset>
                         <legend><?php _e("Account", "reptxtdom"); ?></legend>
                         <!-- profileCallback() -->
                     </fieldset>
                 </div>
-                <div class="contentBuyer defaultContent">
+                <div id="contentApplicant1" class="defaultContent">
                     <fieldset>
                         <legend><?php _e("Personal situation", "reptxtdom"); ?></legend>
                         <table class="form-table personalSituation" role="presentation">
                             <tbody>
-                                <?php foreach($fields["buyer"]["personalSituation"] as $field) { 
+                                <?php foreach($fields["applicant"]["personalSituation"] as $field) { 
                                     self::printField($field);
                                 } ?>
                             </tbody>
@@ -75,7 +89,7 @@ class REALM_EditProfile {
                         <legend><?php _e("Professional situation", "reptxtdom"); ?></legend>
                         <table class="form-table professionalSituation" role="presentation">
                             <tbody>
-                                <?php foreach($fields["buyer"]["professionalSituation"] as $field) {
+                                <?php foreach($fields["applicant"]["professionalSituation"] as $field) {
                                     self::printField($field);
                                 } ?>
                             </tbody>
@@ -85,14 +99,14 @@ class REALM_EditProfile {
                         <legend><?php _e("Other", "reptxtdom"); ?></legend>
                         <table class="form-table other" role="presentation">
                             <tbody>
-                                <?php foreach($fields["buyer"]["other"] as $field) {
+                                <?php foreach($fields["applicant"]["other"] as $field) {
                                     self::printField($field);
                                 } ?>
                             </tbody>
                         </table>
                     </fieldset>
                 </div>
-                <div class="contentGuarantor">
+                <div id="contentGuarantor1">
                     <fieldset>
                         <legend><?php _e("Personal situation", "reptxtdom"); ?></legend>
                         <table class="form-table personalSituation" role="presentation">
@@ -123,8 +137,7 @@ class REALM_EditProfile {
                             </tbody>
                         </table>
                     </fieldset>
-                </div>
-                
+                </div>                
             </div>
         </div>
         <?php }        
@@ -162,10 +175,10 @@ class REALM_EditProfile {
                             printf('<input type="number" name="%s" min="0" value="%s" class="regular-text"%s>', $field["nameAttr"], null, $field["optionnal"]?" required":'');
                             break;
                         case "file":
-                            printf('<input type="file" name="%s" accept="%s" value="%s" class="regular-text"%s>', $field["nameAttr"], $field["extensions"], null, $field["optionnal"]?" required":'');
+                            printf('<input type="file" name="%s" accept="%s" value="%s" class="regular-text"%s>', $field["nameAttr"], implode(';', $field["extensions"]), null, $field["optionnal"]?" required":'');
                             break;
                         case "files":
-                            printf('<input type="file" name="%s" accept="%s" value="%s" class="regular-text" multiple%s>', $field["nameAttr"], $field["extensions"], null, $field["optionnal"]?" required":'');
+                            printf('<input type="file" name="%s" accept="%s" value="%s" class="regular-text" multiple%s>', $field["nameAttr"], implode(';', $field["extensions"]), null, $field["optionnal"]?" required":'');
                             break;
                         case "select":
                             printf('<select name="%s"%s>', $field["nameAttr"], $field["optionnal"]?" required":'');

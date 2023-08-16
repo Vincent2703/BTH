@@ -70,7 +70,9 @@ class REALM_UserModel {
         }
         
         if($role === "customer") {
-            if(isset($_POST["customerPhone"]) && !empty(trim($_POST["customerPhone"]))) {
+            print_r($_POST);
+            die();
+            /*if(isset($_POST["customerPhone"]) && !empty(trim($_POST["customerPhone"]))) {
                 update_user_meta($idUser, "customerPhone", sanitize_text_field($_POST["customerPhone"]));
             }   
 
@@ -104,7 +106,7 @@ class REALM_UserModel {
                         }
                     }
                 }
-            }           
+            }    */       
         }else if($role === "agent") {
             if(isset($_POST["agentPhone"]) && !empty(trim($_POST["agentPhone"]))) {
                 update_user_meta($idUser, "agentPhone", sanitize_text_field($_POST["agentPhone"]));
