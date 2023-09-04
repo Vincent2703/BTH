@@ -12,7 +12,7 @@ class REALM_EditProfile {
         $user = REALM_UserModel::getUser($userWP->ID);
         
         if(defined("PLUGIN_REP_NAME") && $role === "customer") { 
-            $customerCustomFields = json_decode(get_option(PLUGIN_REP_NAME."Options")["customFields"], true);
+            $customerCustomFieldsOptions = json_decode(get_option(PLUGIN_REP_NAME."Options")["customFields"], true);
             
             $fields = array(
                 "applicant" => array(
@@ -27,7 +27,7 @@ class REALM_EditProfile {
                 )
             );
                    
-            foreach($customerCustomFields as $CF) {
+            foreach($customerCustomFieldsOptions as $CF) {
                 if($CF["forWhom"] === "applicant" || $CF["forWhom"] === "guarantor") {
                     array_push($fields[$CF["forWhom"]][$CF["category"]], $CF);
                 }else{
@@ -35,16 +35,28 @@ class REALM_EditProfile {
                     array_push($fields["guarantor"][$CF["category"]], $CF);
                 }
             }
+           
+            $userCF = get_user_meta($userWP->ID, "customerCustomFields", true);
+            $nbApplicants = absint(get_user_meta($userWP->ID, "customerNbApplicants", true));
+            var_dump($nbApplicants);
+            $nbGuarantors = absint(get_user_meta($userWP->ID, "customerNbGuarantors", true));
+            var_dump($userCF);
             
         ?>
             
         <div id="tableCustomProfile">
-            <input type="hidden" name="nbApplicants" class="counter applicant" value="1">
-            <input type="hidden" name="nbGuarantors" class="counter guarantor" value="1">
             <div id="tabsControl">
                 <input type="radio" class="tct account" name="tct" id="tctAccount">
                 <input type="radio" class="tct applicant" name="tct" id="tctApplicant1" checked>
                 <input type="radio" class="tct guarantor" name="tct" id="tctGuarantor1">
+                <?php
+                    for($a=2; $a<=$nbApplicants; $a++) { ?>
+                        <input type="radio" class="tct applicant" name="tct" id="tctApplicant<?=$a;?>">
+                    <?php }
+                    for($g=2; $g<=$nbGuarantors; $g++) { ?>
+                        <input type="radio" class="tct guarantor" name="tct" id="tctGuarantor<?=$g;?>">
+                    <?php }
+                ?>
             </div>
             <div id="tabs">
                 <div id="tabsContainer">
@@ -54,9 +66,24 @@ class REALM_EditProfile {
                     <span class="tab applicant" id="tabApplicant1">
                         <label class="selectedTab" for="tctApplicant1"><?php _e("Applicant", "reptxtdom"); ?> 1</label>
                     </span>
+                    <?php
+                    for($a=2; $a<=$nbApplicants; $a++) { ?>
+                         <span class="tab applicant" id="tabApplicant<?=$a;?>">
+                            <label for="tctApplicant<?=$a;?>"><?php _e("Applicant", "reptxtdom"); ?> <?=$a;?></label>
+                            <span id="deleteApplicant<?=$a;?>" class="deleteTab" onclick="deleteTab(this);"><?php _e("Delete", "reptxtdom"); ?></span>
+                        </span>
+                    <?php } ?>
                     <span class="tab guarantor" id="tabGuarantor1">
                         <label for="tctGuarantor1"><?php _e("Guarantor", "reptxtdom"); ?> 1</label>
                     </span>
+                    <?php
+                    for($g=2; $g<=$nbGuarantors; $g++) { ?>
+                        <span class="tab guarantor" id="tabGuarantor<?=$g;?>">
+                            <label for="tctGuarantor<?=$g;?>"><?php _e("Guarantor", "reptxtdom"); ?> <?=$g;?></label>
+                            <span id="deleteApplicant<?=$g;?>" class="deleteTab" onclick="deleteTab(this);"><?php _e("Delete", "reptxtdom"); ?></span>
+                        </span>
+                    <?php }
+                ?>
                 </div>
                 <div id="btnActions">
                     <span class="btn applicant">
@@ -74,13 +101,15 @@ class REALM_EditProfile {
                         <!-- profileCallback() -->
                     </fieldset>
                 </div>
-                <div id="contentApplicant1" class="defaultContent">
+                <?php for($a=0; $a<$nbApplicants; $a++) { ?>
+                <div id="contentApplicant<?=$a+1;?>" class="defaultContent" <?=$a>0?'style="display: none;"':'';?>>
                     <fieldset>
                         <legend><?php _e("Personal situation", "reptxtdom"); ?></legend>
                         <table class="form-table personalSituation" role="presentation">
-                            <tbody>
+                            <tbody> 
                                 <?php foreach($fields["applicant"]["personalSituation"] as $field) { 
-                                    self::printField($field);
+                                    $value = isset($userCF["applicants"][$a]["personalSituation"][$field["nameAttr"]])?$userCF["applicants"][$a]["personalSituation"][$field["nameAttr"]]:'';
+                                    self::printField($field, $value, in_array($field["type"], array("file", "files"))?"personalSituation_applicant". $a+1 ."_".$field["nameAttr"]:false);
                                 } ?>
                             </tbody>
                         </table>
@@ -90,7 +119,9 @@ class REALM_EditProfile {
                         <table class="form-table professionalSituation" role="presentation">
                             <tbody>
                                 <?php foreach($fields["applicant"]["professionalSituation"] as $field) {
-                                    self::printField($field);
+                                    $value = isset($userCF["applicants"][$a]["professionalSituation"][$field["nameAttr"]])?$userCF["applicants"][$a]["professionalSituation"][$field["nameAttr"]]:'';
+                                    self::printField($field, $value, in_array($field["type"], array("file", "files"))?"professionalSituation_applicant". $a+1 ."_".$field["nameAttr"]:false);
+                                    var_dump($value);
                                 } ?>
                             </tbody>
                         </table>
@@ -100,45 +131,53 @@ class REALM_EditProfile {
                         <table class="form-table other" role="presentation">
                             <tbody>
                                 <?php foreach($fields["applicant"]["other"] as $field) {
-                                    self::printField($field);
+                                    $value = isset($userCF["applicants"][$a]["other"][$field["nameAttr"]])?$userCF["applicants"][$a]["other"][$field["nameAttr"]]:'';
+                                    self::printField($field, $value, in_array($field["type"], array("file", "files"))?"other_applicant". $a+1 ."_".$field["nameAttr"]:false);
                                 } ?>
                             </tbody>
                         </table>
                     </fieldset>
                 </div>
-                <div id="contentGuarantor1">
-                    <fieldset>
-                        <legend><?php _e("Personal situation", "reptxtdom"); ?></legend>
-                        <table class="form-table personalSituation" role="presentation">
-                            <tbody>
-                                <?php foreach($fields["guarantor"]["personalSituation"] as $field) {
-                                    self::printField($field);
-                                } ?>
-                            </tbody>
-                        </table>
-                    </fieldset>
-                    <fieldset>
-                        <legend><?php _e("Professional situation", "reptxtdom"); ?></legend>
-                        <table class="form-table professionalSituation" role="presentation">
-                            <tbody>
-                                <?php foreach($fields["guarantor"]["professionalSituation"] as $field) {
-                                    self::printField($field);
-                                } ?>
-                            </tbody>
-                        </table>
-                    </fieldset>
-                    <fieldset>
-                        <legend><?php _e("Personal situation", "reptxtdom"); ?></legend>
-                        <table class="form-table personalSituation" role="presentation">
-                            <tbody>
-                                <?php foreach($fields["guarantor"]["other"] as $field) {
-                                    self::printField($field);
-                                } ?>
-                            </tbody>
-                        </table>
-                    </fieldset>
-                </div>                
+                <?php }
+                for($g=0; $g<$nbGuarantors; $g++) { ?>
+                    <div id="contentGuarantor<?=$g+1;?>" <?=$g>0?'style="display: none;"':'';?>>
+                        <fieldset>
+                            <legend><?php _e("Personal situation", "reptxtdom"); ?></legend>
+                            <table class="form-table personalSituation" role="presentation">
+                                <tbody>
+                                    <?php foreach($fields["guarantor"]["personalSituation"] as $field) {
+                                        $value = isset($userCF["guarantors"][$g]["personalSituation"][$field["nameAttr"]])?$userCF["guarantors"][$g]["personalSituation"][$field["nameAttr"]]:'';
+                                        self::printField($field, $value, in_array($field["type"], array("file", "files"))?"personalSituation_guarantor". $g+1 ."_".$field["nameAttr"]:false);
+                                    } ?>
+                                </tbody>
+                            </table>
+                        </fieldset>
+                        <fieldset>
+                            <legend><?php _e("Professional situation", "reptxtdom"); ?></legend>
+                            <table class="form-table professionalSituation" role="presentation">
+                                <tbody>
+                                    <?php foreach($fields["guarantor"]["professionalSituation"] as $field) {
+                                        $value = isset($userCF["guarantors"][$g]["professionalSituation"][$field["nameAttr"]])?$userCF["guarantors"][$g]["professionalSituation"][$field["nameAttr"]]:'';
+                                        self::printField($field, $value, in_array($field["type"], array("file", "files"))?"professionalSituation_guarantor". $g+1 ."_".$field["nameAttr"]:false);
+                                    } ?>
+                                </tbody>
+                            </table>
+                        </fieldset>
+                        <fieldset>
+                            <legend><?php _e("Other", "reptxtdom"); ?></legend>
+                            <table class="form-table other" role="presentation">
+                                <tbody>
+                                    <?php foreach($fields["guarantor"]["other"] as $field) {
+                                        $value = isset($userCF["guarantors"][$g]["other"][$field["nameAttr"]])?$userCF["guarantors"][$g]["other"][$field["nameAttr"]]:'';
+                                        self::printField($field, $value, in_array($field["type"], array("file", "files"))?"other_guarantor". $g+1 ."_".$field["nameAttr"]:false);
+                                    } ?>
+                                </tbody>
+                            </table>
+                        </fieldset>
+                    </div>        
+                <?php } ?>
             </div>
+            <input type="hidden" name="customFieldsJSON" id="customFieldsJSON">
         </div>
         <?php }        
     }
@@ -157,7 +196,7 @@ class REALM_EditProfile {
         }    
     }
     
-    private function printField($field) { ?>
+    private function printField($field, $value, $descriminator=false) { ?>
         <tr class="customFieldWrap">
             <th scope="row">
                 <label for="<?=$field["nameAttr"];?>"><?=$field["name"];?></label>
@@ -166,24 +205,28 @@ class REALM_EditProfile {
                 <?php
                     switch($field["type"]) {
                         case "text": 
-                            printf('<input type="text" name="%s" value="%s" class="regular-text"%s>', $field["nameAttr"], null, $field["optionnal"]?" required":'');
+                            printf('<input type="text" value="%s" class="regular-text %s"%s>', $value, $field["nameAttr"], $field["optionnal"]?" required":'');
                             break;
                         case "date":
-                            printf('<input type="date" name="%s" value="%s" class="regular-text"%s>', $field["nameAttr"], null, $field["optionnal"]?" required":'');
+                            printf('<input type="date" value="%s" class="regular-text %s"%s>', $value, $field["nameAttr"], $field["optionnal"]?" required":'');
                             break;
                         case "number":
-                            printf('<input type="number" name="%s" min="0" value="%s" class="regular-text"%s>', $field["nameAttr"], null, $field["optionnal"]?" required":'');
+                            printf('<input type="number" min="0" value="%s" class="regular-text %s"%s>', $value, $field["nameAttr"], $field["optionnal"]?" required":'');
                             break;
                         case "file":
-                            printf('<input type="file" name="%s" accept="%s" value="%s" class="regular-text"%s>', $field["nameAttr"], implode(';', $field["extensions"]), null, $field["optionnal"]?" required":'');
+                            $extensions = implode(", ", array_map(function($ext){ return "." . $ext; }, $field["extensions"]));
+                            printf('<input type="file" name="%s" accept="%s" class="regular-text"%s>', $descriminator, $extensions, $field["optionnal"]?" required":'');
+                            printf('<span>l %s</span>', $value);
                             break;
                         case "files":
-                            printf('<input type="file" name="%s" accept="%s" value="%s" class="regular-text" multiple%s>', $field["nameAttr"], implode(';', $field["extensions"]), null, $field["optionnal"]?" required":'');
+                            $extensions = implode(", ", array_map(function($ext){ return "." . $ext; }, $field["extensions"]));
+                            printf('<input type="file" name="%s" accept="%s" class="regular-text" multiple%s>', $descriminator, $extensions, $field["optionnal"]?" required":'');
+                            printf('<span>l %s</span>', $value);
                             break;
                         case "select":
-                            printf('<select name="%s"%s>', $field["nameAttr"], $field["optionnal"]?" required":'');
+                            printf('<select class="select %s"%s>', $field["nameAttr"], $field["optionnal"]?" required":'');
                             foreach($field["selectValues"] as $option) {
-                                printf('<option value="%s"%s>%s</option>', str_replace(' ', '', strtolower($option)), null, $option);
+                                printf('<option value="%s"%s>%s</option>', str_replace(' ', '', strtolower($option)), $value===str_replace(' ', '', strtolower($option))?"selected":'', $option);
                             }
                             ?></select><?php
                             break;

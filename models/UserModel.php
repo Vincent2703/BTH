@@ -23,32 +23,7 @@ class REALM_UserModel {
         $user["email"] = $userData->user_email;
          
         if($role === "customer") {
-            $user["customerPhone"] = sanitize_text_field(self::getMeta("customerPhone"));
-
-            $user["customFields"] = array();
-
-            $options = get_option(PLUGIN_REP_NAME."Options");
-            if($options !== false && isset($options["customFields"])) {
-                $customFieldsOption = $options["customFields"];
-                if(!empty($customFieldsOption) || $customFieldsOption !== "[]") {
-                    $customFieldsOption = json_decode($customFieldsOption, true);
-                    foreach($customFieldsOption as $field) {
-                        $name = $field["name"];
-                        $nameAttr = $field["nameAttr"];
-                        $type = $field["type"];
-                        $optionnal = boolval($field["optionnal"]);
-                        $category = $field["category"];
-                        $value = maybe_unserialize(self::getMeta("customerCF".$nameAttr));
-
-                        if($field["type"] === "text") {     
-                            $user["customFields"]["$name"] = array("nameAttr"=>$nameAttr, "type"=>$type, "optionnal"=>$optionnal, "category"=>$category, "value"=>sanitize_text_field($value));
-                        }else if($field["type"] === "file") {
-                            $extensions = sanitize_text_field($field["extensions"]);
-                            $user["customFields"]["$name"] = array("nameAttr"=>$nameAttr, "type"=>$type, "extensions"=>$extensions, "category"=>$category, "optionnal"=>$optionnal, "file"=>$value);
-                        }
-                    }
-                }
-            }
+            $user["customFields"] = self::getMeta("customerCustomFields");
             $user["alert"] = maybe_unserialize(self::getMeta("customerAlert"));
         }else if($role === "agent") {
             $user["agentPhone"] = sanitize_text_field(self::getMeta("agentPhone"));
@@ -70,43 +45,77 @@ class REALM_UserModel {
         }
         
         if($role === "customer") {
-            print_r($_POST);
-            die();
-            /*if(isset($_POST["customerPhone"]) && !empty(trim($_POST["customerPhone"]))) {
-                update_user_meta($idUser, "customerPhone", sanitize_text_field($_POST["customerPhone"]));
-            }   
+            if(isset($_POST["customFieldsJSON"]) && !empty($_POST["customFieldsJSON"]) && $_POST["customFieldsJSON"][0] === '{' && $_POST["customFieldsJSON"][-1] === '}' && (!is_null($CFPost = @json_decode(str_replace('\\', '', $_POST["customFieldsJSON"]), true)) || json_last_error() === JSON_ERROR_NONE)) {                              
+                if(isset($CFPost["nbApplicants"]) && absint($CFPost["nbApplicants"]) > 0) {
+                    $nbPeople["applicants"] = absint($CFPost["nbApplicants"]);
+                    update_user_meta($idUser, "customerNbApplicants", absint($nbPeople["applicants"]));
+                }
+                if(isset($CFPost["nbGuarantors"]) && absint($CFPost["nbGuarantors"]) > 0) {
+                    $nbPeople["guarantors"] = absint($CFPost["nbGuarantors"]);
+                    update_user_meta($idUser, "customerNbGuarantors", absint($nbPeople["guarantors"]));
+                }
+                
+                $CFSanitized = get_user_meta($idUser, "customerCustomFields", true);
+                $customFields = json_decode(get_option(PLUGIN_REP_NAME."Options")["customFields"], true);
+                                
+                foreach($customFields as $CF) {
+                    $forWhom = $CF["forWhom"];
+                    if($forWhom === "both") {
+                        $applicantsCount = $nbPeople["applicants"];
+                        $guarantorsCount = $nbPeople["guarantors"];
+                        $forWhomLoopCounts = array("applicants" => $applicantsCount, "guarantors" => $guarantorsCount);
+                    }else {
+                        $forWhom .= 's';
+                        $forWhomLoopCounts = array($forWhom => $nbPeople[$forWhom]);
+                    }
 
-            $options = get_option(PLUGIN_REP_NAME."Options");
-            if($options !== false && isset($options["customFields"])) {
-                $customFields = $options["customFields"];
-                if(!empty($customFields) || $customFields !== "[]") {
-                    $customFields = json_decode($customFields, true);
-                    foreach($customFields as $field) {
-                        if(isset($_POST["CF".$field["nameAttr"]]) && !empty(trim($_POST["CF".$field["nameAttr"]]))) {
-                            if($field["type"] === "text") {
-                                update_user_meta($idUser, "customerCF".$field["nameAttr"], sanitize_text_field($_POST["CF".$field["nameAttr"]]));
-                            }                       
-                        }else if(isset($_FILES["CF".$field["nameAttr"]]) && file_exists($_FILES["CF".$field["nameAttr"]]["tmp_name"]) && is_uploaded_file($_FILES["CF".$field["nameAttr"]]["tmp_name"])) {
-                            if($field["type"] === "file") {
-                                $validMimeTypes = array(
-                                    "pdf"   => "application/pdf",
-                                    "jpg"   => "image/jpeg",
-                                    "jpeg"  => "image/jpeg",
-                                    "png"   => "image/png",
-                                    "bmp"   => "image/bmp",
-                                );
-                                $upload = wp_handle_upload($_FILES["CF".$field["nameAttr"]], array("test_form" => false, "test_type" => true, "mimes"=>$validMimeTypes));
-                                if(!isset($upload["error"])) {
-                                    preg_match("/[^\/]+$/", $upload["file"], $matches);        
-                                    $fileName = wp_unique_filename(wp_upload_dir()["path"], $matches[0]);
-                                    $path = str_replace("\\", '/', $upload["file"]);
-                                    update_user_meta($idUser, "customerCF".$field["nameAttr"], array("name"=>$fileName, "type"=>$upload["type"], "url"=>$upload["url"], "path"=>$path));
+                    foreach($forWhomLoopCounts as $loopForWhom => $loopCount) {
+                        for($i=0; $i<$loopCount; $i++) {
+                            if(!in_array($CF["type"], array("file", "files"))) {
+                                $inputValue = $CFPost[$loopForWhom][$i][$CF["category"]][$CF["nameAttr"]];
+
+                                $inputValueSanitized = self::sanitizeInputValue($inputValue, $CF);
+                                if($inputValueSanitized !== null) {
+                                    $CFSanitized[$loopForWhom][$i][$CF["category"]][$CF["nameAttr"]] = $inputValueSanitized;
                                 }
                             }
                         }
                     }
                 }
-            }    */       
+                
+                $filesFields = array_values(
+                    array_filter(
+                        $customFields,
+                        fn($row) => array_key_exists("type", $row) && in_array($row["type"], array("file", "files"))
+                    )
+                );
+                foreach($filesFields as $field) {
+                    if($field["forWhom"] === "both") {
+                        for($a=0; $a<$nbPeople["applicants"]; $a++) {
+                            $inputFileName = $field["category"]."_applicant". $a+1 .'_'.$field["nameAttr"];
+                            if(isset($_FILES[$inputFileName]) && $_FILES[$inputFileName]["error"] === 0) {
+                                $CFSanitized["applicants"][$a][$field["category"]][$field["nameAttr"]] = self::sanitizeInputFile($inputFileName, $field, $_FILES[$inputFileName]);
+                            }
+                        }
+                        for($g=0; $g<$nbPeople["guarantors"]; $g++) {
+                            $inputFileName = $field["category"]."_guarantor". $g+1 .'_'.$field["nameAttr"];
+                            if(isset($_FILES[$inputFileName]) && $_FILES[$inputFileName]["error"] === 0) {
+                                $CFSanitized["guarantors"][$g][$field["category"]][$field["nameAttr"]] = self::sanitizeInputFile($inputFileName, $field, $_FILES[$inputFileName]);
+                            }
+                        }
+                    }else {
+                        $peopleCount = ($field["forWhom"] === "applicant")?$nbPeople["applicants"]:$nbPeople["guarantors"];
+                        for($i=0; $i<$peopleCount; $i++) {
+                            $inputFileName = $field["category"]."_".$field["forWhom"]. $i+1 .'_'.$field["nameAttr"];
+                            if(isset($_FILES[$inputFileName]) && $_FILES[$inputFileName]["error"] === 0) {
+                                $CFSanitized[$field["forWhom"].'s'][$i][$field["category"]][$field["nameAttr"]] = self::sanitizeInputFile($inputFileName, $field, $_FILES[$inputFileName]);
+                            }
+                        }
+                    }
+                }
+
+                update_user_meta($idUser, "customerCustomFields", $CFSanitized);
+            }   
         }else if($role === "agent") {
             if(isset($_POST["agentPhone"]) && !empty(trim($_POST["agentPhone"]))) {
                 update_user_meta($idUser, "agentPhone", sanitize_text_field($_POST["agentPhone"]));
@@ -136,6 +145,51 @@ class REALM_UserModel {
         }
     }
     
+    private static function sanitizeInputValue($inputValue, $CF) {
+        $type = $CF["type"];
+        
+        switch($type) {
+            case "text":
+            case "date":
+                return esc_attr($inputValue);
+            case "number":
+                return intval($inputValue);
+            case "select":
+                if(isset($CF["selectValues"])) {
+                    $selectValuesUniformised = array_map(
+                        static function ($option) {
+                            return str_replace(' ', '', strtolower($option));
+                        },
+                        $CF["selectValues"]
+                    );
+
+                    if(in_array($inputValue, $selectValuesUniformised, true)) {
+                        return esc_attr($inputValue);
+                    }
+                }
+                break;
+        }
+        return null;
+    }
+    
+    private static function sanitizeInputFile($fieldName, $field, $file) {
+        if(file_exists($_FILES[$fieldName]["tmp_name"]) && is_uploaded_file($_FILES[$fieldName]["tmp_name"])) {
+            $validExtensions = $field["extensions"];
+            $mappingExtMimes = array(
+                "jpg" => "image/jpeg",
+                "png" => "image/png",
+                "bmp" => "image/bmp",
+                "pdf" => "application/pdf",
+                "word" => "application/msword",
+                "opendocument" => "application/vnd.oasis.opendocument.text"
+            );
+            $mimeTypesAuthorized = array_intersect_key($mappingExtMimes, array_flip($validExtensions));
+
+            $upload = wp_handle_upload($file, array("test_form" => false, "test_type" => true, "test_size" => true, "mimes"=>$mimeTypesAuthorized));
+            return $upload["url"];
+        }
+    }
+        
     public static function getUsersByRole($role, $json=false) {
         $users = get_users(array("role" => $role, "fields" => array("ID", "display_name", "email")));    
         if($json) {
