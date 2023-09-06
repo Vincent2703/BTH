@@ -9,10 +9,17 @@ if(!defined("ABSPATH")) {
  */
 class REALM_EditAd {
     
+    private static $ad;
+    
     /*
      * Add meta boxes 
      */
     public function addMetaBoxes() {
+        global $post;
+        $idPost = intval($post->ID);
+        require_once(PLUGIN_RE_PATH."models/AdModel.php");
+        self::$ad = REALM_AdModel::getAd($idPost);
+        
         add_meta_box( //Main features
             "adMainFeaturesMetaBox", //ID HTML
             __("Main features", "retxtdom"), //Display
@@ -30,6 +37,17 @@ class REALM_EditAd {
             "advanced", //Location on the page
             "high" //Priority
         );
+        
+        if(PLUGIN_RE_REP) {
+            add_meta_box( //Housing files authorization
+                "adHousingFileMetaBox", //ID HTML
+                __("Housing files", "retxtdom"), //Display
+                array($this, "housingFileMetabox"), //Callback
+                "re-ad", //Custom type
+                "side", //Location on the page
+                "core" //Priority
+            );
+        }
     }
     
     /* Save the post */
@@ -62,10 +80,9 @@ class REALM_EditAd {
     }
     
     public function mainFeaturesMetaBox($adWP) {
-        require_once(PLUGIN_RE_PATH."models/AdModel.php");
         require_once(PLUGIN_RE_PATH."models/UserModel.php");
                 
-        $ad = REALM_AdModel::getAd($adWP->ID); //Get values
+        $ad = self::$ad;
         $currentUserID = get_current_user_id();
         $currentUser = get_user_by("ID", $currentUserID);
         $userRole = $currentUser->roles[0];
@@ -76,7 +93,7 @@ class REALM_EditAd {
             $user = REALM_UserModel::getUser($currentUserID);
             $agents = REALM_UserModel::getAgentsAgency($user["agentAgency"]);
         }else if($userRole === "agency") {
-            $agents = REALM_UserModel::getAgentsAgency($$currentUserID);
+            $agents = REALM_UserModel::getAgentsAgency($currentUserID);
         }
         if(is_numeric($ad["agent"])) {
             $agentSelected = $ad["agent"];
@@ -180,7 +197,8 @@ class REALM_EditAd {
                         <div class="controlPicture">
                             <span class="moveToLeft" onclick="movePicture(this, 'left');">←</span>
                             <span class="deletePicture" onclick="deletePicture(this);"><?php _e("Delete", "retxtdom"); ?></span>
-                            <span class="moveToRight" onclick="movePicture(this, 'right');">→</span></div>
+                            <span class="moveToRight" onclick="movePicture(this, 'right');">→</span>
+                        </div>
                     </div>
                 <?php }
             }?>
@@ -200,9 +218,8 @@ class REALM_EditAd {
             }
     }
       
-    public function additionalFeaturesMetaBox($adWP) {
-        require_once(PLUGIN_RE_PATH."models/AdModel.php");
-        $ad = REALM_AdModel::getAd($adWP->ID); //Get values
+    public function additionalFeaturesMetaBox() {
+        $ad = self::$ad;
         ?>
         <div id="floors">
             <div class="text">
@@ -335,6 +352,13 @@ class REALM_EditAd {
             }
 
     }
+    
+    public function housingFileMetabox() { 
+        $ad = self::$ad; 
+        ?>
+        <input type="checkbox" id="allowHousingFile" name="allowHousingFile" <?php checked($ad["allowHousingFile"]); ?>><label for="allowHousingFile"><?php _e("Allow file submission", "reptxtdom"); ?></label><br />
+        <input type="checkbox" id="allowGuarantors" name="allowGuarantors" <?php checked($ad["allowGuarantors"]); disabled(!$ad["allowHousingFile"]); ?>><label for="allowGuarantors"><?php _e("Allow guarantors", "reptxtdom"); ?></label>
+    <?php }
     
 }
 ?>

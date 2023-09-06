@@ -11,6 +11,13 @@ jQuery(function($) {
                 $("option:selected", this).attr("selected", "selected");
                 $("#post-status-display").text(textOption); 
             });
+            
+            //MetaBox HF (REALMPLUS)
+            if($("#adHousingFileMetaBox").length > 0) {
+                $("#allowHousingFile").click(function() {
+                    $("#allowGuarantors").prop("disabled", !$("#allowHousingFile").is(":checked"));
+                }); 
+            }
         });
 
     //Media manager - Add Id pictures to an hidden input

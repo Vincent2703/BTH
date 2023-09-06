@@ -75,7 +75,6 @@ class Realm {
         require_once("controllers/RegisterUserDashboard.php");
         require_once("controllers/Export.php");
         require_once("controllers/Import.php");
-        require_once("controllers/EditProfile.php");
         
         //Models
         require_once("models/AdModel.php");
@@ -91,7 +90,6 @@ class Realm {
         $this->RegistrationUser = new REALM_RegisterUserDashboard;
         $this->Export           = new REALM_Export;
         $this->Import           = new REALM_Import;
-        $this->EditProfile      = new REALM_EditProfile;
         
         $this->AdModel          = new REALM_AdModel;   
         $this->UserModel        = new REALM_UserModel;
@@ -108,10 +106,13 @@ class Realm {
         add_action("init", array($this, "initCustomPosts"));
 
         //Add capabilities to admin/agent/agency for Ad posts
-        add_action("init", array($this, "addRolesCaps"));
+        add_action("init", array($this, "addRolesCaps"));       
         
-        //Initialize the admin area
-        add_action("admin_init", array($this, "initAdmin"));      
+        //Add metaboxes to re-ad
+        add_action("add_meta_boxes_re-ad", array($this->EditAd, "addMetaBoxes"));
+        
+        //Initialize the plugin's options
+        add_action("admin_init", array($this->Options, "optionsPageInit"));
         
         //Add menu items to the WordPress admin dashboard
         add_action("admin_menu", array($this, "completeMenu"));    
@@ -181,13 +182,6 @@ class Realm {
         
         //Add actions (links) to the plugin row in plugins.php
         add_action("plugin_action_links_" . plugin_basename( __FILE__ ), array($this, "addActionsPluginRow"));
-        
-        add_action("show_user_profile", array($this->EditProfile, "addProfileCustomFields"));
-        add_action("edit_user_profile", array($this->EditProfile, "addProfileCustomFields"));
-        
-        add_action("personal_options_update", array($this->EditProfile, "saveProfileCustomFields"));
-        add_action("edit_user_profile_update", array($this->EditProfile, "saveProfileCustomFields"));      
-                
     }
     
     /*
@@ -367,14 +361,6 @@ class Realm {
         $this->Ad->createAd();
         $this->Agent->createAgent();
         $this->Agency->createAgency();
-    }
-    
-    /*
-     * Initialize the admin area
-     */
-    public function initAdmin() {
-        $this->EditAd->addMetaBoxes();
-        $this->Options->optionsPageInit();
     }
     
     /*

@@ -5,7 +5,6 @@
     if(have_posts()) {
         //Check if we have the premium complement for the plugin.
         $activatedPluginsList = get_option("active_plugins");
-        $checkPremiumPlugin = in_array("realmPlus/realmPlus.php", $activatedPluginsList);
         
         require_once(PLUGIN_RE_PATH."models/AdModel.php");
         $currency = REALM_AdModel::getCurrency();
@@ -26,15 +25,15 @@
             
             $userIsCustomer = current_user_can("customer");
             
-            if($checkPremiumPlugin && $userIsCustomer) {               
+            if(PLUGIN_RE_REP && $userIsCustomer) {               
                 require_once(PLUGIN_RE_PATH."models/UserModel.php");
                 $idUser = get_current_user_id();
                 $user = REALM_UserModel::getUser($idUser);
-                $userDataConformity = REALM_UserModel::checkDataConformity($idUser);
+                $userDataConformity = /*REALM_UserModel::checkDataConformity($idUser)*/ true;
                 $alreadyHF = get_posts(array(
                     "author"        => $idUser,
                     "post_type"     => "housingfile",
-                    "post_status"   => array("accepted", "decisionwaiting"),
+                    "post_status"   => array("accepted", "decisionwaiting", "revisionwaiting"),
                     "post_parent"   => $idPost,
                     "numberposts"   => 1
                 ));
@@ -44,29 +43,27 @@
                 $nbUserHF = count(get_posts(array(
                     "author"        => $idUser,
                     "post_type"     => "housingfile",
-                    "post_status"   => array("accepted", "decisionwaiting"),
-                    "numberposts"   => 100
+                    "post_status"   => array("accepted", "decisionwaiting", "revisionwaiting"),
+                    "numberposts"   => $optionsHF["limitNbHousingFiles"]
                 )));
-                $exceededNumberHF = $nbUserHF >= $optionsHF["limitNbHousingFiles"];
+                $limitReachedHF = $nbUserHF >= intval($optionsHF["limitNbHousingFiles"]);
             }   
         
             
             get_header();  
-                           
-            if($checkPremiumPlugin && isset($_POST["apply"]) && isset($_POST["nonceSecurity"]) && is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formApply"))) {
-                //Check that the user is a customer or an admin
-                if($userIsCustomer) {        
-                    //Check that there is not already a housing file for this user with the accepted or decisionwaiting
-                    if(!$checkAlreadyHF) {
-                    //Check that the user filled all the required data
-                        if($userDataConformity) {
-                            //Create a housing file
-                            require_once(PLUGIN_REP_PATH."models/HousingFileModel.php");
-                            $HFID = REALMP_HousingFileModel::createPost($idPost, $idUser, $ad["refAd"] ." - ". $user["lastName"] .' '. $user["firstName"]); 
-                        } 
-                    }                    
-                }
-                
+            
+            if(
+                PLUGIN_RE_REP && //Plugin premium
+                isset($_POST["apply"]) &&  //Form submitted
+                isset($_POST["nonceSecurity"]) && //Nonce exists
+                is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formApply")) && //Nonce checked
+                $userIsCustomer &&  //The current user is a customer
+                !$checkAlreadyHF && //There is not already a housing file for the customer
+                !$limitReachedHF && //It didn't reached the limit
+                $userDataConformity //All required fields are filled
+            ) {
+                require_once(PLUGIN_REP_PATH."models/HousingFileModel.php");
+                $HFID = REALMP_HousingFileModel::createPost($idPost, $idUser, $ad["refAd"] ." - ". $user["lastName"] .' '. $user["firstName"]); 
             }else if(isset($_POST["contact"]) && isset($_POST["nonceSecurity"]) && is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formContact"))) {
                 if(isset($_POST["name"]) && isset($_POST["phone"]) && isset($_POST["email"]) && isset($_POST["message"]) && !empty(trim($_POST["names"])) && !empty(trim($_POST["phone"])) && !empty(trim($_POST["email"])) && !empty(trim($_POST["message"]))) {
                     $adRef = $ad["refAd"];
@@ -280,13 +277,13 @@
                             } ?>
                         </div>
                     </div>
-                    <?php if($feesURL !== false) { // If there is a fees schedule specified in the options ?> 
+                    <?php if($feesURL !== false) { // If a fees schedule is specified in the options ?> 
                         <span id="feesSchedule"><a target="_blank" href="<?=$feesURL;?>"><?php _e("Fees schedule", "retxtdom") ;?></a></span>
                     <?php }
-                    if($checkPremiumPlugin && $userIsCustomer) { 
+                    if(PLUGIN_RE_REP && $userIsCustomer && $ad["allowHousingFile"]) { 
                         if($checkAlreadyHF || isset($HFID)) { ?>
                             <a href="<?=admin_url();?>"><button><?php _e("View my housing file");?></button></a>
-                        <?php }else if($exceededNumberHF) { ?>
+                        <?php }else if($limitReachedHF) { ?>
                             <span><?php _e("You have exceeded the maximum number of housing files that you can submit", "retxtdom");?></span>
                             <a href="<?=admin_url("edit.php?post_type=housingfile");?>"><button><?php _e("View my housing files");?></button></a>
                         <?php }else { ?>
@@ -341,10 +338,10 @@
                         </div>
                         <form action="" method="post" class="formContact">
                             <?php wp_nonce_field("formContact", "nonceSecurity"); 
-                            $prefillForm = $checkPremiumPlugin&&$userIsCustomer&&$userDataConformity;
+                            $prefillForm = PLUGIN_RE_REP&&$userIsCustomer&&$userDataConformity;
                             ?>
-                            <label for="names"><?php _e("First name and last name", "retxtdom"); ?></label><input type="text" name="names" class="formContactInput" value="<?= $prefillForm?$ad["firstName"].' '.$ad["lastName"]:''?>" required>
-                            <label for="phone"><?php _e("Phone", "retxtdom"); ?></label><input type="tel" name="phone" class="formContactInput" value="<?= $prefillForm?$ad["phone"]:''?>" required>
+                            <label for="names"><?php _e("First name and last name", "retxtdom"); ?></label><input type="text" name="names" class="formContactInput" value="<?= $prefillForm?$user["firstName"].' '.$user["lastName"]:''?>" required>
+                            <label for="phone"><?php _e("Phone", "retxtdom"); ?></label><input type="tel" name="phone" class="formContactInput" required>
                             <label for="email"><?php _e("Email address", "retxtdom"); ?></label><input type="text" name="email" class="formContactInput" value="<?= $prefillForm?$ad["email"]:'';?>"required>
                             <label for="message"><?php _e("Message", "retxtdom"); ?></label><textarea name="message" class="formContactInput" cols="22" required></textarea>
                             <?php if(isset($emailStatus)) { ?>

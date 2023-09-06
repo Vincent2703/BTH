@@ -177,8 +177,8 @@ class REALM_Ad {
      * Fetch the single or archive custom post Ad template
      */
     public function templatePostAd($path) {
-        if(defined("PLUGIN_RE_THEME")) {
-            $shortPath = PLUGIN_RE_THEME["name"].'/'.PLUGIN_RE_THEME["version"];
+        if(true) {
+            $shortPath = /*PLUGIN_RE_THEME["name"].'/'.PLUGIN_RE_THEME["version"]*/"twentytwenty/2.1";
             $fullPath = PLUGIN_RE_PATH."templates/$shortPath";
             if(is_dir($fullPath)) {
                 if(get_post_type() === "re-ad") {

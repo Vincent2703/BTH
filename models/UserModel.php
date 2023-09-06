@@ -49,34 +49,38 @@ class REALM_UserModel {
                 if(isset($CFPost["nbApplicants"]) && absint($CFPost["nbApplicants"]) > 0) {
                     $nbPeople["applicants"] = absint($CFPost["nbApplicants"]);
                     update_user_meta($idUser, "customerNbApplicants", absint($nbPeople["applicants"]));
+                }else{
+                    $nbPeople["applicants"] = 0;
                 }
                 if(isset($CFPost["nbGuarantors"]) && absint($CFPost["nbGuarantors"]) > 0) {
                     $nbPeople["guarantors"] = absint($CFPost["nbGuarantors"]);
                     update_user_meta($idUser, "customerNbGuarantors", absint($nbPeople["guarantors"]));
+                }else{
+                    $nbPeople["guarantors"] = 0;
                 }
                 
-                $CFSanitized = get_user_meta($idUser, "customerCustomFields", true);
+                $CFSanitized = get_user_meta($idUser, "customerCustomFields", true)?:array();
                 $customFields = json_decode(get_option(PLUGIN_REP_NAME."Options")["customFields"], true);
                                 
                 foreach($customFields as $CF) {
                     $forWhom = $CF["forWhom"];
                     if($forWhom === "both") {
-                        $applicantsCount = $nbPeople["applicants"];
-                        $guarantorsCount = $nbPeople["guarantors"];
-                        $forWhomLoopCounts = array("applicants" => $applicantsCount, "guarantors" => $guarantorsCount);
+                        $forWhomLoopCounts = array("applicants" => $nbPeople["applicants"], "guarantors" => $nbPeople["guarantors"]);
                     }else {
                         $forWhom .= 's';
                         $forWhomLoopCounts = array($forWhom => $nbPeople[$forWhom]);
                     }
 
                     foreach($forWhomLoopCounts as $loopForWhom => $loopCount) {
-                        for($i=0; $i<$loopCount; $i++) {
-                            if(!in_array($CF["type"], array("file", "files"))) {
-                                $inputValue = $CFPost[$loopForWhom][$i][$CF["category"]][$CF["nameAttr"]];
+                        if($loopCount > 0) {
+                            for($i=0; $i<$loopCount; $i++) {
+                                if(!in_array($CF["type"], array("file", "files"))) {
+                                    $inputValue = $CFPost[$loopForWhom][$i][$CF["category"]][$CF["nameAttr"]];
 
-                                $inputValueSanitized = self::sanitizeInputValue($inputValue, $CF);
-                                if($inputValueSanitized !== null) {
-                                    $CFSanitized[$loopForWhom][$i][$CF["category"]][$CF["nameAttr"]] = $inputValueSanitized;
+                                    $inputValueSanitized = self::sanitizeInputValue($inputValue, $CF);
+                                    if($inputValueSanitized !== null) {
+                                        $CFSanitized[$loopForWhom][$i][$CF["category"]][$CF["nameAttr"]] = $inputValueSanitized;
+                                    }
                                 }
                             }
                         }
