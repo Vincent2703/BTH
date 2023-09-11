@@ -11,7 +11,7 @@ jQuery(document).ready(function ($) {
         L.tileLayer("http://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png", {
             attribution: "Données cartographiques : <a href='https://www.openstreetmap.fr/mentions-legales'>OpenStreetMap.fr</a>"
         }).addTo(map);
-        var circle = L.circle([dataMap[0], dataMap[1]], {
+        L.circle([dataMap[0], dataMap[1]], {
             color: "red",
             fillColor: "#f03",
             fillOpacity: 0.5,
@@ -19,12 +19,16 @@ jQuery(document).ready(function ($) {
         }).addTo(map);
     }
 
+    var tabIsActive = true;
+    document.addEventListener("visibilitychange", () => {
+       tabIsActive = !document.hidden;
+    });
 
     /* Slider */
     var autoplay = $("#miniSlider ul li").length > 1;
    
     setInterval(function () {
-        if(autoplay && jQuery("#miniSlider:hover").length===0) {
+        if(tabIsActive && autoplay && jQuery("#miniSlider:hover").length===0) {
             moveSlide("right");
             pagingUpdate("right");
         }
@@ -46,7 +50,7 @@ jQuery(document).ready(function ($) {
     /* REALMP apply button */
     if($("#applyBtn").length) {
         $("#applyForm").submit(function(event){
-            if(!confirm("Etes vous sûr de blablabla ?")){
+            if(!confirm(translations.confirm)){
                 event.preventDefault();
             }
        });

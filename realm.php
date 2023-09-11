@@ -21,22 +21,16 @@ require_once("realm.php"); //Install plugin from interface
  */
 class Realm {
     
-    /* Notices messages */
-    private static $errors;
-    private static $warnings;
-    private static $informations;
     
     /*
      * When the class is instantiate
      */
     public function __construct() {
-        
-        self::$errors = array();
-        self::$warnings = array();
-        self::$informations = array();
-                
         $this->defineGlobalConsts();
-        $this->checkTheme();
+        
+        //$this->createNotices();
+        
+        //$this->checkTheme();
         
         $this->requireClasses();
         
@@ -58,6 +52,23 @@ class Realm {
         
         $activatedPluginsList = get_option("active_plugins");
         define("PLUGIN_RE_REP", in_array("realm/realm.php", $activatedPluginsList));
+    }
+    
+    /*
+     * (Re-)initialize/fill the notices option
+     */
+    public function createNotices($type=null, $msg=null, $reset=false) {
+        if($reset) {
+            $notices = array("errors"=>[], "warnings"=>[], "informations"=>[]);
+        }else{
+            $notices = get_option(PLUGIN_RE_NAME."Notices");
+        }
+        
+        if(!is_null($type) && !is_null($msg)) {
+            array_push($notices[$type], wp_kses_post($msg));
+        }
+        
+        update_option(PLUGIN_RE_NAME."Notices", $notices, true);
     }
     
     /*
@@ -182,6 +193,8 @@ class Realm {
         
         //Add actions (links) to the plugin row in plugins.php
         add_action("plugin_action_links_" . plugin_basename( __FILE__ ), array($this, "addActionsPluginRow"));
+        
+        add_action("after_setup_theme", array($this, "checkTheme"));
     }
     
     /*
@@ -674,7 +687,7 @@ class Realm {
             wp_register_script("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
             $variablesSearchBar = array(
                 "filters" => __("FILTERS", "retxtdom"),
-                "searchBarURL" => plugin_dir_url(__FILE__)."templates/searchBars/searchBarAd.php",
+                "searchBarURL" => plugin_dir_url(__FILE__)."templates/front/searchBars/searchBarAd.php",
                 "autocompleteURL" => plugin_dir_url(__FILE__)."includes/js/searches/autocompleteAddress.js",
                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
                 "nonce" => wp_create_nonce("searchNonce")
@@ -716,49 +729,56 @@ class Realm {
         $currentTheme = wp_get_theme();
         $themeName = str_replace(' ', '', strtolower($currentTheme->name));
         $themeVersion = $currentTheme->version;
-        $listThemes = array_diff(scandir(PLUGIN_RE_PATH."templates/"), array("..", '.', "searchBars")); 
+        $listThemes = array_diff(scandir(PLUGIN_RE_PATH."includes/css/templates"), array("..", '.', "searchBars")); 
         
         if(in_array($themeName, $listThemes)) {
-            $listVersions = array_diff(scandir(PLUGIN_RE_PATH."templates/$themeName"), array('.', ".."));
+            $listVersions = array_diff(scandir(PLUGIN_RE_PATH."includes/css/templates/$themeName"), array('.', ".."));
             if(!in_array($themeVersion, $listVersions)) {
-                array_push(self::$warnings, sprintf(__('The version of the theme you are using (%1$s) is different from the ones the plugin templates were built with (%2$s). Expect potential bugs.', "retxtdom"), $themeVersion, implode(", ", $listVersions))."<br />"
+                $this->createNotices("warnings", sprintf(__('The version of the theme you are using (%1$s) is different from the ones the plugin templates were built with (%2$s). Expect potential bugs.', "retxtdom"), $themeVersion, implode(", ", $listVersions))."<br />"
                 . __("For more information, please read the", "retxtdom").'&nbsp;<a target="_blank" href="#">'.__("documentation", "retxtdom")."</a>");
                 $versionToUse = end($listVersions);
             }else{
                 $versionToUse = $themeVersion;
+                $this->createNotices(null, null, true); //Reset
             }
             define("PLUGIN_RE_THEME", array("name" => $themeName, "version" => $versionToUse));
         }else{
-            array_push(self::$errors, __("The theme that you are using is not compatible with the plugin. Please use one of the following themes :", "retxtdom")."<br />"
+            $this->createNotices("errors", __("The theme that you are using is not compatible with the plugin. Please use one of the following themes :", "retxtdom")."<br />"
                 . "<ul><li><a target='_blank' href='https://wordpress.org/themes/twentytwenty/'>Twenty twenty 2.1</a></li></ul><br />"
                 . __("For more information, please read the", "retxtdom").'&nbsp;<a target="_blank" href="#">'.__("documentation", "retxtdom")."</a>");
+            
+            $listVersions = scandir(PLUGIN_RE_PATH."includes/css/templates/twentytwenty");
+            $themeLastVersion = end($listVersions);
+            define("PLUGIN_RE_THEME", array("name" => "twentytwenty", "version" => $themeLastVersion));      
         } 
     }
     
     /*
-     * Display a notice panel with one  or several messages if needed
+     * Display a notice panel with one or several messages if needed
      */
     public function displayNotices() {
         $pluginName = strtoupper(PLUGIN_RE_NAME);
-        foreach(self::$errors as $error) { ?>
+        $notices = get_option(PLUGIN_RE_NAME."Notices");
+        foreach($notices["errors"] as $error) { ?>
             <div class="notice notice-error is-dismissible">
                 <h3><?= $pluginName; ?></h3>
                 <p><?= $error; ?></p>   
             </div>
         <?php }
-        foreach(self::$warnings as $warning) { ?>
+        foreach($notices["warnings"] as $warning) { ?>
             <div class="notice notice-warning is-dismissible">
                 <h3><?= $pluginName; ?></h3>
                 <p><?= $warning; ?></p>   
             </div>
         <?php }
-        foreach(self::$informations as $info) { ?>
+        foreach($notices["informations"] as $info) { ?>
             <div class="notice notice-info is-dismissible">
                 <h3><?= $pluginName; ?></h3>
                 <p><?= $info; ?></p>   
             </div>
         <?php }
-    }    
+        $this->createNotices(null, null, true); //Reset
+    }  
     
     /*
      * Remove the default WP widgets from the dashboard for the non-administrators

@@ -29,7 +29,6 @@
                 require_once(PLUGIN_RE_PATH."models/UserModel.php");
                 $idUser = get_current_user_id();
                 $user = REALM_UserModel::getUser($idUser);
-                $userDataConformity = /*REALM_UserModel::checkDataConformity($idUser)*/ true;
                 $alreadyHF = get_posts(array(
                     "author"        => $idUser,
                     "post_type"     => "housingfile",
@@ -38,15 +37,12 @@
                     "numberposts"   => 1
                 ));
                 $checkAlreadyHF = !empty($alreadyHF);            
+              
+                $limitReachedHF = REALM_UserModel::checkHousingFileLimitReached($idUser);
                 
-                $optionsHF = get_option(PLUGIN_REP_NAME."Options");
-                $nbUserHF = count(get_posts(array(
-                    "author"        => $idUser,
-                    "post_type"     => "housingfile",
-                    "post_status"   => array("accepted", "decisionwaiting", "revisionwaiting"),
-                    "numberposts"   => $optionsHF["limitNbHousingFiles"]
-                )));
-                $limitReachedHF = $nbUserHF >= intval($optionsHF["limitNbHousingFiles"]);
+                if($ad["allowHousingFile"]) {
+                    $userHasHousingFile = REALM_UserModel::checkUserHasHousingFile($idUser, $ad["allowGuarantors"]);
+                }
             }   
         
             
@@ -59,11 +55,10 @@
                 is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formApply")) && //Nonce checked
                 $userIsCustomer &&  //The current user is a customer
                 !$checkAlreadyHF && //There is not already a housing file for the customer
-                !$limitReachedHF && //It didn't reached the limit
-                $userDataConformity //All required fields are filled
+                !$limitReachedHF //It didn't reached the limit
             ) {
                 require_once(PLUGIN_REP_PATH."models/HousingFileModel.php");
-                $HFID = REALMP_HousingFileModel::createPost($idPost, $idUser, $ad["refAd"] ." - ". $user["lastName"] .' '. $user["firstName"]); 
+                $HFID = REALMP_HousingFileModel::createPost($idPost, $idUser); 
             }else if(isset($_POST["contact"]) && isset($_POST["nonceSecurity"]) && is_numeric(wp_verify_nonce($_POST["nonceSecurity"], "formContact"))) {
                 if(isset($_POST["name"]) && isset($_POST["phone"]) && isset($_POST["email"]) && isset($_POST["message"]) && !empty(trim($_POST["names"])) && !empty(trim($_POST["phone"])) && !empty(trim($_POST["email"])) && !empty(trim($_POST["message"]))) {
                     $adRef = $ad["refAd"];
@@ -284,8 +279,15 @@
                         if($checkAlreadyHF || isset($HFID)) { ?>
                             <a href="<?=admin_url();?>"><button><?php _e("View my housing file");?></button></a>
                         <?php }else if($limitReachedHF) { ?>
-                            <span><?php _e("You have exceeded the maximum number of housing files that you can submit", "retxtdom");?></span>
+                            <span><?php _e("You have exceeded the maximum number of housing files that you can submit", "retxtdom");?>.</span>
                             <a href="<?=admin_url("edit.php?post_type=housingfile");?>"><button><?php _e("View my housing files");?></button></a>
+                        <?php }else if(!$userHasHousingFile) { ?>
+                            <span><?php _e("You need to fill your housing file before be able to apply for the property", "retxtdom");?>.</span>
+                            <?php if($ad["allowGuarantors"] && intval($user["nbGuarantors"]) === 0) { ?>
+                                <span><?php _e("Please, do not forget to add at least a guarantor", "retxtdom");?>.</span>
+                            <?php } 
+                            ?>
+                            <a href="<?= admin_url("profile.php?ad=$idPost"); ?>"><button><?php _e("Fill my housing file"); ?></button></a>
                         <?php }else { ?>
                         <form method="post" action="" id="applyForm">
                             <?php wp_nonce_field("formApply", "nonceSecurity"); ?>
@@ -338,7 +340,7 @@
                         </div>
                         <form action="" method="post" class="formContact">
                             <?php wp_nonce_field("formContact", "nonceSecurity"); 
-                            $prefillForm = PLUGIN_RE_REP&&$userIsCustomer&&$userDataConformity;
+                            $prefillForm = PLUGIN_RE_REP&&$userIsCustomer;
                             ?>
                             <label for="names"><?php _e("First name and last name", "retxtdom"); ?></label><input type="text" name="names" class="formContactInput" value="<?= $prefillForm?$user["firstName"].' '.$user["lastName"]:''?>" required>
                             <label for="phone"><?php _e("Phone", "retxtdom"); ?></label><input type="tel" name="phone" class="formContactInput" required>

@@ -12,10 +12,12 @@ class REALM_Ad {
     /*
      * Register plugin styles for the singleAd template
      */
-    private function registerPluginStylesSingleAd($path) {
+    private function registerPluginStylesSingleAd() {
+        $CSSPath = PLUGIN_RE_NAME."/includes/css/templates/".PLUGIN_RE_THEME["name"].'/'.PLUGIN_RE_THEME["version"];
+
         wp_register_style("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leaflet.min.css"), array(), "1.9.3");
         wp_register_style("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/css/others/leafletFullscreen.min.css"), array(), "2.3.0");
-        wp_register_style("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$path/singles/singleAd.css"));
+        wp_register_style("singleAd", plugins_url("$CSSPath/singles/singleAd.css"));
         wp_register_style("googleIcons", "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0");
         wp_enqueue_style("leaflet");
         wp_enqueue_style("leafletFullscreen");
@@ -30,6 +32,7 @@ class REALM_Ad {
         wp_register_script("leaflet", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leaflet.min.js"), array(), "1.9.3", true);
         wp_register_script("leafletFullscreen", plugins_url(PLUGIN_RE_NAME."/includes/js/others/leafletFullscreen.min.js"), array(), "2.3.0", true);
         wp_register_script("singleAd", plugins_url(PLUGIN_RE_NAME."/includes/js/templates/singles/singleAd.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+        wp_localize_script("singleAd", "translations", array("confirm" => "Do you confirm that you want to apply?"));
         wp_enqueue_script("leaflet");
         wp_enqueue_script("leafletFullscreen");
         wp_enqueue_script("singleAd");
@@ -60,6 +63,7 @@ class REALM_Ad {
                     "set_featured_image"    => __("Choose a thumbnail", "retxtdom"),
                     "remove_featured_image" => __("Remove the thumbnail", "retxtdom"),
                     "use_featured_image"    => __("Use as thumbnail", "retxtdom"),
+                    "rewrite"               => array("slug" => "ad")
                ),
                 "capabilities" => array(
                     "edit_post"              => "edit_ad", 
@@ -177,38 +181,36 @@ class REALM_Ad {
      * Fetch the single or archive custom post Ad template
      */
     public function templatePostAd($path) {
-        if(true) {
-            $shortPath = /*PLUGIN_RE_THEME["name"].'/'.PLUGIN_RE_THEME["version"]*/"twentytwenty/2.1";
-            $fullPath = PLUGIN_RE_PATH."templates/$shortPath";
-            if(is_dir($fullPath)) {
-                if(get_post_type() === "re-ad") {
-                    if(is_single() && !locate_template(array("single-ad.php"))) {
-                        $path = "$fullPath/singles/single-ad.php";
-                        $this->registerPluginScriptsSingleAd();
-                        $this->registerPluginStylesSingleAd($shortPath);
-                    }else if(is_post_type_archive("re-ad") && !locate_template(array("archive-ad.php"))) {
-                        $path =  "$fullPath/archives/archive-ad.php";
-                        wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$shortPath/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
-                        wp_enqueue_style("archiveAd");
-                    }
-                    if(is_post_type_archive("re-ad") && PLUGIN_RE_REP) {
-                        wp_register_script("archiveAds", plugins_url(PLUGIN_REP_NAME."/includes/js/templates/archives/archiveAds.js"), array("jquery"), PLUGIN_REP_VERSION, true);
-                        wp_localize_script("archiveAds", "variables", array(
-                            "APIURL" => get_rest_url(null, PLUGIN_REP_NAME."/v1/alerts"), 
-                            "success" => __("You are subscribed to this alert with success.", "reptxtdom"),
-                            "sameAlert" => __("You are already subscribed to this alert.", "reptxtdom"),
-                            "error" => __("An error occured, please try again later.", "reptxtdom")
-                            ));
-                        wp_enqueue_script("archiveAds");
-                    }
-                }else if(is_search() && !have_posts() && !locate_template(array("no-results.php"))) {
-                    $path =  "$fullPath/archives/no-results.php";
-                    wp_register_style("noResults", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$shortPath/archives/noResults.css"), array(), PLUGIN_RE_VERSION);
-                    wp_enqueue_style("noResults");
+        $shortPath = PLUGIN_RE_THEME["name"].'/'.PLUGIN_RE_THEME["version"];
+        $fullPath = PLUGIN_RE_PATH."templates/front";
+        if(is_dir($fullPath)) {
+            if(get_post_type() === "re-ad") {
+                if(is_single() && !locate_template(array("single-ad.php"))) {
+                    $path = "$fullPath/singles/single-ad.php";
+                    $this->registerPluginScriptsSingleAd();
+                    $this->registerPluginStylesSingleAd();
+                }else if(is_post_type_archive("re-ad") && !locate_template(array("archive-ad.php"))) {
+                    $path =  "$fullPath/archives/archive-ad.php";
+                    wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$shortPath/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
+                    wp_enqueue_style("archiveAd");
                 }
+                if(is_post_type_archive("re-ad") && PLUGIN_RE_REP) {
+                    wp_register_script("archiveAds", plugins_url(PLUGIN_REP_NAME."/includes/js/templates/archives/archiveAds.js"), array("jquery"), PLUGIN_REP_VERSION, true);
+                    wp_localize_script("archiveAds", "variables", array(
+                        "APIURL" => get_rest_url(null, PLUGIN_REP_NAME."/v1/alerts"), 
+                        "success" => __("You are subscribed to this alert with success.", "reptxtdom"),
+                        "sameAlert" => __("You are already subscribed to this alert.", "reptxtdom"),
+                        "error" => __("An error occured, please try again later.", "reptxtdom")
+                        ));
+                    wp_enqueue_script("archiveAds");
+                }
+            }else if(is_search() && !have_posts() && !locate_template(array("no-results.php"))) {
+                $path =  "$fullPath/archives/no-results.php";
+                wp_register_style("noResults", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$shortPath/archives/noResults.css"), array(), PLUGIN_RE_VERSION);
+                wp_enqueue_style("noResults");
             }
         }
-
+        
         return $path;
     }
     

@@ -24,6 +24,8 @@ class REALM_UserModel {
          
         if($role === "customer") {
             $user["customFields"] = self::getMeta("customerCustomFields");
+            $user["nbApplicants"] = !empty(self::getMeta("customerNbApplicants"))?self::getMeta("customerNbApplicants"):0;
+            $user["nbGuarantors"] = !empty(self::getMeta("customerNbGuarantors"))?self::getMeta("customerNbGuarantors"):0;
             $user["alert"] = maybe_unserialize(self::getMeta("customerAlert"));
         }else if($role === "agent") {
             $user["agentPhone"] = sanitize_text_field(self::getMeta("agentPhone"));
@@ -331,35 +333,30 @@ class REALM_UserModel {
         echo json_encode(array("result" => $result));
     }
      
-    public static function checkDataConformity($idUser) {
-        $user = self::getUser($idUser);
-        $checkCF = true;
-        foreach($user["customFields"] as $CF) {
-            if($CF["type"] === "text") {
-                if(empty(trim($CF["nameAttr"])) || !is_bool($CF["optionnal"]) || empty(trim($CF["value"]))) {
-                   $checkCF = false;
-                }
-            }else if($CF["type"] === "file") {
-                if(empty(trim($CF["nameAttr"])) || !preg_match("/^(\.\w+)(,\s*\.\w+)*$/", $CF["extensions"]) || !is_bool($CF["optionnal"]) || !is_array($CF["file"]) || empty(trim($CF["file"]["url"]))) {
-                    $checkCF = false;
-                }
-            }else{
-                $checkCF = false;
-            }
-        }
-        if(
-            !empty(trim($user["lastName"])) &&
-            !empty(trim($user["firstName"])) &&
-            !empty(trim($user["customerPhone"])) &&
-            !empty(trim($user["email"])) &&
-            $checkCF
-        ) {
+    public static function checkUserHasHousingFile($idUser, $guarantor=false) {
+        $nbApplicants = intval(get_user_meta($idUser, "customerNbApplicants", true));
+        $nbGuarantors = intval(get_user_meta($idUser, "customerNbGuarantors", true));
+
+        if(!$guarantor && $nbApplicants > 0) {
             return true;
-        }else{
-            return false;
+        }elseif($guarantor && $nbApplicants > 0 && $nbGuarantors > 0) {
+            return true;
         }
+
+        return false;
     }
     
+    public static function checkHousingFileLimitReached($idUser) {
+        $optionsHF = get_option(PLUGIN_REP_NAME."Options");
+        $nbUserHF = count(get_posts(array(
+            "author"        => $idUser,
+            "post_type"     => "housingfile",
+            "post_status"   => array("accepted", "decisionwaiting", "revisionwaiting"),
+            "numberposts"   => $optionsHF["limitNbHousingFiles"]
+        )));
+        return $nbUserHF >= intval($optionsHF["limitNbHousingFiles"]);
+    }
+
     private static function getMeta($metaName) {
         return isset(self::$metas[$metaName])?implode(self::$metas[$metaName]):'';
     }
