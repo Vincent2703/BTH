@@ -333,11 +333,14 @@ class REALM_Ad {
     
     
     /*
-     * Add or modify the columns shown in the WordPress admin table for the re-da custom post type
+     * Add or modify the columns shown in the WordPress admin table for the re-ad custom post type
      */
     public function colsAdsList($columns) {
         unset($columns["date"]);
         $columns["inCharge"] = __("Agent in charge", "retxtdom");
+        if(PLUGIN_RE_REP) {
+            $columns["submissions"] = __("Submissions", "reptxtdom");
+        }
         $columns["date"] = __("Date", "retxtdom");
         return $columns;
     }
@@ -349,6 +352,8 @@ class REALM_Ad {
             $url = admin_url("edit.php?post_type=re-ad&agent=$agentID");
             $agentName = get_user_meta($agentID, "first_name", true).' '.get_user_meta($agentID, "last_name", true);
             echo '<a href="'.esc_attr($url).'">'.$agentName."</a>";
+        }else if($column === "submissions") {
+            echo boolval(get_post_meta($postID, "adSubmissionsAllowed", true))?__("Yes", "reptxtdom"):__("No", "reptxtdom");
         }
     }
     

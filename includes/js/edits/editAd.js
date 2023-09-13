@@ -13,9 +13,9 @@ jQuery(function($) {
             });
             
             //MetaBox HF (REALMPLUS)
-            if($("#adHousingFileMetaBox").length > 0) {
-                $("#allowHousingFile").click(function() {
-                    $("#allowGuarantors").prop("disabled", !$("#allowHousingFile").is(":checked"));
+            if($("#adSubmissionMetaBox").length > 0) {
+                $("#allowSubmission").click(function() {
+                    $("#needGuarantors").prop("disabled", !$("#allowSubmission").is(":checked"));
                 }); 
             }
         });

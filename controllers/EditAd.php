@@ -40,9 +40,9 @@ class REALM_EditAd {
         
         if(PLUGIN_RE_REP) {
             add_meta_box( //Housing files authorization
-                "adHousingFileMetaBox", //ID HTML
-                __("Housing files", "retxtdom"), //Display
-                array($this, "housingFileMetabox"), //Callback
+                "adSubmissionMetaBox", //ID HTML
+                __("Housing file submissions", "retxtdom"), //Display
+                array($this, "submissionMetabox"), //Callback
                 "re-ad", //Custom type
                 "side", //Location on the page
                 "core" //Priority
@@ -353,11 +353,11 @@ class REALM_EditAd {
 
     }
     
-    public function housingFileMetabox() { 
+    public function submissionMetabox() { 
         $ad = self::$ad; 
         ?>
-        <input type="checkbox" id="allowHousingFile" name="allowHousingFile" <?php checked($ad["allowHousingFile"]); ?>><label for="allowHousingFile"><?php _e("Allow file submission", "reptxtdom"); ?></label><br />
-        <input type="checkbox" id="allowGuarantors" name="allowGuarantors" <?php checked($ad["allowGuarantors"]); disabled(!$ad["allowHousingFile"]); ?>><label for="allowGuarantors"><?php _e("Allow guarantors", "reptxtdom"); ?></label>
+        <input type="checkbox" id="allowSubmission" name="allowSubmission" <?php checked($ad["allowSubmission"]); ?>><label for="allowSubmission"><?php _e("Allow file submission", "reptxtdom"); ?></label><br />
+        <input type="checkbox" id="needGuarantors" name="needGuarantors" <?php checked($ad["needGuarantors"]); disabled(!$ad["allowSubmission"]); ?>><label for="needGuarantors"><?php _e("Need guarantors", "reptxtdom"); ?></label>
     <?php }
     
 }

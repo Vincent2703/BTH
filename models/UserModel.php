@@ -346,15 +346,15 @@ class REALM_UserModel {
         return false;
     }
     
-    public static function checkHousingFileLimitReached($idUser) {
+    public static function checkSubmissionsLimitReached($idUser) {
         $optionsHF = get_option(PLUGIN_REP_NAME."Options");
         $nbUserHF = count(get_posts(array(
             "author"        => $idUser,
-            "post_type"     => "housingfile",
+            "post_type"     => "submission",
             "post_status"   => array("accepted", "decisionwaiting", "revisionwaiting"),
-            "numberposts"   => $optionsHF["limitNbHousingFiles"]
+            "numberposts"   => $optionsHF["limitNbSubmissions"]
         )));
-        return $nbUserHF >= intval($optionsHF["limitNbHousingFiles"]);
+        return $nbUserHF >= intval($optionsHF["limitNbSubmissions"]);
     }
 
     private static function getMeta($metaName) {

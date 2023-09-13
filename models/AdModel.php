@@ -174,8 +174,8 @@ class REALM_AdModel {
             $ad["getContact"] = false;
         }
         
-        $ad["allowHousingFile"] = boolval(self::getMeta("adAllowHousingFile"));
-        $ad["allowGuarantors"] = boolval(self::getMeta("adAllowGuarantors"));
+        $ad["allowSubmission"] = boolval(self::getMeta("adSubmissionsAllowed"));
+        $ad["needGuarantors"] = boolval(self::getMeta("adNeedGuarantors"));
 
         $ad["morePosts"] = get_posts(array(
             "post_type" => "re-ad",
@@ -376,8 +376,8 @@ class REALM_AdModel {
             update_post_meta($adId, "adGES", absint($_POST["GES"]));
         }
         
-        update_post_meta($adId, "adAllowHousingFile", isset($_POST["allowHousingFile"]));
-        update_post_meta($adId, "adAllowGuarantors", isset($_POST["allowGuarantors"]));
+        update_post_meta($adId, "adSubmissionsAllowed", isset($_POST["allowSubmission"]));
+        update_post_meta($adId, "adNeedGuarantors", isset($_POST["needGuarantors"]));
 
         //Custom fields
         $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");

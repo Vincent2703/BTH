@@ -795,12 +795,12 @@ class Realm {
      * Fix a bug when we only want to edit a post with a custom type
      */
     public function fixWPBug22895() {    
-        add_submenu_page("edit.php?post_type=housingfile", "fixWPBug22895", "fixWPBug22895", "edit_housingfiles", "fixWPBug22895");
+        add_submenu_page("edit.php?post_type=submission", "fixWPBug22895", "fixWPBug22895", "edit_submissions", "fixWPBug22895");
         add_filter("add_menu_classes", array($this, "fixWPBug22895Unset"));    
     }
     
     public function fixWPBug22895Unset($menu){
-        remove_submenu_page("edit.php?post_type=housingfile", "fixWPBug22895");
+        remove_submenu_page("edit.php?post_type=submission", "fixWPBug22895");
         return $menu;
     }
     
