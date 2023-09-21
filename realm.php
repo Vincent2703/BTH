@@ -218,6 +218,9 @@ class Realm {
         
         //Add or modify the columns shown in the WordPress admin table for the re-da custom post type
         add_filter("manage_re-ad_posts_columns", array($this->Ad, "colsAdsList")); 
+           
+        //Display a text next to the Ad title in the posts list if the property is unavailable
+        add_filter("display_post_states", array($this->Ad, "addPostStateAvailability"), 10, 2);
         
         //Make the taxonomy columns in the list of ads sortable
         //add_filter("manage_edit-re-ad_sortable_columns", array($this->Ad, "colsAdsListSortable")); 

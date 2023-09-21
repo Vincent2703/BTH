@@ -23,9 +23,9 @@ class REALM_UserModel {
         $user["email"] = $userData->user_email;
          
         if($role === "customer") {
-            $user["customFields"] = self::getMeta("customerCustomFields");
-            $user["nbApplicants"] = !empty(self::getMeta("customerNbApplicants"))?self::getMeta("customerNbApplicants"):0;
-            $user["nbGuarantors"] = !empty(self::getMeta("customerNbGuarantors"))?self::getMeta("customerNbGuarantors"):0;
+            $user["customFields"] = maybe_unserialize(self::getMeta("customerCustomFields"));
+            $user["nbApplicants"] = !empty(self::getMeta("customerNbApplicants"))?absint(self::getMeta("customerNbApplicants")):0;
+            $user["nbGuarantors"] = !empty(self::getMeta("customerNbGuarantors"))?absint(self::getMeta("customerNbGuarantors")):0;
             $user["alert"] = maybe_unserialize(self::getMeta("customerAlert"));
         }else if($role === "agent") {
             $user["agentPhone"] = sanitize_text_field(self::getMeta("agentPhone"));

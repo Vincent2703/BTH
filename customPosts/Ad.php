@@ -336,6 +336,7 @@ class REALM_Ad {
      * Add or modify the columns shown in the WordPress admin table for the re-ad custom post type
      */
     public function colsAdsList($columns) {
+        unset($columns["taxonomy-adAvailable"]);
         unset($columns["date"]);
         $columns["inCharge"] = __("Agent in charge", "retxtdom");
         if(PLUGIN_RE_REP) {
@@ -579,4 +580,16 @@ public function customFiltersQuery($query) {
     public function termTypePropertyUpdate($termId, $ttId, $taxonomy) {
         update_term_meta($termId, "habitable", isset($_POST["habitable"]));   
     }   
+    
+    /*
+     * Display a text next to the Ad title in the posts list if the property is unavailable
+     */
+    public function addPostStateAvailability($postStates, $post) {
+        $availabilityTerms = get_the_terms($post->ID, "adAvailable");
+        if(!is_wp_error($availabilityTerms) && $availabilityTerms !== false && $availabilityTerms[0]->slug === "unavailable") {
+            $postStates["unavailable"] = $availabilityTerms[0]->name;
+        }
+        return $postStates;
+    }
+            
 }
