@@ -57,7 +57,8 @@ class Realm {
     /*
      * (Re-)initialize/fill the notices option
      */
-    public function createNotices($type=null, $msg=null, $reset=false) {
+    public static function createNotices($type=null, $msg=null, $reset=false) {
+        error_log($msg);
         if($reset) {
             $notices = array("errors"=>[], "warnings"=>[], "informations"=>[]);
         }else{

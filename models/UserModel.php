@@ -81,7 +81,7 @@ class REALM_UserModel {
 
                                     $inputValueSanitized = self::sanitizeInputValue($inputValue, $CF);
                                     if($inputValueSanitized !== null) {
-                                        $CFSanitized[$loopForWhom][$i][$CF["category"]][$CF["nameAttr"]] = $inputValueSanitized;
+                                        $CFSanitized[$loopForWhom][$i][$CF["category"]][$CF["nameAttr"]] = array("name" => $CF["name"], "type" => $CF["type"], "value" => $inputValueSanitized);
                                     }
                                 }
                             }
@@ -100,13 +100,13 @@ class REALM_UserModel {
                         for($a=0; $a<$nbPeople["applicants"]; $a++) {
                             $inputFileName = $field["category"]."_applicant". $a+1 .'_'.$field["nameAttr"];
                             if(isset($_FILES[$inputFileName]) && $_FILES[$inputFileName]["error"] === 0) {
-                                $CFSanitized["applicants"][$a][$field["category"]][$field["nameAttr"]] = self::sanitizeInputFile($inputFileName, $field, $_FILES[$inputFileName]);
+                                $CFSanitized["applicants"][$a][$field["category"]][$field["nameAttr"]] = array("name" => $field["name"], "type" => "file", "value" => self::sanitizeInputFile($inputFileName, $field["extensions"], $_FILES[$inputFileName]));
                             }
                         }
                         for($g=0; $g<$nbPeople["guarantors"]; $g++) {
                             $inputFileName = $field["category"]."_guarantor". $g+1 .'_'.$field["nameAttr"];
                             if(isset($_FILES[$inputFileName]) && $_FILES[$inputFileName]["error"] === 0) {
-                                $CFSanitized["guarantors"][$g][$field["category"]][$field["nameAttr"]] = self::sanitizeInputFile($inputFileName, $field, $_FILES[$inputFileName]);
+                                $CFSanitized["guarantors"][$g][$field["category"]][$field["nameAttr"]] = array("name" => $field["name"], "type" => "file", "value" => self::sanitizeInputFile($inputFileName, $field["extensions"], $_FILES[$inputFileName]));
                             }
                         }
                     }else {
@@ -114,7 +114,7 @@ class REALM_UserModel {
                         for($i=0; $i<$peopleCount; $i++) {
                             $inputFileName = $field["category"]."_".$field["forWhom"]. $i+1 .'_'.$field["nameAttr"];
                             if(isset($_FILES[$inputFileName]) && $_FILES[$inputFileName]["error"] === 0) {
-                                $CFSanitized[$field["forWhom"].'s'][$i][$field["category"]][$field["nameAttr"]] = self::sanitizeInputFile($inputFileName, $field, $_FILES[$inputFileName]);
+                                $CFSanitized[$field["forWhom"].'s'][$i][$field["category"]][$field["nameAttr"]] = array("name" => $field["name"], "type" => "file", "value" => self::sanitizeInputFile($inputFileName, $field["extensions"], $_FILES[$inputFileName]));
                             }
                         }
                     }
@@ -178,9 +178,8 @@ class REALM_UserModel {
         return null;
     }
     
-    private static function sanitizeInputFile($fieldName, $field, $file) {
+    private static function sanitizeInputFile($fieldName, $validExtensions, $file) {
         if(file_exists($_FILES[$fieldName]["tmp_name"]) && is_uploaded_file($_FILES[$fieldName]["tmp_name"])) {
-            $validExtensions = $field["extensions"];
             $mappingExtMimes = array(
                 "jpg" => "image/jpeg",
                 "png" => "image/png",
@@ -191,8 +190,20 @@ class REALM_UserModel {
             );
             $mimeTypesAuthorized = array_intersect_key($mappingExtMimes, array_flip($validExtensions));
 
-            $upload = wp_handle_upload($file, array("test_form" => false, "test_type" => true, "test_size" => true, "mimes"=>$mimeTypesAuthorized));
-            return $upload["url"];
+            $upload = wp_handle_upload($file, array(
+                "test_form" => false, 
+                "test_type" => true, 
+                "test_size" => true, 
+                "mimes" => $mimeTypesAuthorized, 
+                "unique_filename_callback" => function() use($file) {
+                    $fileExt = pathinfo($file["name"], PATHINFO_EXTENSION);
+                    $randLength = rand(30, 60);
+                    $genFileName = substr(str_replace(['+', '/', '='], rand(0, 9), base64_encode(random_bytes($randLength))), 0, $randLength).'.'.$fileExt;
+                    $uploadsDirPath = wp_get_upload_dir()["path"];
+                    $uniqFileName = wp_unique_filename($uploadsDirPath, $genFileName);
+                    return $uniqFileName;
+                }));
+            return sanitize_url($upload["url"]);
         }
     }
         
