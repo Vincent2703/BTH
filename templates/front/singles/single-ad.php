@@ -26,9 +26,9 @@
             $userIsCustomer = current_user_can("customer");
             
             if(PLUGIN_RE_REP && $userIsCustomer) {               
-                require_once(PLUGIN_RE_PATH."models/UserModel.php");
+                require_once(PLUGIN_REP_PATH."models/UserModel.php");
                 $idUser = get_current_user_id();
-                $user = REALM_UserModel::getUser($idUser);
+                $user = REALMP_UserModel::getUser($idUser);
                 $alreadyHF = get_posts(array(
                     "author"        => $idUser,
                     "post_type"     => "submission",
@@ -38,10 +38,10 @@
                 ));
                 $checkExistingSubmission = !empty($alreadyHF);            
               
-                $submissionsLimitReached = REALM_UserModel::checkSubmissionsLimitReached($idUser);
+                $submissionsLimitReached = REALMP_UserModel::checkSubmissionsLimitReached($idUser);
                 
                 if($ad["allowSubmission"]) {
-                    $userHasHousingFile = REALM_UserModel::checkUserHasHousingFile($idUser, $ad["needGuarantors"]);
+                    $userHasHousingFile = REALMP_UserModel::checkCustomerHasHousingFile($idUser, $ad["needGuarantors"]);
                 }
             }   
         
