@@ -187,6 +187,14 @@ class REALM_Options {
         );
         
         add_settings_field(
+            "areaUnit", //id
+            sprintf($titleFormat, __("Area Unit", "retxtdom"), __("Unit used to define an area.", "retxtdom")), //title
+            array($this, "areaUnitCallback"), //callback
+            PLUGIN_RE_NAME."OptionsGeneralPage", //page
+            PLUGIN_RE_NAME."optionsSection" //section
+        );
+        
+        add_settings_field(
             "customFields", //id
             sprintf($titleFormat, __("Custom fields", "retxtdom"), __("Add custom fields to the ads.", "retxtdom")), //title
             array($this, "customFieldsCallback"), //callback
@@ -393,7 +401,10 @@ class REALM_Options {
         if(isset($input["currency"]) && !empty(trim($input["currency"]))) {
             $sanitaryValues["currency"] = sanitize_text_field($input["currency"]);
         }
-        
+
+        if(isset($input["areaUnit"]) && !empty(trim($input["areaUnit"]))) {
+            $sanitaryValues["areaUnit"] = sanitize_text_field($input["areaUnit"]);
+        }
 
         if(isset($input["customFields"]) && !empty($input["customFields"]) && $input["customFields"][0] === '[' && $input["customFields"][-1] === ']' && (json_decode($input["customFields"]) !== null || json_last_error() === JSON_ERROR_NONE)) { //Waiting for PHP 8.3 json_validate()
             $sanitaryValues["customFields"] = sanitize_text_field($input["customFields"]);
@@ -548,12 +559,18 @@ class REALM_Options {
     //Fields
     
     /* General setting */
-    public function currencyCallback() { 
-        isset($this->optionsGeneral["currency"]) ? absint($this->optionsGeneral["currency"]) : '1'; ?>
+    public function currencyCallback() { ?>
             <input type="text" id="currency" class="regular-text" 
                name="<?=PLUGIN_RE_NAME."OptionsGeneral[currency]";?>" 
                placeholder='€' 
                value="<?=isset($this->optionsGeneral["currency"]) ? esc_attr($this->optionsGeneral["currency"]) : '$';?>">
+    <?php }
+    
+    public function areaUnitCallback() { ?>
+            <input type="text" id="areaUnit" class="regular-text" 
+               name="<?=PLUGIN_RE_NAME."OptionsGeneral[areaUnit]";?>" 
+               placeholder='m²' 
+               value="<?=isset($this->optionsGeneral["areaUnit"]) ? esc_attr($this->optionsGeneral["areaUnit"]) : 'm²';?>">
     <?php }
     
     public function customFieldsCallback() { ?>

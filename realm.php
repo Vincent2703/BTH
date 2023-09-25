@@ -324,7 +324,8 @@ class Realm {
         
         $defaultValuesLanguage = array(
             "language" => "en",
-            "currency" => "$"
+            "currency" => "$",
+            "areaUnit" => "m²"
         );
         update_option(PLUGIN_RE_NAME."OptionsGeneral", $defaultValuesLanguage); 
         
@@ -634,7 +635,7 @@ class Realm {
      */
     public function permissionCallbackGetAddressData($request) {
         $idUser = apply_filters("determine_current_user", false);
-        wp_set_current_user($idUser);
+        wp_set_current_user($idUser); //Plutôt directement chercher capabilities get_userdata() ?
         $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
         $userCanEdit = current_user_can("edit_ads");
         $nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && is_numeric(wp_verify_nonce($request->get_param("nonce"), "apiAddress"));

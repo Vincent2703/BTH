@@ -887,6 +887,10 @@ class REALM_AdModel {
         return get_option(PLUGIN_RE_NAME."OptionsGeneral")["currency"];
     }
     
+    public static function getAreaUnit() {
+        return get_option(PLUGIN_RE_NAME."OptionsGeneral")["areaUnit"];
+    }
+    
     public static function getFeesURL() {
         if(isset(get_option(PLUGIN_RE_NAME."OptionsFees")["feesUrl"])) {
             return get_option(PLUGIN_RE_NAME."OptionsFees")["feesUrl"];

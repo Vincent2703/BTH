@@ -102,6 +102,10 @@ class REALM_EditAd {
         }else{
             $agentSelected = null;
         }
+        
+        $generalOptions = get_option(PLUGIN_RE_NAME."OptionsGeneral");
+        $currency = $generalOptions["currency"];
+        $areaUnit = $generalOptions["areaUnit"];
         wp_nonce_field("formEditAd", "nonceSecurity"); //Add nonce
         ?>
         <div id="refAgency">
@@ -112,21 +116,21 @@ class REALM_EditAd {
         </div>
         <div id="prices">
             <div class="text">
-                <label><?php _e("Property price", "retxtdom");?> <abbr title="<?php _e("Charges included", "retxtdom"); ?>"><sup>?</sup></abbr></label>
+                <label><?php _e("Property price", "retxtdom");?> (<a target="_blank" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$currency;?></a>) <abbr title="<?php _e("Charges included", "retxtdom"); ?>"><sup>?</sup></abbr></label>
                 <input type="number" name="price" id="priceInput" placeholder="Eg : 180000" value="<?= $ad["price"]; ?>" required>
             </div>
             <div class="text">
-                <label><?php _e("Fees amount", "retxtdom");?></label>
+                <label><?php _e("Fees amount", "retxtdom");?> (<a target="_blank" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$currency;?></a>)</label>
                 <input type="number" name="fees" id="feesInput" placeholder="Eg : 85" value="<?= $ad["fees"]; ?>" required>
             </div>
         </div>
         <div id="surfaces">
             <div class="text">
-                <label><?php _e("Living space", "retxtdom");?> (m²)</label>
+                <label><?php _e("Living space", "retxtdom");?> (<a target="_blank" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$areaUnit;?></a>)</label>
                 <input type="number" name="surface" id="surfaceInput" placeholder="Eg : 90" value="<?= $ad["surface"]; ?>"  required>
             </div>
             <div class="text">
-                <label><?php _e("Land area", "retxtdom");?> (m²)</label>
+                <label><?php _e("Land area", "retxtdom");?> (<a target="_blank" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$areaUnit;?></a>)</label>
                 <input type="number" name="landSurface" id="landSurfaceInput" placeholder="Eg : 90" value="<?= $ad["landSurface"]; ?>">
             </div>
         </div>

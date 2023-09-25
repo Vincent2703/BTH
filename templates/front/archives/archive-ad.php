@@ -19,6 +19,7 @@ get_header(); ?>
 
                     $ad = REALM_AdModel::getAd($idPost);
                     $currency = REALM_AdModel::getCurrency();
+                    $areaUnit = REALM_AdModel::getAreaUnit();
                     ?>
                     <div class="rowAd">
                         <div class="inShortAd">
@@ -37,7 +38,7 @@ get_header(); ?>
                                 <span class="price"><span class="includingFees"><?= $ad["price"].$currency; ?><?= $ad["taxonomies"]["typeAd"]["slug"]==="rental"?'/'.__("month", "retxtdom"):'';?></span>&nbsp;<span class="fees"><?= !empty($ad["fees"])||$ad["fees"]!=0?__("including", "retxtdom").' '.$ad["fees"]."$currency of fees":'';?></span></span>
                                 <span class="iconsDate">
                                     <span class="icons">
-                                        <span class="surface"><span class="dashicons dashicons-fullscreen-alt"></span><span><?=$ad["surface"]." m²";?></span></span>
+                                        <span class="surface"><span class="dashicons dashicons-fullscreen-alt"></span><span><?=$ad["surface"]." $areaUnit";?></span></span>
                                         <?php if(!empty($ad["nbRooms"]) || $ad["nbRooms"] != 0) { ?>
                                         <span class="nbRooms"><span class="dashicons dashicons-grid-view"></span><span><?=$ad["nbRooms"];?></span></span>
                                         <?php } ?>
