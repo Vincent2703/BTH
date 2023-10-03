@@ -1,24 +1,28 @@
 jQuery(function($) {
     $(document).ready(function(){
-            $("#title").attr("maxLength", 64); //Limit ad's title to 64 characteres
-            $("#insertAdPictures").click(mediaManager); //Open the WP media manager
-            
-            
-            const selectStatus = $("#post_status");
-            
-            selectStatus.change(function(event) {
-                let textOption = $("option:selected", this).text();      
-                $("option:selected", this).attr("selected", "selected");
-                $("#post-status-display").text(textOption); 
-            });
-            
-            //MetaBox HF (REALMPLUS)
-            if($("#adSubmissionMetaBox").length > 0) {
-                $("#allowSubmission").click(function() {
-                    $("#needGuarantors").prop("disabled", !$("#allowSubmission").is(":checked"));
-                }); 
-            }
+        $("#title").attr("maxLength", 64); //Limit ad's title to 64 characteres
+        $("#insertAdPictures").click(mediaManager); //Open the WP media manager
+
+        const selectStatus = $("#post_status");
+
+        selectStatus.change(function(event) {
+            let textOption = $("option:selected", this).text();      
+            $("option:selected", this).attr("selected", "selected");
+            $("#post-status-display").text(textOption); 
         });
+
+        //MetaBox HF (REALMPLUS)
+        if($("#adSubmissionMetaBox").length > 0) {
+            $("#allowSubmission").click(function() {
+                $("#needGuarantors").prop("disabled", !$("#allowSubmission").is(":checked"));
+            }); 
+        }
+            
+        $("#agents").click(function() {
+            reloadAgents(this);
+        });
+        
+    });
 
     //Media manager - Add Id pictures to an hidden input
     function mediaManager() {
@@ -45,7 +49,7 @@ jQuery(function($) {
                             <img src="${attachment.sizes.thumbnail.url}" class="imgAd">
                             <div class="controlPicture">
                                 <span class="moveToLeft" onclick="movePicture(this, 'left');">←</span>
-                                <span class="deletePicture" onclick="deletePicture(this);">${translations.delete}</span>
+                                <span class="deletePicture" onclick="deletePicture(this);">${variablesEditAd.delete}</span>
                                 <span class="moveToRight" onclick="movePicture(this, 'right');">→</span>
                             </div>
                         </div>`;
@@ -53,7 +57,7 @@ jQuery(function($) {
                     .join("");
 
                 showPictures.html(picturesHtml);
-                $("#insertAdPictures").text(translations.replace);
+                $("#insertAdPictures").text(variablesEditAd.replace);
             });
         }
 
@@ -108,4 +112,25 @@ function movePicture(elem, dir) {
             picturesElem.val(picturesArray.join(';'));
         }     
     }
+}
+
+//Reload the list of agents
+function reloadAgents(select) {
+    let agentSelected = parseInt(jQuery(":selected", jQuery(select)).val());
+    jQuery.ajax({
+        url: variablesEditAd.URLAPIGetAgents,
+        data: { nonce: variablesEditAd.nonce },
+        type: "GET",
+        dataType: "json"
+    }).success(function(response) {
+        jQuery(select).empty();
+        response.forEach(function(val) {
+            jQuery("<option/>")
+                .val(val.ID)
+                .text(val.display_name)
+                .appendTo(select);
+            }
+        );
+        jQuery('option[value="'+agentSelected+'"]', jQuery(select)).attr("selected", "selected");
+    });
 }

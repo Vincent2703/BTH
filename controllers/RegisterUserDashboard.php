@@ -98,7 +98,7 @@ class REALM_RegisterUserDashboard {
             return;
 	}else {
             require_once(PLUGIN_RE_PATH."models/UserModel.php");
-            REALM_UserAdmin::setData($idUser); //Save in BDD         
+            REALM_UserModel::updateUser($idUser); //Save in BDD         
         }
     }
     
@@ -107,7 +107,7 @@ class REALM_RegisterUserDashboard {
      * The author is the user
      */
     public function createPostOnNewUser($idUser) {
-        $user = get_user_by("id", $idUser);
+        /*$user = get_user_by("id", $idUser);
         $role = $user->roles[0];
         if($role === "agent") {
             require_once(PLUGIN_RE_PATH."models/admin/AgentAdmin.php");
@@ -115,7 +115,7 @@ class REALM_RegisterUserDashboard {
         }else if($role === "agency") {
             require_once(PLUGIN_RE_PATH."models/admin/AgencyAdmin.php");
             REALM_AgencyAdmin::createPost($idUser);
-        }
+        }*/
         
     }
     

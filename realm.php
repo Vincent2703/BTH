@@ -246,6 +246,9 @@ class Realm {
         //To do : sort and filter by the agent's agency
         //add_filter("manage_users_sortable_columns", array($this->UserModel, "agentAgencySortableColumn"));
         
+        //Deactivate Gutenberg editor for Ad posts
+        add_filter("use_block_editor_for_post_type", array($this->Ad, "deactivateGutenberg"), 10, 2);
+        
     }
     
     /*
@@ -473,34 +476,14 @@ class Realm {
                         "path" => "/includes/js/others/registrationUser.js",
                         "footer" => true,
                         "dependencies" => array("jquery")
-                    ),
-                    /*"reloadAgencies" => array(
-                        "path" => "/includes/js/searches/reloadAgencies.js",
-                        "footer" => true,
-                        "dependencies" => array("jquery"),
-                        "variables" => array(
-                            "variablesAgencies" => array(
-                                "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies")
-                            )
-                        )
-                    )*/
+                    )
                 ),
                 "user-edit" => array(
                     "editProfile" => array(
                         "path" => "/includes/js/others/editProfile.js",
                         "footer" => true,
                         "dependencies" => array("jquery")
-                    ),
-                    /*"reloadAgencies" => array(
-                        "path" => "/includes/js/searches/reloadAgencies.js",
-                        "footer" => true,
-                        "dependencies" => array("jquery"),
-                        "variables" => array(
-                            "variablesAgencies" => array(
-                                "getAgenciesURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agencies")
-                            )
-                        )
-                    )*/
+                    )
                 ),
                 "profile" => array(
                     "editProfile" => array(
@@ -517,11 +500,13 @@ class Realm {
                         "footer" => true,
                         "dependencies" => array("jquery"),
                         "variables" => array(
-                            "translations" => array(
+                            "variablesEditAd" => array(
                                 "replace" => __("Replace pictures", "retxtdom"),
-                                "delete" => __("Delete", "retxtdom")
+                                "delete" => __("Delete", "retxtdom"),
+                                "URLAPIGetAgents" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents"),
+                                "nonce" => wp_create_nonce("getAgents")
                             )
-                        ),
+                        )
                     ),
                     "autocompleteAddress" => array(
                         "path" => "/includes/js/searches/autocompleteAddress.js",
@@ -529,21 +514,11 @@ class Realm {
                         "dependencies" => array("jquery"),
                         "variables" => array(
                             "variablesAddress" => array(
-                                "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address")
+                                "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
+                                "nonce" => wp_create_nonce("autocompleteAddress")
                             )
                         )
-                    ),
-                    /*"reloadAgents" => array(
-                        "path" => "/includes/js/searches/reloadAgents.js",
-                        "footer" => true,
-                        "dependencies" => array("jquery"),
-                        "variables" => array(
-                            "variablesAgents" => array(
-                                "getAgentsURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents"),
-                                "currentUserRole" => get_user_by("ID", get_current_user_id())->roles[0]
-                            )
-                        )
-                    )*/
+                    )
                 ),
                 "re-ad_page_".PLUGIN_RE_NAME."import" => array(
                     "import" => array(
@@ -612,14 +587,6 @@ class Realm {
             "permission_callback" => array($this, "permissionCallbackGetAddressData")
         ));
         
-        register_rest_route(PLUGIN_RE_NAME."/v1", "agencies", array( 
-            "methods" => "GET",
-            "callback" => function() {
-                $this->UserModel->getUsersByRole("agency", true);
-            },
-            "permission_callback" => array($this, "permissionCallbackApiGetUsers")
-        ));
-        
         register_rest_route(PLUGIN_RE_NAME."/v1", "agents", array( 
             "methods" => "GET",
             "callback" => function() {
@@ -638,11 +605,11 @@ class Realm {
         wp_set_current_user($idUser); //Plutôt directement chercher capabilities get_userdata() ?
         $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
         $userCanEdit = current_user_can("edit_ads");
-        $nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && is_numeric(wp_verify_nonce($request->get_param("nonce"), "apiAddress"));
+        $nonceValid = is_numeric(wp_verify_nonce($request->get_param("nonce"), "autocompleteAddress"));
         $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";        
         $noLimit = !boolval($apisOptions["apiLimitNbRequests"]);
         
-        if($userCanEdit || ($nonceExistsAndIsValid || $isAjax) || $noLimit) {
+        if($userCanEdit || ($nonceValid || $isAjax) || $noLimit) {
             $clientAllowed = true;
         }else{
             $logsAPI = get_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests");
@@ -670,14 +637,14 @@ class Realm {
         return $clientAllowed;
     }
     
-    public function permissionCallbackApiGetUsers(/*$request*/) {
+    public function permissionCallbackApiGetUsers($request) {
         $idUser = apply_filters("determine_current_user", false);
         wp_set_current_user($idUser);
         $userCanEdit = current_user_can("edit_ads");
-        //$nonceExistsAndIsValid = !is_null($request->get_param("nonce")) && is_numeric(wp_verify_nonce($request->get_param("nonce"), "apiAddress"));
+        $nonceValid = is_numeric(wp_verify_nonce($request->get_param("nonce"), "getAgents"));
         $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";
 
-        return $userCanEdit /*&& $nonceExistsAndIsValid && $isAjax*/;
+        return $userCanEdit && $nonceValid && $isAjax;
     }
     
     

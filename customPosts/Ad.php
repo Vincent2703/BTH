@@ -90,7 +90,8 @@ class REALM_Ad {
                 "menu_position" => 15,
                 "supports" => array("title", "editor", "thumbnail"),
                 "menu_icon" => "dashicons-admin-home",
-                "has_archive" => true
+                "has_archive" => true,
+                "show_in_rest" => true
             )
         );
 
@@ -101,6 +102,7 @@ class REALM_Ad {
             "label"             => __("Property types", "retxtdom"), 
             "show_admin_column" => true, 
             "show_in_menu"      => false,
+            "show_in_rest"      => true,
             "singular_label"    => __("Property type", "retxtdom"), 
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
@@ -151,6 +153,7 @@ class REALM_Ad {
             "label"             => __("Ad types", "retxtdom"), 
             "show_admin_column" => true, 
             "show_in_menu"      => false,
+            "show_in_rest"      => true,
             "singular_label"    => __("Ad type", "retxtdom"), 
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
@@ -183,36 +186,56 @@ class REALM_Ad {
     public function templatePostAd($path) {
         $shortPath = PLUGIN_RE_THEME["name"].'/'.PLUGIN_RE_THEME["version"];
         $fullPath = PLUGIN_RE_PATH."templates/front";
+
+        // heck if the $fullPath directory exists
         if(is_dir($fullPath)) {
             if(get_post_type() === "re-ad") {
+                // Check if it's a single post page and template not found
                 if(is_single() && !locate_template(array("single-ad.php"))) {
                     $path = "$fullPath/singles/single-ad.php";
                     $this->registerPluginScriptsSingleAd();
                     $this->registerPluginStylesSingleAd();
-                }else if(is_post_type_archive("re-ad") && !locate_template(array("archive-ad.php"))) {
-                    $path =  "$fullPath/archives/archive-ad.php";
+                }elseif (is_post_type_archive("re-ad") && !locate_template(array("archive-ad.php"))) {
+                    $path = "$fullPath/archives/archive-ad.php";
                     wp_register_style("archiveAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$shortPath/archives/archiveAd.css"), array(), PLUGIN_RE_VERSION);
                     wp_enqueue_style("archiveAd");
-                }
-                if(is_post_type_archive("re-ad") && PLUGIN_RE_REP) {
-                    wp_register_script("archiveAds", plugins_url(PLUGIN_REP_NAME."/includes/js/templates/archives/archiveAds.js"), array("jquery"), PLUGIN_REP_VERSION, true);
-                    wp_localize_script("archiveAds", "variables", array(
-                        "APIURL" => get_rest_url(null, PLUGIN_REP_NAME."/v1/alerts"), 
-                        "success" => __("You are subscribed to this alert with success.", "reptxtdom"),
-                        "sameAlert" => __("You are already subscribed to this alert.", "reptxtdom"),
-                        "error" => __("An error occured, please try again later.", "reptxtdom")
+
+                    if(PLUGIN_RE_REP) {
+                        wp_register_script("archiveAds", plugins_url(PLUGIN_REP_NAME."/includes/js/templates/archives/archiveAds.js"), array("jquery"), PLUGIN_REP_VERSION, true);
+                        wp_localize_script("archiveAds", "variables", array(
+                            "nonce"            => wp_create_nonce("nonceAlertAPI"),
+                            "APIURL"           => get_rest_url(null, PLUGIN_REP_NAME."/v1/alerts"),
+                            "success"          => __("You are subscribed to this alert with success.", "reptxtdom"),
+                            "unknownAddress"   => __("The city is not recognized.", "reptxtdom"),
+                            "sameAlert"        => __("You are already subscribed to this alert.", "reptxtdom"),
+                            "error"            => __("An error occurred, please try again later.", "reptxtdom")
                         ));
-                    wp_enqueue_script("archiveAds");
+                        wp_enqueue_script("archiveAds");
+                    }
                 }
-            }else if(is_search() && !have_posts() && !locate_template(array("no-results.php"))) {
-                $path =  "$fullPath/archives/no-results.php";
+            }elseif(is_search() && !have_posts() && !locate_template(array("no-results.php"))) {
+                $path = "$fullPath/archives/no-results.php";
                 wp_register_style("noResults", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/$shortPath/archives/noResults.css"), array(), PLUGIN_RE_VERSION);
                 wp_enqueue_style("noResults");
+
+                if(PLUGIN_RE_REP) {
+                    wp_register_script("archiveAds", plugins_url(PLUGIN_REP_NAME."/includes/js/templates/archives/archiveAds.js"), array("jquery"), PLUGIN_REP_VERSION, true);
+                    wp_localize_script("archiveAds", "variables", array(
+                        "nonce"            => wp_create_nonce("nonceAlertAPI"),
+                        "APIURL"           => get_rest_url(null, PLUGIN_REP_NAME."/v1/alerts"),
+                        "success"          => __("You are subscribed to this alert with success.", "reptxtdom"),
+                        "unknownAddress"   => __("The city is not recognized.", "reptxtdom"),
+                        "sameAlert"        => __("You are already subscribed to this alert.", "reptxtdom"),
+                        "error"            => __("An error occurred, please try again later.", "reptxtdom")
+                    ));
+                    wp_enqueue_script("archiveAds");
+                }
             }
         }
-        
+
         return $path;
     }
+
     
     /*
      * Add a metabox to display the taxonomies adType and adProperty
@@ -590,6 +613,13 @@ public function customFiltersQuery($query) {
             $postStates["unavailable"] = $availabilityTerms[0]->name;
         }
         return $postStates;
+    }
+    
+    public function deactivateGutenberg($canEdit, $postType) {         
+          if($postType === "re-ad") {
+              $canEdit = false;
+          }
+          return $canEdit;
     }
             
 }

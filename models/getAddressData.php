@@ -43,27 +43,29 @@ if(!function_exists("getAddressData")) {
                             $resultsBodyDataAPI = wp_remote_retrieve_body($resultsResponseDataAPI);
                             $resultsArrayDataAPI = json_decode($resultsBodyDataAPI, true);
 
-                            $city = $resultsArrayDataAPI["features"][0]["properties"]["city"];
-                            $cityCode = $resultsArrayDataAPI["features"][0]["properties"]["citycode"];
-                            $resultsReponseGeoAPI = wp_safe_remote_get("https://geo.api.gouv.fr/communes/$cityCode?fields=centre,codesPostaux&limit=1", array("timeout" => 10, "httpversion" => "1.1", "headers" => array("Content-Type" => "application/json; charset=utf-8")));
+                            if(isset($resultsArrayDataAPI["features"][0])) {
+                                $city = $resultsArrayDataAPI["features"][0]["properties"]["city"];
+                                $cityCode = $resultsArrayDataAPI["features"][0]["properties"]["citycode"];
+                                $resultsReponseGeoAPI = wp_safe_remote_get("https://geo.api.gouv.fr/communes/$cityCode?fields=centre,codesPostaux&limit=1", array("timeout" => 10, "httpversion" => "1.1", "headers" => array("Content-Type" => "application/json; charset=utf-8")));
 
-                            if(wp_remote_retrieve_response_code($resultsReponseGeoAPI) === 200) {
-                                $resultsBodyGeoAPI = wp_remote_retrieve_body($resultsReponseGeoAPI);
-                                $resultsArrayGeoAPI = json_decode($resultsBodyGeoAPI, true);
+                                if(wp_remote_retrieve_response_code($resultsReponseGeoAPI) === 200) {
+                                    $resultsBodyGeoAPI = wp_remote_retrieve_body($resultsReponseGeoAPI);
+                                    $resultsArrayGeoAPI = json_decode($resultsBodyGeoAPI, true);
 
-                                if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
-                                    $arrayCleaned["city"] = $city;
-                                    $arrayCleaned["postCode"] = min($resultsArrayGeoAPI["codesPostaux"]);
-                                }
-                                else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius") {
-                                    $radius = intval($_GET["radius"]);
-                                    $long = $resultsArrayGeoAPI["centre"]["coordinates"][0];
-                                    $lat = $resultsArrayGeoAPI["centre"]["coordinates"][1];
+                                    if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
+                                        $arrayCleaned["city"] = $city;
+                                        $arrayCleaned["postCode"] = min($resultsArrayGeoAPI["codesPostaux"]);
+                                    }
+                                    else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius") {
+                                        $radius = intval($_GET["radius"]);
+                                        $long = $resultsArrayGeoAPI["centre"]["coordinates"][0];
+                                        $lat = $resultsArrayGeoAPI["centre"]["coordinates"][1];
 
-                                    $arrayCleaned["minLat"] = $lat - $radius / 111;
-                                    $arrayCleaned["maxLat"] = $lat + $radius / 111;
-                                    $arrayCleaned["minLong"] = $long - $radius / 76;
-                                    $arrayCleaned["maxLong"] = $long + $radius / 76;
+                                        $arrayCleaned["minLat"] = $lat - $radius / 111;
+                                        $arrayCleaned["maxLat"] = $lat + $radius / 111;
+                                        $arrayCleaned["minLong"] = $long - $radius / 76;
+                                        $arrayCleaned["maxLong"] = $long + $radius / 76;
+                                    }
                                 }
                             }
                         }
@@ -173,27 +175,31 @@ if(!function_exists("getAddressData")) {
                             $resultsBodyGeocodeAPI = wp_remote_retrieve_body($resultsResponseGeocodeAPI);
                             $resultsArrayGeocodeAPI = json_decode($resultsBodyGeocodeAPI, true);
 
-                            $addressComponents = $resultsArrayGeocodeAPI["results"][0]["address_components"];
+                            if(isset($resultsArrayGeocodeAPI["results"][0])) {
+                                $addressComponents = $resultsArrayGeocodeAPI["results"][0]["address_components"];
 
-                            if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
-                                foreach ($addressComponents as $comp) {
-                                    if(in_array("postal_code", $comp["types"], true)) {
-                                        $arrayCleaned["postCode"] = $comp["long_name"];
-                                    }
-                                    else if(in_array("locality", $comp["types"], true)) {
-                                        $arrayCleaned["city"] = $comp["long_name"];
+                                if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
+                                    foreach ($addressComponents as $comp) {
+                                        if(in_array("postal_code", $comp["types"], true)) {
+                                            $arrayCleaned["postCode"] = $comp["long_name"];
+                                        }
+                                        else if(in_array("locality", $comp["types"], true)) {
+                                            $arrayCleaned["city"] = $comp["long_name"];
+                                        }
                                     }
                                 }
                             }
                             else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius") {
-                                $radius = intval($_GET["radius"]);
-                                $long = $resultsArrayGeocodeAPI["results"][0]["geometry"]["location"]["lng"];
-                                $lat = $resultsArrayGeocodeAPI["results"][0]["geometry"]["location"]["lat"];
+                                if(isset($resultsArrayGeocodeAPI["results"][0])) {
+                                    $radius = intval($_GET["radius"]);
+                                    $long = $resultsArrayGeocodeAPI["results"][0]["geometry"]["location"]["lng"];
+                                    $lat = $resultsArrayGeocodeAPI["results"][0]["geometry"]["location"]["lat"];
 
-                                $arrayCleaned["minLat"] = $lat - $radius / 111;
-                                $arrayCleaned["maxLat"] = $lat + $radius / 111;
-                                $arrayCleaned["minLong"] = $long - $radius / 76;
-                                $arrayCleaned["maxLong"] = $long + $radius / 76;
+                                    $arrayCleaned["minLat"] = $lat - $radius / 111;
+                                    $arrayCleaned["maxLat"] = $lat + $radius / 111;
+                                    $arrayCleaned["minLong"] = $long - $radius / 76;
+                                    $arrayCleaned["maxLong"] = $long + $radius / 76;
+                                }
                             }
                         }
                     break;
