@@ -35,7 +35,6 @@ jQuery(document).ready(function ($) {
     }, 4000);
     
 
-    var slideCount = $("#miniSlider ul li").length;
     var slideWidth = $("#miniSlider ul li").width();
     var slideHeight = $("#miniSlider ul li").height();
     var currentImg = 1;
