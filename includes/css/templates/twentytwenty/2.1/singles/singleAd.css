@@ -277,6 +277,9 @@
 
 .contentAd #miniSlider ul {
    position: relative;
+    display: flex;
+   flex-wrap: wrap;
+   flex-direction: column;
    margin: 0;
    padding: 0;
    height: 200px;
@@ -348,6 +351,7 @@
     height: 100vh;
     background-repeat: no-repeat no-repeat;
     background-position: center center;
+    background-size: contain;
 }
 
 .contentAd #fullscreenSlider .controlClose {

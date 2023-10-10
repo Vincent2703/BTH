@@ -56,14 +56,14 @@ jQuery(document).ready(function ($) {
     }
 
     function moveSlide(direction) {
+                //console.log(jQuery("#miniSlider ul li").width());
+
         if(direction === "left") {
-            $("#miniSlider ul").animate({
-                left: + slideWidth
-            }, 200, function () {
-                $("#miniSlider ul li:last-child").prependTo("#miniSlider ul");
-                $("#miniSlider ul").css("left", '');          
-            });
-            
+            $("#miniSlider ul li:last-child").prependTo("#miniSlider ul");
+            $("#miniSlider ul").css("left", -slideWidth).animate({
+                left: 0
+            }, 200);
+           
         if($("#fullscreenSlider").is(":visible")) {
             var largeImage = $("#miniSlider ul li:last-child img").attr("src").replace(/-[0-9]+x[0-9]+/, '');
             $("#fullscreenSlider .displayFullscreen").fadeOut("400", function() {
