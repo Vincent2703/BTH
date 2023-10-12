@@ -34,15 +34,8 @@ jQuery(document).ready(function ($) {
         }
     }, 4000);
     
-
-    var slideWidth = $("#miniSlider ul li").width();
-    var slideHeight = $("#miniSlider ul li").height();
     var currentImg = 1;
     var maxImg = $("#miniSlider ul li").length;
-
-    $("#miniSlider").css({ maxWidth: slideWidth, height: slideHeight });
-
-    $("#miniSlider ul").css({ width: "100vw" });
 	    
     $(".pagingImg").text("1/" + maxImg);
     
@@ -56,7 +49,7 @@ jQuery(document).ready(function ($) {
     }
 
     function moveSlide(direction) {
-                //console.log(jQuery("#miniSlider ul li").width());
+        var slideWidth = $("#miniSlider ul li").width();
 
         if(direction === "left") {
             $("#miniSlider ul li:last-child").prependTo("#miniSlider ul");

@@ -28,7 +28,7 @@ class Realm {
     public function __construct() {
         $this->defineGlobalConsts();
         
-        //$this->createNotices();
+        //$this->createNotice();
         
         //$this->checkTheme();
         
@@ -57,18 +57,22 @@ class Realm {
     /*
      * (Re-)initialize/fill the notices option
      */
-    public static function createNotices($type=null, $msg=null, $reset=false) {
-        if($reset) {
-            $notices = array("errors"=>[], "warnings"=>[], "informations"=>[]);
-        }else{
-            $notices = get_option(PLUGIN_RE_NAME."Notices");
+    public static function createNotice($name, $msg='', $type="info") {   
+        $notices = get_option(PLUGIN_RE_NAME."Notices")?:array();
+        
+        if(isset($name) && !empty($msg) && (!isset($notices[$name]) || $notices[$name]["message"] != $msg)) {
+            $notices[$name] = ["type"=>$type, "message"=>wp_kses_post($msg), "dismissed"=>false];            
+            update_option(PLUGIN_RE_NAME."Notices", $notices);
         }
         
-        if(!is_null($type) && !is_null($msg)) {
-            array_push($notices[$type], wp_kses_post($msg));
+    }
+    
+    public static function dismissNotice($name) {
+        $notices = get_option(PLUGIN_RE_NAME."Notices")?:null;
+        if(!is_null($notices) && isset($notices[$name]) && !$notices[$name]["dismissed"]) {
+            $notices[$name]["dismissed"] = true;
+            update_option(PLUGIN_RE_NAME."Notices", $notices);
         }
-        
-        update_option(PLUGIN_RE_NAME."Notices", $notices, true);
     }
     
     /*
@@ -195,6 +199,8 @@ class Realm {
         add_action("plugin_action_links_" . plugin_basename( __FILE__ ), array($this, "addActionsPluginRow"));
         
         add_action("after_setup_theme", array($this, "checkTheme"));
+        
+        add_action("wp_ajax_dismissNoticeHandler", array($this, "dismissNoticeHandler"));
     }
     
     /*
@@ -324,6 +330,12 @@ class Realm {
      * Save the default options values
      */
     private function defaultOptionsValues() {
+        
+        $compatibleThemes = array(
+            "twentytwenty"  => array("2.1"),
+            "neve"          => array("3.7.2")
+        );
+        update_option(PLUGIN_RE_NAME."CompatibleThemes", $compatibleThemes);
         
         $defaultValuesLanguage = array(
             "language" => "en",
@@ -567,6 +579,11 @@ class Realm {
                 wp_enqueue_script("mediaButton");
             }
         }
+        
+        //Everywhere in the admin :
+        wp_register_script("dismissableNotices", plugins_url(PLUGIN_RE_NAME."/includes/js/others/dismissableNotices.js"), array("jquery"), PLUGIN_RE_VERSION, true);
+        wp_localize_script("dismissableNotices", "translations", array("notBeDisplayedAnymore" => __("This notice will no longer be displayed.", "reptxtdom")));
+        wp_enqueue_script("dismissableNotices");
     }
     
     /*
@@ -694,34 +711,43 @@ class Realm {
     /*
      * Check that the theme used is compatible with the plugin
      * Fill the notices arrays if needed
-     * Save a constant with the templates path to use
      */
     public function checkTheme() {
         $currentTheme = wp_get_theme();
         $themeName = str_replace(' ', '', strtolower($currentTheme->name));
         $themeVersion = $currentTheme->version;
-        $listThemes = array_diff(scandir(PLUGIN_RE_PATH."includes/css/templates"), array("..", '.', "searchBars")); 
+        $listThemes = get_option(PLUGIN_RE_NAME."CompatibleThemes")?:array();
         
-        if(in_array($themeName, $listThemes)) {
-            $listVersions = array_diff(scandir(PLUGIN_RE_PATH."includes/css/templates/$themeName"), array('.', ".."));
-            if(!in_array($themeVersion, $listVersions)) {
-                $this->createNotices("warnings", sprintf(__('The version of the theme you are using (%1$s) is different from the ones the plugin templates were built with (%2$s). Expect potential bugs.', "retxtdom"), $themeVersion, implode(", ", $listVersions))."<br />"
-                . __("For more information, please read the", "retxtdom").'&nbsp;<a target="_blank" href="#">'.__("documentation", "retxtdom")."</a>");
-                $versionToUse = end($listVersions);
-            }else{
-                $versionToUse = $themeVersion;
-                $this->createNotices(null, null, true); //Reset
+        if(empty($listThemes)) {
+            return;
+        }
+        $noticeDismissed = get_option(PLUGIN_RE_NAME."ThemeNoticeDismissed");
+        if(isset($listThemes[$themeName]) && !in_array($themeVersion, $listThemes[$themeName])) {
+            if(!$noticeDismissed) {
+                $this->createNotice("compatibilityTheme", 
+                    sprintf(__('The version of the theme you are using (%1$s) has not been tested with the templates of the plugin (tested with %2$s). Expect potential bugs.<br />
+                        Please read <a target="_blank" href="#">the documentation</a> for more information.', "retxtdom"), 
+                        $themeVersion, 
+                        implode(" ; ", $listThemes[$themeName])
+                    ),
+                    "warning"
+                );
             }
-            define("PLUGIN_RE_THEME", array("name" => $themeName, "version" => $versionToUse));
         }else{
-            $this->createNotices("errors", __("The theme that you are using is not compatible with the plugin. Please use one of the following themes :", "retxtdom")."<br />"
-                . "<ul><li><a target='_blank' href='https://wordpress.org/themes/twentytwenty/'>Twenty twenty 2.1</a></li></ul><br />"
-                . __("For more information, please read the", "retxtdom").'&nbsp;<a target="_blank" href="#">'.__("documentation", "retxtdom")."</a>");
-            
-            $listVersions = scandir(PLUGIN_RE_PATH."includes/css/templates/twentytwenty");
-            $themeLastVersion = end($listVersions);
-            define("PLUGIN_RE_THEME", array("name" => "twentytwenty", "version" => $themeLastVersion));      
-        } 
+            if(!$noticeDismissed) {
+                $this->createNotice("compatibilityTheme", 
+                    sprintf(__('The theme you are using (<b>%1$s %2$s</b>) has not been tested with the plugin. Expect potential bugs.<br />
+                        You can use one of the following tested themes : 
+                        <ul>%3$s</ul><br />
+                        <a target="_blank" href="#">You can also develop your own templates</a>.', "retxtdom"), 
+                        $themeName, 
+                        $themeVersion,
+                        implode('', array_map(function ($key, $value) { return "<li>".strtolower($key) . " (" . implode(" ; ", $value) . ")</li>"; }, array_keys($listThemes), $listThemes))
+                    ),
+                    "warning"
+                );
+            }
+        }
     }
     
     /*
@@ -730,26 +756,21 @@ class Realm {
     public function displayNotices() {
         $pluginName = strtoupper(PLUGIN_RE_NAME);
         $notices = get_option(PLUGIN_RE_NAME."Notices");
-        foreach($notices["errors"] as $error) { ?>
-            <div class="notice notice-error is-dismissible">
-                <h3><?= $pluginName; ?></h3>
-                <p><?= $error; ?></p>   
-            </div>
-        <?php }
-        foreach($notices["warnings"] as $warning) { ?>
-            <div class="notice notice-warning is-dismissible">
-                <h3><?= $pluginName; ?></h3>
-                <p><?= $warning; ?></p>   
-            </div>
-        <?php }
-        foreach($notices["informations"] as $info) { ?>
-            <div class="notice notice-info is-dismissible">
-                <h3><?= $pluginName; ?></h3>
-                <p><?= $info; ?></p>   
-            </div>
-        <?php }
-        $this->createNotices(null, null, true); //Reset
+        foreach($notices as $notice) { 
+            if(!$notice["dismissed"]) { ?>
+                <div class="RENotices notice notice-<?=$notice["type"];?>" data-notice="<?= array_search($notice, $notices); ?>">
+                    <h3><?= $pluginName; ?></h3>
+                    <p><?= $notice["message"]; ?></p>
+                    <p class="closeNotice" style="cursor: pointer; font-weight: bold;;">&times; <?php _e("Close the notice", "retxtdom") ;?></p>
+                </div>
+            <?php } 
+        }
     }  
+    
+    public function dismissNoticeHandler() {
+        $name = $_POST["name"];
+        self::dismissNotice($name);
+    }
     
     /*
      * Remove the default WP widgets from the dashboard for the non-administrators

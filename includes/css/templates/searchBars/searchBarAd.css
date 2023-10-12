@@ -24,8 +24,9 @@
 
 .searchBar .searchForm>div .searchBarInput input:not(input[type="checkbox"]), .searchBar .searchForm>div .searchBarInput select {
     font-size: 16px;
-    padding: 5px 0 5px 10px;
+    padding: 5px 10% 5px 10px;
     border-radius: 20px;
+    width: 100%;
 }
 
 .searchBar .searchForm #radius {
@@ -63,16 +64,20 @@
     gap: 3vw;
 }
 
-.searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas div {
+.searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas div.colPropertyHas {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 }
 
-.searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas div input {
-    margin-bottom: 20px;
+.searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas div.colPropertyHas span.propertyCharact {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 33%;
 }
 
-.searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas div label {
+.searchBar .searchForm .compSearchBarInputs .otherDetails .propertyHas div.colPropertyHas label {
     margin-left: 0;
 }
 
@@ -95,6 +100,7 @@
     }
     
     .searchBar .searchForm div {
+        display: flex;
         flex-direction: column;
     }
     

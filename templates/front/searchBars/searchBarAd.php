@@ -94,21 +94,33 @@
                         <input type="number" name="nbBathrooms" id="bathrooms" <?= $_GET["nbBathrooms"] ?? '' ? 'value="'.absint($_GET["nbBathrooms"]).'"' : '' ?>>
                     </div>
                     <div class="propertyHas">
-                        <div>
-                            <label for="furnished"><?php _e("Furnished", "retxtdom"); ?></label>
-                            <input type="checkbox" name="furnished" id="furnished" <?php checked(isset($_GET["furnished"])&&$_GET["furnished"]==="on"); ?>>
-                            <label for="land"><?php _e("Land", "retxtdom"); ?></label>
-                            <input type="checkbox" name="land" id="land" <?php checked(isset($_GET["land"])&&$_GET["land"]==="on"); ?>>
-                            <label for="cellar"><?php _e("Cellar", "retxtdom"); ?></label>
-                            <input type="checkbox" name="cellar" id="cellar" <?php checked(isset($_GET["cellar"])&&$_GET["cellar"]==="on"); ?>>
+                        <div class="colPropertyHas">
+                            <span class="propertyCharact">
+                                <label for="furnished"><?php _e("Furnished", "retxtdom"); ?></label>
+                                <input type="checkbox" name="furnished" id="furnished" <?php checked(isset($_GET["furnished"])&&$_GET["furnished"]==="on"); ?>>
+                            </span>
+                            <span class="propertyCharact">
+                                <label for="land"><?php _e("Land", "retxtdom"); ?></label>
+                                <input type="checkbox" name="land" id="land" <?php checked(isset($_GET["land"])&&$_GET["land"]==="on"); ?>>
+                            </span>
+                            <span class="propertyCharact">
+                                <label for="cellar"><?php _e("Cellar", "retxtdom"); ?></label>
+                                <input type="checkbox" name="cellar" id="cellar" <?php checked(isset($_GET["cellar"])&&$_GET["cellar"]==="on"); ?>>
+                            </span>
                         </div>
-                        <div>
-                            <label for="outdoorSpace"><?php _e("Outdoor space", "retxtdom"); ?></label>
-                            <input type="checkbox" name="outdoorSpace" id="outdoorSpace" <?php checked(isset($_GET["outdoorSpace"])&&$_GET["outdoorSpace"]==="on"); ?>>
-                            <label for="elevator"><?php _e("Elevator", "retxtdom"); ?></label>
-                            <input type="checkbox" name="elevator" id="elevator" <?php checked(isset($_GET["elevator"])&&$_GET["elevator"]==="on"); ?>>
-                            <label for="garageparking"><?php _e("Garage/Parking", "retxtdom"); ?></label>
-                            <input type="checkbox" name="garageparking" id="garageparking" <?php checked(isset($_GET["garageparking"])&&$_GET["garageparking"]==="on"); ?>>
+                        <div class="colPropertyHas">
+                            <span class="propertyCharact">
+                                <label for="outdoorSpace"><?php _e("Outdoor space", "retxtdom"); ?></label>
+                                <input type="checkbox" name="outdoorSpace" id="outdoorSpace" <?php checked(isset($_GET["outdoorSpace"])&&$_GET["outdoorSpace"]==="on"); ?>>
+                            </span>
+                            <span class="propertyCharact">
+                                <label for="elevator"><?php _e("Elevator", "retxtdom"); ?></label>
+                                <input type="checkbox" name="elevator" id="elevator" <?php checked(isset($_GET["elevator"])&&$_GET["elevator"]==="on"); ?>>
+                            </span>
+                            <span class="propertyCharact">
+                                <label for="garageparking"><?php _e("Garage/Parking", "retxtdom"); ?></label>
+                                <input type="checkbox" name="garageparking" id="garageparking" <?php checked(isset($_GET["garageparking"])&&$_GET["garageparking"]==="on"); ?>>
+                            </span>
                         </div>
                     </div>
                 </div>
