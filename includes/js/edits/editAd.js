@@ -120,7 +120,7 @@ function reloadAgents(select) {
     jQuery.ajax({
         url: variablesEditAd.URLAPIGetAgents,
         data: { nonce: variablesEditAd.nonce },
-        type: "GET",
+        type: "POST",
         dataType: "json"
     }).success(function(response) {
         jQuery(select).empty();

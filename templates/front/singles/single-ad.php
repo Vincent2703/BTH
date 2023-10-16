@@ -8,6 +8,7 @@
         
         require_once(PLUGIN_RE_PATH."models/AdModel.php");
         $currency = REALM_AdModel::getCurrency();
+        $areaUnit = REALM_AdModel::getAreaUnit();
         $feesURL = REALM_AdModel::getFeesURL();
         while(have_posts()) {
             if(is_active_sidebar("before_content-side-bar")) {
@@ -91,7 +92,7 @@
         <div id="primary" class="content-area contentAd">
             <main id="main" class="site-main">
                 <span class="titleAd"><h1><?php the_title(); ?></h1></span>
-                <span class="subtitleAd"><?= ucfirst($ad["city"])." - ".$ad["price"].$ad["afterPrice"]; ?></span>
+                <div class="subtitleAd"><?=$ad["taxonomies"]["typeProperty"]["name"].' - '.$ad["taxonomies"]["typeAd"]["name"] . " (".$ad["price"].$ad["afterPrice"].")";?></div>
                 <?php if(!empty($ad["imagesIds"][0])) { ?>
                 <div class="sliders">
                     <div id="miniSlider">
@@ -118,7 +119,7 @@
                 <div class="contentLeftAd">
                     <div class="description">
                         <h4>Description</h4>
-                        <?php the_content(); ?>
+                        <span class="contentDescription"><?php the_content(); ?></span>
                     </div>
                     <div class="mainFeatures">
                         <h4><?php _e("Main features", "retxtdom"); ?></h4>
@@ -132,7 +133,7 @@
                                 <span class="valueFeature"><?= $ad["price"].$currency; ?></span>
                             </div>
                             <div>
-                                <span class="nameFeature"><?php _e("Fees", "retxtdom"); ?></span>
+                                <span class="nameFeature"><?php _e("Fees", "retxtdom") . $feesURL!==false?printf('&nbsp;<a class="feesSchedule" target="_blank" href="%1$s">(%2$s)</a>', $feesURL, __("Fees schedule", "retxtdom")):''; ?></span>
                                 <span class="valueFeature"><?= $ad["fees"].$currency; ?></span>
                             </div>
                             <div>
@@ -195,7 +196,10 @@
                             <?php if(intval($ad["floor"]) > 0) { ?>
                             <div>
                                 <span class="nameFeature"><?php _e("Floor", "retxtdom"); ?></span>
-                                <span class="valueFeature"><?= $ad["floor"]; ?> (sur <?=$ad["nbFloors"];?>)</span>
+                                <span class="valueFeature"><?php printf("%d %s",
+                                    $ad["floor"],
+                                    $ad["nbFloors"] >= $ad["floor"] ? ' ('.__("out of", "retxtdom").' '.$ad["nbFloors"].')' : ''); ?>
+                                </span>
                             </div>
                             <?php } ?>
                             <?php if($ad["furnished"] == '1' ) { ?>
@@ -272,9 +276,7 @@
                             } ?>
                         </div>
                     </div>
-                    <?php if($feesURL !== false) { // If a fees schedule is specified in the options ?> 
-                        <span id="feesSchedule"><a target="_blank" href="<?=$feesURL;?>"><?php _e("Fees schedule", "retxtdom") ;?></a></span>
-                    <?php }
+                    <?php
                     if(PLUGIN_RE_REP && $userIsCustomer && $ad["allowSubmission"]) { 
                         if($checkExistingSubmission || isset($HFID)) { ?>
                             <a href="<?=admin_url();?>"><button><?php _e("View my housing file submission(s)", "reptxtdom");?></button></a>
@@ -298,12 +300,14 @@
                     ?>
                 </div>
                 <div class="contentRightAd">
+                    <div class="mapContainer">
                     <?php if($ad["getCoords"]) {  
                         if($ad["showMap"] === "onlyPC") { ?>
                             <span id="addressApprox"><?php _e("The location of the property is approximate", "retxtdom"); ?>.</span>
                         <?php } ?>
                         <div id="map" class="map" data-coords="<?= implode(',', $ad["coords"]); ?>"></div>
                     <?php } ?>
+                    </div>
                     <div class="contact">
                         <div class="headerContact">
                             <?php if($ad["getContact"]) { ?>
@@ -325,10 +329,10 @@
                                     <tbody>
                                         <tr>
                                             <td id="phoneIcon" rowspan="2"><span class="material-symbols-outlined">call</span></td>
-                                            <?php if(isset($ad["phone"])) { ?><td id="phoneContact"><a href="tel:<?= $ad["phone"]; ?>"><?= implode(' ', str_split($ad["phone"], 2)); ?></a></td><?php } ?>
+                                            <?php if(isset($ad["phone"])) { ?><td class="phoneContact"><a href="tel:<?= $ad["phone"]; ?>"><?= implode(' ', str_split($ad["phone"], 2)); ?></a></td><?php } ?>
                                         </tr>
                                         <tr>
-                                            <?php if(isset($ad["mobilePhone"])) { ?><td><span id="mobilePhoneContact"><a href="tel:<?= $ad["mobilePhone"]; ?>"><?= implode(' ', str_split($ad["mobilePhone"], 2)); ?></a></span></td><?php } ?>
+                                            <?php if(isset($ad["mobilePhone"])) { ?><td><span class="mobilePhoneContact"><a href="tel:<?= $ad["mobilePhone"]; ?>"><?= implode(' ', str_split($ad["mobilePhone"], 2)); ?></a></span></td><?php } ?>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -345,7 +349,7 @@
                             <label for="names"><?php _e("First name and last name", "retxtdom"); ?></label><input type="text" name="names" class="formContactInput" value="<?= $prefillForm?$user["firstName"].' '.$user["lastName"]:''?>" required>
                             <label for="phone"><?php _e("Phone", "retxtdom"); ?></label><input type="tel" name="phone" class="formContactInput" required>
                             <label for="email"><?php _e("Email address", "retxtdom"); ?></label><input type="text" name="email" class="formContactInput" value="<?= $prefillForm?$ad["email"]:'';?>"required>
-                            <label for="message"><?php _e("Message", "retxtdom"); ?></label><textarea name="message" class="formContactInput" cols="22" required></textarea>
+                            <label for="message"><?php _e("Message", "retxtdom"); ?></label><textarea name="message" class="formContactInput" rows="3" required></textarea>
                             <?php if(isset($emailStatus)) { ?>
                                 <span id="emailStatus"><?=$emailStatus;?>.</span><br />
                             <?php } ?>
@@ -355,31 +359,33 @@
                 </div>
                 <?php if(!empty($ad["morePosts"])) { ?>
                 <div class="more">
-                    <span id="moreTitle"><?php _e("Other", "retxtdom"); ?> <?= lcfirst($ad["taxonomies"]["typeAd"]["name"]); ?>s <?= _e("in", "retxtdom"); ?> <?= ucfirst($ad["city"]); ?></span><br />
-                    <div class="morePosts">
-                        <?php 
-                            $nbPosts = count($ad["morePosts"]);
-                            $adByPanel = 5;
-                            $nbPanels = ceil($nbPosts/$adByPanel);
-                            for($i=0; $i<$nbPanels; $i++) { ?>
-                                <div class="morePostsPanel" <?= $i>0 ? 'style="display: none;"':'';?>>
-                                    <span class="prevMorePosts" <?= $nbPanels<$adByPanel ? 'style="display: none;"':'';?>><</span>
-                                    <?php for($y=0; $y<$adByPanel; $y++) {
-                                        $currentNbPost = $i*5+$y;
-                                        if(isset($ad["morePosts"][$currentNbPost]) && get_the_post_thumbnail_url($ad["morePosts"][$currentNbPost]) !== false) { 
-                                            $morePost = $ad["morePosts"][$currentNbPost];?>
-                                            <div class="moreAd">
-                                                <div class="moreThumbnailAd">
-                                                    <?= '<a href="'.get_post_permalink($morePost).'">'.get_the_post_thumbnail($morePost, "thumbnail").'</a>' ;?>
-                                                </div>
-                                                <span class="moreTitleAd"><?= '<a href="'.get_post_permalink($morePost).'">'.get_the_title($morePost).'</a>' ;?></span>
-                                            </div>
-                                        <?php }
-                                    } ?>
-                                    <span class="nextMorePosts" <?= $nbPanels<$adByPanel ? 'style="display: none;"':'';?>>></span>
-                                </div>
-                            <?php }
-                        ?>
+                    <span id="moreTitle"><?php _e("Similar ads", "retxtdom"); ?></span>
+                    <div class="similarAdsContainer">
+                        <div class="similarAdsWrapper">
+                        <?php foreach($ad["morePosts"] as $similarAd) {
+                            printf(
+                                '<div class="similarAd">
+                                    <div class="similarAdThumbnail">
+                                        <a href="%s">%s</a>
+                                    </div>
+                                    <div class="similarAdDetails">
+                                        <span class="similarAdTitle"><a href="%s">%s</a></span>
+                                        <span class="similarAdPrice">500000€</span>
+                                        <span class="similarAdSurfaceRooms">
+                                            <span>250m²</span>
+                                            <span>3 pièces</span>
+                                        </span>
+                                    </div>
+                                </div>',
+                                esc_url(get_post_permalink($similarAd)),
+                                get_the_post_thumbnail($similarAd, "thumbnail"),
+                                esc_url(get_post_permalink($similarAd)),
+                                get_the_title($similarAd)
+                            );
+                        } ?>
+                        </div>
+                        <span class="prevMorePosts dashicons dashicons-arrow-left" style="display: none;"></span>
+                        <span class="nextMorePosts dashicons dashicons-arrow-right"></span>
                     </div>
                 </div>
         <?php 

@@ -15,7 +15,7 @@
                         "query": input.val(),
                         "context": context
                     },
-                    type: "GET",
+                    type: "POST",
                     dataType: "json",
                     success: function(data) {
                         var labels = [];

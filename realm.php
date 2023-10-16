@@ -51,7 +51,7 @@ class Realm {
         define("PLUGIN_RE_PATH", WP_PLUGIN_DIR.'/'.PLUGIN_RE_NAME.'/');
         
         $activatedPluginsList = get_option("active_plugins");
-        define("PLUGIN_RE_REP", in_array("realm/realm.php", $activatedPluginsList));
+        define("PLUGIN_RE_REP", in_array("realmPlus/realmPlus.php", $activatedPluginsList));
     }
     
     /*
@@ -201,6 +201,10 @@ class Realm {
         add_action("after_setup_theme", array($this, "checkTheme"));
         
         add_action("wp_ajax_dismissNoticeHandler", array($this, "dismissNoticeHandler"));
+        
+        //add_action('init', array($this, 'add_custom_html_to_header'));
+        
+        add_action("neve_after_header_hook", array($this, "add_custom_html_to_header"));
     }
     
     /*
@@ -256,6 +260,10 @@ class Realm {
         add_filter("use_block_editor_for_post_type", array($this->Ad, "deactivateGutenberg"), 10, 2);
         
     }
+    
+    /*public function add_custom_html_to_header() {
+        include_once("templates/front/searchBars/searchBarAd.php");
+    }*/
     
     /*
      * When the plugin is activated
@@ -337,12 +345,12 @@ class Realm {
         );
         update_option(PLUGIN_RE_NAME."CompatibleThemes", $compatibleThemes);
         
-        $defaultValuesLanguage = array(
-            "language" => "en",
+        $defaultValuesGeneral = array(
             "currency" => "$",
-            "areaUnit" => "m²"
+            "areaUnit" => "m²",
+            "similarAdsSameCity" => true
         );
-        update_option(PLUGIN_RE_NAME."OptionsGeneral", $defaultValuesLanguage); 
+        update_option(PLUGIN_RE_NAME."OptionsGeneral", $defaultValuesGeneral); 
         
         $defaultValuesImports = array(
             "maxSavesImports"       => 2,
@@ -599,13 +607,13 @@ class Realm {
     public function registerRouteCustomAPIs() {
         require_once("models/getAddressData.php");
         register_rest_route(PLUGIN_RE_NAME."/v1", "address", array( 
-            "methods" => "GET",
+            "methods" => "POST",
             "callback" => "getAddressData",
             "permission_callback" => array($this, "permissionCallbackGetAddressData")
         ));
         
         register_rest_route(PLUGIN_RE_NAME."/v1", "agents", array( 
-            "methods" => "GET",
+            "methods" => "POST",
             "callback" => function() {
                 $this->UserModel->getUsersByRole("agent", true);
             },
@@ -674,7 +682,6 @@ class Realm {
         if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {         
             wp_register_script("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
             $variablesSearchBar = array(
-                "filters" => __("FILTERS", "retxtdom"),
                 "searchBarURL" => plugin_dir_url(__FILE__)."templates/front/searchBars/searchBarAd.php",
                 "autocompleteURL" => plugin_dir_url(__FILE__)."includes/js/searches/autocompleteAddress.js",
                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),

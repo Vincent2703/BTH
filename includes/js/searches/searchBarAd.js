@@ -19,18 +19,22 @@ jQuery(document).ready(function($) {
     }); 
 });
 
-function addFilters(button) {
-    var complementaryFilters = jQuery(".compSearchBarInputs");
+function addFilters(elem) {
+    var complementaryFilters = jQuery(".filtersSearchBarInputs");
+    jQuery(".dashicons", elem).toggleClass("dashicons-plus-alt dashicons-minus");
     if(complementaryFilters.is(":hidden")) {
         complementaryFilters.show("slow");
-        jQuery(button).text(variablesSearchBar.filters+" -");
+        jQuery(".searchBar .filtersSearchBarInputs input[type=submit]").show();
+        jQuery(".searchBar .mainSearchBarInputs input[type=submit]").hide();
     }else{
         complementaryFilters.hide("slow");
-        jQuery(button).text(variablesSearchBar.filters+" +");
+        jQuery(".searchBar .filtersSearchBarInputs input[type=submit]").hide();
+        jQuery(".searchBar .mainSearchBarInputs input[type=submit]").show();
     }   
 }
 
 function searchByR(value) {
+    const searchBar = jQuery(".searchBar");
     if(value==="radius") {
         jQuery("#radiusInput").show("slow");
     }else{

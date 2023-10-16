@@ -20,8 +20,8 @@ class REALM_RegisterUserDashboard {
         
         $agencies = REALM_UserModel::getUsersByRole("agency");
         ?>
-        <h3 id="extraInformationTitle"><?php _e("Extra profile information for", "retxtdom");?>&nbsp;<span id="roleName"></span></h3>
-        <table class="form-table" id="extraInformation">
+        <h3 id="extraInformationTitle" style="display: none;"><?php _e("Extra profile information for", "retxtdom");?>&nbsp;<span id="roleName"></span></h3>
+        <table class="form-table" id="extraInformation" style="display: none;">
             <tr class="form-field agent">
                 <th scope="row">
                     <label for="agentPhone"><?php _e("Phone", "retxtdom");?></label>

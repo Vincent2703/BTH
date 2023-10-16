@@ -130,34 +130,84 @@ jQuery(document).ready(function ($) {
         autoplay = false;
         var largeImage = $(this).attr("src").replace(/-[0-9]+x[0-9]+/, '');
         $("#fullscreenSlider .displayFullscreen").css("background-image", "url("+largeImage+")");
-        $("#fullscreenSlider").show("slow"); //Remplacer par quelque chose qui permet de personnaliser l'effet
-        setTimeout(function() { //Pour éviter que la page soit redimensionnée avant que l'image s'affiche en plein écran. On peut peut-être trouver mieux ?
-            $("body").css("overflow", "hidden");
-        }, 600);
+        $("#fullscreenSlider").show("slow", function() { $("body").css("overflow", "hidden"); }); 
     });
     
-    /* More posts */
-    $(".prevMorePosts, .nextMorePosts").click(function(e) {
-        var target = $(e.target);
-        var parent = target.parent();
-        if(target.attr("class") === "prevMorePosts") {
-            parent.hide();
-            if(parent.prev().index() !== -1) {
-                parent.prev().show();
-            }else{
-                parent.parent().find(".morePostsPanel:last").show();
-               
-            }
-        }else if(target.attr("class")=== "nextMorePosts") {
-            parent.hide();
-            if(parent.next().index() !== -1) {
-                parent.next().show();
-            }else{
-                parent.parent().find(".morePostsPanel:first").show();
-            }
+    /* Similar posts */
+    const adsWrapper = jQuery(".similarAdsWrapper");
+    const prevButton = jQuery(".prevMorePosts");
+    const nextButton = jQuery(".nextMorePosts");
+
+    let currentIndex = 0;
+    var adWidth = 20; 
+    var containerWidth = adsWrapper.width();
+    var maxVisibleAds = Math.min(Math.floor(containerWidth/160), 5);
+
+    function updateButtonsVisibility() {
+      const adCount = jQuery("div.similarAd", adsWrapper).length;
+
+      if(adCount > maxVisibleAds) {
+      if(currentIndex === 0) {
+        prevButton.hide();
+      }else {
+        prevButton.show();
+      }
+
+      if(currentIndex >= adCount - maxVisibleAds) {
+        nextButton.hide();
+      }else {
+        nextButton.show();
+      }
+  }else{
+      prevButton.hide();
+      nextButton.hide();
+  }
+    }
+
+    function updateSlider() { 
+        containerWidth = adsWrapper.width();
+        var adCount = jQuery("div.similarAd", adsWrapper).length;
+        var maxIndex = Math.max(adCount - maxVisibleAds, 1);
+                
+        maxVisibleAds = Math.min(Math.floor(containerWidth/160), 5);
+        adWidth = 100/maxVisibleAds;
+
+        currentIndex = Math.min(currentIndex, maxIndex);
+
+        if(adCount <= maxVisibleAds) {
+            adsWrapper.css("transform", "translateX(0)");
+            adsWrapper.css("justify-content", "center");
+            jQuery(".contentAd .similarAd").css("flex", "0 0 0%");
+        }else {
+            jQuery(".contentAd .similarAd").css("flex", "0 0 "+adWidth+"%");
+            var translateX = -currentIndex * adWidth;
+            adsWrapper.css("transform", "translateX("+translateX+"%)");
+            adsWrapper.css("justify-content", "");
         }
+        updateButtonsVisibility();
+    }
+
+    prevButton.click(function () {
+      if(currentIndex > 0) {
+        currentIndex--;
+        updateSlider();
+      }
     });
-    
+
+    nextButton.click(function () {
+      const adCount = jQuery("div.similarAd", adsWrapper).length;
+      if(currentIndex < adCount - maxVisibleAds) {
+        currentIndex++;
+        updateSlider();
+      }
+    });
+
+    updateSlider();
+
+    jQuery(window).resize(updateSlider);
+
+
+
     function DPEGES(diag, domID) {
         var smallDiag = $("<div>")
           .attr("id", domID+"Small")

@@ -177,24 +177,37 @@ class REALM_AdModel {
         $ad["allowSubmission"] = boolval(self::getMeta("adSubmissionsAllowed"));
         $ad["needGuarantors"] = boolval(self::getMeta("adNeedGuarantors"));
 
+        $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
+        
+        $metaQuerySimilarAds = array(
+            array(
+                "key" => "_thumbnail_id"
+            )
+        );
+        if($optionsGeneral["similarAdsSameCity"]) {
+            array_push($metaQuerySimilarAds, array(
+                array(
+                    "key" => "adCity",
+                    "value" => $ad["city"]
+                )
+            ));
+        }
+        
         $ad["morePosts"] = get_posts(array(
             "post_type" => "re-ad",
             "numberposts" => 15,
             "exclude" => $id,
-            "meta_query" => array(
-                array(
-                    "key" => "adCity",
-                    "value" => $ad["city"]
-                ),
-                array(
-                    "key" => "_thumbnail_id"
-                )
-            ),
+            "meta_query" => $metaQuerySimilarAds,
             "tax_query" => array(
                 array(
                     "taxonomy" => "adTypeAd",
                     "field" => "slug",
                     "terms" => $ad["taxonomies"]["typeAd"]["slug"]
+                ),
+                array(
+                    "taxonomy" => "adTypeProperty",
+                    "field" => "slug",
+                    "terms" => $ad["taxonomies"]["typeProperty"]["slug"]
                 ),
                 array(
                     "taxonomy" => "adAvailable",
@@ -203,10 +216,9 @@ class REALM_AdModel {
                 )
             )
         ));
-
+        
         $ad["customMainFields"] = array();
         $ad["customAdditionalFields"] = array();
-        $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsDisplayads");
         if($optionsGeneral !== false ) {
             $customFields = $optionsGeneral["customFields"];
             if(!empty($customFields) || $customFields !== "[]") {

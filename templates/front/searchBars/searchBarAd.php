@@ -18,7 +18,7 @@
 
         <div class="searchForm">
             <div class="mainSearchBarInputs">
-                <div class="searchBarInput">
+                <div class="searchBarInput typeAd">
                     <label for="typeAd"><?php _e("Ad type", "retxtdom"); ?></label>
                     <select name="typeAd" id="typeAd">
                         <?php
@@ -33,7 +33,7 @@
                     </select>
                 </div>
 
-                <div class="searchBarInput">
+                <div class="searchBarInput typeProperty">
                     <label for="typeProperty"><?php _e("Property type", "retxtdom"); ?></label>
                     <select name="typeProperty" id="typeProperty">
                         <?php
@@ -48,28 +48,29 @@
                     </select>
                 </div>
                 
-                <div class="searchBarInput">
+                <div class="searchBarInput address">
                     <label for="addressInput"><?php _e("City and postcode", "retxtdom"); ?></label>
                     <input type="text" name="city" id="addressInput" class="ui-autocomplete-input" autocomplete="off" size="15" placeholder="<?php _e("Ex: London", "retxtdom"); ?>" value="<?=esc_attr(urldecode($_GET["city"] ?? ''), ENT_QUOTES); ?>">
                 </div>
 
-                <div id="searchBy" class="searchBarInput">
-                    <div id="searchBySelect">
-                        <label for="searchBySelect"><?php _e("Search by", "retxtdom");?></label>
-                        <select id="searchBySelect" name="searchBy">
-                            <option value="city" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city"); ?>><?php _e("City", "retxtdom"); ?></option>
-                            <option value="radius" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"); ?>><?php _e("Radius", "retxtdom"); ?></option>
-                        </select>
-                    </div>
-                    <div id="radiusInput" <?= !isset($_GET["searchBy"]) || $_GET["searchBy"]==="city"?'style="display: none;"':''; ?>>
-                        <label for="radius"><?php _e("Radius", "retxtdom"); ?></label>
-                        <input type="number" name="radius" id="radius" value="<?= isset($_GET["radius"])?absint($_GET["radius"]):'10'; ?>">
-                    </div>
+                <div id="searchBy" class="searchBarInput searchBy">
+                    <label for="searchBySelect"><?php _e("Search by", "retxtdom");?></label>
+                    <select id="searchBySelect" name="searchBy">
+                        <option value="city" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city"); ?>><?php _e("City", "retxtdom"); ?></option>
+                        <option value="radius" <?php selected(isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"); ?>><?php _e("Radius", "retxtdom"); ?></option>
+                    </select>                 
                 </div>
-                
-                <button type="button" id="filters"><?php _e("Filters", "retxtdom"); ?> <?=$compSearchBarExtended?'-':'+';?></button>
+                <div id="radiusInput" class="searchBarInput" <?= !isset($_GET["searchBy"]) || $_GET["searchBy"]==="city"?'style="display: none;"':''; ?>>
+                    <label for="radius"><?php _e("Radius", "retxtdom"); ?></label>
+                    <input type="number" name="radius" id="radius" value="<?= isset($_GET["radius"])?absint($_GET["radius"]):'10'; ?>">
+                </div>
+                <div id="filters">
+                    <span><?php _e("Filters", "reptxtdom"); ?></span>
+                    <span class="dashicons dashicons-plus-alt"></span>
+                </div>
+                <input type="submit" value="<?php _e("Search", "retxtdom"); ?>"> 
             </div>          
-            <div class="compSearchBarInputs" <?= $compSearchBarExtended ?: 'style="display: none;"'; ?>>
+            <div class="filtersSearchBarInputs" <?= $compSearchBarExtended ?: 'style="display: none;"'; ?>>
                 <div class="pricesSurfacesInputs">
                     <div class="searchBarInput">
                         <label for="minPrice"><?php _e("Price", "retxtdom"); ?></label>
@@ -84,50 +85,47 @@
                     </div>
                 </div>
                 
-                <div class="searchBarInput otherDetails">
-                    <div class="nbRooms">
-                        <label for="rooms"><?php _e("Rooms", "retxtdom"); ?></label>
-                        <input type="number" name="nbRooms" id="rooms" <?= $_GET["nbRooms"] ?? '' ? 'value="'.absint($_GET["nbRooms"]).'"' : '' ?>>
-                        <label for="bedrooms"><?php _e("Bedrooms", "retxtdom"); ?></label>
-                        <input type="number" name="nbBedrooms" id="bedrooms" <?= $_GET["nbBedrooms"] ?? '' ? 'value="'.absint($_GET["nbBedrooms"]).'"' : '' ?>>
-                        <label for="bathrooms"><?php _e("Bathrooms", "retxtdom"); ?></label>
-                        <input type="number" name="nbBathrooms" id="bathrooms" <?= $_GET["nbBathrooms"] ?? '' ? 'value="'.absint($_GET["nbBathrooms"]).'"' : '' ?>>
+                <div class="searchBarInput rooms">
+                    <label for="rooms"><?php _e("Rooms", "retxtdom"); ?></label>
+                    <input type="number" name="nbRooms" min="0" max="99" id="rooms" <?= $_GET["nbRooms"] ?? '' ? 'value="'.absint($_GET["nbRooms"]).'"' : '' ?>>
+                    <label for="bedrooms"><?php _e("Bedrooms", "retxtdom"); ?></label>
+                    <input type="number" name="nbBedrooms" min="0" max="99" id="bedrooms" <?= $_GET["nbBedrooms"] ?? '' ? 'value="'.absint($_GET["nbBedrooms"]).'"' : '' ?>>
+                    <label for="bathrooms"><?php _e("Bathrooms", "retxtdom"); ?></label>
+                    <input type="number" name="nbBathrooms" min="0" max="99" id="bathrooms" <?= $_GET["nbBathrooms"] ?? '' ? 'value="'.absint($_GET["nbBathrooms"]).'"' : '' ?>>
+                </div>
+                <div class="searchBarInput propertyHas">
+                    <div class="colPropertyHas">
+                        <span class="propertyCharact">
+                            <label for="furnished"><?php _e("Furnished", "retxtdom"); ?></label>
+                            <input type="checkbox" name="furnished" id="furnished" <?php checked(isset($_GET["furnished"])&&$_GET["furnished"]==="on"); ?>>
+                        </span>
+                        <span class="propertyCharact">
+                            <label for="land"><?php _e("Land", "retxtdom"); ?></label>
+                            <input type="checkbox" name="land" id="land" <?php checked(isset($_GET["land"])&&$_GET["land"]==="on"); ?>>
+                        </span>
+                        <span class="propertyCharact">
+                            <label for="cellar"><?php _e("Cellar", "retxtdom"); ?></label>
+                            <input type="checkbox" name="cellar" id="cellar" <?php checked(isset($_GET["cellar"])&&$_GET["cellar"]==="on"); ?>>
+                        </span>
                     </div>
-                    <div class="propertyHas">
-                        <div class="colPropertyHas">
-                            <span class="propertyCharact">
-                                <label for="furnished"><?php _e("Furnished", "retxtdom"); ?></label>
-                                <input type="checkbox" name="furnished" id="furnished" <?php checked(isset($_GET["furnished"])&&$_GET["furnished"]==="on"); ?>>
-                            </span>
-                            <span class="propertyCharact">
-                                <label for="land"><?php _e("Land", "retxtdom"); ?></label>
-                                <input type="checkbox" name="land" id="land" <?php checked(isset($_GET["land"])&&$_GET["land"]==="on"); ?>>
-                            </span>
-                            <span class="propertyCharact">
-                                <label for="cellar"><?php _e("Cellar", "retxtdom"); ?></label>
-                                <input type="checkbox" name="cellar" id="cellar" <?php checked(isset($_GET["cellar"])&&$_GET["cellar"]==="on"); ?>>
-                            </span>
-                        </div>
-                        <div class="colPropertyHas">
-                            <span class="propertyCharact">
-                                <label for="outdoorSpace"><?php _e("Outdoor space", "retxtdom"); ?></label>
-                                <input type="checkbox" name="outdoorSpace" id="outdoorSpace" <?php checked(isset($_GET["outdoorSpace"])&&$_GET["outdoorSpace"]==="on"); ?>>
-                            </span>
-                            <span class="propertyCharact">
-                                <label for="elevator"><?php _e("Elevator", "retxtdom"); ?></label>
-                                <input type="checkbox" name="elevator" id="elevator" <?php checked(isset($_GET["elevator"])&&$_GET["elevator"]==="on"); ?>>
-                            </span>
-                            <span class="propertyCharact">
-                                <label for="garageparking"><?php _e("Garage/Parking", "retxtdom"); ?></label>
-                                <input type="checkbox" name="garageparking" id="garageparking" <?php checked(isset($_GET["garageparking"])&&$_GET["garageparking"]==="on"); ?>>
-                            </span>
-                        </div>
+                    <div class="colPropertyHas">
+                        <span class="propertyCharact">
+                            <label for="outdoorSpace"><?php _e("Outdoor space", "retxtdom"); ?></label>
+                            <input type="checkbox" name="outdoorSpace" id="outdoorSpace" <?php checked(isset($_GET["outdoorSpace"])&&$_GET["outdoorSpace"]==="on"); ?>>
+                        </span>
+                        <span class="propertyCharact">
+                            <label for="elevator"><?php _e("Elevator", "retxtdom"); ?></label>
+                            <input type="checkbox" name="elevator" id="elevator" <?php checked(isset($_GET["elevator"])&&$_GET["elevator"]==="on"); ?>>
+                        </span>
+                        <span class="propertyCharact">
+                            <label for="garageparking"><?php _e("Garage/Parking", "retxtdom"); ?></label>
+                            <input type="checkbox" name="garageparking" id="garageparking" <?php checked(isset($_GET["garageparking"])&&$_GET["garageparking"]==="on"); ?>>
+                        </span>
                     </div>
                 </div>
-
+                <input type="submit" value="<?php _e("Search", "retxtdom"); ?>"> 
             </div>
             
         </div>      
-        <input type="submit" value="<?php _e("Search", "retxtdom"); ?>">
     </form>
 </div>

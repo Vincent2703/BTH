@@ -6,7 +6,7 @@
 
 .contentAd { /*Content width's ad must always be 100%*/
     width: 100% !important;
-    color: #252525;
+    color: #343434;
 }
 
 .contentAd .site-main {
@@ -22,7 +22,7 @@
 .contentAd .subtitleAd {
     flex: 0 1 100%;
     text-align: center;
-    font-size: 16px;
+    font-size: 12px;
     font-weight: bold;
 }
 
@@ -30,6 +30,7 @@
 
 .contentAd .titleAd h1 {
     font-size: 32px;
+    margin-bottom: 10px;
 }
 
 .contentAd .sliders {
@@ -44,46 +45,81 @@
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: center;
+    margin-top: 25px;
     margin-bottom: 10px;
 }
 
 .contentAd #moreTitle {
     display: flex;
     justify-content: center;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: bold;
 }
 
-.contentAd .morePostsPanel {
-    display: flex;    
-    gap: 15px;
-
+.contentAd .similarAdsContainer {
+    overflow: hidden;
+    position: relative;
+    width: 55%;
+    margin: auto;
 }
 
-.contentAd .morePosts {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+.contentAd .similarAdsWrapper {
+  display: flex;
+  transition: transform 0.5s ease-in-out; 
 }
 
-.contentAd .moreAd {
+.contentAd .similarAd {
+    flex: 0 0 20%;
+    min-width: 160px;
     display: flex;
     flex-direction: column;
-    width: 150px;
-    user-select: none;
+    align-items: center;
 }
 
-.contentAd .prevMorePosts, .contentAd .nextMorePosts {
-    font-size: 20px;
-    align-self: center;
-    cursor: pointer;
-    user-select: none;
-}
-
-.contentAd .moreTitleAd {
+.contentAd .similarAdDetails {
+    display: flex;
+    flex-direction: column;
     font-size: 13px;
+    height: 100%;
+    width: 150px;
+    justify-content: space-between;
+}
+
+.contentAd .similarAdDetails .similarAdSurfaceRooms {
+    display: flex;
+    justify-content: space-between;
+}
+
+.contentAd .similarAdDetails .similarAdPrice, 
+.contentAd .similarAdDetails .similarAdSurfaceRooms {
+    width: 100%;
+}
+
+.contentAd .prevMorePosts,
+.contentAd .nextMorePosts {
+    position: absolute;
+    top: 25%;
+    cursor: pointer;
+    font-size: 3em;
+    width: auto;
+    height: auto;
+}
+
+.contentAd .nextMorePosts {
+    right: -15px;
+}
+.contentAd .prevMorePosts {
+    left: -15px;
+}
+
+
+.contentAd .similarAdTitle {
     text-align: center;
 }
 
-.contentAd .contentRightAd, .contentAd .contentLeftAd {
+.contentAd .contentRightAd, 
+.contentAd .contentLeftAd {
     display: flex;
     flex-direction: column;
     background-color: rgba(255, 255, 255, 0.7);
@@ -91,7 +127,7 @@
     padding-bottom: 1vh;
 }
 
-.contentAd .contentRightAd div, .contentAd .contentLeftAd div {
+.contentAd .contentRightAd .headerContact div {
     flex-grow: 1;
 }
 
@@ -99,21 +135,35 @@
     flex: 1 0 75%;
     padding-left: 6vw;
     padding-right: 6vw;
-    border-right: 1px solid black;
+    justify-content: space-between;
+    gap: 50px;
 }
 
 .contentAd .contentRightAd {
     flex: 1 0 25%;
     padding-right: 6vw;
-    padding-left: 1vw;
+    justify-content: space-between;
 }
 
 .contentAd .description {
     text-align: justify;
 }
 
-.contentAd .description h4 {
+.contentAd .description .contentDescription {
+    display: block;
+}
+
+.contentAd .description .contentDescription, 
+.contentAd .mainFeatures .listFeatures, 
+.contentAd .complementaryFeatures .listFeatures {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    border-radius: 10px;
+}
+
+.contentAd h4 {
     margin-top: 0;
+    margin-bottom: 15px;
 }
 
 .contentAd .listFeatures {
@@ -137,7 +187,8 @@
   }
 }
 
-.contentAd .listFeatures div .nameFeature, .contentAd .listFeatures div .valueFeature {
+.contentAd .listFeatures div .nameFeature, 
+.contentAd .listFeatures div .valueFeature {
     display: flex;
     align-items: center;
 }
@@ -185,7 +236,7 @@
     margin-bottom: 10px;
 }
 
-.contentAd .map {
+    .contentAd .map {
     margin-bottom: 5vh;
 }
 
@@ -194,10 +245,16 @@
     font-size: 10px;
 }
 
+.contentAd .contact {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    border-radius: 10px;
+}
+
 .contentAd .headerContact {
     display: flex;
     align-items: center;
-    margin-bottom: 5vh;
+    padding-bottom: 20px;
 }
 
 .contentAd .formContact label {
@@ -205,28 +262,29 @@
 }
 
 .contentAd .formContactInput {
-    margin-bottom: 3vh !important;
+    margin-bottom: 20px;
+    width: 100%;
 }
 
 .contentAd #formContactSubmit {
     display: block;
-    width: auto;
+    width: 100%;
     margin: auto;
 }
 
 .contentAd .headerContactLeft {
-    display: flex;
-    justify-content: center;
+
 }
 
 .contentAd .headerContactRight #nameContact {
     white-space: nowrap;
+    font-size: 22px;
+    font-weight: bold;
 }
 
 .contentAd #phoneContact {
     margin: 0;
     border: 0;
-    margin-top: 10px;
 }
 
 .contentAd #phoneContact tr, .contentAd #phoneContact td {
@@ -240,35 +298,40 @@
     padding: 0;
 }
 
-.contentAd #phoneContact a, .contentAd #mobilePhoneContact a {
+.contentAd #phoneContact a, .contentAd .mobilePhoneContact a {
     margin-left: 0.3vw;
     white-space: nowrap;
     text-decoration: none;
     color: #252525;
 }
 
+.contentAd #phoneContact td:nth-child(n+1) {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
 .contentAd #thumbnailContact {
     width: 70%;
     border-radius: 50%;
+    max-width: 150px;
 }
 
-.contentAd #feesSchedule a {
+.contentAd .feesSchedule {
     text-decoration: none;
-    color: #252525;
+    font-size: 11px;
 }
 
 
 /* carte */
 .contentAd #map { 
     width: 100%;
-    height: 0; /*Pour utiliser la même valeur que width*/
     padding-bottom: 100%;
 }
 
 /* slider photos */
 
 .contentAd #miniSlider {
-    max-width: 600px;
+    max-width: 800px;
     position: relative;
     overflow: hidden;
     margin: 20px auto 0 auto;
@@ -278,7 +341,7 @@
 
 .contentAd #miniSlider ul {
     position: relative;
-    height: 300px;
+    height: 400px;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
@@ -294,10 +357,10 @@
    float: left;
    margin: 0;
    padding: 0;
-   height: 300px;
+   height: 400px;
    background: #ccc;
    text-align: center;
-   line-height: 300px;
+   /*line-height: 300px;*/
 }
 
 .contentAd #miniSlider ul li img {
@@ -332,8 +395,12 @@
     -webkit-transition: all 0.2s ease;
 }
 
+.contentAd .controlPrev {
+    left: 10px;
+}
+
 .contentAd .controlNext {
-   right: 0;
+   right: 10px;
 }
 
 .contentAd #fullscreenSlider {
@@ -358,8 +425,8 @@
 .contentAd #fullscreenSlider .controlClose {
     font-size: 4rem;
     color: white;
-    text-shadow: 2px 0 grey, -2px 0 grey, 0 2px grey, 0 -2px grey,
-               1px 1px grey, -1px -1px grey, 1px -1px grey, -1px 1px grey;
+    text-shadow: 2px 0 black, -2px 0 black, 0 2px black, 0 -2px black,
+               1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black;
     position: absolute;
     right: 2%;
     top: 2%;
@@ -381,8 +448,8 @@
     position: absolute;
     right: 2%;
     user-select: none;
-    text-shadow: 2px 0 grey, -2px 0 grey, 0 2px grey, 0 -2px grey,
-               1px 1px grey, -1px -1px grey, 1px -1px grey, -1px 1px grey;
+    text-shadow: 2px 0 black, -2px 0 black, 0 2px black, 0 -2px black,
+               1px 1px black, -1px -1px black, 1px -1px black, -1px 1px black;
 }
 
 .contentAd #miniSlider .pagingImg {
@@ -393,7 +460,7 @@
     bottom: 10%;
 }
 
-@media only screen and (max-width : 1100px) {
+@media only screen and (max-width : 1400px) {
     .contentAd  h4 {
         text-align: center;
     }
@@ -425,6 +492,16 @@
     
     .contentAd .headerContactRight {
         font-size: 25px;
+    }
+    
+    .contentAd .similarAdsContainer {
+        width: 85%;
+    }
+    
+    .contentAd #map { 
+        width: 95%;
+        padding-bottom: 95%;
+        margin: auto;
     }
 
 }

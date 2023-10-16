@@ -1,10 +1,23 @@
 jQuery(document).ready(function($) {
+            var role = $("#role option:selected").val();
+        var extraInformationTitle = $("#extraInformationTitle");
+        var extraInformation = $("#extraInformation");
+        var roleName = $("#roleName");
+        
+        
+    if(role === "agent" || role === "agency") {
+         extraInformationTitle.show();
+            extraInformation.show();
+            roleName.text(role);    
+            $($('.'+role), extraInformation).show();
+            $($("tr:not(."+role+')', extraInformation)).hide();
+    }
+    
     $("#role").click(function() {
-        let role = $("#role option:selected").val();
-        let extraInformationTitle = $("#extraInformationTitle");
-        let extraInformation = $("#extraInformation");
-        let roleName = $("#roleName");
-
+        role = $("#role option:selected").val();
+        extraInformationTitle = $("#extraInformationTitle");
+        extraInformation = $("#extraInformation");
+        roleName = $("#roleName");
         if(role === "agent" || role === "agency") {
             extraInformationTitle.show();
             extraInformation.show();

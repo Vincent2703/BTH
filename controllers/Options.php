@@ -195,6 +195,14 @@ class REALM_Options {
         );
         
         add_settings_field(
+            "similarAdsSameCity", //id
+            sprintf($titleFormat, __("Refine similar ads by same city", "retxtdom"), __("At the bottom of each ad page, show only similar ads located in the same city.", "retxtdom")), //title
+            array($this, "similarAdsSameCityCallback"), //callback
+            PLUGIN_RE_NAME."OptionsGeneralPage", //page
+            PLUGIN_RE_NAME."optionsSection" //section
+        );
+        
+        add_settings_field(
             "customFields", //id
             sprintf($titleFormat, __("Custom fields", "retxtdom"), __("Add custom fields to the ads.", "retxtdom")), //title
             array($this, "customFieldsCallback"), //callback
@@ -405,6 +413,8 @@ class REALM_Options {
         if(isset($input["areaUnit"]) && !empty(trim($input["areaUnit"]))) {
             $sanitaryValues["areaUnit"] = sanitize_text_field($input["areaUnit"]);
         }
+        
+        $sanitaryValues["similarAdsSameCity"] = isset($input["similarAdsSameCity"]);
 
         if(isset($input["customFields"]) && !empty($input["customFields"]) && $input["customFields"][0] === '[' && $input["customFields"][-1] === ']' && (json_decode($input["customFields"]) !== null || json_last_error() === JSON_ERROR_NONE)) { //Waiting for PHP 8.3 json_validate()
             $sanitaryValues["customFields"] = sanitize_text_field($input["customFields"]);
@@ -571,6 +581,13 @@ class REALM_Options {
                name="<?=PLUGIN_RE_NAME."OptionsGeneral[areaUnit]";?>" 
                placeholder='m²' 
                value="<?=isset($this->optionsGeneral["areaUnit"]) ? esc_attr($this->optionsGeneral["areaUnit"]) : 'm²';?>">
+    <?php }
+    
+    public function similarAdsSameCityCallback() { ?>
+        <input type="checkbox" 
+               name="<?=PLUGIN_RE_NAME."OptionsGeneral[similarAdsSameCity]";?>" id="similarAdsSameCity" 
+                   <?php isset($this->optionsGeneral["similarAdsSameCity"])?checked($this->optionsGeneral["similarAdsSameCity"], true):''?>>&nbsp;
+        <label for="similarAdsSameCity"><?php _e("Yes", "retxtdom"); ?></label>
     <?php }
     
     public function customFieldsCallback() { ?>

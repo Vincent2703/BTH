@@ -20,10 +20,16 @@
     width: 40%;
 }
 
+.inShortAd .thumbnailAd a {
+    display: flex;
+    height: 100%;
+}
+
 .inShortAd .thumbnailAd a img {
     object-fit: cover;
-    max-height: 40vh;
+    max-height: 300px;
     width: 100%;
+    border-radius: 15px;
 }
 
 .inShortAd .typeAd {
@@ -124,37 +130,28 @@
     margin-right: 5px;
 }
 
-.inShortAd .icons span {
-    display: flex;
-    align-items: center;
-}
-
 .inShortAd .bathIcon {
-    display: inline-block;
     width: 20px;
     height: 20px;
-    background: url("../../../../../images/bathIcon.svg") no-repeat bottom;
+    background: url("../../../images/bathIcon.svg") no-repeat bottom;
 }
 
 .inShortAd .bedIcon {
-    display: inline-block;
     width: 22px;
     height: 20px;
-    background: url("../../../../../images/bedIcon.svg") no-repeat bottom;    
+    background: url("../../../images/bedIcon.svg") no-repeat bottom;    
 }
 
 .inShortAd .showerIcon {
-    display: inline-block;
     width: 20px;
     height: 20px;
-    background: url("../../../../../images/showerIcon.svg") no-repeat bottom;    
+    background: url("../../../images/showerIcon.svg") no-repeat bottom;    
 }
 
 .inShortAd .exteriorIcon {
-    display: inline-block;
     width: 20px;
     height: 20px;
-    background: url("../../../../../images/exteriorIcon.svg") no-repeat bottom;    
+    background: url("../../../images/exteriorIcon.svg") no-repeat bottom;    
 }
 
 #btnSubscribeAlert {
