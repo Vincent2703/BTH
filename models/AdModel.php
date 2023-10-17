@@ -170,14 +170,14 @@ class REALM_AdModel {
         }
 
         if(!is_numeric($ad["idContact"])) {
-            $ad["email"] = get_option(PLUGIN_RE_NAME . "OptionsEmail")["emailAd"];
+            $ad["email"] = get_bloginfo("admin_email");
             $ad["getContact"] = false;
         }
         
         $ad["allowSubmission"] = boolval(self::getMeta("adSubmissionsAllowed"));
         $ad["needGuarantors"] = boolval(self::getMeta("adNeedGuarantors"));
 
-        $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
+        $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsMisc");
         
         $metaQuerySimilarAds = array(
             array(
@@ -392,7 +392,7 @@ class REALM_AdModel {
         update_post_meta($adId, "adNeedGuarantors", isset($_POST["needGuarantors"]));
 
         //Custom fields
-        $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
+        $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsMisc");
         if($optionsGeneral !== false && isset($optionsGeneral["customFields"])) {
             $customFields = $optionsGeneral["customFields"];
             if(!empty($customFields) || $customFields !== "[]") {
@@ -896,16 +896,16 @@ class REALM_AdModel {
     }    
     
     public static function getCurrency() {
-        return get_option(PLUGIN_RE_NAME."OptionsGeneral")["currency"];
+        return get_option(PLUGIN_RE_NAME."OptionsMisc")["currency"];
     }
     
     public static function getAreaUnit() {
-        return get_option(PLUGIN_RE_NAME."OptionsGeneral")["areaUnit"];
+        return get_option(PLUGIN_RE_NAME."OptionsMisc")["areaUnit"];
     }
     
     public static function getFeesURL() {
-        if(isset(get_option(PLUGIN_RE_NAME."OptionsFees")["feesUrl"])) {
-            return get_option(PLUGIN_RE_NAME."OptionsFees")["feesUrl"];
+        if(isset(get_option(PLUGIN_RE_NAME."OptionsMisc")["feesUrl"])) {
+            return get_option(PLUGIN_RE_NAME."OptionsMisc")["feesUrl"];
         }
         return false;
     }

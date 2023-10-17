@@ -103,9 +103,9 @@ class REALM_EditAd {
             $agentSelected = null;
         }
         
-        $generalOptions = get_option(PLUGIN_RE_NAME."OptionsGeneral");
-        $currency = $generalOptions["currency"];
-        $areaUnit = $generalOptions["areaUnit"];
+        $miscOptions = get_option(PLUGIN_RE_NAME."OptionsMisc");
+        $currency = $miscOptions["currency"];
+        $areaUnit = $miscOptions["areaUnit"];
         wp_nonce_field("formEditAd", "nonceSecurity"); //Add nonce
         ?>
         <div id="refAgency">

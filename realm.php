@@ -60,7 +60,7 @@ class Realm {
     public static function createNotice($name, $msg='', $type="info") {   
         $notices = get_option(PLUGIN_RE_NAME."Notices")?:array();
         
-        if(isset($name) && !empty($msg) && (!isset($notices[$name]) || $notices[$name]["message"] != $msg)) {
+        if(isset($name) && !empty($msg) && in_array($type, ["info", "warning", "error"])) {
             $notices[$name] = ["type"=>$type, "message"=>wp_kses_post($msg), "dismissed"=>false];            
             update_option(PLUGIN_RE_NAME."Notices", $notices);
         }
@@ -88,8 +88,6 @@ class Realm {
         require_once("controllers/Options.php");
         require_once("controllers/EditAd.php");
         require_once("controllers/RegisterUserDashboard.php");
-        require_once("controllers/Export.php");
-        require_once("controllers/Import.php");
         
         //Models
         require_once("models/AdModel.php");
@@ -103,8 +101,6 @@ class Realm {
         $this->Options          = new REALM_Options;
         $this->EditAd           = new REALM_EditAd;
         $this->RegistrationUser = new REALM_RegisterUserDashboard;
-        $this->Export           = new REALM_Export;
-        $this->Import           = new REALM_Import;
         
         $this->AdModel          = new REALM_AdModel;   
         $this->UserModel        = new REALM_UserModel;
@@ -166,10 +162,6 @@ class Realm {
         //Remove some widgets from the WordPress dashboard
         add_action("wp_dashboard_setup", array($this, "removeWidgets"));
 
-        //Add widgets to the WordPress dashboard
-        add_action("wp_dashboard_setup", array($this->Import, "widgetImport"));
-        add_action("wp_dashboard_setup", array($this->Export, "widgetExport"));
-
         //Save custom post types
         add_action("save_post_re-ad", array($this->EditAd, "savePost"), 10, 2);
 
@@ -188,23 +180,23 @@ class Realm {
         add_action("adTypeProperty_edit_form_fields", array($this->Ad, "typePropertyEditFields"), 10, 2);
         
         add_action("manage_re-ad_posts_custom_column", array($this->Ad, "contentCustomColsAds"), 10, 2);
-
-        //Import data via AJAX
-        add_action("wp_ajax_nopriv_import", array($this->Import, "startImport"));
-
+        
         //Register custom API route
         add_action("rest_api_init", array($this, "registerRouteCustomAPIs"));
         
         //Add actions (links) to the plugin row in plugins.php
         add_action("plugin_action_links_" . plugin_basename( __FILE__ ), array($this, "addActionsPluginRow"));
         
-        add_action("after_setup_theme", array($this, "checkTheme"));
+        add_action("after_switch_theme", array($this, "checkTheme"));
         
         add_action("wp_ajax_dismissNoticeHandler", array($this, "dismissNoticeHandler"));
         
-        //add_action('init', array($this, 'add_custom_html_to_header'));
-        
-        add_action("neve_after_header_hook", array($this, "add_custom_html_to_header"));
+        if(isset(get_option(PLUGIN_RE_NAME."OptionsMisc")["searchBarHook"])) {
+            $searchBarHook = get_option(PLUGIN_RE_NAME."OptionsMisc")["searchBarHook"];
+            if(!empty($searchBarHook)) {
+                add_action($searchBarHook, array($this, "addSearchBar"));
+            }
+        }
     }
     
     /*
@@ -223,8 +215,13 @@ class Realm {
         //Modify the query before it is executed, in order to include custom search functionality for the ads
         add_filter("pre_get_posts", array($this->AdModel, "setQueryAds")); 
         
-        //Add custom styles or scripts to the WordPress header section
-        add_filter("wp_enqueue_scripts", array($this, "updateHeader"));
+        //Add search bar to the header if there is no hook name inputted in the searchBarHook option
+        if(isset(get_option(PLUGIN_RE_NAME."OptionsMisc")["searchBarHook"])) {
+            $searchBarHook = get_option(PLUGIN_RE_NAME."OptionsMisc")["searchBarHook"];
+            if(empty($searchBarHook)) {
+                add_filter("wp_enqueue_scripts", array($this, "updateHeader"));
+            }
+        }
         
         //Add or modify the columns shown in the WordPress admin table for the re-da custom post type
         add_filter("manage_re-ad_posts_columns", array($this->Ad, "colsAdsList")); 
@@ -257,13 +254,17 @@ class Realm {
         //add_filter("manage_users_sortable_columns", array($this->UserModel, "agentAgencySortableColumn"));
         
         //Deactivate Gutenberg editor for Ad posts
-        add_filter("use_block_editor_for_post_type", array($this->Ad, "deactivateGutenberg"), 10, 2);
-        
+        add_filter("use_block_editor_for_post_type", array($this->Ad, "deactivateGutenberg"), 10, 2);   
     }
     
-    /*public function add_custom_html_to_header() {
+   public function addSearchBar() {
+        wp_register_style("searchBarAdCSS", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
+        wp_enqueue_style("searchBarAdCSS");
+
+        wp_register_style("autocompleteAddressCSS", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
+        wp_enqueue_style("autocompleteAddressCSS");
         include_once("templates/front/searchBars/searchBarAd.php");
-    }*/
+    }
     
     /*
      * When the plugin is activated
@@ -327,8 +328,16 @@ class Realm {
     }
     
     public function onPluginDeactivation() {
-        //TODO : Ajouter option pour supprimer options ou non quand on désactive le plugin
         flush_rewrite_rules(); //Update the permalinks structure
+        
+        $miscOptions = get_option(PLUGIN_RE_NAME."OptionsMisc");
+        if(isset($miscOptions["deleteOptions"]) && $miscOptions["deleteOptions"]) {
+            error_log("OH");
+            delete_option(PLUGIN_RE_NAME."Notices");
+            delete_option(PLUGIN_RE_NAME."CompatibleThemes");
+            delete_option(PLUGIN_RE_NAME."OptionsApis");
+            delete_option(PLUGIN_RE_NAME."OptionsMisc");
+        }
         
         remove_role("agent");
         remove_role("agency");
@@ -337,40 +346,27 @@ class Realm {
     /*
      * Save the default options values
      */
-    private function defaultOptionsValues() {
-        
+    private function defaultOptionsValues() {        
         $compatibleThemes = array(
-            "twentytwenty"  => array("2.1"),
-            "neve"          => array("3.7.2")
+            "twentytwenty"  => ["versions" => ["2.1"], "searchBarHook" => ""],
+            "neve"          => ["versions" => ["3.7.2"], "searchBarHook" => "neve_after_header_hook"]
         );
         update_option(PLUGIN_RE_NAME."CompatibleThemes", $compatibleThemes);
         
-        $defaultValuesGeneral = array(
+        $defaultValuesMisc = array(
             "currency" => "$",
             "areaUnit" => "m²",
             "similarAdsSameCity" => true
         );
-        update_option(PLUGIN_RE_NAME."OptionsGeneral", $defaultValuesGeneral); 
+
+        $miscOptions = array_replace($defaultValuesMisc, get_option(PLUGIN_RE_NAME."OptionsMisc")?:array());
         
-        $defaultValuesImports = array(
-            "maxSavesImports"       => 2,
-            "maxDim"                => 1024,
-            "qualityPictures"       => 85,
-            //"templateUsedImport"    => "stdxml"
-        );
-        update_option(PLUGIN_RE_NAME."OptionsImports", $defaultValuesImports); 
+        $currentTheme = strtolower(wp_get_theme());
+        if(isset($compatibleThemes[$currentTheme])) {
+            $miscOptions["searchBarHook"] = $compatibleThemes[$currentTheme]["searchBarHook"];
+        }
+        update_option(PLUGIN_RE_NAME."OptionsMisc", $miscOptions); 
         
-        $defaultValuesExports = array(
-            //"templateUsedExport"    => "stdxml",
-            "maxSavesExports"       => 1
-        );
-        update_option(PLUGIN_RE_NAME."OptionsExports", $defaultValuesExports); 
-        
-        $defaultValuesEmail = array(
-            //"emailError"    => wp_get_current_user()->user_email,
-            "emailAd"       => wp_get_current_user()->user_email
-        );
-        update_option(PLUGIN_RE_NAME."OptionsEmail", $defaultValuesEmail); 
         
         $defaultValuesApis = array(
             "apiUsed" => "govFr",
@@ -379,7 +375,9 @@ class Realm {
             "apiAdminAreaLvl1" => false,
             "apiAdminAreaLvl2" => false
         );
-        update_option(PLUGIN_RE_NAME."OptionsApis", $defaultValuesApis); 
+        $apisOptions = array_replace($defaultValuesApis, get_option(PLUGIN_RE_NAME."OptionsApis")?:array());
+        update_option(PLUGIN_RE_NAME."OptionsApis", $apisOptions); 
+        
     }
     
     private function rewriteFlush() {
@@ -408,24 +406,7 @@ class Realm {
      */
     public function completeMenu() {
         $parentSlug = "edit.php?post_type=re-ad";
-        add_submenu_page(
-            $parentSlug, //Parent slug
-            __("Import ads", "retxtdom"), //Page title
-            __("Import ads", "retxtdom"), //Menu title
-            "manage_options", //Capability
-            PLUGIN_RE_NAME."import", //Menu slug
-            array($this->Import, "showPage"), //Callback
-            2 //Priority
-        );
-        add_submenu_page(
-            $parentSlug, //Parent slug
-            __("Export ads", "retxtdom"), //Page title
-            __("Export ads", "retxtdom"), //Menu title
-            "manage_options", //Capability
-            PLUGIN_RE_NAME."export", //Menu slug
-            array($this->Export, "showPage"), //Callback
-            3 //Priority
-        );
+
         add_submenu_page(
             $parentSlug, //Parent slug
             __("Options", "retxtdom"), //Page title
@@ -565,6 +546,13 @@ class Realm {
                             )
                         )
                     )
+                ),
+                "edit-tags" => array(
+                    "highlightOptions" => array(
+                        "path" => "/includes/js/others/highlightOptions.js",
+                        "footer" => true,
+                        "dependencies" => array("jquery")
+                    )
                 )
             ),
         );
@@ -680,21 +668,21 @@ class Realm {
         global $post_type;
         global $pagenow;
         if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {         
-            wp_register_script("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
+            wp_register_script("searchBarAdJS", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
             $variablesSearchBar = array(
                 "searchBarURL" => plugin_dir_url(__FILE__)."templates/front/searchBars/searchBarAd.php",
                 "autocompleteURL" => plugin_dir_url(__FILE__)."includes/js/searches/autocompleteAddress.js",
                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
                 "nonce" => wp_create_nonce("searchNonce")
             );
-            wp_localize_script("searchBarAd", "variablesSearchBar", $variablesSearchBar);
-            wp_enqueue_script("searchBarAd");
+            wp_localize_script("searchBarAdJS", "variablesSearchBar", $variablesSearchBar);
+            wp_enqueue_script("searchBarAdJS");
 
-            wp_register_style("searchBarAd", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
-            wp_enqueue_style("searchBarAd");
+            wp_register_style("searchBarAdCSS", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
+            wp_enqueue_style("searchBarAdCSS");
             
-            wp_register_style("autocompleteAddress", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
-            wp_enqueue_style("autocompleteAddress");
+            wp_register_style("autocompleteAddressCSS", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
+            wp_enqueue_style("autocompleteAddressCSS");
         }
     }
     
@@ -710,7 +698,10 @@ class Realm {
      */
     public function addActionsPluginRow($links) {
        $links = array_merge($links, array(
-            '<a href="'.esc_url(admin_url("/edit.php?post_type=re-ad&page=".PLUGIN_RE_NAME."options")).'">'.__("Options", "retxtdom")."</a>"
+            sprintf('<a href="%s">%s</a>', 
+                esc_url(admin_url("/edit.php?post_type=re-ad&page=".PLUGIN_RE_NAME."options")),
+                __("Options", "retxtdom")
+            )
         ));
 	return $links;
     }
@@ -723,54 +714,71 @@ class Realm {
         $currentTheme = wp_get_theme();
         $themeName = str_replace(' ', '', strtolower($currentTheme->name));
         $themeVersion = $currentTheme->version;
-        $listThemes = get_option(PLUGIN_RE_NAME."CompatibleThemes")?:array();
-        
+        $listThemes = get_option(PLUGIN_RE_NAME . "CompatibleThemes") ?: array();
+
+        self::dismissNotice("compatibilityTheme");
+
         if(empty($listThemes)) {
             return;
         }
-        $noticeDismissed = get_option(PLUGIN_RE_NAME."ThemeNoticeDismissed");
-        if(isset($listThemes[$themeName]) && !in_array($themeVersion, $listThemes[$themeName])) {
-            if(!$noticeDismissed) {
-                $this->createNotice("compatibilityTheme", 
-                    sprintf(__('The version of the theme you are using (%1$s) has not been tested with the templates of the plugin (tested with %2$s). Expect potential bugs.<br />
-                        Please read <a target="_blank" href="#">the documentation</a> for more information.', "retxtdom"), 
-                        $themeVersion, 
-                        implode(" ; ", $listThemes[$themeName])
-                    ),
-                    "warning"
-                );
+
+        $miscOptions = get_option(PLUGIN_RE_NAME."OptionsMisc");
+
+        if(isset($listThemes[$themeName]["versions"]) && in_array($themeVersion, $listThemes[$themeName]["versions"])) {
+            if(isset($listThemes[$themeName]["searchBarHook"])) {
+                $miscOptions["searchBarHook"] = $listThemes[$themeName]["searchBarHook"];
+                update_option(PLUGIN_RE_NAME."OptionsMisc", $miscOptions);
             }
+        }else if(isset($listThemes[$themeName]["versions"])) {
+            if(isset($listThemes[$themeName]["searchBarHook"])) {
+                $miscOptions["searchBarHook"] = $listThemes[$themeName]["searchBarHook"];
+                update_option(PLUGIN_RE_NAME."OptionsMisc", $miscOptions);
+            }
+            $this->createNotice("compatibilityTheme",
+                sprintf(
+                    __('The version of the theme you are using (%1$s) has not been tested with the templates of the plugin (tested with %2$s). Expect potential bugs.<br /> Please read <a target="_blank" href="#">the documentation</a> for more information.', "retxtdom"),
+                    $themeVersion,
+                    implode(" ; ", $listThemes[$themeName]["versions"])
+                ),
+                "warning"
+            );
         }else{
-            if(!$noticeDismissed) {
-                $this->createNotice("compatibilityTheme", 
-                    sprintf(__('The theme you are using (<b>%1$s %2$s</b>) has not been tested with the plugin. Expect potential bugs.<br />
-                        You can use one of the following tested themes : 
-                        <ul>%3$s</ul><br />
-                        <a target="_blank" href="#">You can also develop your own templates</a>.', "retxtdom"), 
-                        $themeName, 
-                        $themeVersion,
-                        implode('', array_map(function ($key, $value) { return "<li>".strtolower($key) . " (" . implode(" ; ", $value) . ")</li>"; }, array_keys($listThemes), $listThemes))
-                    ),
-                    "warning"
-                );
+            if(isset($listThemes[$themeName]["searchBarHook"])) {
+                $miscOptions["searchBarHook"] = '';
+                update_option(PLUGIN_RE_NAME."OptionsMisc", $miscOptions);
             }
+            $this->createNotice("compatibilityTheme",
+                sprintf(
+                    __('The theme you are using (<b>%1$s %2$s</b>) has not been tested with the plugin. Expect potential bugs.<br /> You can use one of the following tested themes : <ul>%3$s</ul><br /> <a target="_blank" href="#">You can also develop your own templates</a>.', "retxtdom"),
+                    $themeName,
+                    $themeVersion,
+                    implode('', array_map(function ($key, $value) {
+                        return "<li>" . strtolower($key) . " (" . implode(" ; ", $value["versions"]) . ")</li>";
+                    }, array_keys($listThemes), $listThemes))
+                ),
+                "warning"
+            );
         }
     }
-    
-    /*
+
+
+
+        /*
      * Display a notice panel with one or several messages if needed
      */
     public function displayNotices() {
         $pluginName = strtoupper(PLUGIN_RE_NAME);
         $notices = get_option(PLUGIN_RE_NAME."Notices");
-        foreach($notices as $notice) { 
-            if(!$notice["dismissed"]) { ?>
-                <div class="RENotices notice notice-<?=$notice["type"];?>" data-notice="<?= array_search($notice, $notices); ?>">
-                    <h3><?= $pluginName; ?></h3>
-                    <p><?= $notice["message"]; ?></p>
-                    <p class="closeNotice" style="cursor: pointer; font-weight: bold;;">&times; <?php _e("Close the notice", "retxtdom") ;?></p>
-                </div>
-            <?php } 
+        if(is_array($notices) && !empty($notices)) {
+            foreach($notices as $notice) { 
+                if(!$notice["dismissed"]) { ?>
+                    <div class="RENotices notice notice-<?=$notice["type"];?>" data-notice="<?= array_search($notice, $notices); ?>">
+                        <h3><?= $pluginName; ?></h3>
+                        <p><?= $notice["message"]; ?></p>
+                        <p class="closeNotice" style="cursor: pointer; font-weight: bold;;">&times; <?php _e("Close the notice", "retxtdom") ;?></p>
+                    </div>
+                <?php } 
+            }
         }
     }  
     

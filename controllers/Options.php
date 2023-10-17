@@ -21,7 +21,7 @@ class REALM_Options {
                     if(isset($_GET["tab"])) { //If a tab is selected
                         $option = "Options".ucfirst($_GET["tab"]); //Will display the corresponding tab
                     }else{
-                        $option = "OptionsGeneral"; //Default tab
+                        $option = "OptionsCustomFields"; //Default tab
                     }
                     settings_fields(PLUGIN_RE_NAME.$option."Group");
                     do_settings_sections(PLUGIN_RE_NAME.$option."Page");
@@ -38,28 +38,21 @@ class REALM_Options {
         $base = get_current_screen()->base;
         if($base === "edit-tags" || $base === "re-ad_page_".PLUGIN_RE_NAME."options") { //Either editing the tags or the custom options
             if($base === "re-ad_page_".PLUGIN_RE_NAME."options") { //Custom options
-                if(isset($_GET["tab"])) { //If in a tab
-                    $tab = $_GET["tab"]; //We set it
-                }else{
-                    $tab = "general"; //By default
-                }
+                $tab = isset($_GET["tab"])?$_GET["tab"]:"customFields";
             }else{ //Edit-tags
-                $tab = "general"; //Set the default tab (it will appear as selected)
+                $taxonomy = get_current_screen()->taxonomy;
+                $tab = $taxonomy==="adTypeProperty"?"propertyTypes":"adTypes";
             }
             $pluginName = strtoupper(PLUGIN_RE_NAME);
             $pageOptions = PLUGIN_RE_NAME."options"; ?>
             <h2><?= $pluginName; ?></h2>
             <p>Interface de configuration - <?= $pluginName; ?></p>
             <h2 class="nav-tab-wrapper">
-                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=general" class="nav-tab <?= $tab === "general" ? "nav-tab-active" : ''; ?>"><?php _e("General", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=imports" class="nav-tab <?= $tab === "imports" ? "nav-tab-active" : ''; ?>"><?php _e("Imports", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=exports" class="nav-tab <?= $tab === "exports" ? "nav-tab-active" : ''; ?>"><?php _e("Exports", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=email" class="nav-tab <?= $tab === "email" ? "nav-tab-active" : ''; ?>"><?php _e("Email", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=fees" class="nav-tab <?= $tab === "fees" ? "nav-tab-active" : ''; ?>"><?php _e("Fees schedule", "retxtdom"); ?></a>
-                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=apis" class="nav-tab <?= $tab === "apis" ? "nav-tab-active" : ''; ?>">APIs</a>    
-                <?php if(isset($this->optionsImports["templateUsedImport"]) && $this->optionsImports["templateUsedImport"] == "seloger" || isset($this->optionsImports["templateUsedExport"]) && $this->optionsExports["templateUsedExport"] == "seloger") { ?>
-                    <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=seloger" class="nav-tab <?= $tab === "seloger" ? "nav-tab-active" : ''; ?>"><?php _e("Template", "retxtdom"); ?> SeLoger</a>  
-                <?php } ?>
+                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=customFields" class="nav-tab <?= $tab === "customFields" ? "nav-tab-active" : ''; ?>"><?php _e("Custom fields", "retxtdom"); ?></a>
+                <a href="edit-tags.php?taxonomy=adTypeProperty&post_type=re-ad" class="nav-tab <?= $tab === "propertyTypes" ? "nav-tab-active" : ''; ?>"><?php _e("Property types", "retxtdom"); ?></a>
+                <a href="edit-tags.php?taxonomy=adTypeAd&post_type=re-ad" class="nav-tab <?= $tab === "adTypes" ? "nav-tab-active" : ''; ?>"><?php _e("Ad types", "retxtdom"); ?></a>
+                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=apis" class="nav-tab <?= $tab === "apis" ? "nav-tab-active" : ''; ?>"><?php _e("APIs", "retxtdom"); ?></a>    
+                <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=misc" class="nav-tab <?= $tab === "misc" ? "nav-tab-active" : ''; ?>"><?php _e("Miscellaneous", "retxtdom"); ?></a>
             </h2>
         <?php   
         }
@@ -70,259 +63,66 @@ class REALM_Options {
      */
     public function optionsPageInit() {
         //Get options
-        $this->optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsGeneral");
-        $this->optionsImports = get_option(PLUGIN_RE_NAME."OptionsImports");
-        $this->optionsExports = get_option(PLUGIN_RE_NAME."OptionsExports");
-        $this->optionsEmail = get_option(PLUGIN_RE_NAME."OptionsEmail");
-        $this->optionsFees = get_option(PLUGIN_RE_NAME."OptionsFees");
+        $this->optionsCustomFields = get_option(PLUGIN_RE_NAME."OptionsCustomFields");
         $this->optionsApis = get_option(PLUGIN_RE_NAME."OptionsApis");
-        //$this->optionsSeLoger = get_option(PLUGIN_RE_NAME."OptionsSeloger");
-        
+        $this->optionsMisc = get_option(PLUGIN_RE_NAME."OptionsMisc");        
         
         //Register settings
-        register_setting( //Register a setting for general options
-            PLUGIN_RE_NAME."OptionsGeneralGroup", //option group
-            PLUGIN_RE_NAME."OptionsGeneral", //option name
-            array($this, "sanitizationGeneralFields") //Sanitization callback
+        register_setting( //Register a setting for custom fields options
+            PLUGIN_RE_NAME."OptionsCustomFieldsGroup", //option group
+            PLUGIN_RE_NAME."OptionsCustomFields", //option name
+            array($this, "sanitizationCustomFields") //Sanitization callback
         );
-        
-        register_setting( //Register a setting for importation options
-            PLUGIN_RE_NAME."OptionsImportsGroup", //option group
-            PLUGIN_RE_NAME."OptionsImports", //option name
-            array($this, "sanitizationImportFields") //Sanitization callback
-        );
-        
-        register_setting( //Register a setting for exportation options
-            PLUGIN_RE_NAME."OptionsExportsGroup", //option group
-            PLUGIN_RE_NAME."OptionsExports", //option name
-            array($this, "sanitizationExportFields") //Sanitization callback
-        );
-                       
-        register_setting( //Register a setting for mail options
-            PLUGIN_RE_NAME."OptionsEmailGroup", //option group
-            PLUGIN_RE_NAME."OptionsEmail", //option name
-            array($this, "sanitizationEmailFields") //Sanitization callback
-        );
-        
-        register_setting( //Register a setting for the fee schedule
-            PLUGIN_RE_NAME."OptionsFeesGroup", //option group
-            PLUGIN_RE_NAME."OptionsFees", //option name
-            array($this, "sanitizationFeesScheduleFields") //Sanitization callback
-        );
-        
+                               
         register_setting( //Register a setting for the fee schedule
             PLUGIN_RE_NAME."OptionsApisGroup", //option group
             PLUGIN_RE_NAME."OptionsApis", //option name
             array($this, "sanitizationApisFields") //Sanitization callback
         );
+        
+        register_setting( //Register a setting for the fee schedule
+            PLUGIN_RE_NAME."OptionsMiscGroup", //option group
+            PLUGIN_RE_NAME."OptionsMisc", //option name
+            array($this, "sanitizationMiscFields") //Sanitization callback
+        );
 
-        /*register_setting( //Register a setting for SeLoger template
-            PLUGIN_RE_NAME."OptionsSeLogerGroup", //option group
-            PLUGIN_RE_NAME."OptionsSeloger", //option name
-            array($this, "sanitizationSeLogerFields") //Sanitization callback
-        );*/
         
         
         //Add sections
-        add_settings_section( //Section for general setting
+        add_settings_section( //Section for custom field setting
             PLUGIN_RE_NAME."optionsSection", //id
-            __("Ads", "retxtdom"), //title
-            array($this, "generalSettingPreForm"), //callback - display info before 
-            PLUGIN_RE_NAME."OptionsGeneralPage" //page
-        );
-        
-        add_settings_section( //Section for importation setting
-            PLUGIN_RE_NAME."optionsSection", //id
-            __("Imports", "retxtdom"), //title
-            null, //callback
-            PLUGIN_RE_NAME."OptionsImportsPage" //page
-        );
-        
-        add_settings_section( //Section for exportation setting
-            PLUGIN_RE_NAME."optionsSection", //id
-            __("Exports", "retxtdom"), //title
-            null, //callback
-            PLUGIN_RE_NAME."OptionsExportsPage" //page
-        );
-                
-        add_settings_section( //Section for mail setting
-            PLUGIN_RE_NAME."optionsSection", //id
-            __("Email", "retxtdom"), //title
-            null, //callback
-            PLUGIN_RE_NAME."OptionsEmailPage" //page
-        );
-        
-        add_settings_section( //Section for fees schedule setting
-            PLUGIN_RE_NAME."optionsSection", //id
-            __("Fees", "retxtdom"), //title
-            null, //callback
-            PLUGIN_RE_NAME."OptionsFeesPage" //page
+            __("Manage your custom fields", "retxtdom"), //title
+            array($this, "customFieldsSettingPreForm"), //callback - display info before 
+            PLUGIN_RE_NAME."OptionsCustomFieldsPage" //page
         );
         
         add_settings_section( //Section for APIs setting
             PLUGIN_RE_NAME."optionsSection", //id
-            "APIs", //title
+            __("APIs", "retxtdom"), //title
             null, //callback
             PLUGIN_RE_NAME."OptionsApisPage" //page
         );
         
-        /*add_settings_section( //Section for SeLoger template setting
+        add_settings_section(
             PLUGIN_RE_NAME."optionsSection", //id
-            "SeLoger", //title
-            null,
-            PLUGIN_RE_NAME."OptionsSelogerPage" //page
-        );*/
+            __("Miscellaneous", "retxtdom"), //title
+            null, //callback
+            PLUGIN_RE_NAME."OptionsMiscPage" //page
+        );
         
         
         //Add fields
         
-        /* General options */
         $titleFormat = '%s&nbsp;<abbr title="%s"><sup>?</sup></abbr>';
-        add_settings_field(
-            "currency", //id
-            sprintf($titleFormat, __("Currency", "retxtdom"), __("Monetary currency symbol.", "retxtdom")), //title
-            array($this, "currencyCallback"), //callback
-            PLUGIN_RE_NAME."OptionsGeneralPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
         
-        add_settings_field(
-            "areaUnit", //id
-            sprintf($titleFormat, __("Area Unit", "retxtdom"), __("Unit used to define an area.", "retxtdom")), //title
-            array($this, "areaUnitCallback"), //callback
-            PLUGIN_RE_NAME."OptionsGeneralPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
-        
-        add_settings_field(
-            "similarAdsSameCity", //id
-            sprintf($titleFormat, __("Refine similar ads by same city", "retxtdom"), __("At the bottom of each ad page, show only similar ads located in the same city.", "retxtdom")), //title
-            array($this, "similarAdsSameCityCallback"), //callback
-            PLUGIN_RE_NAME."OptionsGeneralPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
-        
+        /* Custom fields options */        
         add_settings_field(
             "customFields", //id
             sprintf($titleFormat, __("Custom fields", "retxtdom"), __("Add custom fields to the ads.", "retxtdom")), //title
             array($this, "customFieldsCallback"), //callback
-            PLUGIN_RE_NAME."OptionsGeneralPage", //page
+            PLUGIN_RE_NAME."OptionsCustomFieldsPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
         );
-        
-        /* Importation options */
-     
-        /*add_settings_field(
-            "templateUsedImport", //id
-            __("Import template", "retxtdom").SELF::fieldPurpose("Template to use for imports."),
-            array($this, "templateUsedImportCallback"), //callback
-            PLUGIN_RE_NAME."OptionsImportsPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );*/
-             
-        add_settings_field(
-            "maxSavesImports", //id
-            sprintf($titleFormat, __("Backups number", "retxtdom"), __("Number of file copies containing imported ads to keep.", "retxtdom")), //title    
-            array($this, "maxSavesImportsCallback"), //callback
-            PLUGIN_RE_NAME."OptionsImportsPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
-        
-        add_settings_field(
-            "maxDim", //id
-            sprintf($titleFormat, __("Pictures dimensions", "retxtdom"), __("Maximum dimension of the imported pictures.", "retxtdom")), //title
-            array($this, "maxDimCallback"), //callback
-            PLUGIN_RE_NAME."OptionsImportsPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
-        
-        add_settings_field(
-            "qualityPictures", //id
-            sprintf($titleFormat, __("Pictures quality", "retxtdom"), __("The higher the value, the more the quality is faithful to the original, at the expense of the weight of the image.", "retxtdom")), //title    
-            array($this, "qualityPicturesCallback"), //callback
-            PLUGIN_RE_NAME."OptionsImportsPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
-        
-        /*add_settings_field(
-            "allowAutoImport", //id
-            __("Automatic ads import", "retxtdom").SELF::fieldPurpose("When this option is activated, a cronjob can be run to import the ads from the most recent file located in the plugin's import directory."),
-            array($this, "allowAutoImportCallback"), //callback
-            PLUGIN_RE_NAME."OptionsImportsPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );*/
-        
-
-        /* Exportation options */
-        
-        /*add_settings_field(
-            "templateUsedExport", //id
-            __("Export template", "retxtdom").SELF::fieldPurpose("Template to use for exports."),
-            array($this, "templateUsedExportCallback"), //callback
-            PLUGIN_RE_NAME."OptionsExportsPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );*/
-        
-        add_settings_field(
-            "maxSavesExports", //id
-            sprintf($titleFormat, __("Backups number", "retxtdom"), __("Number of file copies containing the exported ads to keep.", "retxtdom")), //title    
-            array($this, "maxSavesExportsCallback"), //callback
-            PLUGIN_RE_NAME."OptionsExportsPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
-        
-        /*add_settings_field(
-            "allowAutoExport", //id
-            __("Automatic ads export", "retxtdom").SELF::fieldPurpose("When this option is activated, a cronjob can be run to export the ads that feature an available property to the plugin's export directory."),
-            array($this, "allowAutoExportCallback"), //callback
-            PLUGIN_RE_NAME."OptionsExportsPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );*/
-       
-        /* Mail options */
-
-        /*add_settings_field(
-            "sendMail", //id
-            __("Send email in case of error", "retxtdom").SELF::fieldPurpose("An email will be sent to the following email address if the plugin detects an error during an export or import."),
-            array($this, "sendMailCallback"), //callback
-            PLUGIN_RE_NAME."OptionsEmailPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
-
-        add_settings_field(
-            "emailError", //id
-            __("Email address to contact in case of error", "retxtdom"), //title
-            array($this, "emailErrorCallback"), //callback
-            PLUGIN_RE_NAME."OptionsEmailPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );*/
-        
-        add_settings_field(
-            "emailAd", //id
-            sprintf($titleFormat, __("Email address to contact by default for ads", "retxtdom"), __("Email address to contact if it is not possible to contact an agent or agency about an ad.", "retxtdom")), //title    
-            array($this, "emailAdCallback"), //callback
-            PLUGIN_RE_NAME."OptionsEmailPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
-        
-        /* Fees schedule options */
-        
-        add_settings_field(
-            "feesUrl", //id
-            sprintf($titleFormat, __("URL address to the fees schedule", "retxtdom"), __("URL to the file presenting the fees schedule. It will be displayed on each ad. You can also directly upload the file with the button below.", "retxtdom")), //title    
-            array($this, "feesUrlCallback"), //callback
-            PLUGIN_RE_NAME."OptionsFeesPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
-        
-        add_settings_field(
-            "feesFile", //id
-            sprintf($titleFormat, __("File with the fees schedule", "retxtdom"), ''), //title    
-            array($this, "feesFileCallback"), //callback
-            PLUGIN_RE_NAME."OptionsFeesPage", //page
-            PLUGIN_RE_NAME."optionsSection" //section
-        );
-       
         
         /* APIs options */
         
@@ -382,130 +182,73 @@ class REALM_Options {
             PLUGIN_RE_NAME."optionsSection" //section
         );
         
-        /* SeLoger template options */
+        /* Miscellaneous options */ 
         
-        /*add_settings_field(
-            "versionSeLoger", //id
-            __("Version", "retxtdom")." SeLoger".SELF::fieldPurpose("Version and revision of the template used"), //title
-            array($this, "versionSeLogerCallback"), //callback
-            PLUGIN_RE_NAME."OptionsSelogerPage", //page
+        add_settings_field(
+            "currency", //id
+            sprintf($titleFormat, __("Currency", "retxtdom"), __("Monetary currency symbol.", "retxtdom")), //title
+            array($this, "currencyCallback"), //callback
+            PLUGIN_RE_NAME."OptionsMiscPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
         );
         
         add_settings_field(
-            "idAgency", //id
-            __("Agency ID ", "retxtdom").SELF::fieldPurpose("ID for using the template"), //title    
-            array($this, "idAgencyCallback"), //callback
-            PLUGIN_RE_NAME."OptionsSelogerPage", //page
+            "areaUnit", //id
+            sprintf($titleFormat, __("Area Unit", "retxtdom"), __("Unit used to define an area.", "retxtdom")), //title
+            array($this, "areaUnitCallback"), //callback
+            PLUGIN_RE_NAME."OptionsMiscPage", //page
             PLUGIN_RE_NAME."optionsSection" //section
-        );*/
+        );
+        
+        add_settings_field(
+            "similarAdsSameCity", //id
+            sprintf($titleFormat, __("Refine similar ads by same city", "retxtdom"), __("At the bottom of each ad page, show only similar ads located in the same city.", "retxtdom")), //title
+            array($this, "similarAdsSameCityCallback"), //callback
+            PLUGIN_RE_NAME."OptionsMiscPage", //page
+            PLUGIN_RE_NAME."optionsSection" //section
+        );
+        
+        add_settings_field(
+            "searchBarHook", //id
+            sprintf($titleFormat, __("Add the search bar when the hook fires", "retxtdom"), __("When this hook fires, add the search bar to the page at that time.", "retxtdom")), //title
+            array($this, "searchBarHookCallback"), //callback
+            PLUGIN_RE_NAME."OptionsMiscPage", //page
+            PLUGIN_RE_NAME."optionsSection" //section
+        );
+        
+        add_settings_field(
+            "feesUrl", //id
+            sprintf($titleFormat, __("URL address to the fees schedule", "retxtdom"), __("URL to the file presenting the fees schedule. It will be displayed on each ad. You can also directly upload the file with the button below.", "retxtdom")), //title    
+            array($this, "feesUrlCallback"), //callback
+            PLUGIN_RE_NAME."OptionsMiscPage", //page
+            PLUGIN_RE_NAME."optionsSection" //section
+        );
+        
+        add_settings_field(
+            "feesFile", //id
+            sprintf($titleFormat, __("File with the fees schedule", "retxtdom"), ''), //title    
+            array($this, "feesFileCallback"), //callback
+            PLUGIN_RE_NAME."OptionsMiscPage", //page
+            PLUGIN_RE_NAME."optionsSection" //section
+        );
+        
+        add_settings_field(
+            "deleteOptions", //id
+            sprintf($titleFormat, __("Delete the options when deactivating the plugin", "retxtdom"), ''), //title    
+            array($this, "deleteOptionsCallback"), //callback
+            PLUGIN_RE_NAME."OptionsMiscPage", //page
+            PLUGIN_RE_NAME."optionsSection" //section
+        );
         
     }
     
     //Sanitization callbacks
-    public function sanitizationGeneralFields($input) {
+    public function sanitizationCustomFields($input) {
         $sanitaryValues = array();
-
-        if(isset($input["currency"]) && !empty(trim($input["currency"]))) {
-            $sanitaryValues["currency"] = sanitize_text_field($input["currency"]);
-        }
-
-        if(isset($input["areaUnit"]) && !empty(trim($input["areaUnit"]))) {
-            $sanitaryValues["areaUnit"] = sanitize_text_field($input["areaUnit"]);
-        }
         
-        $sanitaryValues["similarAdsSameCity"] = isset($input["similarAdsSameCity"]);
-
         if(isset($input["customFields"]) && !empty($input["customFields"]) && $input["customFields"][0] === '[' && $input["customFields"][-1] === ']' && (json_decode($input["customFields"]) !== null || json_last_error() === JSON_ERROR_NONE)) { //Waiting for PHP 8.3 json_validate()
             $sanitaryValues["customFields"] = sanitize_text_field($input["customFields"]);
         } 
-        
-        return $sanitaryValues;
-    }
-
-    public function sanitizationImportFields($input) {
-        $sanitaryValues = array();
-        
-        /*if(isset($input["templateUsedImport"]) && !empty(trim($input["templateUsedImport"]))) {
-            $sanitaryValues["templateUsedImport"] = sanitize_text_field($input["templateUsedImport"]);
-        }*/
-                
-        if(isset($input["maxSavesImports"]) && is_numeric($input["maxSavesImports"])) {
-            $sanitaryValues["maxSavesImports"] = absint($input["maxSavesImports"]);
-        }
-
-        if(isset($input["maxDim"]) && is_numeric($input["maxDim"])) {
-            $sanitaryValues["maxDim"] = absint($input["maxDim"]);
-        }
-        
-        if(isset($input["qualityPictures"]) && is_numeric($input["qualityPictures"])) {
-            $sanitaryValues["qualityPictures"] = absint($input["qualityPictures"]);
-        }
-        
-        //$sanitaryValues["allowAutoImport"] = isset($input["allowAutoImport"]);
-
-        
-        return $sanitaryValues;
-}
-
-    public function sanitizationExportFields($input) {
-        $sanitaryValues = array();
-        
-        /*if(isset($input["templateUsedExport"])) {
-            $sanitaryValues["templateUsedExport"] = sanitize_text_field($input["templateUsedExport"]);
-        }*/
-        
-        $sanitaryValues["maxSavesExports"] = absint($input["maxSavesExports"]);
-        
-        //$sanitaryValues["allowAutoExport"] = isset($input["allowAutoExport"]);
-
-        
-        return $sanitaryValues;
-    }
-    
-    
-    public function sanitizationEmailFields($input) {
-        $sanitaryValues = array();
-        
-        /*$sanitaryValues["sendMail"] = isset($input["sendMail"]);
-
-
-        if(isset($input["emailError"]) && is_email($input["emailError"])) {
-            $sanitaryValues["emailError"] = sanitize_text_field($input["emailError"]);
-        }*/
-        
-        if(isset($input["emailAd"]) && is_email($input["emailAd"])) {
-            $sanitaryValues["emailAd"] = sanitize_text_field($input["emailAd"]);
-        }
-        
-        return $sanitaryValues;
-    }
-    
-    public function sanitizationFeesScheduleFields($input) {
-        $sanitaryValues = array();
-        $inputFile = $_FILES[PLUGIN_RE_NAME."OptionsFees"];
-        
-        foreach($inputFile as $key => $value) {
-            $inputFile[$key] = $value["feesFile"]; 
-        }
-        
-        if(isset($input["feesUrl"]) && !empty(trim($input["feesUrl"]))) {
-            $sanitaryValues["feesUrl"] = sanitize_url($input["feesUrl"], array("https", "http"));
-        }
-                
-        if(isset($inputFile)) {
-            $validMimeTypes = array(
-                "pdf"   => "application/pdf",
-                "jpg"   => "image/jpeg",
-                "jpeg"  => "image/jpeg",
-                "png"   => "image/png",
-                "bmp"   => "image/bmp",
-            );
-            $upload = wp_handle_upload($inputFile, array("test_form" => false, "test_type" => true, "mimes"=>$validMimeTypes));
-            if(!isset($upload["error"]) && isset($upload["url"]) && !empty($upload["url"])) {
-                $sanitaryValues["feesUrl"] = $upload["url"];
-            }
-        }
         
         return $sanitaryValues;
     }
@@ -540,212 +283,117 @@ class REALM_Options {
         return $sanitaryValues;
     }
     
-    /*public function sanitizationSeLogerFields($input) {
-        $sanitaryValues = array();
+    public function sanitizationMiscFields($input) {
+        $inputFile = $_FILES[PLUGIN_RE_NAME."OptionsMisc"];
         
-        if(isset($input["versionSeLoger"]) && !empty(trim($input["versionSeLoger"]))) {
-            $sanitaryValues["versionSeLoger"] = sanitize_text_field($input["versionSeLoger"]);
+        foreach($inputFile as $key => $value) {
+            $inputFile[$key] = $value["feesFile"]; 
         }
         
-        if(isset($input["idAgency"]) && !empty(trim($input["idAgency"]))) {
-            $sanitaryValues["idAgency"] = sanitize_text_field($input["idAgency"]);
+        if(isset($input["feesUrl"]) && !empty(trim($input["feesUrl"]))) {
+            $sanitaryValues["feesUrl"] = sanitize_url($input["feesUrl"], array("https", "http"));
         }
+                
+        if(isset($inputFile)) {
+            $validMimeTypes = array(
+                "pdf"   => "application/pdf",
+                "jpg"   => "image/jpeg",
+                "jpeg"  => "image/jpeg",
+                "png"   => "image/png",
+                "bmp"   => "image/bmp",
+            );
+            $upload = wp_handle_upload($inputFile, array("test_form" => false, "test_type" => true, "mimes"=>$validMimeTypes));
+            if(!isset($upload["error"]) && isset($upload["url"]) && !empty($upload["url"])) {
+                $sanitaryValues["feesUrl"] = $upload["url"];
+            }
+        }
+        
+        if(isset($input["currency"]) && !empty(trim($input["currency"]))) {
+            $sanitaryValues["currency"] = sanitize_text_field($input["currency"]);
+        }
+
+        if(isset($input["areaUnit"]) && !empty(trim($input["areaUnit"]))) {
+            $sanitaryValues["areaUnit"] = sanitize_text_field($input["areaUnit"]);
+        }
+        
+        $sanitaryValues["similarAdsSameCity"] = isset($input["similarAdsSameCity"]);
+        
+        if(isset($input["searchBarHook"])) {
+            $sanitaryValues["searchBarHook"] = sanitize_text_field($input["searchBarHook"]);
+        }
+        
+        $sanitaryValues["deleteOptions"] = isset($input["deleteOptions"]);
         
         return $sanitaryValues;
-    }*/
+    }
     
     /*
-     * Display link to edit-tags before the form in General setting
+     * Display link to edit-tags before the form in custom fields setting
      */
-    public function generalSettingPreForm() { ?>
+    public function customFieldsSettingPreForm() { ?>
         <p>
-            <a target="_blank" href="edit-tags.php?taxonomy=adTypeProperty&post_type=re-ad"><?php _e("Click here to update the property types"); ?></a><br />
-            <br />
-            <a target="_blank" href="edit-tags.php?taxonomy=adTypeAd&post_type=re-ad"><?php _e("Click here to update the ad types"); ?></a><br />
+            Hello
         </p>
     <?php }
 
     
     //Fields
     
-    /* General setting */
-    public function currencyCallback() { ?>
-            <input type="text" id="currency" class="regular-text" 
-               name="<?=PLUGIN_RE_NAME."OptionsGeneral[currency]";?>" 
-               placeholder='€' 
-               value="<?=isset($this->optionsGeneral["currency"]) ? esc_attr($this->optionsGeneral["currency"]) : '$';?>">
-    <?php }
-    
-    public function areaUnitCallback() { ?>
-            <input type="text" id="areaUnit" class="regular-text" 
-               name="<?=PLUGIN_RE_NAME."OptionsGeneral[areaUnit]";?>" 
-               placeholder='m²' 
-               value="<?=isset($this->optionsGeneral["areaUnit"]) ? esc_attr($this->optionsGeneral["areaUnit"]) : 'm²';?>">
-    <?php }
-    
-    public function similarAdsSameCityCallback() { ?>
-        <input type="checkbox" 
-               name="<?=PLUGIN_RE_NAME."OptionsGeneral[similarAdsSameCity]";?>" id="similarAdsSameCity" 
-                   <?php isset($this->optionsGeneral["similarAdsSameCity"])?checked($this->optionsGeneral["similarAdsSameCity"], true):''?>>&nbsp;
-        <label for="similarAdsSameCity"><?php _e("Yes", "retxtdom"); ?></label>
-    <?php }
-    
+    /* Custom fields setting */
     public function customFieldsCallback() { ?>
-            <table id="customFields">
-                <thead>
-                    <tr>
-                        <th id="fieldName"><?php _e("Field name", "retxtdom"); ?></th>
-                        <th id="section"><?php _e("Section", "retxtdom"); ?></th>
-                        <th id="arrows">
-                            <span class="dashicons-before dashicons-arrow-up-alt"></span>
-                            <span class="dashicons-before dashicons-arrow-down-alt"></span>
-                        </th>
-                        <th id="trash">
-                            <span class="dashicons-before dashicons-trash"></span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="demo">
-                        <td class="fieldName"><input type="text" placeholder="<?php _e("Eg : Orientation", "retxtdom"); ?>"></td>
-                        <td class="section"><select><option id="mainFeatures"><?php _e("Main features", "retxtdom"); ?></option><option id="additionalFeatures"><?php _e("Additional features", "retxtdom"); ?></option></select></td>
-                        <td>
-                            <span class="dashicons-before dashicons-arrow-up-alt fieldUp"></span>
-                            <span class="dashicons-before dashicons-arrow-down-alt fieldDown"></span>
-                        </td>
-                        <td>
-                            <span class="dashicons-before dashicons-trash fieldTrash"></span>
-                        </td>
-                    </tr>
-                    <?php 
-                    if(isset($this->optionsGeneral["customFields"])) {
-                        $customFields = json_decode($this->optionsGeneral["customFields"], true);
-                        foreach($customFields as $field) { ?>
-                            <tr>
-                                <td class="fieldName"><input type="text" value="<?=$field["name"];?>"></td>
-                                <td class="section"><select><option id="mainFeatures" <?php selected($field["section"], "mainFeatures"); ?>><?php _e("Main features", "retxtdom"); ?></option><option id="additionalFeatures"  <?php selected($field["section"], "additionalFeatures"); ?>><?php _e("Additional features", "retxtdom"); ?></option></select></td>
-                                <td>
-                                    <span class="dashicons-before dashicons-arrow-up-alt fieldUp"></span>
-                                    <span class="dashicons-before dashicons-arrow-down-alt fieldDown"></span>
-                                </td>
-                                <td>
-                                    <span class="dashicons-before dashicons-trash fieldTrash"></span>
-                                </td>
-                            </tr>
-                    <?php               
-                        } 
-                    }?>
-                </tbody>
-            </table>
-            <br />
-            <span class="dashicons-before dashicons-plus fieldPlus"></span>
-            <input type="hidden" name="<?=PLUGIN_RE_NAME."OptionsGeneral[customFields]";?>" id="customFieldsData">
-    <?php }
-
-    
-    /* Importation setting */   
-    /*public function templateUsedImportCallback() {
-        ?> <select name="<?=PLUGIN_RE_NAME."OptionsImports[templateUsedImport]";?>" id="templateUsedImport">
-            <option value="stdxml" <?php selected($this->optionsImports["templateUsedImport"], "stdxml"); ?>>XML</option>
-            <option value="seloger" <?php selected($this->optionsImports["templateUsedImport"], "seloger"); ?>>Se Loger</option>
-        </select> <?php
-    }*/
-
-    public function maxSavesImportsCallback() {
-        $value = isset($this->optionsImports["maxSavesImports"]) ? absint($this->optionsImports["maxSavesImports"]) : '1'; ?>
-        <input type="number" min="1" id="maxSavesImports" class="regular-text" required
-                name="<?=PLUGIN_RE_NAME."OptionsImports[maxSavesImports];"?>" 
-                value="<?=$value;?>">
-        <?php
-    }
-    
-    public function maxDimCallback() {
-        ?> <select name="<?=PLUGIN_RE_NAME."OptionsImports[maxDim]";?>" id="maxDim">
-            <option value="512" <?php selected($this->optionsImports["maxDim"], "512"); ?>>512px</option>
-            <option value="1024" <?php selected($this->optionsImports["maxDim"], "1024"); ?>>1024px</option>
-            <option value="1536" <?php selected($this->optionsImports["maxDim"], "1536"); ?>>1536px</option>
-            <option value="2048" <?php selected($this->optionsImports["maxDim"], "2048"); ?>>2048px</option>
-        </select> <?php
-    }
-    
-    public function qualityPicturesCallback() { 
-        $value = isset($this->optionsImports["qualityPictures"]) ? absint($this->optionsImports["qualityPictures"]) : '85'; ?>
-        <input type="range" name="<?=PLUGIN_RE_NAME."OptionsImports[qualityPictures]";?>" 
-               min="75" max="100" step="1" oninput="this.nextElementSibling.value = this.value" required 
-               value="<?=$value?>">
-        <output><?=$value;?></output>
-    <?php }
-    
-    /*public function allowAutoImportCallback() { ?>
-        <input type="checkbox" 
-               name="<?=PLUGIN_RE_NAME."OptionsImports[allowAutoImport]";?>" id="allowAutoImport" 
-                   <?php isset($this->optionsImports["allowAutoImport"])?checked($this->optionsImports["allowAutoImport"], true):''?>>&nbsp;
-        <label for="allowAutoImport"><?php _e("Yes", "retxtdom"); ?></label>
-    <?php }*/
-      
-    
-    /* Exportation setting */
-    public function templateUsedExportCallback() {
-        ?> <select name="<?=PLUGIN_RE_NAME."OptionsExports[templateUsedExport]";?>" id="templateUsedExprot">
-            <option value="stdxml" <?php selected($this->optionsExports["templateUsedExport"], "stdxml"); ?>>XML</option>
-            <option value="seloger" <?php selected($this->optionsExports["templateUsedExport"], "seloger"); ?>>Se Loger</option>
-        </select> <?php
-    }
-    
-    public function maxSavesExportsCallback() {
-        $value = isset($this->optionsExports["maxSavesExports"]) ? absint($this->optionsExports["maxSavesExports"]) : '1'; ?>
-        <input type="number" min="1" id="maxSavesExports" class="regular-text" required
-                name="<?=PLUGIN_RE_NAME."OptionsExports[maxSavesExports];"?>" 
-                value="<?=$value;?>">
-    <?php }
-   
-    public function allowAutoExportCallback() { ?>
-        <input type="checkbox" 
-               name="<?=PLUGIN_RE_NAME."OptionsExports[allowAutoExport]";?>" id="allowAutoExport" 
-                   <?php isset($this->optionsExports["allowAutoExport"])?checked($this->optionsExports["allowAutoExport"], true):''?>>&nbsp;
-        <label for="allowAutoExport"><?php _e("Yes", "retxtdom"); ?></label>
+        <table id="customFields">
+            <thead>
+                <tr>
+                    <th id="fieldName"><?php _e("Field name", "retxtdom"); ?></th>
+                    <th id="section"><?php _e("Section", "retxtdom"); ?></th>
+                    <th id="arrows">
+                        <span class="dashicons-before dashicons-arrow-up-alt"></span>
+                        <span class="dashicons-before dashicons-arrow-down-alt"></span>
+                    </th>
+                    <th id="trash">
+                        <span class="dashicons-before dashicons-trash"></span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="demo">
+                    <td class="fieldName"><input type="text" placeholder="<?php _e("Eg : Orientation", "retxtdom"); ?>"></td>
+                    <td class="section"><select><option id="mainFeatures"><?php _e("Main features", "retxtdom"); ?></option><option id="additionalFeatures"><?php _e("Additional features", "retxtdom"); ?></option></select></td>
+                    <td>
+                        <span class="dashicons-before dashicons-arrow-up-alt fieldUp"></span>
+                        <span class="dashicons-before dashicons-arrow-down-alt fieldDown"></span>
+                    </td>
+                    <td>
+                        <span class="dashicons-before dashicons-trash fieldTrash"></span>
+                    </td>
+                </tr>
+                <?php 
+                if(isset($this->optionsCustomFields["customFields"])) {
+                    $customFields = json_decode($this->optionsCustomFields["customFields"], true);
+                    foreach($customFields as $field) { ?>
+                        <tr>
+                            <td class="fieldName"><input type="text" value="<?=$field["name"];?>"></td>
+                            <td class="section"><select><option id="mainFeatures" <?php selected($field["section"], "mainFeatures"); ?>><?php _e("Main features", "retxtdom"); ?></option><option id="additionalFeatures"  <?php selected($field["section"], "additionalFeatures"); ?>><?php _e("Additional features", "retxtdom"); ?></option></select></td>
+                            <td>
+                                <span class="dashicons-before dashicons-arrow-up-alt fieldUp"></span>
+                                <span class="dashicons-before dashicons-arrow-down-alt fieldDown"></span>
+                            </td>
+                            <td>
+                                <span class="dashicons-before dashicons-trash fieldTrash"></span>
+                            </td>
+                        </tr>
+                <?php               
+                    } 
+                }?>
+            </tbody>
+        </table>
+        <br />
+        <span class="dashicons-before dashicons-plus fieldPlus"></span>
+        <input type="hidden" name="<?=PLUGIN_RE_NAME."OptionsCustomFields[customFields]";?>" id="customFieldsData">
     <?php }
     
     
-    /* Email setting */
-    public function sendMailCallback() { ?>
-        <input type="checkbox" 
-               name="<?=PLUGIN_RE_NAME."OptionsEmail[sendMail]";?>" id="sendMail" 
-                   <?php isset($this->optionsEmail["sendMail"])?checked($this->optionsEmail["sendMail"], true):''?>>&nbsp;
-        <label for="sendMail"><?php _e("Yes", "retxtdom"); ?></label>
-    <?php }
-
-    public function emailErrorCallback() {      
-        $value = isset($this->optionsEmail["emailError"]) ? esc_attr($this->optionsEmail["emailError"]) : '';
-        ?>
-        <input type="email" class="regular-text" 
-               name="<?=PLUGIN_RE_NAME."OptionsEmail[emailError]";?>" 
-               id="emailError" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" 
-               value="<?=$value;?>">
-    <?php }
-    
-    public function emailAdCallback() { ?>
-        <input type="email" class="regular-text" 
-               name="<?=PLUGIN_RE_NAME."OptionsEmail[emailAd]";?>" id="emailAd" placeholder="<?php _e("address@email.com", "retxtdom"); ?>" 
-               value="<?=isset($this->optionsEmail["emailAd"]) ? esc_attr($this->optionsEmail["emailAd"]) : '';?>">
-    <?php }
-       
-
-    /* Fees schedule setting */    
-    public function feesUrlCallback() { ?>
-        <input type="text" id="feesUrl" class="regular-text" 
-               name="<?=PLUGIN_RE_NAME."OptionsFees[feesUrl]";?>" 
-               placeholder="<?=get_site_url().'/'. __("feesSchedule", "retxtdom").".pdf";?>" 
-               value="<?=isset($this->optionsFees["feesUrl"]) ? esc_url($this->optionsFees["feesUrl"]) : '';?>">
-    <?php }
-    
-    public function feesFileCallback() {
-        $name = PLUGIN_RE_NAME."OptionsFees[feesFile]";
-        echo "<input type='file' name='$name' accept='.pdf, .jpg, .jpeg, .png, .bmp'>";
-    }
-    
-    
-    /* APIs setting */
+    /* APIs settings */
     public function apiUsedCallback() {         
         $name = PLUGIN_RE_NAME."OptionsApis[apiUsed]"; ?>
             <input type="radio" name="<?=$name;?>" id="govFr" value="govFr" <?php isset($this->optionsApis["apiUsed"])?checked($this->optionsApis["apiUsed"], "govFr"):'';?>><label for="govFr">adresse.data.gouv.fr API&nbsp;</label><br />
@@ -796,22 +444,52 @@ class REALM_Options {
     <?php }
     
     
-    /* SeLoger setting */
-    /*public function idAgencyCallback() {
-        $value = isset($this->optionsSeLoger["idAgency"]) ? esc_attr($this->optionsSeLoger["idAgency"]) : '';
-        ?>
-            <input type="text" class="regular-text" 
-                   name="<?=PLUGIN_RE_NAME."OptionsSeLoger[idAgency]";?>" id="idAgency" placeholder="<?php _e("MyAgency", "retxtdom"); ?>" 
-                   value="<?=$value;?>">         
+    /* Misc settings */
+    public function currencyCallback() { ?>
+            <input type="text" id="currency" class="regular-text" 
+               name="<?=PLUGIN_RE_NAME."OptionsMisc[currency]";?>" 
+               placeholder='€' 
+               value="<?=isset($this->optionsMisc["currency"]) ? esc_attr($this->optionsMisc["currency"]) : '$';?>">
     <?php }
     
-    public function versionSeLogerCallback() {
-        $value = isset($this->optionsSeLoger["versionSeLoger"]) ? esc_attr($this->optionsSeLoger["versionSeLoger"]) : '';
-        ?>
-            <input type="text" class="regular-text" 
-                   name="<?=PLUGIN_RE_NAME."OptionsSeLoger[versionSeLoger]";?>" id="versionSeLoger" placeholder="4.08-007" 
-                   value="<?=$value;?>">         
-    <?php }*/
+    public function areaUnitCallback() { ?>
+            <input type="text" id="areaUnit" class="regular-text" 
+               name="<?=PLUGIN_RE_NAME."OptionsMisc[areaUnit]";?>" 
+               placeholder='m²' 
+               value="<?=isset($this->optionsMisc["areaUnit"]) ? esc_attr($this->optionsMisc["areaUnit"]) : 'm²';?>">
+    <?php }
     
+    public function similarAdsSameCityCallback() { ?>
+        <input type="checkbox" 
+               name="<?=PLUGIN_RE_NAME."OptionsMisc[similarAdsSameCity]";?>" id="similarAdsSameCity" 
+                   <?php isset($this->optionsMisc["similarAdsSameCity"])?checked($this->optionsMisc["similarAdsSameCity"], true):''?>>&nbsp;
+        <label for="similarAdsSameCity"><?php _e("Yes", "retxtdom"); ?></label>
+    <?php }
+    
+    public function searchBarHookCallback() { ?>
+            <input type="text" id="searchBarHook" class="regular-text" 
+               name="<?=PLUGIN_RE_NAME."OptionsMisc[searchBarHook]";?>" 
+               value="<?=isset($this->optionsMisc["searchBarHook"]) ? esc_attr($this->optionsMisc["searchBarHook"]) : '';?>">
+            <p><i><?php _e('If this field is empty, the search bar will be added using Javascript. You can also <a target="_blank" href="https://developer.wordpress.org/plugins/hooks/custom-hooks">create your own hook</a> and add it to your theme, preferably at the end of the &lt;header&gt; tag.', "retxtdom"); ?></i></p>
+    <?php }
+    
+    public function feesUrlCallback() { ?>
+        <input type="text" id="feesUrl" class="regular-text" 
+               name="<?=PLUGIN_RE_NAME."OptionsMisc[feesUrl]";?>" 
+               placeholder="<?=get_site_url().'/'. __("feesSchedule", "retxtdom").".pdf";?>" 
+               value="<?=isset($this->optionsMisc["feesUrl"]) ? esc_url($this->optionsMisc["feesUrl"]) : '';?>">
+    <?php }
+    
+    public function feesFileCallback() {
+        $name = PLUGIN_RE_NAME."OptionsMisc[feesFile]";
+        echo "<input type='file' name='$name' accept='.pdf, .jpg, .jpeg, .png, .bmp'>";
+    }
+    
+    public function deleteOptionsCallback() { ?>
+        <input type="checkbox" 
+               name="<?=PLUGIN_RE_NAME."OptionsMisc[deleteOptions]";?>" id="deleteOptions" 
+                   <?php isset($this->optionsMisc["deleteOptions"])?checked($this->optionsMisc["deleteOptions"], true):''?>>&nbsp;
+        <label for="deleteOptions"><?php _e("Yes", "retxtdom"); ?></label>
+    <?php }
     
 }
