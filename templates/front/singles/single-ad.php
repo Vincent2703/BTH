@@ -363,24 +363,27 @@
                     <div class="similarAdsContainer">
                         <div class="similarAdsWrapper">
                         <?php foreach($ad["morePosts"] as $similarAd) {
+                            $ad = REALM_AdModel::getAd($similarAd->ID);
                             printf(
                                 '<div class="similarAd">
                                     <div class="similarAdThumbnail">
-                                        <a href="%s">%s</a>
+                                        <a href="%1$s">%2$s</a>
                                     </div>
                                     <div class="similarAdDetails">
-                                        <span class="similarAdTitle"><a href="%s">%s</a></span>
-                                        <span class="similarAdPrice">500000€</span>
+                                        <span class="similarAdTitle"><a href="%1$s">%3$s</a></span>
+                                        <span class="similarAdPrice">%4$s</span>
                                         <span class="similarAdSurfaceRooms">
-                                            <span>250m²</span>
-                                            <span>3 pièces</span>
+                                            <span>%5$s</span>
+                                            <span>%6$s</span>
                                         </span>
                                     </div>
                                 </div>',
-                                esc_url(get_post_permalink($similarAd)),
-                                get_the_post_thumbnail($similarAd, "thumbnail"),
-                                esc_url(get_post_permalink($similarAd)),
-                                get_the_title($similarAd)
+                                $ad["permalink"],
+                                $ad["thumbnails"]["small"],
+                                $ad["title"],
+                                $ad["price"].REALM_AdModel::getCurrency(),
+                                $ad["surface"].REALM_AdModel::getAreaUnit(),
+                                ($ad["nbRooms"] > 0)?$ad["nbRooms"].' '.__("rooms", "retxtdom"):''
                             );
                         } ?>
                         </div>

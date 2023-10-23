@@ -102,22 +102,5 @@ class REALM_RegisterUserDashboard {
         }
     }
     
-    /*
-     * Create an agent or agency post if a new agent or agency user is created
-     * The author is the user
-     */
-    public function createPostOnNewUser($idUser) {
-        /*$user = get_user_by("id", $idUser);
-        $role = $user->roles[0];
-        if($role === "agent") {
-            require_once(PLUGIN_RE_PATH."models/admin/AgentAdmin.php");
-            REALM_AgentAdmin::createPost($idUser);
-        }else if($role === "agency") {
-            require_once(PLUGIN_RE_PATH."models/admin/AgencyAdmin.php");
-            REALM_AgencyAdmin::createPost($idUser);
-        }*/
-        
-    }
-    
 }
     

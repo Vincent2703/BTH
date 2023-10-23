@@ -96,6 +96,10 @@
     width: 100%;
 }
 
+.contentAd .similarAdDetails .similarAdPrice, .contentAd .similarAdDetails .similarAdSurfaceRooms span {
+    font-weight: bold;
+}
+
 .contentAd .prevMorePosts,
 .contentAd .nextMorePosts {
     position: absolute;
@@ -270,6 +274,10 @@
     display: block;
     width: 100%;
     margin: auto;
+}
+
+.contentAd #formContactSubmit:hover {
+    filter: brightness(85%);
 }
 
 .contentAd .headerContactLeft {

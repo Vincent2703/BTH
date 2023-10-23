@@ -1,5 +1,8 @@
 <?php
     require_once(preg_replace("/wp-content(?!.*wp-content).*/", '', __DIR__ )."wp-load.php");
+    if(wp_get_referer() === false || !defined("PLUGIN_RE_SEARCHBAR")) {
+        exit;
+    }
     $adTypesAd = get_terms(array(
         "taxonomy" => "adTypeAd",
         "hide_empty" => true,
@@ -9,13 +12,33 @@
         "hide_empty" => true,
     ));
     
-    $compSearchBarExtended = (isset($_GET["minPrice"]) && is_numeric($_GET["minPrice"])) || (isset($_GET["maxPrice"]) && is_numeric($_GET["maxPrice"])) || (isset($_GET["minSurface"]) && is_numeric($_GET["minSurface"])) || (isset($_GET["maxSurface"]) && is_numeric($_GET["maxSurface"])) || (isset($_GET["nbRooms"]) && is_numeric($_GET["nbRooms"])) || (isset($_GET["nbBedrooms"]) && is_numeric($_GET["nbBedrooms"])) || (isset($_GET["nbBathrooms"]) && is_numeric($_GET["nbBathrooms"]))
+    $compSearchBarExtended = (isset($_GET["minPrice"]) && is_numeric($_GET["minPrice"])) || 
+            (isset($_GET["maxPrice"]) && is_numeric($_GET["maxPrice"])) || 
+            (isset($_GET["minSurface"]) && is_numeric($_GET["minSurface"])) || 
+            (isset($_GET["maxSurface"]) && is_numeric($_GET["maxSurface"])) || 
+            (isset($_GET["nbRooms"]) && is_numeric($_GET["nbRooms"])) || 
+            (isset($_GET["nbBedrooms"]) && is_numeric($_GET["nbBedrooms"])) || 
+            (isset($_GET["nbBathrooms"]) && is_numeric($_GET["nbBathrooms"])) ||
+            isset($_GET["furnished"]) ||
+            isset($_GET["outdoorSpace"]) ||
+            isset($_GET["land"]) ||
+            isset($_GET["elevator"]) ||
+            isset($_GET["cellar"]) ||
+            isset($_GET["garageparking"]);
+            
 ?>
 <div class="searchBar">
     <form role="search" action="<?= get_post_type_archive_link("re-ad"); ?>" method="get">
         <input type="hidden" name="s">
         <input type="hidden" name="post_type" value="re-ad">
-
+        <input type="hidden" name="city" value="<?=isset($_GET["city"])?esc_attr($_GET["city"]):'';?>">
+        <input type="hidden" name="postCode" value="<?=isset($_GET["postCode"])?esc_attr($_GET["postCode"]):'';?>">
+        <input type="hidden" name="lat" value="<?=isset($_GET["lat"])?esc_attr($_GET["lat"]):'';?>">
+        <input type="hidden" name="long" value="<?=isset($_GET["long"])?esc_attr($_GET["long"]):'';?>">
+        
+        <button id="btnSearchBarSmallScreens" type="button"><?php _e("Search ads", "retxtdom"); ?>&nbsp;<span class="dashicons dashicons-arrow-down-alt2"></span></button>
+        <button id="btnCloseSearchBarSmallScreens" type="button"><span class="dashicons dashicons-arrow-up-alt2"></span></button>
+        
         <div class="searchForm">
             <div class="mainSearchBarInputs">
                 <div class="searchBarInput typeAd">
@@ -50,7 +73,14 @@
                 
                 <div class="searchBarInput address">
                     <label for="addressInput"><?php _e("City and postcode", "retxtdom"); ?></label>
-                    <input type="text" name="city" id="addressInput" class="ui-autocomplete-input" autocomplete="off" size="15" placeholder="<?php _e("Ex: London", "retxtdom"); ?>" value="<?=esc_attr(urldecode($_GET["city"] ?? ''), ENT_QUOTES); ?>">
+                    <?php printf(
+                        '<input type="text" data-context="searchBar" data-nonce="%s" id="addressInput" class="ui-autocomplete-input" autocomplete="off" size="15" placeholder="%s" value="%s%s">',
+                        esc_attr(wp_create_nonce("autocompleteAddress"), ENT_QUOTES),
+                        esc_attr(__("Ex: London", "retxtdom"), ENT_QUOTES),
+                        isset($_GET["city"]) && !empty(trim($_GET["city"]))?esc_attr(urldecode($_GET["city"])):'',
+                        isset($_GET["postCode"]) && !empty(trim($_GET["postCode"]))?' '.esc_attr(urldecode($_GET["postCode"])):'',
+                    ); ?>
+
                 </div>
 
                 <div id="searchBy" class="searchBarInput searchBy">
@@ -68,7 +98,16 @@
                     <span><?php _e("Filters", "reptxtdom"); ?></span>
                     <span class="dashicons dashicons-plus-alt"></span>
                 </div>
-                <input type="submit" value="<?php _e("Search", "retxtdom"); ?>"> 
+                <span class="searchBtn">
+                    <input type="submit" value="<?php _e("Search", "retxtdom"); ?>" 
+                        <?php disabled(
+                                !isset($_GET["city"]) || empty(trim($_GET["city"])) ||
+                                !isset($_GET["lat"]) || empty(trim($_GET["lat"])) ||
+                                !isset($_GET["long"]) || empty(trim($_GET["long"]))
+                            ); 
+                        ?>
+                    > 
+                </span>
             </div>          
             <div class="filtersSearchBarInputs" <?= $compSearchBarExtended ?: 'style="display: none;"'; ?>>
                 <div class="pricesSurfacesInputs">
@@ -123,7 +162,16 @@
                         </span>
                     </div>
                 </div>
-                <input type="submit" value="<?php _e("Search", "retxtdom"); ?>"> 
+                <span class="searchBtn">
+                    <input type="submit" value="<?php _e("Search", "retxtdom"); ?>" 
+                        <?php disabled(
+                                !isset($_GET["city"]) || empty(trim($_GET["city"])) ||
+                                !isset($_GET["lat"]) || empty(trim($_GET["lat"])) ||
+                                !isset($_GET["long"]) || empty(trim($_GET["long"]))
+                            ); 
+                        ?>
+                    > 
+                </span>
             </div>
             
         </div>      

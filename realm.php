@@ -81,8 +81,6 @@ class Realm {
     public function requireClasses() {
         //Custom posts
         require_once("customPosts/Ad.php");
-        require_once("customPosts/Agent.php");
-        require_once("customPosts/Agency.php");
         
         //Controllers
         require_once("controllers/Options.php");
@@ -95,8 +93,6 @@ class Realm {
         
         
         $this->Ad               = new REALM_Ad;
-        $this->Agent            = new REALM_Agent;
-        $this->Agency           = new REALM_Agency;
         
         $this->Options          = new REALM_Options;
         $this->EditAd           = new REALM_EditAd;
@@ -148,14 +144,10 @@ class Realm {
         
         //Save the custom fields
         add_action("user_register", array($this->RegistrationUser, "saveCustomFieldsNewUser"));
-        //When the user is an agent or an agency, create a post
-        add_action("user_register", array($this->RegistrationUser, "createPostOnNewUser"));
 
         //Remove the default search widget
         add_action("widgets_init", array($this, "removeSearchWidget"));
         
-        //add_action("widgets_init", array($this->SearchBar, "searchBarWidget"));
-
         //Add tabs to the admin notice area
         add_action("all_admin_notices", array($this->Options, "tabsOption"));
         
@@ -219,6 +211,7 @@ class Realm {
         if(isset(get_option(PLUGIN_RE_NAME."OptionsMisc")["searchBarHook"])) {
             $searchBarHook = get_option(PLUGIN_RE_NAME."OptionsMisc")["searchBarHook"];
             if(empty($searchBarHook)) {
+                define("PLUGIN_RE_SEARCHBAR", true);
                 add_filter("wp_enqueue_scripts", array($this, "updateHeader"));
             }
         }
@@ -257,13 +250,27 @@ class Realm {
         add_filter("use_block_editor_for_post_type", array($this->Ad, "deactivateGutenberg"), 10, 2);   
     }
     
-   public function addSearchBar() {
-        wp_register_style("searchBarAdCSS", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
-        wp_enqueue_style("searchBarAdCSS");
+    public function addSearchBar() {
+        if(is_front_page() || is_post_type_archive("re-ad") || is_singular("re-ad")) {
+            wp_register_style("searchBarAdCSS", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
+            wp_enqueue_style("searchBarAdCSS");
 
-        wp_register_style("autocompleteAddressCSS", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
-        wp_enqueue_style("autocompleteAddressCSS");
-        include_once("templates/front/searchBars/searchBarAd.php");
+            wp_register_style("autocompleteAddressCSS", plugins_url(PLUGIN_RE_NAME."/includes/css/others/autocompleteAddress.css"), array(), PLUGIN_RE_VERSION);
+            wp_enqueue_style("autocompleteAddressCSS");
+            
+            wp_register_script("searchBarAdJS", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery"), PLUGIN_RE_VERSION);
+            wp_enqueue_script("searchBarAdJS");
+            
+            wp_register_script("autocompleteAddressJS", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/autocompleteAddress.js"), array("jquery", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION);
+            wp_localize_script("autocompleteAddressJS", "variablesAddress", array(
+                "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"), 
+                "allCity" => __("All the city", "retxtdom") 
+            ));
+            wp_enqueue_script("autocompleteAddressJS");
+            
+            define("PLUGIN_RE_SEARCHBAR", true);
+            include_once("templates/front/searchBars/searchBarAd.php");
+        }
     }
     
     /*
@@ -332,7 +339,6 @@ class Realm {
         
         $miscOptions = get_option(PLUGIN_RE_NAME."OptionsMisc");
         if(isset($miscOptions["deleteOptions"]) && $miscOptions["deleteOptions"]) {
-            error_log("OH");
             delete_option(PLUGIN_RE_NAME."Notices");
             delete_option(PLUGIN_RE_NAME."CompatibleThemes");
             delete_option(PLUGIN_RE_NAME."OptionsApis");
@@ -397,8 +403,6 @@ class Realm {
      */    
     public function initCustomPosts() {
         $this->Ad->createAd();
-        $this->Agent->createAgent();
-        $this->Agency->createAgency();
     }
     
     /*
@@ -504,8 +508,7 @@ class Realm {
                             "variablesEditAd" => array(
                                 "replace" => __("Replace pictures", "retxtdom"),
                                 "delete" => __("Delete", "retxtdom"),
-                                "URLAPIGetAgents" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents"),
-                                "nonce" => wp_create_nonce("getAgents")
+                                "URLAPIGetAgents" => get_rest_url(null, PLUGIN_RE_NAME."/v1/agents")
                             )
                         )
                     ),
@@ -516,7 +519,7 @@ class Realm {
                         "variables" => array(
                             "variablesAddress" => array(
                                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
-                                "nonce" => wp_create_nonce("autocompleteAddress")
+                                "nonce" => wp_create_nonce("autocompleteAddress"),
                             )
                         )
                     )
@@ -614,39 +617,49 @@ class Realm {
      * Update the logs TODO : Put that part elsewhere
      */
     public function permissionCallbackGetAddressData($request) {
-        $idUser = apply_filters("determine_current_user", false);
+        if(is_numeric($request->get_param("idUser"))) {
+            $idUser = absint($request->get_param("idUser"));
+        }else {
+            $idUser = apply_filters("determine_current_user", false);
+        }
         wp_set_current_user($idUser); //Plutôt directement chercher capabilities get_userdata() ?
         $apisOptions = get_option(PLUGIN_RE_NAME."OptionsApis");
         $userCanEdit = current_user_can("edit_ads");
         $nonceValid = is_numeric(wp_verify_nonce($request->get_param("nonce"), "autocompleteAddress"));
         $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";        
-        $noLimit = !boolval($apisOptions["apiLimitNbRequests"]);
+        $noLimit = !boolval($apisOptions["apiLimitNbRequests"]);  
+        $saveAd = $request->get_param("context") === "saveAd" && $userCanEdit;
         
-        if($userCanEdit || ($nonceValid || $isAjax) || $noLimit) {
-            $clientAllowed = true;
-        }else{
-            $logsAPI = get_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests");
-            $date = date("m-d-Y");
-            $maxRequests = intval($apisOptions["apiMaxNbRequests"]);
-            $clientIP = $_SERVER["REMOTE_ADDR"]; 
-
-            if($logsAPI !== false && isset($logsAPI[$date])) {
-                $newLogsAPI = array($date=>$logsAPI[$date]);
-                $IPs = $newLogsAPI[$date];
-                $clientAllowed = !isset($IPs[$clientIP]) || isset($IPs[$clientIP]) && $IPs[$clientIP] < $maxRequests;
-                if($clientAllowed) {
-                    if(!isset($IPs[$clientIP])) {
-                        $newLogsAPI[$date][$clientIP] = 1;
-                    }else{
-                        $newLogsAPI[$date][$clientIP]++;
-                    }
-                }      
-            }else{
-                $newLogsAPI = array($date=>array($clientIP=>1));
+        if($saveAd || $isAjax && $nonceValid) {
+            if($userCanEdit || $noLimit) {
                 $clientAllowed = true;
+            }else{
+                $logsAPI = get_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests");
+                $date = date("m-d-Y");
+                $maxRequests = intval($apisOptions["apiMaxNbRequests"]);
+                $clientIP = $_SERVER["REMOTE_ADDR"]; 
+
+                if($logsAPI !== false && isset($logsAPI[$date])) {
+                    $newLogsAPI = array($date=>$logsAPI[$date]);
+                    $IPs = $newLogsAPI[$date];
+                    $clientAllowed = !isset($IPs[$clientIP]) || isset($IPs[$clientIP]) && $IPs[$clientIP] < $maxRequests;
+                    if($clientAllowed) {
+                        if(!isset($IPs[$clientIP])) {
+                            $newLogsAPI[$date][$clientIP] = 1;
+                        }else{
+                            $newLogsAPI[$date][$clientIP]++;
+                        }
+                    }      
+                }else{
+                    $newLogsAPI = array($date=>array($clientIP=>1));
+                    $clientAllowed = true;
+                }
+                update_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests", $newLogsAPI);
             }
-            update_option(PLUGIN_RE_NAME."LogsAPIIPNbRequests", $newLogsAPI);
+        }else{
+            $clientAllowed = false;
         }
+
         return $clientAllowed;
     }
     
@@ -654,7 +667,7 @@ class Realm {
         $idUser = apply_filters("determine_current_user", false);
         wp_set_current_user($idUser);
         $userCanEdit = current_user_can("edit_ads");
-        $nonceValid = is_numeric(wp_verify_nonce($request->get_param("nonce"), "getAgents"));
+        $nonceValid = is_numeric(wp_verify_nonce($request->get_param("nonce"), "reloadNonce"));
         $isAjax = !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) && strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest";
 
         return $userCanEdit && $nonceValid && $isAjax;
@@ -667,16 +680,20 @@ class Realm {
     public function updateHeader() {
         global $post_type;
         global $pagenow;
-        if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {         
-            wp_register_script("searchBarAdJS", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION, false);
+        if($post_type === "re-ad" || ($pagenow === "index.php" && empty($post_type))) {        
+            wp_register_script("searchBarAdJS", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/searchBarAd.js"), array("jquery"), PLUGIN_RE_VERSION);
+            wp_enqueue_script("searchBarAdJS");
+            
+            wp_register_script("addSearchBarHeaderJS", plugins_url(PLUGIN_RE_NAME."/includes/js/searches/addSearchBarHeader.js"), array("jquery", "jquery-ui-slider", "jquery-ui-autocomplete"), PLUGIN_RE_VERSION);
             $variablesSearchBar = array(
                 "searchBarURL" => plugin_dir_url(__FILE__)."templates/front/searchBars/searchBarAd.php",
                 "autocompleteURL" => plugin_dir_url(__FILE__)."includes/js/searches/autocompleteAddress.js",
                 "getAddressDataURL" => get_rest_url(null, PLUGIN_RE_NAME."/v1/address"),
-                "nonce" => wp_create_nonce("searchNonce")
+                "allCity" => __("All the city", "retxtdom")
             );
-            wp_localize_script("searchBarAdJS", "variablesSearchBar", $variablesSearchBar);
-            wp_enqueue_script("searchBarAdJS");
+            wp_localize_script("addSearchBarHeaderJS", "variablesSearchBar", $variablesSearchBar);
+            wp_enqueue_script("addSearchBarHeaderJS");
+           
 
             wp_register_style("searchBarAdCSS", plugins_url(PLUGIN_RE_NAME."/includes/css/templates/searchBars/searchBarAd.css"), array(), PLUGIN_RE_VERSION);
             wp_enqueue_style("searchBarAdCSS");

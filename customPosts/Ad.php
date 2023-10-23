@@ -320,9 +320,12 @@ class REALM_Ad {
                     foreach($terms as $term) { 
                         $nbTerms = 0;
                         foreach($wp_query->posts as $post) {                           
-                            $adTermID = get_the_terms($post->ID, "$taxonomy")[0]->term_id;
-                            if($adTermID === $term->term_id) {
-                                $nbTerms++;
+                            $terms = get_the_terms($post->ID, "$taxonomy");
+                            if(!empty($terms)) {
+                                $adTermID = $terms[0]->term_id;
+                                if($adTermID === $term->term_id) {
+                                    $nbTerms++;
+                                }
                             }
                         }?>
                         <option value="<?=$term->term_id;?>" <?php selected($term->term_id==$current);?>><?=$term->name;?>&nbsp;(<?=$nbTerms;?>)</option>

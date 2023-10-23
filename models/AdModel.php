@@ -115,6 +115,7 @@ class REALM_AdModel {
 
         $ad["showMap"] = self::getMeta("adShowMap");
         $ad["fullAddress"] = self::getMeta("adAddress");
+        $ad["placeId"] = self::getMeta("adPlaceId"); //Google API
         if($ad["showMap"] === "onlyPC") {
             $ad["address"] = self::getMeta("adCity").' '.self::getMeta("adPostCode");
             $optionsApis = get_option(PLUGIN_RE_NAME."OptionsApis");
@@ -177,14 +178,15 @@ class REALM_AdModel {
         $ad["allowSubmission"] = boolval(self::getMeta("adSubmissionsAllowed"));
         $ad["needGuarantors"] = boolval(self::getMeta("adNeedGuarantors"));
 
-        $optionsGeneral = get_option(PLUGIN_RE_NAME."OptionsMisc");
+        $optionsMisc = get_option(PLUGIN_RE_NAME."OptionsMisc");
+        $optionsCF = get_option(PLUGIN_RE_NAME."OptionsCustomFields");
         
         $metaQuerySimilarAds = array(
             array(
                 "key" => "_thumbnail_id"
             )
         );
-        if($optionsGeneral["similarAdsSameCity"]) {
+        if($optionsMisc["similarAdsSameCity"]) {
             array_push($metaQuerySimilarAds, array(
                 array(
                     "key" => "adCity",
@@ -219,8 +221,8 @@ class REALM_AdModel {
         
         $ad["customMainFields"] = array();
         $ad["customAdditionalFields"] = array();
-        if($optionsGeneral !== false ) {
-            $customFields = $optionsGeneral["customFields"];
+        if(isset($optionsCF["customFields"])) {
+            $customFields = $optionsCF["customFields"];
             if(!empty($customFields) || $customFields !== "[]") {
                foreach(json_decode($customFields, true) as $field) {
                    if($field["section"] === "mainFeatures") {
@@ -297,42 +299,68 @@ class REALM_AdModel {
         }            
 
         if(isset($_POST["showMap"]) && !empty(trim($_POST["showMap"]))) {
-            update_post_meta($adId, "adShowMap", sanitize_text_field($_POST["showMap"]));
-            if(isset($_POST["address"]) && !empty(trim($_POST["address"]))) {                   
-                $query = urlencode(addslashes(htmlentities(sanitize_text_field($_POST["address"]))));
-                $nonce = wp_create_nonce("apiAddress");
-                if($_POST["showMap"] !== "all") { 
-                    $zoom = 14;
-                    $radiusCircle = 0;
-                    $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=$query&context=saveAd&coordsApprox&nonce=$nonce";
-                    $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                }else{
-                    $zoom = 16;
-                    $radiusCircle = 0;
-                    $url = get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=$query&context=saveAd&nonce=$nonce";
-                    $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
+            if(isset($_POST["address"]) && !empty(trim($_POST["address"]))) {
+                $apisOptions = get_option(PLUGIN_RE_NAME . "OptionsApis");
+                $apiUsed = $apisOptions["apiUsed"];
+            
+                $oldAddress = get_post_meta($adId, "adAddress", true);
+                $oldPlaceId = get_post_meta($adId, "adPlaceId", true);
+                $oldShowMap = get_post_meta($adId, "adShowMap", true);
+
+                if($apiUsed === "govFr" && $oldAddress !== $_POST["address"] || $apiUsed === "google" && $oldPlaceId !== $_POST["placeId"] || $oldShowMap !== $_POST["showMap"]) { //If new localisation or new showMap
+                    $query = urlencode(addslashes(htmlentities(sanitize_text_field($_POST["address"]))));
+
+                    $APIURL = get_rest_url(null, PLUGIN_RE_NAME."/v1/address");
+                    $params = array(
+                        "nonce" => $_POST["autocompleteNonce"],
+                        "context" => "saveAd",
+                        "query" => $query,
+                        "idUser" => get_current_user_id()
+                    );
+                    if($_POST["showMap"] !== "all") { 
+                        $params["coordsApprox"] = "true";
+                        $zoom = 14;
+                        $circ = 500;
+                    }else{
+                        $zoom = 16;
+                        $circ = 0;
+                    }
+                    $placeId = sanitize_text_field($_POST["placeId"]);
+                    if(!empty(trim($placeId)) && $apiUsed == "google") {
+                        $params["placeId"] = $placeId;
+                    }
+                    update_post_meta($adId, "adPlaceId", $placeId);
+                    
+                    $response = json_decode(wp_remote_retrieve_body(wp_remote_post($APIURL, array(
+                        "method"      => "POST",
+                        "timeout"     => 10,
+                        "httpversion" => "1.1",
+                        "body"        => $params
+                    ))), true);
+
+                    $coordinates = $response["coordinates"];
+                    update_post_meta($adId, "adDataMap", array("lat" => $coordinates["lat"], "long" => $coordinates["long"], "zoom" => $zoom, "circ" => $circ));
+                    update_post_meta($adId, "adLatitude", $coordinates["lat"]);
+                    update_post_meta($adId, "adLongitude", $coordinates["long"]);
+
+                    $address = sanitize_text_field($response["address"]);
+                    update_post_meta($adId, "adAddress", $address);
+
+                    $postCode = sanitize_text_field($response["postCode"]);
+                    update_post_meta($adId, "adPostCode", $postCode);
+
+                    if(isset($response["adminLvl1"])) {
+                        update_post_meta($adId, "adAdminLvl1", $response["adminLvl1"]);
+                    }
+                    if(isset($response["adminLvl2"])) {
+                        update_post_meta($adId, "adAdminLvl2", $response["adminLvl2"]);
+                    }
+
+                    $city = sanitize_text_field($response["city"]);
+                    update_post_meta($adId, "adCity", $city);
                 }
-                $coordinates = $addressData["coordinates"];
-                update_post_meta($adId, "adDataMap", array("lat" => $coordinates["lat"], "long" => $coordinates["long"], "zoom" => $zoom, "circ" => $radiusCircle));
-                update_post_meta($adId, "adLatitude", $coordinates["lat"]);
-                update_post_meta($adId, "adLongitude", $coordinates["long"]);
-
-                $address = $addressData["address"];
-                update_post_meta($adId, "adAddress", $address);
-
-                $postCode = $addressData["postCode"];
-                update_post_meta($adId, "adPostCode", $postCode);
-
-                if(isset($addressData["adminLvl1"])) {
-                    update_post_meta($adId, "adAdminLvl1", $addressData["adminLvl1"]);
-                }
-                if(isset($addressData["adminLvl2"])) {
-                    update_post_meta($adId, "adAdminLvl2", $addressData["adminLvl2"]);
-                }
-
-                $city = $addressData["city"];
-                update_post_meta($adId, "adCity", $city);
             }
+            update_post_meta($adId, "adShowMap", sanitize_text_field($_POST["showMap"]));
         }
         if(isset($_POST["images"]) && !empty(trim($_POST["images"]))) {
             update_post_meta($adId, "adImages", sanitize_text_field($_POST["images"]));
@@ -605,6 +633,8 @@ class REALM_AdModel {
         return $postsIds;
     }
     
+    
+    //Archive
     public function setQueryAds($query) {
         if(!is_admin() && $query->is_main_query() && is_post_type_archive("re-ad")) {       
             $query->set("post_type", "re-ad");
@@ -774,59 +804,54 @@ class REALM_AdModel {
                 );
             }
             
-            if(isset($_GET["city"]) && !empty(trim($_GET["city"]))) {
-                $nonce = wp_create_nonce("apiAddress"); //Would be probably MUCH better in a hidden field, TODO ?
-                if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") {
-                    $url = urlencode(get_rest_url(null, PLUGIN_RE_NAME."/v1/address") ."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=city&nonce=$nonce");
-                    $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                    
-                    if(isset($addressData["city"])) {
-                        array_push($metas,
-                            array(
-                                "key" => "adCity",
-                                "value" => $addressData["city"],
-                                "compare" => "IN"
-                            )    
-                        );
-                    }else{
-                        array_push($metas,
-                            array(
-                                "key" => "adCity",
-                                "value" => $_GET["city"],
-                                "compare" => "IN"
-                            )    
-                        );
-                    }
-                    
-                    if(isset($addressData["postCode"])) {
-                        array_push($metas,
-                            array(
-                                "key" => "adPostCode",
-                                "value" => $addressData["postCode"],
-                            )
-                        );
-                    }
-                }else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius"){ 
-                    $url = urlencode(get_rest_url(null, PLUGIN_RE_NAME."/v1/address")."?query=".sanitize_text_field($_GET["city"])."&context=searchAds&searchBy=radius&radius=".intval($_GET["radius"])."&nonce=$nonce");
-                    $addressData = json_decode(wp_remote_retrieve_body(wp_remote_get($url)), true);
-                    if(isset($addressData["minLat"]) && isset($addressData["maxLat"]) && isset($addressData["minLong"]) && isset($addressData["maxLong"])) {
-                        array_push($metas,
-                            array(
-                                "key" => "adLatitude",
-                                "value" => array($addressData["minLat"], $addressData["maxLat"]),
-                                "compare" => "BETWEEN"
-                            )
-                        );
-                        array_push($metas,
-                            array(
-                                "key" => "adLongitude",
-                                "value" => array($addressData["minLong"], $addressData["maxLong"]),
-                                "compare" => "BETWEEN"
-                            )
-                        );
-                    }
+            
+            if(isset($_GET["searchBy"]) && $_GET["searchBy"] === "city") { //Search by city
+                if(isset($_GET["city"]) && !empty(trim($_GET["city"]))) {
+                    array_push($metas,
+                        array(
+                            "key" => "adCity",
+                            "value" => sanitize_text_field($_GET["city"]),
+                            "compare" => "LIKE"
+                        )    
+                    );
                 }
-            }                         
+                
+                if(isset($_GET["postCode"]) && !empty(trim($_GET["postCode"]))) {
+                    array_push($metas,
+                        array(
+                            "key" => "adPostCode",
+                            "value" => sanitize_text_field($_GET["postCode"]),
+                        )    
+                    );
+                }
+            }else if(isset($_GET["radius"]) && isset($_GET["searchBy"]) && $_GET["searchBy"] === "radius") { //Search by radius (coordinates)
+                if(isset($_GET["lat"]) && !empty(trim($_GET["lat"])) && isset($_GET["long"]) && !empty(trim($_GET["long"]))) {
+                    $radius = absint($_GET["radius"]);
+                    $lat = sanitize_text_field(urldecode($_GET["lat"]));
+                    $long = sanitize_text_field(urldecode($_GET["long"]));
+                    
+                    $minLat = $lat - $radius/111;
+                    $maxLat = $lat + $radius/111;
+                    $minLong = $long - $radius/76;
+                    $maxLong = $long + $radius/76;
+                    
+                    array_push($metas,
+                        array(
+                            "key" => "adLatitude",
+                            "value" => array($minLat, $maxLat),
+                            "compare" => "BETWEEN"
+                        )
+                    );
+                    array_push($metas,
+                        array(
+                            "key" => "adLongitude",
+                            "value" => array($minLong, $maxLong),
+                            "compare" => "BETWEEN"
+                        )
+                    );
+                }
+            }
+                 
             $query->set("tax_query", array($terms));
             
             if(!empty($metas)) {

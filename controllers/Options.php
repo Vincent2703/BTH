@@ -159,6 +159,14 @@ class REALM_Options {
         );
         
         add_settings_field(
+            "apiLanguage", //id
+            sprintf($titleFormat, __("Display the results in a specific language", "retxtdom"), ''), //title 
+            array($this, "apiLanguageCallback"), //callback
+            PLUGIN_RE_NAME."OptionsApisPage", //page
+            PLUGIN_RE_NAME."optionsSection" //section
+        );
+        
+        add_settings_field(
             "apiLimitCountry", //id
             sprintf($titleFormat, __("Limit search to one country", "retxtdom"), ''), //title 
             array($this, "apiLimitCountryCallback"), //callback
@@ -268,6 +276,10 @@ class REALM_Options {
         
         if(isset($input["apiMaxNbRequests"]) && is_numeric($input["apiMaxNbRequests"])) {
              $sanitaryValues["apiMaxNbRequests"] = intval($input["apiMaxNbRequests"]);
+        }
+        
+        if(isset($input["apiLanguage"]) && !empty(trim($input["apiLanguage"]))) {
+            $sanitaryValues["apiLanguage"] = sanitize_text_field($input["apiLanguage"]);
         }
         
         if(isset($input["apiLimitCountry"]) && !empty(trim($input["apiLimitCountry"]))) {
@@ -421,9 +433,18 @@ class REALM_Options {
                 name="<?=PLUGIN_RE_NAME."OptionsApis[apiMaxNbRequests];"?>" 
                 value="<?=$value;?>">
     <?php }
+    
+    public function apiLanguageCallback() { ?>
+        <p><i><a target="_blank" href="https://developers.google.com/maps/faq?hl=en#languagesupport"><?php _e("See the list of supported languages", "retxtdom"); ?></a></i></p>
+        <?php $value = isset($this->optionsApis["apiLanguage"]) ? esc_attr($this->optionsApis["apiLanguage"]) : ''; ?>
+            <input type="text" class="regular-text" 
+                   name="<?=PLUGIN_RE_NAME."OptionsApis[apiLanguage]";?>" id="apiLanguage" placeholder="fr" 
+                   value="<?=$value;?>">
+    <?php }
         
-    public function apiLimitCountryCallback() {
-        $value = isset($this->optionsApis["apiLimitCountry"]) ? esc_attr($this->optionsApis["apiLimitCountry"]) : ''; ?>
+    public function apiLimitCountryCallback() { ?>
+        <p><i><a target="_blank" href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes"><?php _e("See the list of ISO 3166-1 Alpha-2 codes for compatible countries", "retxtdom"); ?></a></i></p>
+        <?php $value = isset($this->optionsApis["apiLimitCountry"]) ? esc_attr($this->optionsApis["apiLimitCountry"]) : ''; ?>
             <input type="text" class="regular-text" 
                    name="<?=PLUGIN_RE_NAME."OptionsApis[apiLimitCountry]";?>" id="apiLimitCountry" placeholder="fr" 
                    value="<?=$value;?>">

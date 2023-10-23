@@ -1,35 +1,42 @@
-jQuery(document).ready(function($) {
-    /* Only way I see. I can't add a custom sidebar after the header but before the content for each theme */
-    $.ajax({
-        url: variablesSearchBar.searchBarURL+window.location.search,
-        type: "GET"                 
-    }).done(function(response) {
-        nonce = variablesSearchBar.nonce;
-        $("header:first").after(response);
-            $("#searchBySelect").change(function() {
-                searchByR($("#searchBySelect :selected").val());
-            });
-            $("#filters").click(function() {
-                addFilters($("#filters"));
-            });
-        $.ajax({
-           url: variablesSearchBar.autocompleteURL,
-           dataType: "script"
-        });
-    }); 
+jQuery(document).ready(function($) {          
+    $("#searchBySelect").change(function() {
+        searchByR($("#searchBySelect :selected").val());
+    });
+    $("#filters").click(function() {
+        manageFilters($("#filters"));
+    });
+    $(".searchBar #addressInput").on("input", function() {
+        $(".searchBar input[type=submit]").prop("disabled", true);
+        $(".searchBar #addressInput").removeClass("inputHighlighted");
+    });
+    $(".searchBar .searchBtn").on("click", function() {
+        if($(this).has("input[type=submit]:disabled").length === 1) {
+            $(".searchBar #addressInput").addClass("inputHighlighted");
+        }
+    });
+    $(".searchBar #btnSearchBarSmallScreens").on("click", function() {
+        $(this).hide();
+        $(".searchForm").show("slow");
+        $(".searchBar #btnCloseSearchBarSmallScreens").show();
+    });
+    $(".searchBar #btnCloseSearchBarSmallScreens").on("click", function() {
+        $(this).hide();
+        $(".searchForm").hide("slow");
+        $(".searchBar #btnSearchBarSmallScreens").show();
+    });
 });
 
-function addFilters(elem) {
+function manageFilters(elem) {
     var complementaryFilters = jQuery(".filtersSearchBarInputs");
     jQuery(".dashicons", elem).toggleClass("dashicons-plus-alt dashicons-minus");
     if(complementaryFilters.is(":hidden")) {
         complementaryFilters.show("slow");
-        jQuery(".searchBar .filtersSearchBarInputs input[type=submit]").show();
-        jQuery(".searchBar .mainSearchBarInputs input[type=submit]").hide();
+        jQuery(".searchBar .filtersSearchBarInputs .searchBtn").show();
+        jQuery(".searchBar .mainSearchBarInputs .searchBtn").hide();
     }else{
         complementaryFilters.hide("slow");
-        jQuery(".searchBar .filtersSearchBarInputs input[type=submit]").hide();
-        jQuery(".searchBar .mainSearchBarInputs input[type=submit]").show();
+        jQuery(".searchBar .filtersSearchBarInputs .searchBtn").hide();
+        jQuery(".searchBar .mainSearchBarInputs .searchBtn").show();
     }   
 }
 

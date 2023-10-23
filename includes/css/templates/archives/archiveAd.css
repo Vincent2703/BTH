@@ -170,6 +170,38 @@
     opacity: 100%;
 }
 
+.paginationAds {
+    display: flex;
+    justify-content: center;
+    font-size: 1.3em;
+}
+
+.paginationAds .nav-links {
+    display: flex;
+}
+
+.paginationAds .nav-links .page-numbers {
+    padding: 5px;
+    width: 35px;
+    height: 35px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2d2d2d;
+
+}
+
+.paginationAds .nav-links .current {
+    background-color: #2d2d2d;
+    color: white;
+}
+
+.paginationAds .nav-links .page-numbers:not(.current):hover {
+    background-color: grey;
+    color: white;
+}
+
 /* REPONSIVE */
 
 @media only screen and (max-width : 900px) {
@@ -180,15 +212,33 @@
     }
     
     .inShortAd .thumbnailAd {
-        width: 90%;
+        width: 95%;
         margin-bottom: 20px;
     }
     
     .inShortAd .detailsAd {
-        width: 90%;
+        width: 95%;
+    }
+    
+    .inShortAd .detailsAd .shortDescription, .inShortAd .detailsAd .price {
+        margin-top: 10px;
+    }
+    
+    .inShortAd .detailsAd .titleAd, .inShortAd .detailsAd .address {
+        margin: auto;
     }
     
     .inShortAd .detailsAd .shortDescription {
-        margin-bottom: 10px;
+        text-align: justify; 
+        height: 100%;
+    }
+    
+    .inShortAd .detailsAd .icons {
+        align-items: center;
+        gap: 0 10px;
+    }
+    
+    .inShortAd .detailsAd .furnished span:last-child, .inShortAd .detailsAd .outdoorSpace span:last-child {
+        display: none;
     }
 }

@@ -55,7 +55,7 @@ get_header(); ?>
                                         <span class="furnished"><span class="dashicons dashicons-archive"></span><span><?php _e("furnished", "retxtdom");?></span></span>
                                         <?php } ?>
                                         <?php if($ad["outdoorSpace"]) { ?>
-                                        <span class="furnished"><span class="exteriorIcon"></span><span><?php _e("Outdoor space", "retxtdom");?></span></span>
+                                        <span class="outdoorSpace"><span class="exteriorIcon"></span><span><?php _e("Outdoor space", "retxtdom");?></span></span>
                                         <?php } ?>
                                     </span>
                                     <span class="date"><?= get_the_date(); ?></span>
@@ -68,14 +68,14 @@ get_header(); ?>
                 }
                 wp_reset_postdata();
 
-                the_posts_pagination();
+                ?><div class="paginationAds"><?php the_posts_pagination(array("next_text" => '>', "prev_text" => '<')); ?></div>
                 
-            }else{ ?>
+            <?php }else{ ?>
                 <?php get_template_part("content", "none" ); ?>
             <?php } ?>
 
-            <?php if(defined("PLUGIN_RE_REP") && PLUGIN_RE_REP && current_user_can("customer")) { ?>
-            <span id="btnSubscribeAlert">
+            <?php if(defined("PLUGIN_RE_REP") && PLUGIN_RE_REP && current_user_can("customer")) /*replace by get userdata*/{ ?>
+            <span id="btnSubscribeAlert" data-nonce="<?=wp_create_nonce("setAlertNonce");?>">
                 <button id="subscribeAlert"><?php _e("Save the search", "reptxtdom"); ?></button>
             </span>
             <?php } ?> 

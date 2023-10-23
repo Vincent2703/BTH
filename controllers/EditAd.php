@@ -106,8 +106,11 @@ class REALM_EditAd {
         $miscOptions = get_option(PLUGIN_RE_NAME."OptionsMisc");
         $currency = $miscOptions["currency"];
         $areaUnit = $miscOptions["areaUnit"];
-        wp_nonce_field("formEditAd", "nonceSecurity"); //Add nonce
+        wp_nonce_field("formEditAd", "nonceSecurity");
+        $nonce = wp_create_nonce("autocompleteAddress");
+        wp_nonce_field("reloadAgent", "reloadNonce", false);
         ?>
+        <input type="hidden" name="autocompleteNonce" value="<?=$nonce;?>">
         <div id="refAgency">
             <div class="text">
                 <label><?php _e("Ad's reference", "retxtdom");?><span id="generateRef" onclick="document.getElementById('refAgencyInput').value = <?= $adWP->ID;?>;"><?php _e("Generate a reference", "retxtdom");?></span></label>
@@ -137,7 +140,8 @@ class REALM_EditAd {
         <div id="address">
             <div class="text">
                 <label><?php _e("Property address", "retxtdom");?></label>
-                <input type="text" name="address" id="addressInput" autocomplete="off" placeholder='Eg : <?php _e("123 Chester Square, London", "retxtdom");?>' value="<?= $ad["fullAddress"]; ?>" required>
+                <input type="text" name="address" data-context="searchAddress" data-nonce="<?=$nonce;?>" id="addressInput" autocomplete="off" placeholder='Eg : <?php _e("123 Chester Square, London", "retxtdom");?>' value="<?= $ad["fullAddress"]; ?>" required>
+                <input type="hidden" name="placeId" value="<?= $ad["placeId"]; ?>">
             </div>             
 
             <div class="radio">

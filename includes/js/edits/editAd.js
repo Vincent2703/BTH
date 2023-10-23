@@ -119,7 +119,7 @@ function reloadAgents(select) {
     let agentSelected = parseInt(jQuery(":selected", jQuery(select)).val());
     jQuery.ajax({
         url: variablesEditAd.URLAPIGetAgents,
-        data: { nonce: variablesEditAd.nonce },
+        data: { nonce: jQuery("#reloadNonce").val() },
         type: "POST",
         dataType: "json"
     }).success(function(response) {

@@ -13,6 +13,29 @@
     width: 100%;
 }
 
+.searchBar #btnCloseSearchBarSmallScreens {
+    display: none;
+    width: 100%;
+}
+
+/*.searchBar form select {
+    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCI+PHBhdGggZmlsbD0iIzYyNjI2MiIgZD0iTTE1IDhsLTQgNi00LTZoOHoiLz48L3N2Zz4=) right center/18px no-repeat, white;
+    border-style: solid;
+    border-color: #dddddd;
+    border-width: 2px;
+    border-radius: 3px;
+    color: #272626;
+    padding: 10px 12px;
+    font-size: 15px;
+    min-height: 35px;   
+    box-sizing: border-box;
+    display: inline-block;
+    appearance: none;
+    outline: 0;
+    resize: vertical;
+    margin: 0;
+}*/
+
 .searchBar .mainSearchBarInputs {
     margin-bottom: 20px;
 }
@@ -31,6 +54,16 @@
 
 .searchBar .searchBarInput label, .searchBar .mainSearchBarInputs #filters span:first-child {
     font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;   
+}
+
+.searchBarInput #addressInput:placeholder-shown {
+    border: 2px solid black;
+}
+
+.searchBarInput #addressInput.inputHighlighted {
+    border: 2px solid red;
 }
 
 .searchBar .searchBarInput.typeAd, .searchBar .searchBarInput.typeProperty {
@@ -50,6 +83,7 @@
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
 }
 
 .searchBar .mainSearchBarInputs #radiusInput {
@@ -60,14 +94,24 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2em;
+    font-size: 32px;
     width: 40px;
     height: 40px;
 }
 
-.searchBar input[type=submit] {
+.searchBar .searchBtn {
     border-radius: 5px;
     width: 15%;
+}
+
+.searchBar .searchBtn input[type=submit]:not([disabled]):hover {
+    filter: brightness(85%);
+}
+
+.searchBar input[type=submit]:disabled {
+    filter: brightness(85%);
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .searchBar .filtersSearchBarInputs {
@@ -114,11 +158,15 @@
 }
 
 @media only screen and (min-width : 1201px) {
-    .searchBar .mainSearchBarInputs input[type=submit] {
+    .searchBar #btnSearchBarSmallScreens {
+        display: none;
+    }
+        
+    .searchBar .mainSearchBarInputs .searchBtn {
         display: block !important;
     }
     
-    .searchBar .filtersSearchBarInputs input[type=submit] {
+    .searchBar .filtersSearchBarInputs .searchBtn {
         display: none !important;
     }
 }
@@ -126,6 +174,15 @@
 @media only screen and (max-width : 1200px) {
     .searchBar {
         width: 100%;
+    }
+    
+    .searchBar #btnSearchBarSmallScreens {
+        display: block;
+        width: 100%;
+    }  
+    
+    .searchBar .searchForm {
+        display: none;
     }
     
     .searchBar .mainSearchBarInputs {
@@ -142,13 +199,9 @@
         gap: 0;
     }
     
-    .searchBar input[type=submit] {
+    .searchBar .searchBtn, .searchBar .searchBtn input[type=submit] {
         width: 100%;
     }
-    
-    .searchBar .filtersSearchBarInputs .searchBarInput {
-    }
-    
     .searchBar .filtersSearchBarInputs {
         flex-direction: column;
         width: 100%;
