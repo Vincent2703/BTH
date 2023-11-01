@@ -267,7 +267,7 @@ class Realm {
                 "allCity" => __("All the city", "retxtdom") 
             ));
             wp_enqueue_script("autocompleteAddressJS");
-            
+
             define("PLUGIN_RE_SEARCHBAR", true);
             include_once("templates/front/searchBars/searchBarAd.php");
         }

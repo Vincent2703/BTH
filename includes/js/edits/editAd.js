@@ -21,6 +21,20 @@ jQuery(function($) {
         $("#agents").click(function() {
             reloadAgents(this);
         });
+
+        $("#post").submit(function(e) {
+            if($("#addressOK").val() === "false") {
+                e.preventDefault();
+                $("html, body").animate({
+                    scrollTop: $("#address").offset().top-200
+                }, 900);
+                $("#addressInput").css("border-color", "red");
+            }
+        });
+        
+        /*$("#addressInput").on("click", function() {
+            $("#publish").prop("disabled", true);
+        });*/
         
     });
 

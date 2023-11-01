@@ -66,6 +66,8 @@ jQuery(document).ready(function($) {
                $(".searchBar input[type=submit]").prop("disabled", false);
             }else if(context === "searchAddress") {
                 $("#address input[name=placeId]").val(res.placeId);
+                $("#addressOK").val("true");
+                $("#addressInput").css("border-color", '');
             }
         },
         minLength: minLength,

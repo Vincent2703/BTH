@@ -13,31 +13,22 @@
     width: 100%;
 }
 
-.searchBar #btnCloseSearchBarSmallScreens {
-    display: none;
+.searchBar button {
     width: 100%;
 }
 
-/*.searchBar form select {
+.searchBar form select {
     background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCI+PHBhdGggZmlsbD0iIzYyNjI2MiIgZD0iTTE1IDhsLTQgNi00LTZoOHoiLz48L3N2Zz4=) right center/18px no-repeat, white;
-    border-style: solid;
     border-color: #dddddd;
     border-width: 2px;
     border-radius: 3px;
     color: #272626;
     padding: 10px 12px;
-    font-size: 15px;
-    min-height: 35px;   
-    box-sizing: border-box;
-    display: inline-block;
     appearance: none;
-    outline: 0;
-    resize: vertical;
-    margin: 0;
-}*/
+}
 
 .searchBar .mainSearchBarInputs {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .searchBar .mainSearchBarInputs, .searchBar .filtersSearchBarInputs {
@@ -52,10 +43,14 @@
     flex-direction: column;
 }
 
-.searchBar .searchBarInput label, .searchBar .mainSearchBarInputs #filters span:first-child {
+.searchBar .searchBarInput label, .searchBar #filters span:first-child {
     font-weight: 600;
     font-size: 15px;
     white-space: nowrap;   
+}
+
+.searchBarInput #addressInput {
+    padding: 10px 12px;
 }
 
 .searchBarInput #addressInput:placeholder-shown {
@@ -67,23 +62,23 @@
 }
 
 .searchBar .searchBarInput.typeAd, .searchBar .searchBarInput.typeProperty {
-    width: 20%;
+    width: 26%;
 }
 
 .searchBar .searchBarInput.address {
-    width: 30%;
+    width: 36%;
 }
 
 .searchBar .searchBarInput.searchBy {
-    width: 15%;
+    width: 12%;
 }
 
-.searchBar .mainSearchBarInputs #filters {
+.searchBar #filters {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 3px;
     cursor: pointer;
+    justify-content: flex-end;
 }
 
 .searchBar .mainSearchBarInputs #radiusInput {
@@ -102,6 +97,10 @@
 .searchBar .searchBtn {
     border-radius: 5px;
     width: 15%;
+}
+
+.searchBar .searchBtn input[type=submit] {
+    width: 100%;
 }
 
 .searchBar .searchBtn input[type=submit]:not([disabled]):hover {
@@ -157,9 +156,22 @@
     justify-content: space-between;
 }
 
+.searchBar button:hover {
+    text-decoration: none;
+}
+
 @media only screen and (min-width : 1201px) {
+    .searchBar #btnCloseSearchBarSmallScreens {
+        display: none !important;
+        margin-bottom: 10px;
+    }
+    
     .searchBar #btnSearchBarSmallScreens {
-        display: none;
+        display: none !important;
+    }
+    
+    .searchBar .searchForm {
+        display: block !important;
     }
         
     .searchBar .mainSearchBarInputs .searchBtn {
@@ -175,11 +187,15 @@
     .searchBar {
         width: 100%;
     }
-    
+        
     .searchBar #btnSearchBarSmallScreens {
         display: block;
         width: 100%;
     }  
+    
+    .searchBar #btnCloseSearchBarSmallScreens {
+        display: none;
+    }
     
     .searchBar .searchForm {
         display: none;
@@ -224,5 +240,9 @@
     
     .searchBar .propertyHas .colPropertyHas {
         gap: 15px;
+    }
+    
+    .searchBar #filters {
+        justify-content: center;
     }
 }

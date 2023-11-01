@@ -126,6 +126,10 @@
     align-items: center;
 }
 
+.inShortAd .iconsDate .date {
+    font-style: italic;
+}
+
 .inShortAd .iconsDate .icons span span {
     margin-right: 5px;
 }

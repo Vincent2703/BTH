@@ -133,7 +133,7 @@
                                 <span class="valueFeature"><?= $ad["price"].$currency; ?></span>
                             </div>
                             <div>
-                                <span class="nameFeature"><?php _e("Fees", "retxtdom") . $feesURL!==false?printf('&nbsp;<a class="feesSchedule" target="_blank" href="%1$s">(%2$s)</a>', $feesURL, __("Fees schedule", "retxtdom")):''; ?></span>
+                                <span class="nameFeature"><?php _e("Fees", "retxtdom") . !empty($feesURL)?printf('&nbsp;<a class="feesSchedule" target="_blank" href="%1$s">(%2$s)</a>', $feesURL, __("Fees schedule", "retxtdom")):''; ?></span>
                                 <span class="valueFeature"><?= $ad["fees"].$currency; ?></span>
                             </div>
                             <div>
@@ -258,11 +258,31 @@
                             <?php } ?>
                             <div>
                                 <span id="DPEName" class="nameFeature"><?php _e("EPD", "retxtdom"); ?>&nbsp;<abbr data-title="<?php _e("In kWhPE/m²/year", "retxtdom"); ?>"><sup>?</sup></abbr></span>
-                                <span id="DPEValue" class="valueFeature"><?= $ad["DPE"]; ?>&nbsp;</span>
+                                <span id="DPEValue" class="valueFeature"><span><?= $ad["DPE"];?>&nbsp;</span> 
+                                    <div>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">A</span>', $ad["DPE"]>=0&&$ad["DPE"]<=50?'class="dpe"':'', "black", "rgb(49, 152, 52)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">B</span>', $ad["DPE"]>=51&&$ad["DPE"]<=90?'class="dpe"':'',"black", "rgb(51, 204, 49)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">C</span>', $ad["DPE"]>=91&&$ad["DPE"]<=150?'class="dpe"':'',"black", "rgb(203, 252, 52)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">D</span>', $ad["DPE"]>=151&&$ad["DPE"]<=230?'class="dpe"':'',"black", "rgb(251, 254, 6)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">E</span>', $ad["DPE"]>=231&&$ad["DPE"]<=330?'class="dpe"':'',"black", "rgb(251, 204, 5)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">F</span>', $ad["DPE"]>=331&&$ad["DPE"]<=450?'class="dpe"':'',"black", "rgb(252, 153, 53)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">G</span>', $ad["DPE"]>=451&&$ad["DPE"]<=500?'class="dpe"':'',"white", "rgb(252, 2, 5)"); ?>
+                                    </div>
+                                </span>
                             </div>
                             <div>
                                 <span id="GESName" class="nameFeature"><?php _e("Greenhouse gas", "retxtdom"); ?>&nbsp;<abbr data-title="<?php _e("In kg eqCO2/m²/year", "retxtdom"); ?>"><sup>?</sup></abbr></span>
-                                <span id="GESValue" class="valueFeature"><?= $ad["GES"]; ?>&nbsp;</span>
+                                <span id="GESValue" class="valueFeature"><span><?= $ad["GES"]; ?>&nbsp;</span>
+                                    <div>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">A</span>', $ad["GES"]>=0&&$ad["GES"]<=5?'class="ges"':'', "black", "rgb(242, 239, 244)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">B</span>', $ad["GES"]>=6&&$ad["GES"]<=10?'class="ges"':'',"black", "rgb(233, 193, 247)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">C</span>', $ad["GES"]>=11&&$ad["GES"]<=20?'class="ges"':'',"black", "rgb(214, 170, 244)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">D</span>', $ad["GES"]>=21&&$ad["GES"]<=35?'class="ges"':'',"black", "rgb(204, 147, 244)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">E</span>', $ad["GES"]>=36&&$ad["GES"]<=55?'class="ges"':'',"white", "rgb(187, 114, 243)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">F</span>', $ad["GES"]>=56&&$ad["GES"]<=80?'class="ges"':'',"white", "rgb(169, 76, 238)"); ?>
+                                        <?php printf('<span %s style="color: %s; background-color: %s;">G</span>', $ad["GES"]>=81&&$ad["GES"]<=100?'class="ges"':'',"white", "rgb(139, 26, 225)"); ?>
+                                    </div>
+                                </span>
                             </div>
                             <?php if(!empty($customComplementaryFields)) {
                                 foreach($customComplementaryFields as $fieldName) {

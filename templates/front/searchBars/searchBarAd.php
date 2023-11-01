@@ -1,6 +1,6 @@
 <?php
     require_once(preg_replace("/wp-content(?!.*wp-content).*/", '', __DIR__ )."wp-load.php");
-    if(wp_get_referer() === false || !defined("PLUGIN_RE_SEARCHBAR")) {
+    if(!defined("PLUGIN_RE_SEARCHBAR")) {
         exit;
     }
     $adTypesAd = get_terms(array(
@@ -94,10 +94,6 @@
                     <label for="radius"><?php _e("Radius", "retxtdom"); ?></label>
                     <input type="number" name="radius" id="radius" value="<?= isset($_GET["radius"])?absint($_GET["radius"]):'10'; ?>">
                 </div>
-                <div id="filters">
-                    <span><?php _e("Filters", "reptxtdom"); ?></span>
-                    <span class="dashicons dashicons-plus-alt"></span>
-                </div>
                 <span class="searchBtn">
                     <input type="submit" value="<?php _e("Search", "retxtdom"); ?>" 
                         <?php disabled(
@@ -173,7 +169,10 @@
                     > 
                 </span>
             </div>
-            
+            <span id="filters">
+                <span><?php _e("Filters", "reptxtdom"); ?></span>
+                <span class="dashicons dashicons-plus-alt"></span>
+            </span>
         </div>      
     </form>
 </div>

@@ -26,6 +26,10 @@
     max-width: 300px;
 }
 
+.text a.linkNoUnderline {
+    text-decoration: none;
+}
+
 .radio, .select {
     margin: 10px 10px 30px 10px;
     display: inline-flex;
@@ -61,6 +65,7 @@
 #showPictures {
     gap: 10px;
     margin-top: 10px;
+    user-select: none;
 }
 
 .aPicture {
@@ -93,7 +98,6 @@
 
 .controlPicture .deletePicture:hover {
     cursor: pointer;
-    user-select: none;
     background-color: rgba(255, 0, 0, 0.8);
     color: rgba(255, 255, 255, 1);
     -webkit-transition: all 0.2s ease;

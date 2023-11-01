@@ -412,66 +412,66 @@ class REALM_Ad {
      * If agent : own agency
      * If admin : by id agency get variable
      */
-public function customFiltersQuery($query) {
-    global $pagenow, $typenow;
+    public function customFiltersQuery($query) {
+        global $pagenow, $typenow;
 
-    if(is_admin() && $pagenow === "edit.php" && $typenow === "re-ad") {
-        $currentUserID = get_current_user_id();
-        $currentUser = get_user_by("ID", $currentUserID);
-        if(!$currentUser) {
-            return;
-        }
-        $currentUserRole = $currentUser->roles[0];
-
-        if($currentUserRole === "agency") {
-            $idAgency = $currentUserID;
-        }elseif ($currentUserRole === "agent") {
-            $idAgency = get_user_meta($currentUserID, "agentAgency", true);
-        }elseif($currentUserRole === "administrator" && isset($_GET["agency"]) && absint($_GET["agency"]) > 0) {
-            $idAgency = absint($_GET["agency"]);
-        }
-
-        if(isset($idAgency)) {
-            $agentsAgency = REALM_UserModel::getAgentsAgency($idAgency);
-            $agentsAgencyIds = array_column($agentsAgency, "ID");
-
-            $metaQueryValue = !empty($agentsAgencyIds) ? $agentsAgencyIds : 0;
-            $meta_query = array(
-                "key" => "adIdAgent",
-                "value" => $metaQueryValue,
-                "compare" => !empty($agentsAgencyIds) ? "IN" : "=",
-            );
-
-            if(isset($_GET["agent"]) && is_numeric($_GET["agent"]) && in_array(absint($_GET["agent"]), $agentsAgencyIds)) {
-                $meta_query["value"] = absint($_GET["agent"]);
+        if(is_admin() && $pagenow === "edit.php" && $typenow === "re-ad") {
+            $currentUserID = get_current_user_id();
+            $currentUser = get_user_by("ID", $currentUserID);
+            if(!$currentUser) {
+                return;
             }
-        }else if($currentUserRole === "administrator") {
-            if(isset($_GET["agency"]) && $_GET["agency"] === "no") {
+            $currentUserRole = $currentUser->roles[0];
+
+            if($currentUserRole === "agency") {
+                $idAgency = $currentUserID;
+            }elseif ($currentUserRole === "agent") {
+                $idAgency = get_user_meta($currentUserID, "agentAgency", true);
+            }elseif($currentUserRole === "administrator" && isset($_GET["agency"]) && absint($_GET["agency"]) > 0) {
+                $idAgency = absint($_GET["agency"]);
+            }
+
+            if(isset($idAgency)) {
+                $agentsAgency = REALM_UserModel::getAgentsAgency($idAgency);
+                $agentsAgencyIds = array_column($agentsAgency, "ID");
+
+                $metaQueryValue = !empty($agentsAgencyIds) ? $agentsAgencyIds : 0;
                 $meta_query = array(
                     "key" => "adIdAgent",
-                    "compare" => "NOT EXISTS",
+                    "value" => $metaQueryValue,
+                    "compare" => !empty($agentsAgencyIds) ? "IN" : "=",
                 );
-            }else if(isset($_GET["agent"]) && absint($_GET["agent"]) > 0) {
-                $meta_query = array(
-                    "key" => "adIdAgent",
-                    "value" => absint($_GET["agent"])
-                );
-            }
-        }
 
-        if(isset($meta_query)) {
-            $postStatus = $query->get("post_status");
-
-            if(empty($postStatus) && !$query->get("author")) {
-                $query->set("post_status", array("publish", "draft"));
-            }elseif ($postStatus === "trash") {
-                $query->set("post_status", "trash");
+                if(isset($_GET["agent"]) && is_numeric($_GET["agent"]) && in_array(absint($_GET["agent"]), $agentsAgencyIds)) {
+                    $meta_query["value"] = absint($_GET["agent"]);
+                }
+            }else if($currentUserRole === "administrator") {
+                if(isset($_GET["agency"]) && $_GET["agency"] === "no") {
+                    $meta_query = array(
+                        "key" => "adIdAgent",
+                        "compare" => "NOT EXISTS",
+                    );
+                }else if(isset($_GET["agent"]) && absint($_GET["agent"]) > 0) {
+                    $meta_query = array(
+                        "key" => "adIdAgent",
+                        "value" => absint($_GET["agent"])
+                    );
+                }
             }
-            $query->set("meta_query", array($meta_query));
+
+            if(isset($meta_query)) {
+                $postStatus = $query->get("post_status");
+
+                if(empty($postStatus) && !$query->get("author")) {
+                    $query->set("post_status", array("publish", "draft"));
+                }elseif ($postStatus === "trash") {
+                    $query->set("post_status", "trash");
+                }
+                $query->set("meta_query", array($meta_query));
+            }
+
         }
-        
     }
-}
 
     
     /*

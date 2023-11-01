@@ -113,35 +113,49 @@ class REALM_EditAd {
         <input type="hidden" name="autocompleteNonce" value="<?=$nonce;?>">
         <div id="refAgency">
             <div class="text">
-                <label><?php _e("Ad's reference", "retxtdom");?><span id="generateRef" onclick="document.getElementById('refAgencyInput').value = <?= $adWP->ID;?>;"><?php _e("Generate a reference", "retxtdom");?></span></label>
-                <input type="text" name="refAgency" id="refAgencyInput" placeholder="Eg : A-123" value="<?= $ad["refAd"]; ?>">
+                <label>
+                    <?php _e("Ad's reference", "retxtdom");?>
+                    <abbr title="<?php _e("You can use it to manage your ads easily", "retxtdom"); ?>"><sup>?</sup></abbr>
+                    <span id="generateRef" onclick="document.getElementById('refAgencyInput').value = <?= $adWP->ID;?>;">
+                        <?php _e("Generate a reference", "retxtdom");?>
+                    </span>
+                </label>
+                <input type="text" name="refAgency" id="refAgencyInput" placeholder="<?php _e("Eg: A-123", "retxtdom"); ?>" value="<?= $ad["refAd"]; ?>">
             </div>
         </div>
         <div id="prices">
             <div class="text">
-                <label><?php _e("Property price", "retxtdom");?> (<a target="_blank" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$currency;?></a>) <abbr title="<?php _e("Charges included", "retxtdom"); ?>"><sup>?</sup></abbr></label>
-                <input type="number" name="price" id="priceInput" placeholder="Eg : 180000" value="<?= $ad["price"]; ?>" required>
+                <label>
+                    <?php _e("Property price", "retxtdom");?>
+                    (<a target="_blank" class="linkNoUnderline" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$currency;?></a>)
+                    <abbr title="<?php _e("Charges included", "retxtdom"); ?>"><sup>?</sup></abbr>
+                </label>
+                <input type="number" name="price" id="priceInput" placeholder="<?php _e("Eg:", "retxtdom"); ?> 180000" value="<?= $ad["price"]; ?>" required>
             </div>
             <div class="text">
-                <label><?php _e("Fees amount", "retxtdom");?> (<a target="_blank" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$currency;?></a>)</label>
-                <input type="number" name="fees" id="feesInput" placeholder="Eg : 85" value="<?= $ad["fees"]; ?>" required>
+                <label>
+                    <?php _e("Fees amount", "retxtdom");?> 
+                    (<a target="_blank" class="linkNoUnderline" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$currency;?></a>)
+                </label>
+                <input type="number" name="fees" id="feesInput" placeholder="<?php _e("Eg:", "retxtdom"); ?> 90" value="<?= $ad["fees"]; ?>" required>
             </div>
         </div>
         <div id="surfaces">
             <div class="text">
-                <label><?php _e("Living space", "retxtdom");?> (<a target="_blank" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$areaUnit;?></a>)</label>
-                <input type="number" name="surface" id="surfaceInput" placeholder="Eg : 90" value="<?= $ad["surface"]; ?>"  required>
+                <label><?php _e("Living space", "retxtdom");?> (<a target="_blank" class="linkNoUnderline" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$areaUnit;?></a>)</label>
+                <input type="number" name="surface" id="surfaceInput" placeholder="<?php _e("Eg:", "retxtdom"); ?> 90" value="<?= $ad["surface"]; ?>"  required>
             </div>
             <div class="text">
-                <label><?php _e("Land area", "retxtdom");?> (<a target="_blank" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$areaUnit;?></a>)</label>
-                <input type="number" name="landSurface" id="landSurfaceInput" placeholder="Eg : 90" value="<?= $ad["landSurface"]; ?>">
+                <label><?php _e("Land area", "retxtdom");?> (<a target="_blank" class="linkNoUnderline" href="<?=admin_url("edit.php?post_type=re-ad&page=realmoptions");?>"><?=$areaUnit;?></a>)</label>
+                <input type="number" name="landSurface" id="landSurfaceInput" placeholder="<?php _e("Eg:", "retxtdom"); ?> 90" value="<?= $ad["landSurface"]; ?>">
             </div>
         </div>
         <div id="address">
             <div class="text">
                 <label><?php _e("Property address", "retxtdom");?></label>
-                <input type="text" name="address" data-context="searchAddress" data-nonce="<?=$nonce;?>" id="addressInput" autocomplete="off" placeholder='Eg : <?php _e("123 Chester Square, London", "retxtdom");?>' value="<?= $ad["fullAddress"]; ?>" required>
+                <input type="text" name="address" data-context="searchAddress" data-nonce="<?=$nonce;?>" id="addressInput" autocomplete="off" placeholder="<?php _e("Eg:", "retxtdom"); ?> <?php _e("123 Chester Square, London", "retxtdom");?>" value="<?= $ad["fullAddress"]; ?>" required>
                 <input type="hidden" name="placeId" value="<?= $ad["placeId"]; ?>">
+                <input type="hidden" id="addressOK" value="<?= !empty($ad["fullAddress"])?"true":"false"; ?>">
             </div>             
 
             <div class="radio">

@@ -1,4 +1,4 @@
-jQuery(document).ready(function ($) {
+jQuery(document).ready(function($) {
     /* Map */
     if($("#map").length) {
         var dataMap = $("#map").data("coords").split(",");
@@ -9,7 +9,7 @@ jQuery(document).ready(function ($) {
             }
         }).setView([dataMap[0], dataMap[1]], dataMap[2]);
         L.tileLayer("http://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png", {
-            attribution: "Données cartographiques : <a href='https://www.openstreetmap.fr/mentions-legales'>OpenStreetMap.fr</a>"
+            attribution: 'Données cartographiques : <a href="https://www.openstreetmap.fr/mentions-legales">OpenStreetMap.fr</a>'
         }).addTo(map);
         L.circle([dataMap[0], dataMap[1]], {
             color: "red",
@@ -28,7 +28,7 @@ jQuery(document).ready(function ($) {
     var autoplay = $("#miniSlider ul li").length > 1;
    
     setInterval(function () {
-        if(tabIsActive && autoplay && jQuery("#miniSlider:hover").length===0) {
+        if(tabIsActive && autoplay && $("#miniSlider:hover").length===0) {
             moveSlide("right");
             pagingUpdate("right");
         }
@@ -134,9 +134,9 @@ jQuery(document).ready(function ($) {
     });
     
     /* Similar posts */
-    const adsWrapper = jQuery(".similarAdsWrapper");
-    const prevButton = jQuery(".prevMorePosts");
-    const nextButton = jQuery(".nextMorePosts");
+    const adsWrapper = $(".similarAdsWrapper");
+    const prevButton = $(".prevMorePosts");
+    const nextButton = $(".nextMorePosts");
 
     let currentIndex = 0;
     var adWidth = 20; 
@@ -144,7 +144,7 @@ jQuery(document).ready(function ($) {
     var maxVisibleAds = Math.min(Math.floor(containerWidth/160), 5);
 
     function updateButtonsVisibility() {
-      const adCount = jQuery("div.similarAd", adsWrapper).length;
+      const adCount = $("div.similarAd", adsWrapper).length;
 
       if(adCount > maxVisibleAds) {
       if(currentIndex === 0) {
@@ -166,7 +166,7 @@ jQuery(document).ready(function ($) {
 
     function updateSlider() { 
         containerWidth = adsWrapper.width();
-        var adCount = jQuery("div.similarAd", adsWrapper).length;
+        var adCount = $("div.similarAd", adsWrapper).length;
         var maxIndex = Math.max(adCount - maxVisibleAds, 1);
                 
         maxVisibleAds = Math.min(Math.floor(containerWidth/160), 5);
@@ -177,9 +177,9 @@ jQuery(document).ready(function ($) {
         if(adCount <= maxVisibleAds) {
             adsWrapper.css("transform", "translateX(0)");
             adsWrapper.css("justify-content", "center");
-            jQuery(".contentAd .similarAd").css("flex", "0 0 0%");
+            //$(".contentAd .similarAd").css("flex", "0 0 0%");
         }else {
-            jQuery(".contentAd .similarAd").css("flex", "0 0 "+adWidth+"%");
+            $(".contentAd .similarAd").css("flex", "0 0 "+adWidth+"%");
             var translateX = -currentIndex * adWidth;
             adsWrapper.css("transform", "translateX("+translateX+"%)");
             adsWrapper.css("justify-content", "");
@@ -195,7 +195,7 @@ jQuery(document).ready(function ($) {
     });
 
     nextButton.click(function () {
-      const adCount = jQuery("div.similarAd", adsWrapper).length;
+      const adCount = $("div.similarAd", adsWrapper).length;
       if(currentIndex < adCount - maxVisibleAds) {
         currentIndex++;
         updateSlider();
@@ -204,61 +204,6 @@ jQuery(document).ready(function ($) {
 
     updateSlider();
 
-    jQuery(window).resize(updateSlider);
-
-
-
-    function DPEGES(diag, domID) {
-        var smallDiag = $("<div>")
-          .attr("id", domID+"Small")
-          .css({"font-size": 0, "user-select": "none"});
-
-        var valueDiag = $("#" + domID).text();
-
-        var diagRanks = [];
-        if(diag === "DPE") {
-          diagRanks = [
-            { min: 0, max: 50, color: "#319834", textColor: "#000000", label: 'A' },
-            { min: 51, max: 90, color: "#33cc31", textColor: "#000000", label: 'B' },
-            { min: 91, max: 150, color: "#cbfc34", textColor: "#000000", label: 'C' },
-            { min: 151, max: 230, color: "#fbfe06", textColor: "#000000", label: 'D' },
-            { min: 231, max: 330, color: "#fbcc05", textColor: "#000000", label: 'E' },
-            { min: 331, max: 450, color: "#fc9935", textColor: "#000000", label: 'F' },
-            { min: 451, max: 500, color: "#fc0205", textColor: "#ffffff", label: 'G' }
-          ];
-        } else {
-          diagRanks = [
-            { min: 0, max: 5, color: "#f2eff4", textColor: "#000000", label: 'A' },
-            { min: 6, max: 10, color: "#dfc1f7", textColor: "#000000", label: 'B' },
-            { min: 11, max: 20, color: "#d6aaf4", textColor: "#000000", label: 'C' },
-            { min: 21, max: 35, color: "#cc93f4", textColor: "#000000", label: 'D' },
-            { min: 36, max: 55, color: "#bb72f3", textColor: "#ffffff", label: 'E' },
-            { min: 56, max: 80, color: "#a94cee", textColor: "#ffffff", label: 'F' },
-            { min: 81, max: 100, color: "#8b1ae1", textColor: "#ffffff", label: 'G' }
-          ];
-        }
-
-        $.each(diagRanks, function(index, rank) {
-          var span = $("<span>")
-            .text(rank.label)
-            .css({"padding": "5px 7px 7px 5px", "font-size": "10px", "color": rank.textColor, "background-color": rank.color});
-
-          if(valueDiag >= rank.min && valueDiag <= rank.max) {
-            span.css({fontWeight: "bold", border: "white solid", fontSize: "15px"});
-          } 
-
-          smallDiag.append(span);              
-        });
-
-        $("#" + domID).append(smallDiag);
-      }
-
-      if($("#DPEValue").length) {
-        DPEGES("DPE", "DPEValue");
-      }
-      if($("#GESValue").length) {
-        DPEGES("GES", "GESValue");
-      }
-    
+    $(window).resize(updateSlider);
 
 });    
