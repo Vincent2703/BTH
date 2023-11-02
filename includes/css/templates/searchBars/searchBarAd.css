@@ -1,5 +1,5 @@
 .searchBar {
-    width: 60%;
+    width: 70%;
     margin: auto;
     padding: 10px;
     background-color: white;
@@ -17,13 +17,88 @@
     width: 100%;
 }
 
+.searchBar input:not([type=checkbox]), .searchBar select {
+    padding: 10px 12px;
+    height: 50px;
+}
+
+.searchBar .propertyCharact {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.searchBar .propertyCharact input[type=checkbox] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+    height: 25px;
+    width: 25px;
+    z-index: 9;
+}
+
+.searchBar .propertyCharact .checkMark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: rgba(238, 238, 238, 0.27);
+  border: 1px solid #e0e0e0;
+}
+
+.searchBar .propertyCharact:hover input ~ .checkMark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.searchBar .propertyCharact input:checked ~ .checkMark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkMark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.searchBar .propertyCharact input:checked ~ .checkMark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.searchBar .propertyCharact .checkMark:after {
+  left: 8px;
+  top: 5px;
+  width: 7px;
+  height: 11px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.searchBar .propertyCharact label {
+    cursor: pointer;
+}
+
 .searchBar form select {
     background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCI+PHBhdGggZmlsbD0iIzYyNjI2MiIgZD0iTTE1IDhsLTQgNi00LTZoOHoiLz48L3N2Zz4=) right center/18px no-repeat, white;
     border-color: #dddddd;
     border-width: 2px;
     border-radius: 3px;
     color: #272626;
-    padding: 10px 12px;
     appearance: none;
 }
 
@@ -47,10 +122,6 @@
     font-weight: 600;
     font-size: 15px;
     white-space: nowrap;   
-}
-
-.searchBarInput #addressInput {
-    padding: 10px 12px;
 }
 
 .searchBarInput #addressInput:placeholder-shown {
@@ -81,10 +152,6 @@
     justify-content: flex-end;
 }
 
-.searchBar .mainSearchBarInputs #radiusInput {
-    width: 80px;
-}
-
 .searchBar .mainSearchBarInputs #filters .dashicons {
     display: flex;
     align-items: center;
@@ -101,6 +168,7 @@
 
 .searchBar .searchBtn input[type=submit] {
     width: 100%;
+    padding: 0;
 }
 
 .searchBar .searchBtn input[type=submit]:not([disabled]):hover {
@@ -114,7 +182,7 @@
 }
 
 .searchBar .filtersSearchBarInputs {
-    width: 70%;
+    width: 85%;
     gap: 60px;
     margin: auto;
 }
@@ -173,6 +241,10 @@
     .searchBar .searchForm {
         display: block !important;
     }
+    
+    .searchBar .mainSearchBarInputs #radiusInput {
+        width: 80px;
+    }
         
     .searchBar .mainSearchBarInputs .searchBtn {
         display: block !important;
@@ -199,6 +271,7 @@
     
     .searchBar .searchForm {
         display: none;
+        margin-top: 15px;
     }
     
     .searchBar .mainSearchBarInputs {
@@ -206,7 +279,7 @@
         align-items: center;
     }
     
-    .searchBar .mainSearchBarInputs .searchBarInput {
+    .searchBar .mainSearchBarInputs .searchBarInput, .searchBar #radiusInput {
         width: 100%;
     }
     
@@ -217,6 +290,7 @@
     
     .searchBar .searchBtn, .searchBar .searchBtn input[type=submit] {
         width: 100%;
+        margin-top: 5px;
     }
     .searchBar .filtersSearchBarInputs {
         flex-direction: column;
@@ -239,10 +313,12 @@
     }
     
     .searchBar .propertyHas .colPropertyHas {
-        gap: 15px;
+        gap: 25px;
     }
     
     .searchBar #filters {
+        margin-top: 25px;
         justify-content: center;
     }
+    
 }

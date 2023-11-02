@@ -133,7 +133,7 @@
                                 <span class="valueFeature"><?= $ad["price"].$currency; ?></span>
                             </div>
                             <div>
-                                <span class="nameFeature"><?php _e("Fees", "retxtdom") . !empty($feesURL)?printf('&nbsp;<a class="feesSchedule" target="_blank" href="%1$s">(%2$s)</a>', $feesURL, __("Fees schedule", "retxtdom")):''; ?></span>
+                                <span class="nameFeature"><span style="white-space: nowrap"><?php _e("Fees", "retxtdom"); ?></span><?php !empty($feesURL)?printf('&nbsp;<a class="feesSchedule" target="_blank" href="%1$s">(%2$s)</a>', $feesURL, __("Fees schedule", "retxtdom")):''; ?></span>
                                 <span class="valueFeature"><?= $ad["fees"].$currency; ?></span>
                             </div>
                             <div>
@@ -299,17 +299,17 @@
                     <?php
                     if(PLUGIN_RE_REP && $userIsCustomer && $ad["allowSubmission"]) { 
                         if($checkExistingSubmission || isset($HFID)) { ?>
-                            <a href="<?=admin_url();?>"><button><?php _e("View my housing file submission(s)", "reptxtdom");?></button></a>
+                            <a href="<?=admin_url();?>"><button><?php _e("View my housing file submission", "retxtdom");?></button></a>
                         <?php }else if($submissionsLimitReached) { ?>
                             <span><?php _e("You have exceeded the maximum number of housing file submissions that you can submit", "retxtdom");?>.</span>
-                            <a href="<?=admin_url("edit.php?post_type=submission");?>"><button><?php _e("View my housing file submissions", "reptxtdom");?></button></a>
+                            <a href="<?=admin_url("edit.php?post_type=submission");?>"><button><?php _e("View my housing file submission", "retxtdom");?></button></a>
                         <?php }else if(!$userHasHousingFile) { ?>
-                            <span><?php _e("You need to fill your housing file before be able to apply for the property", "retxtdom");?>.</span>
+                            <span><?php _e("You must fill your housing file before be able to apply for the property", "retxtdom");?>.</span>
                             <?php if($ad["needGuarantors"] && intval($user["nbGuarantors"]) === 0) { ?>
                                 <span><?php _e("Please, do not forget to add at least a guarantor", "retxtdom");?>.</span>
                             <?php } 
                             ?>
-                            <a href="<?= admin_url("profile.php?ad=$idPost"); ?>"><button><?php _e("Fill my housing file", "reptxtdom"); ?></button></a>
+                            <a href="<?= admin_url("profile.php?ad=$idPost"); ?>"><button><?php _e("Fill my housing file", "retxtdom"); ?></button></a>
                         <?php }else { ?>
                         <form method="post" action="" id="applyForm">
                             <?php wp_nonce_field("formApply", "nonceSecurity"); ?>

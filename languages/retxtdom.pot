@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: REALM\n"
-"POT-Creation-Date: 2023-05-11 11:06+0200\n"
+"POT-Creation-Date: 2023-11-02 14:43+0100\n"
 "PO-Revision-Date: 2023-05-01 09:37+0200\n"
 "Last-Translator: \n"
 "Language-Team: Vincent Bourdon\n"
@@ -17,980 +17,917 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: includes/js\n"
 
-#: controllers/EditAd.php:18 controllers/Options.php:571
-#: controllers/Options.php:586
-#: templates/twentytwenty2.1/singles/single-ad.php:86
+#: controllers/EditAd.php:25 controllers/Options.php:373
+#: controllers/Options.php:388 templates/front/singles/single-ad.php:125
 msgid "Main features"
 msgstr ""
 
-#: controllers/EditAd.php:27 controllers/Options.php:571
-#: controllers/Options.php:586 realm.php:420
-#: templates/twentytwenty2.1/singles/single-ad.php:155
+#: controllers/EditAd.php:34 controllers/Options.php:373
+#: controllers/Options.php:388 realm.php:548
+#: templates/front/singles/single-ad.php:194
 msgid "Additional features"
 msgstr ""
 
-#: controllers/EditAd.php:55
+#: controllers/EditAd.php:44
+msgid "Housing file submissions"
+msgstr ""
+
+#: controllers/EditAd.php:117
 msgid "Ad's reference"
 msgstr ""
 
-#: controllers/EditAd.php:55
+#: controllers/EditAd.php:118
+msgid "You can use it to manage your ads easily"
+msgstr ""
+
+#: controllers/EditAd.php:120
 msgid "Generate a reference"
 msgstr ""
 
-#: controllers/EditAd.php:61
-msgid "Property price"
-msgstr ""
-
-#: controllers/EditAd.php:61
-msgid "Charges included"
-msgstr ""
-
-#: controllers/EditAd.php:65
-msgid "Fees amount"
-msgstr ""
-
-#: controllers/EditAd.php:71 templates/searchBars/searchBarAd.php:81
-#: templates/twentytwenty2.1/singles/single-ad.php:105
-msgid "Living space"
-msgstr ""
-
-#: controllers/EditAd.php:75
-#: templates/twentytwenty2.1/singles/single-ad.php:110
-msgid "Land area"
-msgstr ""
-
-#: controllers/EditAd.php:81
-msgid "Property address"
-msgstr ""
-
-#: controllers/EditAd.php:82 controllers/EditAgency.php:50
-msgid "123 Chester Square, London"
-msgstr ""
-
-#: controllers/EditAd.php:86
-msgid "Show postal code and city"
-msgstr ""
-
-#: controllers/EditAd.php:87
-msgid "Show full address"
-msgstr ""
-
-#: controllers/EditAd.php:92 controllers/EditAd.php:93
-#: templates/twentytwenty2.1/singles/single-ad.php:115
-msgid "Number of rooms"
-msgstr ""
-
-#: controllers/EditAd.php:98 controllers/EditAd.php:99
-#: templates/twentytwenty2.1/singles/single-ad.php:120
-msgid "Number of bedrooms"
-msgstr ""
-
-#: controllers/EditAd.php:101 controllers/EditAd.php:102
-#: templates/twentytwenty2.1/singles/single-ad.php:132
-msgid "Number of bathrooms"
-msgstr ""
-
-#: controllers/EditAd.php:105 controllers/EditAd.php:106
-#: templates/twentytwenty2.1/singles/single-ad.php:138
-msgid "Number of shower rooms"
-msgstr ""
-
-#: controllers/EditAd.php:108 controllers/EditAd.php:109
-#: templates/twentytwenty2.1/singles/single-ad.php:126
-msgid "Number of toilets"
-msgstr ""
-
-#: controllers/EditAd.php:114
-msgid "Agent linked to the ad"
+#: controllers/EditAd.php:123 controllers/EditAd.php:133
+#: controllers/EditAd.php:140 controllers/EditAd.php:146
+#: controllers/EditAd.php:150 controllers/EditAd.php:156
+msgid "Eg:"
 msgstr ""
 
 #: controllers/EditAd.php:129
+msgid "Property price"
+msgstr ""
+
+#: controllers/EditAd.php:131
+msgid "Charges included"
+msgstr ""
+
+#: controllers/EditAd.php:137
+msgid "Fees amount"
+msgstr ""
+
+#: controllers/EditAd.php:145 templates/front/searchBars/searchBarAd.php:117
+#: templates/front/singles/single-ad.php:144
+msgid "Living space"
+msgstr ""
+
+#: controllers/EditAd.php:149 templates/front/singles/single-ad.php:149
+msgid "Land area"
+msgstr ""
+
+#: controllers/EditAd.php:155
+msgid "Property address"
+msgstr ""
+
+#: controllers/EditAd.php:156
+msgid "123 Chester Square, London"
+msgstr ""
+
+#: controllers/EditAd.php:162
+msgid "Show postal code and city"
+msgstr ""
+
+#: controllers/EditAd.php:163
+msgid "Show full address"
+msgstr ""
+
+#: controllers/EditAd.php:168 controllers/EditAd.php:169
+#: templates/front/singles/single-ad.php:154
+msgid "Number of rooms"
+msgstr ""
+
+#: controllers/EditAd.php:174 controllers/EditAd.php:175
+#: templates/front/singles/single-ad.php:159
+msgid "Number of bedrooms"
+msgstr ""
+
+#: controllers/EditAd.php:177 controllers/EditAd.php:178
+#: templates/front/singles/single-ad.php:171
+msgid "Number of bathrooms"
+msgstr ""
+
+#: controllers/EditAd.php:181 controllers/EditAd.php:182
+#: templates/front/singles/single-ad.php:177
+msgid "Number of shower rooms"
+msgstr ""
+
+#: controllers/EditAd.php:184 controllers/EditAd.php:185
+#: templates/front/singles/single-ad.php:165
+msgid "Number of toilets"
+msgstr ""
+
+#: controllers/EditAd.php:190
+msgid "Agent linked to the ad"
+msgstr ""
+
+#: controllers/EditAd.php:202
 msgid "Publish the agent contact"
 msgstr ""
 
-#: controllers/EditAd.php:130 customPosts/Agent.php:22
+#: controllers/EditAd.php:205
 msgid "Add an agent"
 msgstr ""
 
-#: controllers/EditAd.php:134
+#: controllers/EditAd.php:210
 msgid "Add pictures"
 msgstr ""
 
-#: controllers/EditAd.php:134 realm.php:373
+#: controllers/EditAd.php:210 realm.php:509
 msgid "Replace pictures"
 msgstr ""
 
-#: controllers/EditAd.php:145 controllers/Export.php:51
-#: controllers/Export.php:60 realm.php:374
+#: controllers/EditAd.php:221 realm.php:510
 msgid "Delete"
 msgstr ""
 
-#: controllers/EditAd.php:172 controllers/EditAd.php:173
-#: templates/twentytwenty2.1/singles/single-ad.php:159
+#: controllers/EditAd.php:248 controllers/EditAd.php:249
+#: templates/front/singles/single-ad.php:198
 msgid "Floor"
 msgstr ""
 
-#: controllers/EditAd.php:176 controllers/EditAd.php:177
+#: controllers/EditAd.php:252 controllers/EditAd.php:253
 msgid "Number of floors"
 msgstr ""
 
-#: controllers/EditAd.php:182
-#: templates/twentytwenty2.1/singles/single-ad.php:194
+#: controllers/EditAd.php:258 templates/front/singles/single-ad.php:249
 msgid "Type of heating"
 msgstr ""
 
-#: controllers/EditAd.php:185 controllers/EditAd.php:211
+#: controllers/EditAd.php:261 controllers/EditAd.php:287
 msgid "Do not fill"
 msgstr ""
 
-#: controllers/EditAd.php:188
+#: controllers/EditAd.php:264
 msgid "Invidual gas"
 msgstr ""
 
-#: controllers/EditAd.php:191 models/singles/AdSingle.php:97
+#: controllers/EditAd.php:267 models/AdModel.php:66
 msgid "Collective gas"
 msgstr ""
 
-#: controllers/EditAd.php:194 models/singles/AdSingle.php:100
+#: controllers/EditAd.php:270 models/AdModel.php:69
 msgid "Individual fuel"
 msgstr ""
 
-#: controllers/EditAd.php:197 models/singles/AdSingle.php:103
+#: controllers/EditAd.php:273 models/AdModel.php:72
 msgid "Collective fuel"
 msgstr ""
 
-#: controllers/EditAd.php:200 models/singles/AdSingle.php:106
+#: controllers/EditAd.php:276 models/AdModel.php:75
 msgid "Individual electric"
 msgstr ""
 
-#: controllers/EditAd.php:203 models/singles/AdSingle.php:109
+#: controllers/EditAd.php:279 models/AdModel.php:78
 msgid "Collective electric"
 msgstr ""
 
-#: controllers/EditAd.php:208
-#: templates/twentytwenty2.1/singles/single-ad.php:198
+#: controllers/EditAd.php:284 templates/front/singles/single-ad.php:255
 msgid "Type of kitchen"
 msgstr ""
 
-#: controllers/EditAd.php:213 models/singles/AdSingle.php:119
+#: controllers/EditAd.php:289 models/AdModel.php:88
 msgid "Not equipped"
 msgstr ""
 
-#: controllers/EditAd.php:214 models/singles/AdSingle.php:122
+#: controllers/EditAd.php:290 models/AdModel.php:91
 msgid "Kitchenette"
 msgstr ""
 
-#: controllers/EditAd.php:215 models/singles/AdSingle.php:125
+#: controllers/EditAd.php:291 models/AdModel.php:94
 msgid "Standard"
 msgstr ""
 
-#: controllers/EditAd.php:216 models/singles/AdSingle.php:128
+#: controllers/EditAd.php:292 models/AdModel.php:97
 msgid "Industrial"
 msgstr ""
 
-#: controllers/EditAd.php:222 controllers/EditAd.php:223
+#: controllers/EditAd.php:298 controllers/EditAd.php:299
 msgid "Number of balconies"
 msgstr ""
 
-#: controllers/EditAd.php:232 templates/searchBars/searchBarAd.php:108
-#: templates/twentytwenty2.1/singles/single-ad.php:171
+#: controllers/EditAd.php:308 templates/front/searchBars/searchBarAd.php:156
+#: templates/front/singles/single-ad.php:213
 msgid "Elevator"
 msgstr ""
 
-#: controllers/EditAd.php:239
-#: templates/twentytwenty2.1/singles/single-ad.php:177
+#: controllers/EditAd.php:315 templates/front/singles/single-ad.php:219
 msgid "Basement"
 msgstr ""
 
-#: controllers/EditAd.php:246 templates/searchBars/searchBarAd.php:106
-#: templates/twentytwenty2.1/singles/single-ad.php:183
-msgid "Terrace"
+#: controllers/EditAd.php:322 templates/front/archives/archive-ad.php:58
+#: templates/front/searchBars/searchBarAd.php:151
+#: templates/front/singles/single-ad.php:225
+msgid "Outdoor space"
 msgstr ""
 
-#: controllers/EditAd.php:253 templates/searchBars/searchBarAd.php:98
-#: templates/twentytwenty2.1/singles/single-ad.php:165
+#: controllers/EditAd.php:329 templates/front/searchBars/searchBarAd.php:134
+#: templates/front/singles/single-ad.php:207
 msgid "Furnished"
 msgstr ""
 
-#: controllers/EditAd.php:258 controllers/EditAd.php:259
-#: templates/twentytwenty2.1/singles/single-ad.php:189
+#: controllers/EditAd.php:336 templates/front/singles/single-ad.php:234
+msgid "Garage"
+msgstr ""
+
+#: controllers/EditAd.php:343 templates/front/singles/single-ad.php:236
+msgid "Parking"
+msgstr ""
+
+#: controllers/EditAd.php:348 controllers/EditAd.php:349
+#: templates/front/singles/single-ad.php:243
 msgid "Construction year"
 msgstr ""
 
-#: controllers/EditAd.php:264
+#: controllers/EditAd.php:354
 msgid "EPD in kWhPE/m²/year"
 msgstr ""
 
-#: controllers/EditAd.php:268
+#: controllers/EditAd.php:358
 msgid "Greenhouse gas in kg eqCO2/m²/year"
 msgstr ""
 
-#: controllers/EditAgency.php:14
-msgid "Agency contact"
+#: controllers/EditAd.php:381
+msgid "Allow housing file submission"
 msgstr ""
 
-#: controllers/EditAgency.php:41 controllers/EditAgent.php:49
-#: templates/twentytwenty2.1/singles/single-ad.php:34
-#: templates/twentytwenty2.1/singles/single-ad.php:269
-msgid "Phone"
+#: controllers/EditAd.php:382
+msgid "Need guarantors"
 msgstr ""
 
-#: controllers/EditAgency.php:42 controllers/EditAgent.php:50
-msgid "0100000000"
-msgstr ""
-
-#: controllers/EditAgency.php:45 controllers/EditAgent.php:57
-#: templates/twentytwenty2.1/singles/single-ad.php:34
-#: templates/twentytwenty2.1/singles/single-ad.php:270
-msgid "Email address"
-msgstr ""
-
-#: controllers/EditAgency.php:46 controllers/EditAgent.php:58
-#: controllers/Options.php:683 controllers/Options.php:689
-msgid "address@email.com"
-msgstr ""
-
-#: controllers/EditAgency.php:49
-msgid "Postal address"
-msgstr ""
-
-#: controllers/EditAgent.php:14
-msgid "Agent's contact"
-msgstr ""
-
-#: controllers/EditAgent.php:22 customPosts/Agent.php:115
-msgid "Agency"
-msgstr ""
-
-#: controllers/EditAgent.php:53
-msgid "Mobile phone"
-msgstr ""
-
-#: controllers/EditAgent.php:54
-msgid "0600000000"
-msgstr ""
-
-#: controllers/EditAgent.php:78 customPosts/Agency.php:22
-msgid "Add an agency"
-msgstr ""
-
-#: controllers/Export.php:19 controllers/Export.php:71
-msgid "Export the ads"
-msgstr ""
-
-#: controllers/Export.php:24
-msgid "Successful export"
-msgstr ""
-
-#: controllers/Export.php:27
-msgid "File deleted with success"
-msgstr ""
-
-#: controllers/Export.php:30
-msgid "The file has not been deleted due to an error"
-msgstr ""
-
-#: controllers/Export.php:39
-msgid "Export"
-msgstr ""
-
-#: controllers/Export.php:41
-msgid "Export only available properties"
-msgstr ""
-
-#: controllers/Export.php:48 controllers/Import.php:48
-msgid "Date"
-msgstr ""
-
-#: controllers/Export.php:49
-msgid "Size"
-msgstr ""
-
-#: controllers/Export.php:50 controllers/Export.php:59
-msgid "Download"
-msgstr ""
-
-#: controllers/Export.php:266
-msgid "ads"
-msgstr ""
-
-#: controllers/Import.php:31 controllers/Import.php:36
-#: controllers/Import.php:185
-msgid "Import the ads"
-msgstr ""
-
-#: controllers/Import.php:39
-msgid "Publish directly the ads"
-msgstr ""
-
-#: controllers/Import.php:41
-msgid "Replace the ads with the same reference"
-msgstr ""
-
-#: controllers/Import.php:49
-msgid "Number of ads"
-msgstr ""
-
-#: controllers/Import.php:50 controllers/Import.php:59
-msgid "Import"
-msgstr ""
-
-#: controllers/Import.php:77
-#, php-format
-msgid "Only the files with one of these extensions are accepted : (%1$s)"
-msgstr ""
-
-#: controllers/Import.php:85
-msgid "An error occurred while sending."
-msgstr ""
-
-#: controllers/Import.php:87
-msgid "Successful import"
-msgstr ""
-
-#: controllers/Import.php:282
-msgid "The file is not valid"
-msgstr ""
-
-#: controllers/Options.php:54
-msgid "General"
-msgstr ""
-
-#: controllers/Options.php:55 controllers/Options.php:130
-msgid "Imports"
-msgstr ""
-
-#: controllers/Options.php:56 controllers/Options.php:137
-msgid "Exports"
-msgstr ""
-
-#: controllers/Options.php:57 controllers/Options.php:144
-msgid "Email"
-msgstr ""
-
-#: controllers/Options.php:58
-#: templates/twentytwenty2.1/singles/single-ad.php:222
-msgid "Fees schedule"
-msgstr ""
-
-#: controllers/Options.php:61
-msgid "Template"
-msgstr ""
-
-#: controllers/Options.php:123 customPosts/Ad.php:46
-#: templates/twentytwenty2.1/archives/archive-ad.php:9
-msgid "Ads"
-msgstr ""
-
-#: controllers/Options.php:151
-#: templates/twentytwenty2.1/singles/single-ad.php:97
-msgid "Fees"
-msgstr ""
-
-#: controllers/Options.php:177
-msgid "Currency"
-msgstr ""
-
-#: controllers/Options.php:177
-msgid "Monetary currency symbol."
-msgstr ""
-
-#: controllers/Options.php:185
+#: controllers/Options.php:51 controllers/Options.php:121
 msgid "Custom fields"
 msgstr ""
 
-#: controllers/Options.php:185
+#: controllers/Options.php:52 customPosts/Ad.php:100
+msgid "Types of property"
+msgstr ""
+
+#: controllers/Options.php:53 customPosts/Ad.php:151
+msgid "Types of ad"
+msgstr ""
+
+#: controllers/Options.php:54 controllers/Options.php:101
+msgid "APIs"
+msgstr ""
+
+#: controllers/Options.php:55 controllers/Options.php:108
+msgid "Miscellaneous"
+msgstr ""
+
+#: controllers/Options.php:94
+msgid "Manage your custom fields"
+msgstr ""
+
+#: controllers/Options.php:121
 msgid "Add custom fields to the ads."
 msgstr ""
 
-#: controllers/Options.php:203 controllers/Options.php:246
-msgid "Backups number"
+#: controllers/Options.php:131
+msgid "API to use"
 msgstr ""
 
-#: controllers/Options.php:203
-msgid "Number of file copies containing imported ads to keep."
+#: controllers/Options.php:131
+msgid "API to use to retrieve address data."
 msgstr ""
 
-#: controllers/Options.php:211
-msgid "Pictures dimensions"
+#: controllers/Options.php:139
+msgid "Google API key"
 msgstr ""
 
-#: controllers/Options.php:211
-msgid "Maximum dimension of the imported pictures."
+#: controllers/Options.php:147
+msgid "Limit the number of requests per day and user"
 msgstr ""
 
-#: controllers/Options.php:219
-msgid "Pictures quality"
+#: controllers/Options.php:147
+msgid "Limiting the number of requests makes abuse less likely."
 msgstr ""
 
-#: controllers/Options.php:219
+#: controllers/Options.php:155
+msgid "The maximum number of requests made by a user in a day"
+msgstr ""
+
+#: controllers/Options.php:163
+msgid "Display the results in a specific language"
+msgstr ""
+
+#: controllers/Options.php:171
+msgid "Limit search to one country"
+msgstr ""
+
+#: controllers/Options.php:179
+msgid "Display addresses with the administration area level 1"
+msgstr ""
+
+#: controllers/Options.php:179
+msgid "Generally a state or a prefecture."
+msgstr ""
+
+#: controllers/Options.php:187
+msgid "Display addresses with the administration area level 2"
+msgstr ""
+
+#: controllers/Options.php:187
+msgid "Generally a country or a district."
+msgstr ""
+
+#: controllers/Options.php:197
+msgid "Currency"
+msgstr ""
+
+#: controllers/Options.php:197
+msgid "Monetary currency symbol."
+msgstr ""
+
+#: controllers/Options.php:205
+msgid "Area Unit"
+msgstr ""
+
+#: controllers/Options.php:205
+msgid "Unit used to define an area."
+msgstr ""
+
+#: controllers/Options.php:213
+msgid "Refine similar ads by same city"
+msgstr ""
+
+#: controllers/Options.php:213
 msgid ""
-"The higher the value, the more the quality is faithful to the original, at "
-"the expense of the weight of the image."
+"At the bottom of each ad page, show only similar ads located in the same "
+"city."
 msgstr ""
 
-#: controllers/Options.php:246
-msgid "Number of file copies containing the exported ads to keep."
+#: controllers/Options.php:221
+msgid "Add the search bar when the hook fires"
 msgstr ""
 
-#: controllers/Options.php:280
-msgid "Email address to contact by default for ads"
+#: controllers/Options.php:221
+msgid "When this hook fires, add the search bar to the page at that time."
 msgstr ""
 
-#: controllers/Options.php:280
-msgid ""
-"Email address to contact if it is not possible to contact an agent or "
-"agency about an ad."
-msgstr ""
-
-#: controllers/Options.php:290
+#: controllers/Options.php:229
 msgid "URL address to the fees schedule"
 msgstr ""
 
-#: controllers/Options.php:290
+#: controllers/Options.php:229
 msgid ""
 "URL to the file presenting the fees schedule. It will be displayed on each "
 "ad. You can also directly upload the file with the button below."
 msgstr ""
 
-#: controllers/Options.php:298
+#: controllers/Options.php:237
 msgid "File with the fees schedule"
 msgstr ""
 
-#: controllers/Options.php:309
-msgid "API to use"
+#: controllers/Options.php:245
+msgid "Delete the options when deactivating the plugin"
 msgstr ""
 
-#: controllers/Options.php:309
-msgid "API to use to retrieve address data."
-msgstr ""
-
-#: controllers/Options.php:317
-msgid "Google API key"
-msgstr ""
-
-#: controllers/Options.php:325
-msgid "Limit the number of requests per day and user"
-msgstr ""
-
-#: controllers/Options.php:325
-msgid "Limiting the number of requests makes abuse less likely."
-msgstr ""
-
-#: controllers/Options.php:333
-msgid "The maximum number of requests made by a user in a day"
-msgstr ""
-
-#: controllers/Options.php:341
-msgid "Limit search to one country"
-msgstr ""
-
-#: controllers/Options.php:349
-msgid "Display addresses with the administration area level 1"
-msgstr ""
-
-#: controllers/Options.php:349
-msgid "Generally a state or a prefecture."
-msgstr ""
-
-#: controllers/Options.php:357
-msgid "Display addresses with the administration area level 2"
-msgstr ""
-
-#: controllers/Options.php:357
-msgid "Generally a country or a district."
-msgstr ""
-
-#: controllers/Options.php:535
-msgid "Click here to update the property types"
-msgstr ""
-
-#: controllers/Options.php:537
-msgid "Click here to update the ad types"
-msgstr ""
-
-#: controllers/Options.php:557
+#: controllers/Options.php:359
 msgid "Field name"
 msgstr ""
 
-#: controllers/Options.php:558
+#: controllers/Options.php:360
 msgid "Section"
 msgstr ""
 
-#: controllers/Options.php:570
+#: controllers/Options.php:372
 msgid "Eg : Orientation"
 msgstr ""
 
-#: controllers/Options.php:666 controllers/Options.php:675
-#: controllers/Options.php:727 controllers/Options.php:748
-#: controllers/Options.php:755 customPosts/Ad.php:278
-#: templates/twentytwenty2.1/singles/single-ad.php:166
-#: templates/twentytwenty2.1/singles/single-ad.php:172
-#: templates/twentytwenty2.1/singles/single-ad.php:178
-#: templates/twentytwenty2.1/singles/single-ad.php:184
+#: controllers/Options.php:427 controllers/Options.php:457
+#: controllers/Options.php:464 controllers/Options.php:487
+#: controllers/Options.php:513 customPosts/Ad.php:380 customPosts/Ad.php:570
+#: templates/front/singles/single-ad.php:208
+#: templates/front/singles/single-ad.php:214
+#: templates/front/singles/single-ad.php:220
+#: templates/front/singles/single-ad.php:226
 msgid "Yes"
 msgstr ""
 
-#: controllers/Options.php:698
+#: controllers/Options.php:438
+msgid "See the list of supported languages"
+msgstr ""
+
+#: controllers/Options.php:446
+msgid "See the list of ISO 3166-1 Alpha-2 codes for compatible countries"
+msgstr ""
+
+#: controllers/Options.php:494
+msgid ""
+"If this field is empty, the search bar will be added using Javascript. You "
+"can also <a target=\"_blank\" href=\"https://developer.wordpress.org/"
+"plugins/hooks/custom-hooks\">create your own hook</a> and add it to your "
+"theme, preferably at the end of the &lt;header&gt; tag."
+msgstr ""
+
+#: controllers/Options.php:500
 msgid "feesSchedule"
 msgstr ""
 
-#: customPosts/Ad.php:47
-msgid "An ad"
+#: controllers/RegisterUserDashboard.php:23
+msgid "Extra profile information for"
 msgstr ""
 
-#: customPosts/Ad.php:48 customPosts/Ad.php:49
-msgid "Add an ad"
+#: controllers/RegisterUserDashboard.php:27
+#: controllers/RegisterUserDashboard.php:58
+#: templates/front/singles/single-ad.php:73
+#: templates/front/singles/single-ad.php:370
+#: templates/front/singles/single-agency.php:25
+msgid "Phone"
 msgstr ""
 
-#: customPosts/Ad.php:50 customPosts/Agency.php:23 customPosts/Agent.php:23
-msgid "Edit"
+#: controllers/RegisterUserDashboard.php:35
+msgid "Mobile phone"
 msgstr ""
 
-#: customPosts/Ad.php:51
-msgid "Edit an ad"
+#: controllers/RegisterUserDashboard.php:43 models/UserModel.php:109
+msgid "Agency of the agent"
 msgstr ""
 
-#: customPosts/Ad.php:52
-msgid "New ad"
-msgstr ""
-
-#: customPosts/Ad.php:53 customPosts/Agency.php:26 customPosts/Agent.php:26
-msgid "View"
-msgstr ""
-
-#: customPosts/Ad.php:54
-msgid "View an ad"
-msgstr ""
-
-#: customPosts/Ad.php:55
-msgid "Search ads"
-msgstr ""
-
-#: customPosts/Ad.php:56
-msgid "No ads found"
-msgstr ""
-
-#: customPosts/Ad.php:57
-msgid "No ads found in trash"
-msgstr ""
-
-#: customPosts/Ad.php:58
-msgid "All ads"
-msgstr ""
-
-#: customPosts/Ad.php:59
-msgid "Ad's thumbnail"
-msgstr ""
-
-#: customPosts/Ad.php:60 customPosts/Agency.php:33 customPosts/Agent.php:33
-msgid "Choose a thumbnail"
-msgstr ""
-
-#: customPosts/Ad.php:61 customPosts/Agency.php:34 customPosts/Agent.php:34
-msgid "Remove the thumbnail"
-msgstr ""
-
-#: customPosts/Ad.php:62 customPosts/Agency.php:35 customPosts/Agent.php:35
-msgid "Use as thumbnail"
-msgstr ""
-
-#: customPosts/Ad.php:76
-msgid "Create a property type to categorize your ads"
-msgstr ""
-
-#: customPosts/Ad.php:77
-msgid "Property types"
-msgstr ""
-
-#: customPosts/Ad.php:80 templates/searchBars/searchBarAd.php:37
-msgid "Property type"
-msgstr ""
-
-#: customPosts/Ad.php:86
-msgid "House"
-msgstr ""
-
-#: customPosts/Ad.php:91
-msgid "Apartment"
-msgstr ""
-
-#: customPosts/Ad.php:96
-msgid "Shop"
-msgstr ""
-
-#: customPosts/Ad.php:101
-msgid "Office"
-msgstr ""
-
-#: customPosts/Ad.php:106
-msgid "Parking/garage"
-msgstr ""
-
-#: customPosts/Ad.php:111
-msgid "Building"
-msgstr ""
-
-#: customPosts/Ad.php:116 templates/searchBars/searchBarAd.php:100
-msgid "Land"
-msgstr ""
-
-#: customPosts/Ad.php:126
-msgid "Create an ad type to categorize your ads"
-msgstr ""
-
-#: customPosts/Ad.php:127
-msgid "Ad types"
-msgstr ""
-
-#: customPosts/Ad.php:130 templates/searchBars/searchBarAd.php:22
-msgid "Ad type"
-msgstr ""
-
-#: customPosts/Ad.php:135
-msgid "Rental"
-msgstr ""
-
-#: customPosts/Ad.php:136
-msgid "Sell"
-msgstr ""
-
-#: customPosts/Ad.php:140 customPosts/Ad.php:141 customPosts/Ad.php:144
-msgid "Property availability"
-msgstr ""
-
-#: customPosts/Ad.php:150
-msgid "Available"
-msgstr ""
-
-#: customPosts/Ad.php:151
-msgid "Unavailable"
-msgstr ""
-
-#: customPosts/Ad.php:225 customPosts/Ad.php:227
-msgid "The property is available"
-msgstr ""
-
-#: customPosts/Ad.php:280
-msgid "No"
-msgstr ""
-
-#: customPosts/Ad.php:289 customPosts/Ad.php:300
-msgid "Habitable"
-msgstr ""
-
-#: customPosts/Ad.php:290 customPosts/Ad.php:302
-msgid "Is this type of property habitable?"
-msgstr ""
-
-#: customPosts/Agency.php:19
-msgid "Agencies"
-msgstr ""
-
-#: customPosts/Agency.php:20
-msgid "An agency"
-msgstr ""
-
-#: customPosts/Agency.php:21 customPosts/Agent.php:21
-msgid "Add"
-msgstr ""
-
-#: customPosts/Agency.php:24
-msgid "Edit an agency"
-msgstr ""
-
-#: customPosts/Agency.php:25
-msgid "New agency"
-msgstr ""
-
-#: customPosts/Agency.php:27
-msgid "View an agency"
-msgstr ""
-
-#: customPosts/Agency.php:28
-msgid "Search agencies"
-msgstr ""
-
-#: customPosts/Agency.php:29
-msgid "No agencies found"
-msgstr ""
-
-#: customPosts/Agency.php:30
-msgid "No agencies found in trash"
-msgstr ""
-
-#: customPosts/Agency.php:31
-msgid "All agencies"
-msgstr ""
-
-#: customPosts/Agency.php:32
-msgid "Agency's thumbnail"
-msgstr ""
-
-#: customPosts/Agent.php:19
-msgid "Agents"
-msgstr ""
-
-#: customPosts/Agent.php:20
-msgid "An agent"
-msgstr ""
-
-#: customPosts/Agent.php:24
-msgid "Edit an agent"
-msgstr ""
-
-#: customPosts/Agent.php:25
-msgid "New agent"
-msgstr ""
-
-#: customPosts/Agent.php:27
-msgid "View an agent"
-msgstr ""
-
-#: customPosts/Agent.php:28
-msgid "Search agents"
-msgstr ""
-
-#: customPosts/Agent.php:29
-msgid "No agents found"
-msgstr ""
-
-#: customPosts/Agent.php:30
-msgid "No agents found in trash"
-msgstr ""
-
-#: customPosts/Agent.php:31
-msgid "All agents"
-msgstr ""
-
-#: customPosts/Agent.php:32
-msgid "Agent's thumbnail"
-msgstr ""
-
-#: customPosts/Agent.php:128
-msgid "No assigned agency"
-msgstr ""
-
-#: models/singles/AdSingle.php:94
-msgid "Individual gas"
-msgstr ""
-
-#: models/singles/AdSingle.php:112 models/singles/AdSingle.php:131
-msgid "Unknown"
-msgstr ""
-
-#: models/singles/AdSingle.php:140
-#: templates/twentytwenty2.1/archives/archive-ad.php:50
-#: templates/twentytwenty2.1/singles/single-agency.php:71
-msgid "month"
-msgstr ""
-
-#: realm.php:285 realm.php:286
-msgid "Import ads"
-msgstr ""
-
-#: realm.php:294 realm.php:295
-msgid "Export ads"
-msgstr ""
-
-#: realm.php:303 realm.php:304 realm.php:628
-msgid "Options"
-msgstr ""
-
-#: realm.php:406
-msgid "Are you sure that you want to import this file?"
-msgstr ""
-
-#: realm.php:419
-msgid "main features"
-msgstr ""
-
-#: realm.php:606
-msgid "FILTERS"
-msgstr ""
-
-#: realm.php:661
-msgid ""
-"The theme that you are using is not compatible with the plugin. Please use "
-"one of the following themes :"
-msgstr ""
-
-#: realm.php:663 realm.php:666
-msgid "For more information, please read the"
-msgstr ""
-
-#: realm.php:663 realm.php:666
-msgid "documentation"
-msgstr ""
-
-#: realm.php:665
-#, php-format
-msgid ""
-"The version of the theme you are using (%1$s) is different from the one the "
-"plugin templates were built with (%2$s). Expect potential bugs."
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:26
-#: templates/searchBars/searchBarAd.php:41
-msgid "No ad posted"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:52
-msgid "City and postcode"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:53
-msgid "Ex: London"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:58
-msgid "Search by"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:60
-msgid "City"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:61
-#: templates/searchBars/searchBarAd.php:65
-msgid "Radius"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:70
-msgid "Filters"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:75
-#: templates/twentytwenty2.1/singles/single-ad.php:93
-msgid "Price"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:76
-#: templates/searchBars/searchBarAd.php:82
-msgid "min"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:77
-#: templates/searchBars/searchBarAd.php:83
-msgid "max"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:89
-msgid "Rooms"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:91
-msgid "Bedrooms"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:93
-msgid "Bathrooms"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:102
-msgid "Cellar"
-msgstr ""
-
-#: templates/searchBars/searchBarAd.php:117
-msgid "Search"
-msgstr ""
-
-#: templates/twentytwenty2.1/archives/archive-ad.php:50
-#: templates/twentytwenty2.1/singles/single-agency.php:71
-msgid "including"
-msgstr ""
-
-#: templates/twentytwenty2.1/archives/archive-ad.php:64
-#: templates/twentytwenty2.1/singles/single-agency.php:85
-msgid "furnished"
-msgstr ""
-
-#: templates/twentytwenty2.1/archives/no-results.php:8
-msgid "There is no results for this search."
-msgstr ""
-
-#: templates/twentytwenty2.1/singles/single-ad.php:32
-msgid "Message about the ad"
-msgstr ""
-
-#: templates/twentytwenty2.1/singles/single-ad.php:33
-msgid "Message from"
-msgstr ""
-
-#: templates/twentytwenty2.1/singles/single-ad.php:35
-msgid "About"
-msgstr ""
-
-#: templates/twentytwenty2.1/singles/single-ad.php:36
-#: templates/twentytwenty2.1/singles/single-ad.php:271
-msgid "Message"
-msgstr ""
-
-#: templates/twentytwenty2.1/singles/single-ad.php:41
-msgid "The email has been sent successfully"
-msgstr ""
-
-#: templates/twentytwenty2.1/singles/single-ad.php:43
-msgid "The email could not be sent"
-msgstr ""
-
-#: templates/twentytwenty2.1/singles/single-ad.php:46
-msgid "All fields are required"
-msgstr ""
-
-#: templates/twentytwenty2.1/singles/single-ad.php:89
-msgid "Reference"
-msgstr ""
-
-#: templates/twentytwenty2.1/singles/single-ad.php:101
+#: controllers/RegisterUserDashboard.php:66
+#: templates/front/singles/single-ad.php:140
 msgid "Address"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:202
+#: controllers/RegisterUserDashboard.php:74
+msgid "Description"
+msgstr ""
+
+#: customPosts/Ad.php:47
+msgid "Ads"
+msgstr ""
+
+#: customPosts/Ad.php:48
+msgid "An ad"
+msgstr ""
+
+#: customPosts/Ad.php:49 customPosts/Ad.php:50
+msgid "Add an ad"
+msgstr ""
+
+#: customPosts/Ad.php:51
+msgid "Edit"
+msgstr ""
+
+#: customPosts/Ad.php:52
+msgid "Edit an ad"
+msgstr ""
+
+#: customPosts/Ad.php:53
+msgid "New ad"
+msgstr ""
+
+#: customPosts/Ad.php:54
+msgid "View"
+msgstr ""
+
+#: customPosts/Ad.php:55
+msgid "View an ad"
+msgstr ""
+
+#: customPosts/Ad.php:56 templates/front/searchBars/searchBarAd.php:39
+msgid "Search ads"
+msgstr ""
+
+#: customPosts/Ad.php:57
+msgid "No ads found"
+msgstr ""
+
+#: customPosts/Ad.php:58
+msgid "No ads found in trash"
+msgstr ""
+
+#: customPosts/Ad.php:59
+msgid "All ads"
+msgstr ""
+
+#: customPosts/Ad.php:60
+msgid "Ad's thumbnail"
+msgstr ""
+
+#: customPosts/Ad.php:61
+msgid "Choose a thumbnail"
+msgstr ""
+
+#: customPosts/Ad.php:62
+msgid "Remove the thumbnail"
+msgstr ""
+
+#: customPosts/Ad.php:63
+msgid "Use as thumbnail"
+msgstr ""
+
+#: customPosts/Ad.php:99
+msgid "Create a type of property to categorize your ads"
+msgstr ""
+
+#: customPosts/Ad.php:104 templates/front/searchBars/searchBarAd.php:60
+msgid "Type of property"
+msgstr ""
+
+#: customPosts/Ad.php:110
+msgid "House"
+msgstr ""
+
+#: customPosts/Ad.php:115
+msgid "Apartment"
+msgstr ""
+
+#: customPosts/Ad.php:120
+msgid "Shop"
+msgstr ""
+
+#: customPosts/Ad.php:125
+msgid "Office"
+msgstr ""
+
+#: customPosts/Ad.php:130
+msgid "Parking/garage"
+msgstr ""
+
+#: customPosts/Ad.php:135
+msgid "Building"
+msgstr ""
+
+#: customPosts/Ad.php:140 templates/front/searchBars/searchBarAd.php:139
+msgid "Land"
+msgstr ""
+
+#: customPosts/Ad.php:150
+msgid "Create a type of ad to categorize your ads"
+msgstr ""
+
+#: customPosts/Ad.php:155 templates/front/searchBars/searchBarAd.php:45
+msgid "Type of ad"
+msgstr ""
+
+#: customPosts/Ad.php:160
+msgid "Rental"
+msgstr ""
+
+#: customPosts/Ad.php:161
+msgid "Sell"
+msgstr ""
+
+#: customPosts/Ad.php:165 customPosts/Ad.php:166 customPosts/Ad.php:169
+msgid "Property availability"
+msgstr ""
+
+#: customPosts/Ad.php:175
+msgid "Available"
+msgstr ""
+
+#: customPosts/Ad.php:176
+msgid "Unavailable"
+msgstr ""
+
+#: customPosts/Ad.php:205 customPosts/Ad.php:223
+msgid "You are subscribed to this alert with success."
+msgstr ""
+
+#: customPosts/Ad.php:206 customPosts/Ad.php:224
+msgid "The city is not recognized."
+msgstr ""
+
+#: customPosts/Ad.php:207 customPosts/Ad.php:225
+msgid "You are already subscribed to this alert."
+msgstr ""
+
+#: customPosts/Ad.php:208 customPosts/Ad.php:226
+msgid "An error occurred, please try again later."
+msgstr ""
+
+#: customPosts/Ad.php:273 customPosts/Ad.php:275
+msgid "The property is available"
+msgstr ""
+
+#: customPosts/Ad.php:338
+msgid "Agents"
+msgstr ""
+
+#: customPosts/Ad.php:364
+msgid "Agent in charge"
+msgstr ""
+
+#: customPosts/Ad.php:366
+msgid "Submissions"
+msgstr ""
+
+#: customPosts/Ad.php:368
+msgid "Date"
+msgstr ""
+
+#: customPosts/Ad.php:380 customPosts/Ad.php:572
+msgid "No"
+msgstr ""
+
+#: customPosts/Ad.php:503
+msgid "Draft"
+msgstr ""
+
+#: customPosts/Ad.php:507
+msgid "Trash"
+msgstr ""
+
+#: customPosts/Ad.php:512 realm.php:297
+msgid "Agency"
+msgstr ""
+
+#: customPosts/Ad.php:535
+msgid "Without agency"
+msgstr ""
+
+#: customPosts/Ad.php:555 customPosts/Ad.php:581 customPosts/Ad.php:592
+msgid "Habitable"
+msgstr ""
+
+#: customPosts/Ad.php:582 customPosts/Ad.php:594
+msgid "Is this type of property habitable?"
+msgstr ""
+
+#: models/AdModel.php:63
+msgid "Individual gas"
+msgstr ""
+
+#: models/AdModel.php:81 models/AdModel.php:100
+msgid "Unknown"
+msgstr ""
+
+#: models/AdModel.php:107 templates/front/archives/archive-ad.php:38
+#: templates/front/singles/single-agency.php:71
+msgid "month"
+msgstr ""
+
+#: realm.php:267 realm.php:692
+msgid "All the city"
+msgstr ""
+
+#: realm.php:285
+msgid "Agent"
+msgstr ""
+
+#: realm.php:416 realm.php:417 realm.php:720
+msgid "Options"
+msgstr ""
+
+#: realm.php:534
+msgid "Are you sure that you want to import this file?"
+msgstr ""
+
+#: realm.php:547
+msgid "main features"
+msgstr ""
+
+#: realm.php:584
+msgid "This notice will no longer be displayed."
+msgstr ""
+
+#: realm.php:733
+msgid ""
+"The plugin does not support block themes yet. Please, use a classic theme "
+"instead."
+msgstr ""
+
+#: realm.php:764
+#, php-format
+msgid ""
+"The version of the theme you are using (%1$s) has not been tested with the "
+"templates of the plugin (tested with %2$s). Expect potential bugs.<br /> "
+"Please read <a target=\"_blank\" href=\"#\">the documentation</a> for more "
+"information."
+msgstr ""
+
+#: realm.php:777
+#, php-format
+msgid ""
+"The theme you are using (<b>%1$s %2$s</b>) has not been tested with the "
+"plugin. Expect potential bugs.<br /> You can use one of the following "
+"tested themes : <ul>%3$s</ul><br /> <a target=\"_blank\" href=\"#\">You can "
+"also develop your own templates</a>."
+msgstr ""
+
+#: realm.php:803
+msgid "Close the notice"
+msgstr ""
+
+#: templates/front/archives/archive-ad.php:12
+msgid "ads found"
+msgstr ""
+
+#: templates/front/archives/archive-ad.php:38
+#: templates/front/singles/single-agency.php:71
+msgid "including"
+msgstr ""
+
+#: templates/front/archives/archive-ad.php:55
+#: templates/front/singles/single-agency.php:85
+msgid "furnished"
+msgstr ""
+
+#: templates/front/archives/archive-ad.php:79
+#: templates/front/archives/no-results.php:11
+msgid "Save the search"
+msgstr ""
+
+#: templates/front/archives/no-results.php:8
+msgid "There is no results for this search."
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:49
+#: templates/front/searchBars/searchBarAd.php:64
+msgid "No ad posted"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:75
+msgid "City and postcode"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:79
+msgid "Ex: London"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:87
+msgid "Search by"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:89
+msgid "City"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:90
+#: templates/front/searchBars/searchBarAd.php:94
+msgid "Radius"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:98
+#: templates/front/searchBars/searchBarAd.php:168
+msgid "Search"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:111
+#: templates/front/singles/single-ad.php:132
+msgid "Price"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:112
+#: templates/front/searchBars/searchBarAd.php:118
+msgid "min"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:113
+#: templates/front/searchBars/searchBarAd.php:119
+msgid "max"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:124
+msgid "Rooms"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:126
+msgid "Bedrooms"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:128
+msgid "Bathrooms"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:144
+msgid "Cellar"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:161
+#: templates/front/singles/single-ad.php:231
+msgid "Garage/Parking"
+msgstr ""
+
+#: templates/front/searchBars/searchBarAd.php:179
+msgid "Filters"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:71
+msgid "Message about the ad"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:72
+msgid "Message from"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:73
+#: templates/front/singles/single-ad.php:371
+#: templates/front/singles/single-agency.php:30
+msgid "Email address"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:74
+msgid "About"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:75
+#: templates/front/singles/single-ad.php:372
+msgid "Message"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:80
+msgid "The email has been sent successfully"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:82
+msgid "The email could not be sent"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:85
+msgid "All fields are required"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:128
+msgid "Reference"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:136
+msgid "Fees"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:136
+msgid "Fees schedule"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:201
+msgid "out of"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:260
 msgid "EPD"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:202
+#: templates/front/singles/single-ad.php:260
 msgid "In kWhPE/m²/year"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:206
+#: templates/front/singles/single-ad.php:274
 msgid "Greenhouse gas"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:206
+#: templates/front/singles/single-ad.php:274
 msgid "In kg eqCO2/m²/year"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:228
+#: templates/front/singles/single-ad.php:302
+#: templates/front/singles/single-ad.php:305
+msgid "View my housing file submission"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:304
+msgid ""
+"You have exceeded the maximum number of housing file submissions that you "
+"can submit"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:307
+msgid ""
+"You must fill your housing file before be able to apply for the property"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:309
+msgid "Please, do not forget to add at least a guarantor"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:312
+msgid "Fill my housing file"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:316
+msgid "Apply for the property"
+msgstr ""
+
+#: templates/front/singles/single-ad.php:326
 msgid "The location of the property is approximate"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:239
-#: templates/twentytwenty2.1/singles/single-ad.php:242
+#: templates/front/singles/single-ad.php:338
+#: templates/front/singles/single-ad.php:341
 msgid "Contact's thumbnail"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:263
+#: templates/front/singles/single-ad.php:362
 msgid "Contact form"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:268
+#: templates/front/singles/single-ad.php:369
 msgid "First name and last name"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:275
+#: templates/front/singles/single-ad.php:376
 msgid "Send"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:281
-msgid "Other"
+#: templates/front/singles/single-ad.php:382
+msgid "Similar ads"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-ad.php:281
-msgid "in"
+#: templates/front/singles/single-ad.php:406
+msgid "rooms"
 msgstr ""
 
-#: templates/twentytwenty2.1/singles/single-agency.php:46
+#: templates/front/singles/single-agency.php:35
+msgid "Postal address"
+msgstr ""
+
+#: templates/front/singles/single-agency.php:46
 msgid "Last ads published by the agency"
 msgstr ""

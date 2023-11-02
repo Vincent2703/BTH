@@ -120,7 +120,7 @@ class REALM_EditAd {
                         <?php _e("Generate a reference", "retxtdom");?>
                     </span>
                 </label>
-                <input type="text" name="refAgency" id="refAgencyInput" placeholder="<?php _e("Eg: A-123", "retxtdom"); ?>" value="<?= $ad["refAd"]; ?>">
+                <input type="text" name="refAgency" id="refAgencyInput" placeholder="<?php _e("Eg:", "retxtdom"); ?> 123" value="<?= $ad["refAd"]; ?>">
             </div>
         </div>
         <div id="prices">
@@ -378,8 +378,8 @@ class REALM_EditAd {
     public function submissionMetabox() { 
         $ad = self::$ad; 
         ?>
-        <input type="checkbox" id="allowSubmission" name="allowSubmission" <?php checked($ad["allowSubmission"]); ?>><label for="allowSubmission"><?php _e("Allow file submission", "reptxtdom"); ?></label><br />
-        <input type="checkbox" id="needGuarantors" name="needGuarantors" <?php checked($ad["needGuarantors"]); disabled(!$ad["allowSubmission"]); ?>><label for="needGuarantors"><?php _e("Need guarantors", "reptxtdom"); ?></label>
+        <input type="checkbox" id="allowSubmission" name="allowSubmission" <?php checked($ad["allowSubmission"]); ?>><label for="allowSubmission"><?php _e("Allow housing file submission", "retxtdom"); ?></label><br />
+        <input type="checkbox" id="needGuarantors" name="needGuarantors" <?php checked($ad["needGuarantors"]); disabled(!$ad["allowSubmission"]); ?>><label for="needGuarantors"><?php _e("Need guarantors", "retxtdom"); ?></label>
     <?php }
     
 }

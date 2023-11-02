@@ -76,7 +76,7 @@ get_header(); ?>
 
             <?php if(defined("PLUGIN_RE_REP") && PLUGIN_RE_REP && current_user_can("customer")) /*replace by get userdata*/{ ?>
             <span id="btnSubscribeAlert" data-nonce="<?=wp_create_nonce("setAlertNonce");?>">
-                <button id="subscribeAlert"><?php _e("Save the search", "reptxtdom"); ?></button>
+                <button id="subscribeAlert"><?php _e("Save the search", "retxtdom"); ?></button>
             </span>
             <?php } ?> 
             </main>

@@ -40,7 +40,7 @@ class REALM_RegisterUserDashboard {
             </tr>
             <tr class="form-field agent">
                 <th scope="row">
-                    <label for="agentAgency"><?php _e("Agent's agency");?></label>
+                    <label for="agentAgency"><?php _e("Agency of the agent");?></label>
                 </th>
                 <td>
                     <select name="agentAgency" id="agencies"">

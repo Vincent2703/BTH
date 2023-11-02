@@ -106,7 +106,7 @@ class REALM_UserModel {
             $orderby = "agentAgency";
             $order = isset($_GET["order"]) && strtolower($_GET['order']) === "asc"?"desc":"asc";
             //$columns["agentAgency"] = '<a href="?role='.$role.'&orderby='.$orderby.'&order='.$order.'">' . __("Agent's agency", "retxtdom") . '</a>';
-            $columns["agentAgency"] = __("Agent's agency", "retxtdom");
+            $columns["agentAgency"] = __("Agency of the agent", "retxtdom");
             unset($columns["posts"]);
             unset($columns["role"]);
         }

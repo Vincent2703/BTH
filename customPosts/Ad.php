@@ -96,12 +96,12 @@ class REALM_Ad {
         //Taxonomy property's type
         register_taxonomy("adTypeProperty", array("re-ad"), array(
             "hierarchical"      => false, 
-            "description"       => __("Create a property type to categorize your ads", "retxtdom"), 
-            "label"             => __("Property types", "retxtdom"), 
+            "description"       => __("Create a type of property to categorize your ads", "retxtdom"), 
+            "label"             => __("Types of property", "retxtdom"), 
             "show_admin_column" => true, 
             "show_in_menu"      => false,
             "show_in_rest"      => true,
-            "singular_label"    => __("Property type", "retxtdom"), 
+            "singular_label"    => __("Type of property", "retxtdom"), 
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
         ));
@@ -147,12 +147,12 @@ class REALM_Ad {
         //Taxonomy ad's type
         register_taxonomy("adTypeAd", array("re-ad"), array(
             "hierarchical"      => false, 
-            "description"       => __("Create an ad type to categorize your ads", "retxtdom"), 
-            "label"             => __("Ad types", "retxtdom"), 
+            "description"       => __("Create a type of ad to categorize your ads", "retxtdom"), 
+            "label"             => __("Types of ad", "retxtdom"), 
             "show_admin_column" => true, 
             "show_in_menu"      => false,
             "show_in_rest"      => true,
-            "singular_label"    => __("Ad type", "retxtdom"), 
+            "singular_label"    => __("Type of ad", "retxtdom"), 
             "rewrite"           => false,
             "meta_box_cb"       => array($this, "taxonomyMetaBoxCB")
         ));
@@ -202,10 +202,10 @@ class REALM_Ad {
                         wp_localize_script("archiveAds", "variables", array(
                             "nonce"            => wp_create_nonce("nonceAlertAPI"),
                             "APIURL"           => get_rest_url(null, PLUGIN_REP_NAME."/v1/alerts"),
-                            "success"          => __("You are subscribed to this alert with success.", "reptxtdom"),
-                            "unknownAddress"   => __("The city is not recognized.", "reptxtdom"),
-                            "sameAlert"        => __("You are already subscribed to this alert.", "reptxtdom"),
-                            "error"            => __("An error occurred, please try again later.", "reptxtdom")
+                            "success"          => __("You are subscribed to this alert with success.", "retxtdom"),
+                            "unknownAddress"   => __("The city is not recognized.", "retxtdom"),
+                            "sameAlert"        => __("You are already subscribed to this alert.", "retxtdom"),
+                            "error"            => __("An error occurred, please try again later.", "retxtdom")
                         ));
                         wp_enqueue_script("archiveAds");
                     }
@@ -220,10 +220,10 @@ class REALM_Ad {
                     wp_localize_script("archiveAds", "variables", array(
                         "nonce"            => wp_create_nonce("nonceAlertAPI"),
                         "APIURL"           => get_rest_url(null, PLUGIN_REP_NAME."/v1/alerts"),
-                        "success"          => __("You are subscribed to this alert with success.", "reptxtdom"),
-                        "unknownAddress"   => __("The city is not recognized.", "reptxtdom"),
-                        "sameAlert"        => __("You are already subscribed to this alert.", "reptxtdom"),
-                        "error"            => __("An error occurred, please try again later.", "reptxtdom")
+                        "success"          => __("You are subscribed to this alert with success.", "retxtdom"),
+                        "unknownAddress"   => __("The city is not recognized.", "retxtdom"),
+                        "sameAlert"        => __("You are already subscribed to this alert.", "retxtdom"),
+                        "error"            => __("An error occurred, please try again later.", "retxtdom")
                     ));
                     wp_enqueue_script("archiveAds");
                 }
@@ -335,7 +335,7 @@ class REALM_Ad {
             } ?>
             
             <select name="agent">
-                <option value=""><?php _e("Agents", "reptxtdom");?></option>
+                <option value=""><?php _e("Agents", "retxtdom");?></option>
                 <?php
                     $current = isset($_GET["agent"])?$_GET["agent"]:'';
                     foreach($agents as $agent) {
@@ -363,7 +363,7 @@ class REALM_Ad {
         unset($columns["date"]);
         $columns["inCharge"] = __("Agent in charge", "retxtdom");
         if(PLUGIN_RE_REP) {
-            $columns["submissions"] = __("Submissions", "reptxtdom");
+            $columns["submissions"] = __("Submissions", "retxtdom");
         }
         $columns["date"] = __("Date", "retxtdom");
         return $columns;
@@ -377,7 +377,7 @@ class REALM_Ad {
             $agentName = get_user_meta($agentID, "first_name", true).' '.get_user_meta($agentID, "last_name", true);
             echo '<a href="'.esc_attr($url).'">'.$agentName."</a>";
         }else if($column === "submissions") {
-            echo boolval(get_post_meta($postID, "adSubmissionsAllowed", true))?__("Yes", "reptxtdom"):__("No", "reptxtdom");
+            echo boolval(get_post_meta($postID, "adSubmissionsAllowed", true))?__("Yes", "retxtdom"):__("No", "retxtdom");
         }
     }
     
@@ -504,7 +504,7 @@ class REALM_Ad {
             $tabs["draft"] = $draftLink;     
             
             $currentTrash = isset($wp_query->query["post_status"]) && $wp_query->query["post_status"]==="trash";
-            $trashLink = '<a'.($currentTrash?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&post_status=trash").'">'.__("Trash", "reptxtdom").'</a><span class="count">('.$nbTrashedAds.')</span>';
+            $trashLink = '<a'.($currentTrash?' class="current" aria-current="page"':'').' href="'.admin_url("edit.php?post_type=re-ad&post_status=trash").'">'.__("Trash", "retxtdom").'</a><span class="count">('.$nbTrashedAds.')</span>';
             $tabs["trash"] = $trashLink;  
                     
             $nbAds = REALM_AdModel::getNbAdsByAgency($currentUserAgencyID);

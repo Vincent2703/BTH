@@ -51,8 +51,18 @@ if(!function_exists("getAddressData")) {
                                             $CPQuery = $matches[0];
                                             $codesPostaux = preg_grep("/^$CPQuery/i", $codesPostaux);
                                         }
-                                        $codesPostaux = array_slice(preg_grep("/^$CPQuery/i", $codesPostaux), 0, 5);
 
+                                        if(count($codesPostaux) > 1) {
+                                            $codesPostaux = array_slice($codesPostaux, 0, 4);
+                                            array_push(
+                                                $arrayCleaned,
+                                                array(
+                                                    "city" => $city["properties"]["city"],
+                                                    "long" => $resultsArrayGeoAPI["centre"]["coordinates"][0],
+                                                    "lat"  => $resultsArrayGeoAPI["centre"]["coordinates"][1]
+                                                )
+                                            );
+                                        }
                                         foreach($codesPostaux as $CP) {
                                             $resultsCleaned["city"] = $city["properties"]["city"];
                                             $resultsCleaned["postCode"] = $CP;

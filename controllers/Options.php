@@ -49,8 +49,8 @@ class REALM_Options {
             <p>Interface de configuration - <?= $pluginName; ?></p>
             <h2 class="nav-tab-wrapper">
                 <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=customFields" class="nav-tab <?= $tab === "customFields" ? "nav-tab-active" : ''; ?>"><?php _e("Custom fields", "retxtdom"); ?></a>
-                <a href="edit-tags.php?taxonomy=adTypeProperty&post_type=re-ad" class="nav-tab <?= $tab === "propertyTypes" ? "nav-tab-active" : ''; ?>"><?php _e("Property types", "retxtdom"); ?></a>
-                <a href="edit-tags.php?taxonomy=adTypeAd&post_type=re-ad" class="nav-tab <?= $tab === "adTypes" ? "nav-tab-active" : ''; ?>"><?php _e("Ad types", "retxtdom"); ?></a>
+                <a href="edit-tags.php?taxonomy=adTypeProperty&post_type=re-ad" class="nav-tab <?= $tab === "propertyTypes" ? "nav-tab-active" : ''; ?>"><?php _e("Types of property", "retxtdom"); ?></a>
+                <a href="edit-tags.php?taxonomy=adTypeAd&post_type=re-ad" class="nav-tab <?= $tab === "adTypes" ? "nav-tab-active" : ''; ?>"><?php _e("Types of ad", "retxtdom"); ?></a>
                 <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=apis" class="nav-tab <?= $tab === "apis" ? "nav-tab-active" : ''; ?>"><?php _e("APIs", "retxtdom"); ?></a>    
                 <a href="edit.php?post_type=re-ad&page=<?=$pageOptions;?>&tab=misc" class="nav-tab <?= $tab === "misc" ? "nav-tab-active" : ''; ?>"><?php _e("Miscellaneous", "retxtdom"); ?></a>
             </h2>

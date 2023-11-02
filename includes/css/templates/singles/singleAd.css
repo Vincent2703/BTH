@@ -161,7 +161,6 @@
 .contentAd .mainFeatures .listFeatures, 
 .contentAd .complementaryFeatures .listFeatures {
     border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 25px;
     border-radius: 10px;
 }
 
@@ -526,12 +525,20 @@
 
 }
 
+@media only screen and (min-width : 700px) {
+    .contentAd .contentDescription {
+        padding: 25px;
+    }
+}
+
 @media only screen and (max-width : 700px) {
     .contentAd .contentLeftAd .mainFeatures ul, .contentAd .contentLeftAd .complementaryFeatures ul {
         columns: 1;
     }
     
-    /*.contentAd .headerContactRight {
-        font-size: 23px;
-    }*/
+    .contentAd .description .contentDescription, 
+    .contentAd .mainFeatures .listFeatures, 
+    .contentAd .complementaryFeatures .listFeatures {
+        padding: 10px;
+    }
 }

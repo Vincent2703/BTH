@@ -581,7 +581,7 @@ class Realm {
         
         //Everywhere in the admin :
         wp_register_script("dismissableNotices", plugins_url(PLUGIN_RE_NAME."/includes/js/others/dismissableNotices.js"), array("jquery"), PLUGIN_RE_VERSION, true);
-        wp_localize_script("dismissableNotices", "translations", array("notBeDisplayedAnymore" => __("This notice will no longer be displayed.", "reptxtdom")));
+        wp_localize_script("dismissableNotices", "translations", array("notBeDisplayedAnymore" => __("This notice will no longer be displayed.", "retxtdom")));
         wp_enqueue_script("dismissableNotices");
     }
     
@@ -728,6 +728,14 @@ class Realm {
      * Fill the notices arrays if needed
      */
     public function checkTheme() {
+        if(wp_is_block_theme()) {
+            $this->createNotice("compatibilityTheme",
+                __('The plugin does not support block themes yet. Please, use a classic theme instead.', "retxtdom"),
+                "error"
+            );
+            return;
+        }
+        
         $currentTheme = wp_get_theme();
         $themeName = str_replace(' ', '', strtolower($currentTheme->name));
         $themeVersion = $currentTheme->version;
